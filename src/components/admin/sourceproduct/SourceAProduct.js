@@ -3,7 +3,7 @@ import { useState } from 'react';
 import img from '@/app/assets/image-badge.png'
 import { IoCloseOutline } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa6";
-import { Image } from 'next/image';
+import Image  from 'next/image';
 const SourceAProduct = () => {
     const [images, setImages] = useState(null);
 
