@@ -72,7 +72,7 @@ export default function SupplierMiddleWareProvider({ children }) {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [router]);
 
     // ✅ Run verifyDropShipperAuth when adminToken changes
 
