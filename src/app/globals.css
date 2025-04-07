@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import "tailwindcss";
+
+.font-lato {
+  font-family: var(--font-lato), sans-serif;
+}
+
+.font-dm-sans {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.font-public-sans {
+  font-family: var(--font-public-sans), sans-serif;
+}
+
+body {
+  font-family: 'Public Sans', sans-serif;
+  background: #F1F5F9 !important;
+}
+
+.container {
+  width: 100%;
+  max-width: 100% !important;
+}
+
+
+.dm {
+  font-family: "DM Sans", sans-serif;
+}
+
+table tr th i {
+  position: relative;
+}
+
+table tr th i::after {
+  content: "";
+  height: 12px;
+  width: 12px;
+  position: absolute;
+  right: -22px;
+  top: 5px;
+  background-image: url(./assets/tablearrow.png);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+@media(min-width:380px) and (max-width:600px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 47.5%);
+    gap: 15px;
+  }
+}
+
+@media(min-width:601px) and (max-width:900px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 31.5%);
+    gap: 15px;
+  }
+}
+
+@media(min-width:901px) and (max-width:1030px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 23.5%);
+    gap: 15px;
+  }
+}
+
+table tr th:last-child i::after {
+  right: 5px;
+  top: 15px;
+}
+
+table tr th:last-child i {
+  position: static;
+}
+
+table tr th:last-child {
+  position: relative;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  background: #F4F7FE;
+  color: var(--foreground);
+  font-family: "DM Sans", sans-serif;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+@media(min-width:2000px) {
+  .container {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+}
+
+.nunito {
+  font-family: "Nunito Sans", sans-serif;
+}
+
+table tr th i {
+  position: relative;
+}
+
+table tr th i::after {
+  content: "";
+  height: 12px;
+  width: 12px;
+  position: absolute;
+  right: -22px;
+  top: 5px;
+  background-image: url(./images/tablearrow.png);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media(max-width:767px) {
+  .container {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+input,
+select {
+  outline: none;
+}
+
+@media(min-width:1024px) and (max-width:1580px) {
+  .sidebar nav ul li button span {
+    font-size: 15px;
+  }
+
+  .sidebar nav ul li button img {
+    max-width: 16px;
+  }
+}
+
+table tr td,
+table tr th {
+  font-size: 15px;
+}
+
+table tr th:last-child i::after {
+  right: 5px;
+  top: 15px;
+}
+
+table tr th:last-child i {
+  position: static;
+}
+
+table tr th:last-child {
+  position: relative;
+}
