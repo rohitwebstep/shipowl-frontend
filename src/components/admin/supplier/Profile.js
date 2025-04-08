@@ -10,7 +10,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState("profile-edit");
 
   const tabs = [
-    { id: "profile-edit", label: "Edit Profile" },
+    { id: "profile-edit", label: "Personal Information" },
     { id: "business-info", label: "Business Information" },
     { id: "account-info", label: "Account Information" },
   ];

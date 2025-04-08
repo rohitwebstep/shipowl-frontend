@@ -3,7 +3,7 @@ import { Bell, Menu } from 'lucide-react';
 import Image from 'next/image';
 import { IoIosArrowDown } from "react-icons/io";
 import user from "@/app/images/userimage.png";
-
+import { FaSignOutAlt } from 'react-icons/fa';
 const Header = () => {
   return (
     <nav className="fixed rounded-xl lg:mt-3 lg:relative top-0 left-0 w-full bg-white   p-4 flex items-center justify-between lg:shadow-none">
@@ -28,6 +28,12 @@ const Header = () => {
           <div className="flex gap-2 items-center">
             <Image src={user} alt="User" className="w-8 h-8 rounded-full" />
             <IoIosArrowDown className="text-gray-600" />
+            <button
+              onClick={() => localStorage.removeItem('shippingData')}
+              className="bg-orange-500 p-1 rounded-full h-10 w-10 flex items-center justify-center"
+            >
+              <FaSignOutAlt className="text-white" />
+            </button>
           </div>
         </div>
       </div>

@@ -174,7 +174,7 @@ const Products = () => {
 
 
                 </div>
-                <div className="flex  lg:w-1/12  justify-end items-end">
+                <div className="flex  mt-3 lg:mt-0 lg:w-1/12  justify-end items-end">
                     <button className="bg-[#F98F5C] text-white px-6 py-3 rounded-lg text-sm">
                         Save
                     </button>

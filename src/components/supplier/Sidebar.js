@@ -60,7 +60,7 @@ export default function Sidebar() {
 
             {/* Sidebar Panel */}
             <aside 
-                className={`fixed top-0 left-0 w-72 sidebar rounded-md  bg-white z-50 shadow-lg lg:w-full   transition-transform duration-300 ease-in-out 
+                className={`fixed top-0 left-0 w-72 sidebar rounded-md h-[500px] lg:h-full overflow-auto   bg-white z-50 shadow-lg lg:w-full   transition-transform duration-300 ease-in-out 
                 ${isSidebarOpen ? "translate-x-0 lg:h-full" : "-translate-x-full lg:h-full"} lg:translate-x-0 lg:relative lg:h-full`}
             >
                 {/* Sidebar Header */}
@@ -78,7 +78,7 @@ export default function Sidebar() {
                 <nav className="p-3 h-full">
                     <ul className="space-y-1">
                         {menuItems.map((item) => {
-                            const isActive = pathname === item.href;
+                            const isActive = pathname === item.href.concat('/');
                             return (
                                 <li key={item.name} className="my-2 w-full">
                                     <Link href={item.href} className="w-full">

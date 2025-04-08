@@ -22,10 +22,10 @@ const products = [
 export default function NewProducts() {
   return (
     <div className="">
-      <div className="flex flex-wrap lg:justify-end space-x-3 gap-3 justify-center mb-6">
-        <button className="bg-[#05CD99] text-white px-8 py-2 rounded-md">Export</button>
-        <button className="bg-[#3965FF] text-white px-8 py-2 rounded-md">Import</button>
-        <button className="bg-[#F98F5C] text-white px-8 py-2 rounded-md">Add New</button>
+      <div className="flex flex-wrap md:justify-end  gap-3 justify-center mb-6">
+        <button className="bg-[#05CD99] text-white lg:px-8 p-4 py-2 rounded-md">Export</button>
+        <button className="bg-[#3965FF] text-white lg:px-8 p-4 py-2 rounded-md">Import</button>
+        <button className="bg-[#F98F5C] text-white lg:px-8 p-4 py-2 rounded-md">Add New</button>
       </div>
       <div className="grid lg:grid-cols-4 md:grid-cols-2 products-grid gap-6">
         {products.map((product) => (

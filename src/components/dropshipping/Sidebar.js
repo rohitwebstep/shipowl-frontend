@@ -15,11 +15,11 @@ import {
   Volume2,
   MapPin,
   ChevronDown,
-  Menu,
   X
 } from "lucide-react";
 import Image from "next/image";
 import Logo from "@/app/assets/Shipowl-logo1.png";
+import { HiBars3CenterLeft } from "react-icons/hi2";
 
 const menuItems = [
   { name: "Home", icon: Home, href: "/dropshipping", section: "MENU" },
@@ -40,9 +40,9 @@ const menuItems = [
   { name: "Manage NDR", icon: FileText, href: "/dropshipping/manage-ndr", section: "MENU" },
   { name: "High RTO Pincode", icon: MapPin, href: "/dropshipping/high-rto-pincode", section: "OTHERS" },
   { name: "Boosters", icon: Volume2, href: "/dropshipping/boosters", section: "OTHERS" },
-  { name: "Integrations", icon: Link, href: "/dropshipping/integrations", section: "OTHERS" },
+  { name: "Integrations", icon: Link, href: "/dropshipping/Integration", section: "OTHERS" },
   { name: "Settings", icon: Settings, href: "/dropshipping/settings", section: "OTHERS" },
-  { name: "Terms & Conditions", icon: FileText, href: "/dropshipping/terms", section: "OTHERS" }
+  { name: "Terms & Conditions", icon: FileText, href: "/dropshipping/term-and-condition", section: "OTHERS" }
 ];
 
 const Sidebar = () => {
@@ -71,7 +71,7 @@ const Sidebar = () => {
         className="fixed top-4 left-5 z-50 p-2 lg:hidden"
         onClick={() => setIsSidebarOpen(true)}
       >
-        <Menu className="w-6 h-6 text-white" />
+        <HiBars3CenterLeft className="w-6 h-6 text-white" />
       </button>
 
       {isSidebarOpen && (
@@ -82,7 +82,7 @@ const Sidebar = () => {
       )}
 
       <aside
-        className={`fixed top-0 left-0 w-72 h-screen bg-white z-50 rounded-xl lg:w-full shadow-lg p-4 transform transition-transform duration-300 ease-in-out
+        className={`fixed top-0 left-0 w-72 sidebar h-[500px] lg:h-full overflow-auto   bg-white z-50 rounded-xl lg:w-full shadow-lg p-4 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         lg:translate-x-0 lg:relative w-64 lg:h-full`}
       >
@@ -122,7 +122,7 @@ const Sidebar = () => {
                           href={item.href}
                           onClick={() => setIsSidebarOpen(false)}
                           className={`font-lato font-medium flex items-center text-[#2C3454] p-3 rounded-md hover:bg-[#2C3454] hover:text-white hover:border-[#F98F5C] border-l-4 
-                          ${pathname === item.href ? "bg-[#2C3454] text-white border-[#F98F5C]" : "bg-[#F0F1F3] border-[#667085]"}`}
+                          ${pathname === item.href.concat('/') ? "bg-[#2C3454] text-white border-[#F98F5C]" : "bg-[#F0F1F3] border-[#667085]"}`}
                         >
                           <item.icon className="w-5 h-5 mr-2" /> {item.name}
                         </a>

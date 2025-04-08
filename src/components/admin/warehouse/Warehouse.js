@@ -72,117 +72,117 @@ export default function Warehouse() {
                     <table className="w-full">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 whitespace-nowrap text-left font-normal">Warehouse Name<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left font-normal">Contact Name<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left font-normal">Address<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left font-normal">Pickup Address<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left font-normal">RTO Address<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left font-normal">Action<i></i></th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Warehouse Name<i></i></th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Contact Name<i></i></th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Address<i></i></th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Pickup Address<i></i></th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">RTO Address<i></i></th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Action<i></i></th>
                             </tr>
                         </thead>
                         <tbody>
                             {currentData.map((item) => (
-                                <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                    <td className="p-2 whitespace-nowrap"> <div className="flex items-center">
-                                        <label className="flex items-center cursor-pointer me-2">
-                                            <input
-                                                type="checkbox"
-                                                checked={selected.includes(item.id)}
-                                                onChange={() => handleCheckboxChange(item.id)}
-                                                className="peer hidden"
-                                            />
-                                            <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                            peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                                <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                            </div>
-                                        </label>
-                                        {item.name}
-                                    </div></td>
-                                    <td className="p-2 whitespace-nowrap">{item.contact_name}<br />
-                                        {item.contact_number}</td>
-                                    <td className="p-2 whitespace-nowrap">
-                                        {(() => {
-                                            const parts = item.address.split(",");
-
-                                            if (parts.length > 2) {
-                                                const firstPart = parts.slice(0, 2).join(",") + ","; // First 2 segments
-                                                const remaining = parts.slice(2).join(","); // Remaining part after 2nd comma
-
-                                                // Now split the remaining part again
-                                                const remainingParts = remaining.split(",");
-
-                                                if (remainingParts.length > 2) {
-                                                    return (
-                                                        <>
-                                                            {firstPart}
-                                                            <br />
-                                                            {remainingParts.slice(0, 2).join(",")},{" "}
-                                                            <br />
-                                                            {remainingParts.slice(2).join(",")}
-                                                        </>
-                                                    );
-                                                }
-
-                                                return (
-                                                    <>
-                                                        {firstPart}
-                                                        <br />
-                                                        {remaining}
-                                                    </>
-                                                );
-                                            }
-
-                                            return item.address; // If not enough commas, return full address
-                                        })()}
-                                    </td>
-
-
-                                    <td className="p-2">
-                                        <div className="flex items-center mb-4">
-                                            <label className="flex items-center cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    className="sr-only"
-                                                    checked={item.pickup_address}
-                                                    readOnly
-                                                />
-                                                <div
-                                                    className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.pickup_address ? "bg-orange-500" : ""
-                                                        }`}
-                                                >
-                                                    <div
-                                                        className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.pickup_address ? "translate-x-5" : ""
-                                                            }`}
-                                                    ></div>
-                                                </div>
-
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td className="p-2">
-                                        <div className="flex items-center mb-4">
-                                            <label className="flex items-center cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    className="sr-only"
-                                                    checked={item.rto_address}
-                                                    readOnly
-                                                />
-                                                <div
-                                                    className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.rto_address ? "bg-orange-500" : ""
-                                                        }`}
-                                                >
-                                                    <div
-                                                        className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.rto_address ? "translate-x-5" : ""
-                                                            }`}
-                                                    ></div>
-                                                </div>
-
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td className="p-2 text-[#8F9BBA]"><MdModeEdit /></td>
-                                </tr>
+                                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                 <td className="p-2 whitespace-nowrap px-5"> <div className="flex items-center">
+                                   <label className="flex items-center cursor-pointer me-2">
+                                     <input
+                                       type="checkbox"
+                                       checked={selected.includes(item.id)}
+                                       onChange={() => handleCheckboxChange(item.id)}
+                                       className="peer hidden"
+                                     />
+                                     <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                                                                           peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                       <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                     </div>
+                                   </label>
+                                   {item.name}
+                                 </div></td>
+                                 <td className="p-2 whitespace-nowrap px-5">{item.contact_name}<br />
+                                   {item.contact_number}</td>
+                                 <td className="p-2 whitespace-nowrap px-5">
+                                   {(() => {
+                                     const parts = item.address.split(",");
+               
+                                     if (parts.length > 2) {
+                                       const firstPart = parts.slice(0, 2).join(",") + ","; // First 2 segments
+                                       const remaining = parts.slice(2).join(","); // Remaining part after 2nd comma
+               
+                                       // Now split the remaining part again
+                                       const remainingParts = remaining.split(",");
+               
+                                       if (remainingParts.length > 2) {
+                                         return (
+                                           <>
+                                             {firstPart}
+                                             <br />
+                                             {remainingParts.slice(0, 2).join(",")},{" "}
+                                             <br />
+                                             {remainingParts.slice(2).join(",")}
+                                           </>
+                                         );
+                                       }
+               
+                                       return (
+                                         <>
+                                           {firstPart}
+                                           <br />
+                                           {remaining}
+                                         </>
+                                       );
+                                     }
+               
+                                     return item.address; // If not enough commas, return full address
+                                   })()}
+                                 </td>
+               
+               
+                                 <td className="p-2 px-5">
+                                   <div className="flex items-center mb-4">
+                                     <label className="flex items-center cursor-pointer">
+                                       <input
+                                         type="checkbox"
+                                         className="sr-only"
+                                         checked={item.pickup_address}
+                                         readOnly
+                                       />
+                                       <div
+                                         className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.pickup_address ? "bg-orange-500" : ""
+                                           }`}
+                                       >
+                                         <div
+                                           className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.pickup_address ? "translate-x-5" : ""
+                                             }`}
+                                         ></div>
+                                       </div>
+               
+                                     </label>
+                                   </div>
+                                 </td>
+                                 <td className="p-2 px-5">
+                                   <div className="flex items-center mb-4">
+                                     <label className="flex items-center cursor-pointer">
+                                       <input
+                                         type="checkbox"
+                                         className="sr-only"
+                                         checked={item.rto_address}
+                                         readOnly
+                                       />
+                                       <div
+                                         className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.rto_address ? "bg-orange-500" : ""
+                                           }`}
+                                       >
+                                         <div
+                                           className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.rto_address ? "translate-x-5" : ""
+                                             }`}
+                                         ></div>
+                                       </div>
+               
+                                     </label>
+                                   </div>
+                                 </td>
+                                 <td className="p-2 px-5 text-[#8F9BBA]"><MdModeEdit /></td>
+                               </tr>
                             ))}
                         </tbody>
                     </table>

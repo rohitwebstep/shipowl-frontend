@@ -25,12 +25,12 @@ const NewlyLaunched = () => {
                     <Link href="/dropshipping/product-list" className="text-[16px] text-[#222222] hover:text-orange-500 flex items-center gap-2 font-lato">View All <IoIosArrowForward className='text-[#F98F5C]' /></Link>
                 </div>
                 <div className="md:w-[293px] border-b-3 border-[#F98F5C] mt-1 mb-4"></div>
-                <div className="products-grid grid xl:grid-cols-5 lg:grid-cols-4  gap-4  xl:gap-10 lg:gap-4">
+                <div className="products-grid grid xl:grid-cols-5 lg:grid-cols-4  gap-4  xl:gap-6 lg:gap-4">
                     {/* First Card */}
                     <div className="h-full rounded-xl shadow-xl overflow-hidden">
                         <Image src={product} alt="Best of Newly Launched" className="w-full max-h-[248px] object-cover" />
-                        <div className=" bg-[#212B36] bg-opacity-50  p-4 text-center text-white">
-                            <p className="text-[18px] font-semibold font-lato">Best of Newly Launched</p>
+                        <div className=" bg-[#212B36] bg-opacity-50  p-4 px-2 text-center text-white">
+                            <p className="text-[16px] font-semibold font-lato">Best of Newly Launched</p>
                             <p className="text-[15px] text-[#F98F5C] font-lato">10+ Products</p>
                         </div>
                     </div>

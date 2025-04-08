@@ -21,7 +21,7 @@ export default function Dashboard() {
   return (
     <>
       <div>
-        <div className="md:flex gap-4 justify-between">
+        <div className="md:flex gap-4 justify-between items-baseline">
           <DashboardCards />
           <DailyDeliveryChart />
           <OrdersLineChart />

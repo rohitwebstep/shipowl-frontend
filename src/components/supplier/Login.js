@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from 'next/navigation'; // ✅ Correct import for Next.js 13
-import { useState ,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/app/images/logo.png";
@@ -19,20 +19,25 @@ export default function Login() {
     const handlePasswordChange = (e) => setPassword(e.target.value);
     const handleEmailChange = (e) => setEmail(e.target.value);
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+
     useEffect(() => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
         const token = supplierData?.security?.token;
-
-        if (!supplierData?.project?.active_panel == "supplier") {
-            localStorage.clear("shippingData");
+    
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
             router.push("/supplier/auth/login");
+            return;
         }
-
+    
         if (token && verifySupplierAuth()) {
             router.push("/supplier");
         }
+    
+    }, []); // empty array = run only once
+    
 
-    }, [router,verifySupplierAuth])
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
@@ -96,12 +101,12 @@ export default function Login() {
 
 
     return (
-        <div className="md:flex h-screen w-full">
+        <div className="md:flex h-screen w-full ">
             {/* Left Section */}
-            <div className="md:w-1/2 relative md:flex md:flex-col justify-center items-center px-3 bg-white lg:px-12">
+            <div className="md:w-1/2 relative md:p-0 p-6 md:flex md:flex-col justify-center items-center px-3 bg-white lg:px-12">
                 <div className="w-full max-w-sm">
-                    <div className="absolute top-7">
-                        <Link href="/admin" className="text-[#A3AED0] text-sm mb-6 inline-block">
+                    <div className="lg:absolute top-7">
+                        <Link href="/supplier" className="text-[#A3AED0] text-sm mb-6 inline-block">
                             ← Back to dashboard
                         </Link>
                     </div>

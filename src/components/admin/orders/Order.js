@@ -73,18 +73,18 @@ export default function Order() {
                 <label className="block  font-bold text-gray-700">
                     Select Supplier
                 </label>
-                <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg ">
+                <select className="w-full mt-1 px-3 py-2 border-[#DFEAF2] bg-white border rounded-lg ">
                     <option></option>
                 </select>
             </div>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 px-3 md:px-0 gap-4 mb-4">
-                    <div> <label className='text-[#232323] font-semibold block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
                     <div className="flex gap-2 items-end">
                         <button className="bg-blue-600 text-white px-6 py-3 rounded-md">Apply</button>
                         <button className="bg-red-500 text-white px-6 py-3 rounded-md">Reset</button>
@@ -94,12 +94,12 @@ export default function Order() {
                 <div className="flex flex-wrap gap-2 mb-4 items-end justify-normal ">
                     <div className='lg:w-[150px]'>
                         <label className='text-[#232323] font-semibold block'>Status:</label>
-                        <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl">
+                        <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl">
                             <option value="All">All</option>
                         </select>
                     </div>
                     <div className='lg:w-2/12'> <label className='text-[#232323] font-semibold block'>Select Model</label>
-                        <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl">
+                        <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl">
                             <option value="Warehouse Model">Warehouse Model</option>
                         </select>
                     </div>

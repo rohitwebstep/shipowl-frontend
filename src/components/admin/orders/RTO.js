@@ -75,25 +75,25 @@ export default function RTO() {
     return (
         <div className='px-2 md:px-0'>
             <div>
-                <div className="w-full py-3">
+                <div className="w-full py-2">
                     <label className="block  font-bold text-gray-700">
                         Select Supplier
                     </label>
-                    <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg ">
+                    <select className="w-full mt-1 px-2 py-2 border-[#DFEAF2] bg-white border rounded-lg ">
                         <option></option>
                     </select>
                 </div>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mb-4">
-                    <div> <label className='text-[#232323] font-semibold block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-semibold block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
                     <div className="flex gap-2 items-end">
-                        <button className="bg-blue-600 text-white px-6 py-3 rounded-md">Apply</button>
-                        <button className="bg-red-500 text-white px-6 py-3 rounded-md">Reset</button>
+                        <button className="bg-blue-600 text-white px-6 py-2 rounded-md">Apply</button>
+                        <button className="bg-red-500 text-white px-6 py-2 rounded-md">Reset</button>
                     </div>
                 </div>
 
@@ -103,24 +103,24 @@ export default function RTO() {
                     <div className="grid md:grid-cols-3 gap-3 lg:w-8/12 grid-cols-1 items-end justify-between">
                         <div>
                             <label className='text-[#232323] font-semibold block'>Status:</label>
-                            <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-3 rounded-xl">
+                            <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
                                 <option value="All">All</option>
                             </select>
                         </div>
                         <div > <label className='text-[#232323] font-semibold block'>Select Model</label>
-                            <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl">
+                            <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl">
                                 <option value="Warehouse Model">Warehouse Model</option>
                             </select>
                         </div>
                         <div > <label className='text-[#232323] font-semibold block'>Select Dropshipper</label>
-                            <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-3 rounded-xl">
+                            <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
                                 <option value="John Doe (john@gmail.com)">John Doe (john@gmail.com)</option>
                             </select>
                         </div>
                     </div>
                     <div className='lg:w-4/12 mt-3 lg:mt-0 flex justify-end gap-3'>
-                        <button className="bg-[#4C82FF] text-white font-medium px-6 py-3 rounded-md text-sm">Filter</button>
-                        <button className="bg-[#F98F5C] text-white font-medium px-6 py-3 rounded-md text-sm">Export</button>
+                        <button className="bg-[#4C82FF] text-white font-medium px-6 py-2 rounded-md text-sm">Filter</button>
+                        <button className="bg-[#F98F5C] text-white font-medium px-6 py-2 rounded-md text-sm">Export</button>
                     </div>
                 </div>
             </div>

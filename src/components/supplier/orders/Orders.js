@@ -71,13 +71,13 @@ export default function Orders() {
       <div>
 
         <div className="grid lg:grid-cols-4 md:grid-cols-2 px-3 md:px-0 gap-4 mb-4">
-          <div> <label className='text-[#232323]  block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
           <div className="flex gap-2 items-end">
             <button className="bg-blue-600 text-white px-6 py-3 rounded-md">Apply</button>
             <button className="bg-red-500 text-white px-6 py-3 rounded-md">Reset</button>
@@ -87,12 +87,12 @@ export default function Orders() {
         <div className="flex flex-wrap gap-2 mb-4 items-end justify-normal ">
           <div className='lg:w-[150px]'>
             <label className='text-[#232323]  block'>Status:</label>
-            <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl">
+            <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl">
               <option value="All">All</option>
             </select>
           </div>
           <div className='lg:w-2/12'> <label className='text-[#232323]  block'>Select Model</label>
-            <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl">
+            <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl">
               <option value="Warehouse Model">Warehouse Model</option>
             </select>
           </div>
@@ -111,7 +111,7 @@ export default function Orders() {
       <div className="bg-white p-4 rounded-2xl">
         <div className="flex flex-wrap justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-[#2B3674] font-dm-sans">RTO Order Details</h2>
-          <div className="flex gap-3  flex-wrap items-center">
+          <div className="flex gap-2  flex-wrap items-center">
             <span className="font-bold text-[#2B3674]  font-dm-sans">Clear Filters</span>
             <span><IoMdRefresh className="text-red-600 text-xl" /></span>
             <span><IoSettingsOutline className="text-xl" /></span>
@@ -142,25 +142,25 @@ export default function Orders() {
           <table className="w-full border-collapse">
             <thead className="">
               <tr className="text-[#A3AED0]  border-b  border-[#E9EDF7]">
-                <th className="p-3 whitespace-nowrap font-medium text-left">Order ID <i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Name<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Payment Info<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Order Tags<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Seller Tags<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Shipment Details<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">SLA<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-center">Action<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Order ID <i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Name<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Payment Info<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Order Tags<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Seller Tags<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Shipment Details<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">SLA<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-center">Action<i></i></th>
               </tr>
             </thead>
             <tbody>
               {currentData.map((order) => (
                 <tr key={order.id} className="text-[#8F9BBA]  border-b  border-[#E9EDF7] align-top">
-                  <td className="p-3 whitespace-nowrap"><input type="checkbox" name="" id="" className='me-2' /><b className='text-black truncate'>{order.id}</b><br />
+                  <td className="p-2 whitespace-nowrap"><input type="checkbox" name="" id="" className='me-2' /><b className='text-black truncate'>{order.id}</b><br />
                     <span className="font-bold text-xs">
                       {order.date}</span></td>
-                  <td className="p-3 font-bold whitespace-nowrap"><span className='text-[#2B3674]'>{order.product}</span><br /><span className=" text-sm">SKU: {order.sku}<br /> Qty: {order.qty}</span></td>
-                  <td className="p-3 font-bold whitespace-nowrap"> <span className='text-[#2B3674]'>COD:{order.cod}</span><br /> <span className="text-[#8F9BBA]">Order Value:{order.orderValue}</span><span className="text-red-500 block">{order.status}</span></td>
-                  <td className="p-3 space-y-1 whitespace-nowrap">
+                  <td className="p-2 font-bold whitespace-nowrap"><span className='text-[#2B3674]'>{order.product}</span><br /><span className=" text-sm">SKU: {order.sku}<br /> Qty: {order.qty}</span></td>
+                  <td className="p-2 font-bold whitespace-nowrap"> <span className='text-[#2B3674]'>COD:{order.cod}</span><br /> <span className="text-[#8F9BBA]">Order Value:{order.orderValue}</span><span className="text-red-500 block">{order.status}</span></td>
+                  <td className="p-2 space-y-1 whitespace-nowrap">
                     {order.tags.map((tag, i) => (
                       <span
                         key={i}
@@ -173,12 +173,12 @@ export default function Orders() {
                       </span>
                     ))}
                   </td>
-                  <td className="p-3 font-medium whitespace-nowrap"><span className='text-[#2B3674] font-medium'>{order.seller_tags || 'NA'}</span></td>
-                  <td className="p-3 font-medium whitespace-nowrap"><span className='text-[#2B3674] font-medium'>{order.shipment.id}</span><br />
+                  <td className="p-2 font-medium whitespace-nowrap"><span className='text-[#2B3674] font-medium'>{order.seller_tags || 'NA'}</span></td>
+                  <td className="p-2 font-medium whitespace-nowrap"><span className='text-[#2B3674] font-medium'>{order.shipment.id}</span><br />
                     <span className="text-[#05CD99] font-medium">{order.shipment.status}</span>
                     <br /><span className='font-medium'>{order.shipment.provider}</span><br /><span className="text-sm font-bold">{order.shipment.date}</span></td>
-                  <td className="p-3 font-bold text-[#2B3674] whitespace-nowrap">{order.sla}<span className='block text-green-400 font-normal'>{order.sla_date}</span></td>
-                  <td className=" p-3 whitespace-nowrap">
+                  <td className="p-2 font-bold text-[#2B3674] whitespace-nowrap">{order.sla}<span className='block text-green-400 font-normal'>{order.sla_date}</span></td>
+                  <td className=" p-2 whitespace-nowrap">
                     <ul className=" flex gap-2 justify-between">
                       <li><RiFileEditFill className=" text-black text-2xl" /></li>
                       <li><IoCloudDownloadOutline className=" text-black text-2xl" /></li>

@@ -77,13 +77,13 @@ export default function Rto() {
       <div>
 
         <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mb-4">
-          <div> <label className='text-[#232323]  block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
-          <div> <label className='text-[#232323]  block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+          <div> <label className='text-[#232323]  block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
           <div className="flex gap-2 items-end">
             <button className="bg-blue-600 text-white px-6 py-3 rounded-md">Apply</button>
             <button className="bg-red-500 text-white px-6 py-3 rounded-md">Reset</button>
@@ -96,17 +96,17 @@ export default function Rto() {
           <div className="grid md:grid-cols-3 gap-3 lg:w-8/12 grid-cols-1 items-end justify-between">
             <div>
               <label className='text-[#232323]  block'>Status:</label>
-              <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-3 rounded-xl">
+              <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
                 <option value="All">All</option>
               </select>
             </div>
             <div > <label className='text-[#232323]  block'>Select Model</label>
-              <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-3 rounded-xl">
+              <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl">
                 <option value="Warehouse Model">Warehouse Model</option>
               </select>
             </div>
             <div > <label className='text-[#232323]  block'>Select Dropshipper</label>
-              <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-3 rounded-xl">
+              <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
                 <option value="John Doe (john@gmail.com)">John Doe (john@gmail.com)</option>
               </select>
             </div>
@@ -152,7 +152,7 @@ export default function Rto() {
           <table className="w-full border-collapse">
             <thead className="">
               <tr className="text-[#A3AED0]  border-b  border-[#E9EDF7]">
-                <th className="p-3 px-5 whitespace-nowrap font-medium text-left">
+                <th className="p-2 px-5 whitespace-nowrap font-medium text-left">
                   <div className='flex gap-2 items-center'>
 
                     <label className="flex items-center  cursor-pointer me-2">
@@ -168,21 +168,21 @@ export default function Rto() {
                     <span>Order ID <i></i></span>
                   </div>
                 </th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Name<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Payment Info<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Model<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Shipment Details<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Return tracking number<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Return status<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-left">Return Date<i></i></th>
-                <th className="p-3 whitespace-nowrap font-medium text-center">Action<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Name<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Payment Info<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Model<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Shipment Details<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Return tracking number<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Return status<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-left">Return Date<i></i></th>
+                <th className="p-2 whitespace-nowrap font-medium text-center">Action<i></i></th>
               </tr>
             </thead>
             <tbody>
               {currentData.map((order) => (
                 <tr key={order.id} className="text-[#8F9BBA] border-b align-top  border-[#E9EDF7]">
 
-                  <td className="p-3 whitespace-nowrap px-5"> <div className="flex items-start  gap-2">
+                  <td className="p-2 whitespace-nowrap px-5"> <div className="flex items-start  gap-2">
                     <label className="flex items-center mt-2 cursor-pointer me-2">
                       <input
                         type="checkbox"
@@ -205,9 +205,9 @@ export default function Rto() {
 
                   </td>
 
-                  <td className="p-3 font-bold whitespace-nowrap"><span className='text-[#2B3674]'>{order.product}</span><br /><span className=" text-sm">SKU: {order.sku}<br /> Qty: {order.qty}</span></td>
-                  <td className="p-3 font-bold whitespace-nowrap"> <span className='text-[#2B3674]'>COD:{order.cod}</span><br /> <span className="text-[#8F9BBA]">Order Value:{order.orderValue}</span></td>
-                  <td className="p-3 space-y-1 whitespace-nowrap">
+                  <td className="p-2 font-bold whitespace-nowrap"><span className='text-[#2B3674]'>{order.product}</span><br /><span className=" text-sm">SKU: {order.sku}<br /> Qty: {order.qty}</span></td>
+                  <td className="p-2 font-bold whitespace-nowrap"> <span className='text-[#2B3674]'>COD:{order.cod}</span><br /> <span className="text-[#8F9BBA]">Order Value:{order.orderValue}</span></td>
+                  <td className="p-2 space-y-1 whitespace-nowrap">
                     {order.tags.map((tag, i) => (
                       <span
                         key={i}
@@ -219,14 +219,14 @@ export default function Rto() {
                     ))}
                   </td>
 
-                  <td className="whitespace-nowrap p-3 font-medium "><span className='text-[#2B3674] font-medium'>{order.shipment.id}</span><br />
+                  <td className="whitespace-nowrap p-2 font-medium "><span className='text-[#2B3674] font-medium'>{order.shipment.id}</span><br />
                     <span className="text-[#05CD99] font-medium">{order.shipment.status}</span>
                     <br /><span className='font-medium'>{order.shipment.provider}</span><br /><span className="text-sm font-bold">{order.shipment.date}</span></td>
 
-                  <td className="p-3 text-[#2B3674] font-bold whitespace-nowrap">{order.returnTracking}</td>
-                  <td className="p-3  whitespace-nowrap"><span className={`rounded-md p-2 px-3 ${order.returnStatus == "Returned" ? "bg-[#00b69b36] text-[#00B69B]" : "bg-[#f98e5c2c] text-[#F98F5C]"}`}>{order.returnStatus}</span></td>
-                  <td className="p-3 font-bold whitespace-nowrap text-[#2B3674]">{order.returnDate}</td>
-                  <td className=" p-3 whitespace-nowrap">
+                  <td className="p-2 text-[#2B3674] font-bold whitespace-nowrap">{order.returnTracking}</td>
+                  <td className="p-2  whitespace-nowrap"><span className={`rounded-md p-2 px-3 ${order.returnStatus == "Returned" ? "bg-[#00b69b36] text-[#00B69B]" : "bg-[#f98e5c2c] text-[#F98F5C]"}`}>{order.returnStatus}</span></td>
+                  <td className="p-2 font-bold whitespace-nowrap text-[#2B3674]">{order.returnDate}</td>
+                  <td className=" p-2 whitespace-nowrap">
                     <ul className=" flex gap-2 justify-between">
                       <li><RiFileEditFill className=" text-black text-2xl" /></li>
                       <li><IoCloudDownloadOutline className=" text-black text-2xl" /></li>

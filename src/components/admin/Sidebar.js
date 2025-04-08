@@ -37,6 +37,11 @@ export default function Sidebar() {
         }));
     };
 
+
+    const isSubMenuActive = (subMenu) => {
+        return subMenu?.some((subItem) => pathname === subItem.href);
+    };
+
     const menuSections = [
         {
             title: "Supplier Dashboard",
@@ -57,10 +62,10 @@ export default function Sidebar() {
                 { name: "Orders", icon: ShoppingCart, href: "/admin/supplier/orders" },
                 { name: "Warehouse", icon: Warehouse, href: "/admin/supplier/warehouse/list" },
                 { name: "RTO Orders", icon: ClipboardList, href: "/admin/supplier/orders/rto-orders" },
-                { name: "Profile", icon: User, href: "/profile" },
-                { name: "Settings", icon: Settings, href: "/settings" },
-                { name: "Billings", icon: BadgeDollarSign, href: "/billings" },
-                { name: "Payment", icon: CreditCard, href: "/payment" },
+                { name: "Profile", icon: User, href: "/admin/profile" },
+                { name: "Settings", icon: Settings, href: "/admin/setting" },
+                { name: "Billings", icon: BadgeDollarSign, href: "/admin/billing" },
+                { name: "Payment", icon: CreditCard, href: "/admin/payments" },
                 { name: "Terms & Condition", icon: ShieldCheck, href: "/terms" },
             ],
         },
@@ -85,8 +90,8 @@ export default function Sidebar() {
 
     return (
         <>
-            <div className="fixed top-0 w-full left-0 z-50 p-2 bg-white rounded-lg lg:hidden shadow-md">
-                <div className="flex justify-between items-center">
+            <div className="fixed top-0 w-full left-0 z-50 p-2 lg:p-0 bg-white rounded-lg  lg:hidden shadow-md">
+                <div className="flex justify-between  items-center">
                     <Image src={logo} alt="ShipOwl Logo" className="max-w-[100px]" />
                     <button onClick={() => setIsSidebarOpen(true)}>
                         <Menu className="w-8 h-8 text-[#2C3454]" />
@@ -102,11 +107,11 @@ export default function Sidebar() {
             )}
 
             <aside
-                className={`fixed top-0 left-0 w-72 bg-white z-50 shadow-lg lg:w-full transition-transform duration-300 ease-in-out 
-                ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+                className={`fixed top-0 left-0 w-72 sidebar bg-white z-50 shadow-lg lg:w-full  rounded-lg transition-transform duration-300 ease-in-out 
+                ${isSidebarOpen ? "translate-x-0 h-[500px] overflow-auto " : "-translate-x-full"} 
                 lg:translate-x-0 lg:relative lg:h-full`}
             >
-                <div className="flex items-center justify-between p-5 border-b border-[#F4F7FE]">
+                <div className="flex items-center justify-between p-5 lg:justify-center border-b border-[#F4F7FE]">
                     <Image src={logo} alt="ShipOwl Logo" className="max-w-[150px]" />
                     <button className="lg:hidden p-1" onClick={() => setIsSidebarOpen(false)}>
                         <X className="w-6 h-6 text-[#2C3454]" />
@@ -118,21 +123,21 @@ export default function Sidebar() {
                         <li>
                             <Link href="/admin">
                                 <button
-                                    className={`font-medium flex gap-2 items-center w-full p-3 rounded-lg hover:bg-[#2C3454] hover:text-white 
-                                    ${pathname === "/admin" ? "bg-[#2C3454] text-white" : "bg-[#F0F1F3] text-[#2C3454]"}`}
+                                    className={`font-medium flex gap-2 border-l-4 items-center w-full p-2 rounded-lg hover:bg-[#2C3454] hover:text-white 
+                                    ${pathname === "/admin/" ? "bg-[#131a44] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44c9] text-[#2C3454]"}`}
                                     onClick={() => setIsSidebarOpen(false)}
                                 >
                                     <Home className="w-5 h-5" />
-                                    <span>Dashboard</span>
+                                    <span className="font-medium text-lg">Dashboard</span>
                                 </button>
                             </Link>
                         </li>
 
                         {menuSections.map((section) => (
-                            <div key={section.title}>
+                            <li key={section.title}>
                                 <Link href={section.href}>
                                     <button
-                                        className={`font-semibold text-sm uppercase text-[#2C3454] w-full flex items-center gap-2 p-2 px-3 mb-1`}
+                                        className={`font-medium text-lg lg:text-[13px] md:text-[12px] uppercase text-[#2C3454] w-full flex items-center gap-2 p-2 px-0  mb-1`}
                                         onClick={() => setIsSidebarOpen(false)}
                                     >
                                         <section.icon className="w-4 h-4" />
@@ -140,32 +145,29 @@ export default function Sidebar() {
                                     </button>
                                 </Link>
 
-                                <ul className="px-2 space-y-1">
+                                <ul className=" space-y-1">
                                     {section.children.map((item) => (
-                                        <div key={item.name}>
-                                             <Link href={item.href}>
-                                            <button
-                                                onClick={() => {
-                                                    if (item.subMenu) {
-                                                        toggleSubMenu(item.name);
-                                                    } else {
-                                                        setIsSidebarOpen(false);
-                                                    }
-                                                }}
-                                                className={`flex justify-between items-center w-full p-2 rounded-md ${
-                                                    pathname === item.href
-                                                        ? "bg-[#2C3454] text-white"
-                                                        : "bg-[#F0F1F3] text-[#2C3454]"
-                                                }`}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <item.icon className="w-4 h-4" />
-                                                    <span>{item.name}</span>
-                                                </div>
-                                                {item.subMenu && (
-                                                    <span>{openSubMenus[item.name] ? "−" : "+"}</span>
-                                                )}
-                                            </button>
+                                        <li key={item.name}>
+                                            <Link href={item.href}>
+                                                <button
+                                                    onClick={() => {
+                                                        if (item.subMenu) {
+                                                            toggleSubMenu(item.name);
+                                                        } else {
+                                                            setIsSidebarOpen(false);
+                                                        }
+                                                    }}
+                                                    className={`flex justify-between items-center border-l-4 w-full p-2 rounded-md 
+                                                        ${pathname === item.href.concat('/') || isSubMenuActive(item.subMenu) ? "bg-[#131a44] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44c9] text-[#2C3454]"}`}
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <item.icon className="w-4 h-4" />
+                                                        <span className="font-medium text-lg">{item.name}</span>
+                                                    </div>
+                                                    {item.subMenu && (
+                                                        <span className="font-medium text-lg">{openSubMenus[item.name] ? "−" : "+"}</span>
+                                                    )}
+                                                </button>
                                             </Link>
                                             {item.subMenu && openSubMenus[item.name] && (
                                                 <ul className="pl-6 mt-1 space-y-1">
@@ -173,25 +175,22 @@ export default function Sidebar() {
                                                         <li key={subItem.name}>
                                                             <Link href={subItem.href}>
                                                                 <button
-                                                                    className={`flex items-center gap-2 w-full p-2 rounded-md ${
-                                                                        pathname === subItem.href
-                                                                            ? "bg-[#2C3454] text-white"
-                                                                            : "bg-[#F0F1F3] text-[#2C3454]"
-                                                                    }`}
+                                                                    className={`flex items-center gap-2 w-full p-2 rounded-md 
+                                                                        ${pathname === subItem.href ? "bg-blue-500 text-white" : "bg-[#F0F1F3] text-[#2C3454]"}`}
                                                                     onClick={() => setIsSidebarOpen(false)}
                                                                 >
                                                                     <subItem.icon className="w-3.5 h-3.5" />
-                                                                    <span>{subItem.name}</span>
+                                                                    <span className="font-medium text-lg">{subItem.name}</span>
                                                                 </button>
                                                             </Link>
                                                         </li>
                                                     ))}
                                                 </ul>
                                             )}
-                                        </div>
+                                        </li>
                                     ))}
                                 </ul>
-                            </div>
+                            </li>
                         ))}
                     </ul>
                 </nav>

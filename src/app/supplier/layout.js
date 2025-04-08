@@ -18,7 +18,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${dmSans.variable} antialiased`}>
-        <LayoutWrapper>{children}</LayoutWrapper> 
+        <div className="main-wrapper">
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </div>
       </body>
     </html>
   );

@@ -48,7 +48,7 @@ export default function Warehouse() {
   return (
     <>
       <div className="flex justify-end mb-5">
-        <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/add-warehouse">Add New</Link></button>
+        <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/supplier/add-warehouse">Add New</Link></button>
 
       </div>
       <div className="bg-white rounded-3xl p-5">
@@ -61,21 +61,21 @@ export default function Warehouse() {
           </div>
         </div>
         <div className="overflow-x-auto w-full relative">
-        <table className="w-full">
+          <table className="w-full">
             <thead>
               <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                <th className="p-2 whitespace-nowrap text-left font-normal">Warehouse Name<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left font-normal">Contact Name<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left font-normal">Address<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left font-normal">Pickup Address<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left font-normal">RTO Address<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left font-normal">Action<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Warehouse Name<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Contact Name<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Address<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Pickup Address<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">RTO Address<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Action<i></i></th>
               </tr>
             </thead>
             <tbody>
               {currentData.map((item) => (
                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                  <td className="p-2 whitespace-nowrap"> <div className="flex items-center">
+                  <td className="p-2 whitespace-nowrap px-5"> <div className="flex items-center">
                     <label className="flex items-center cursor-pointer me-2">
                       <input
                         type="checkbox"
@@ -90,9 +90,9 @@ export default function Warehouse() {
                     </label>
                     {item.name}
                   </div></td>
-                  <td className="p-2 whitespace-nowrap">{item.contact_name}<br />
+                  <td className="p-2 whitespace-nowrap px-5">{item.contact_name}<br />
                     {item.contact_number}</td>
-                  <td className="p-2 whitespace-nowrap">
+                  <td className="p-2 whitespace-nowrap px-5">
                     {(() => {
                       const parts = item.address.split(",");
 
@@ -129,7 +129,7 @@ export default function Warehouse() {
                   </td>
 
 
-                  <td className="p-2">
+                  <td className="p-2 px-5">
                     <div className="flex items-center mb-4">
                       <label className="flex items-center cursor-pointer">
                         <input
@@ -151,7 +151,7 @@ export default function Warehouse() {
                       </label>
                     </div>
                   </td>
-                  <td className="p-2">
+                  <td className="p-2 px-5">
                     <div className="flex items-center mb-4">
                       <label className="flex items-center cursor-pointer">
                         <input
@@ -173,7 +173,7 @@ export default function Warehouse() {
                       </label>
                     </div>
                   </td>
-                  <td className="p-2 text-[#8F9BBA]"><MdModeEdit /></td>
+                  <td className="p-2 px-5 text-[#8F9BBA]"><MdModeEdit /></td>
                 </tr>
               ))}
             </tbody>
@@ -181,46 +181,46 @@ export default function Warehouse() {
         </div>
 
         <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
-                    <div className="flex gap-1 items-center">
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            <MdKeyboardArrowLeft /> Previous
-                        </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentPage(index + 1)}
-                                className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
-                                    }`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            Next <MdKeyboardArrowRight />
-                        </button>
-                    </div>
+          <div className="flex gap-1 items-center">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
+            >
+              <MdKeyboardArrowLeft /> Previous
+            </button>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
+                  }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
+            >
+              Next <MdKeyboardArrowRight />
+            </button>
+          </div>
 
-                    {/* Per Page Selection */}
-                    <select
-                        value={perPage}
-                        onChange={(e) => setPerPage(Number(e.target.value))}
-                        className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
-                    >
-                        {[5, 10, 15].map((num) => (
-                            <option key={num} value={num}>
-                                {num} /Per Page
-                            </option>
-                        ))}
-                    </select>
-                </div>
+          {/* Per Page Selection */}
+          <select
+            value={perPage}
+            onChange={(e) => setPerPage(Number(e.target.value))}
+            className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
+          >
+            {[5, 10, 15].map((num) => (
+              <option key={num} value={num}>
+                {num} /Per Page
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
 

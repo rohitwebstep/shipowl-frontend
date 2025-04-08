@@ -25,7 +25,6 @@ export default function DropshipperMiddleWareProvider({ children }) {
         const dropshipper_token = supplierData?.security?.token;
     
         // ✅ Corrected the condition for active panel
-        console.log('dropshipper_token',dropshipper_token)
         if (supplierData?.project?.active_panel !== "dropshipper") {
             localStorage.removeItem("shippingData"); // Correct way to remove item
             router.push("/dropshipping/auth/login");
@@ -68,8 +67,6 @@ export default function DropshipperMiddleWareProvider({ children }) {
                 return;
             }
     
-            // ✅ Successful auth, proceed with logic
-            console.log("Dropshipper Auth Verified:", result);
     
         } catch (error) {
             console.error("Error:", error);
