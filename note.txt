@@ -1,0 +1,11 @@
+catogary management  -- name -dec- img 
+(list ) edit delete 
+brand management    same as cat
+
+country management - -[admin]
+BOOSTERS --TO BE ASK ON CLIOENT
+dropshipper user details add edit delete block
+supplier user details add edit delete block
+admin- shipping dahsboard   -[ e delivery  ] courior company   ,api details-textarea ,
+high rto (admin)   -[ e delivery  ] courior company   ,api details-textarea , 
+  (   excel  form  . ..)

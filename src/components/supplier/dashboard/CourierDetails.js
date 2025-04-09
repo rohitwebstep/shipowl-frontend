@@ -11,6 +11,9 @@ const initialData = [
 ];
 
 export default function CourierDetails() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   const [data, setData] = useState(initialData);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
@@ -41,7 +44,7 @@ export default function CourierDetails() {
                 className="outline-0"
               />
             </button>
-            <button className="bg-[#F4F7FE] p-2 rounded-lg">
+            <button onClick={openModal} className="bg-[#F4F7FE] p-2 rounded-lg">
               <MoreHorizontal className="text-[#F98F5C]" />
             </button>
           </div>
@@ -49,21 +52,21 @@ export default function CourierDetails() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead className="">
-              <tr className="text-[#A3AED0] font-normal border-b  ">
-                <th className="p-2 px-5 font-normal whitespace-nowrap text-left">NAME <i></i></th>
-                <th className="p-2 px-5 font-normal whitespace-nowrap text-left">Total <i></i></th>
-                <th className="p-2 px-5 font-normal whitespace-nowrap text-left">Booked <i></i></th>
-                <th className="p-2 px-5 font-normal whitespace-nowrap text-left">PP <i></i></th>
-                <th className="p-2 px-5 font-normal whitespace-nowrap text-left">IT <i></i></th>
-                <th className="p-2 px-5 font-normal whitespace-nowrap text-left">DL <i></i></th>
-                <th className="p-2 px-5 font-normal whitespace-nowrap text-left">Exception <i></i></th>
-                <th className="p-2 px-5 font-normal whitespace-nowrap text-left">RTO <i></i></th>
+              <tr className="text-[#A3AED0] border-b  ">
+                <th className="p-2 ps-0 px-5 whitespace-nowrap text-left uppercase">NAME <i></i></th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Total <i></i></th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Booked <i></i></th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">PP <i></i></th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">IT <i></i></th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">DL <i></i></th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Exception <i></i></th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">RTO <i></i></th>
               </tr>
             </thead>
             <tbody>
               {currentData.map((item) => (
                 <tr key={item.id} className="text-[#2B3674] font-semibold ">
-                  <td className="p-2 px-5 whitespace-nowrap">{item.name}</td>
+                  <td className="p-2 ps-0 px-5 whitespace-nowrap">{item.name}</td>
                   <td className="p-2 px-5 whitespace-nowrap">{item.total}</td>
                   <td className="p-2 px-5 whitespace-nowrap">{item.booked}</td>
                   <td className="p-2 px-5 whitespace-nowrap">{item.pp}</td>
@@ -117,6 +120,17 @@ export default function CourierDetails() {
             ))}
           </select>
         </div>
+
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
+            <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
+              <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+              <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
+              <p className="text-[#4A5568]">Add your content here.</p>
+            </div>
+          </div>
+        )}
+
       </div>
     </>
   );

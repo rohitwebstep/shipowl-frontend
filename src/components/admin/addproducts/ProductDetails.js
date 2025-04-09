@@ -28,7 +28,7 @@ export default function ProductDetails() {
           <label className="block   text-[#232323] font-semibold">Product Category</label>
           <select
             name="category"
-            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
+            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#4468a7]  mt-2 outline-0"
             onChange={handleChange}
           >
             <option>Category</option>
@@ -39,7 +39,7 @@ export default function ProductDetails() {
           <input
             type="text"
             name="name"
-            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
+            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#4468a7]  mt-2 outline-0"
             placeholder="Name"
             onChange={handleChange}
           />
@@ -49,7 +49,7 @@ export default function ProductDetails() {
           <input
             type="text"
             name="sku"
-            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
+            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#4468a7]  mt-2 outline-0"
             placeholder="SKU"
             onChange={handleChange}
           />
@@ -60,7 +60,7 @@ export default function ProductDetails() {
         <label className="block   text-[#232323] font-semibold">Description *</label>
         <textarea
           name="description"
-          className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0 h-24"
+          className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#4468a7]  mt-2 outline-0 h-24"
           placeholder="Description"
           onChange={handleChange}
         ></textarea>
@@ -72,7 +72,7 @@ export default function ProductDetails() {
           <input
             type="text"
             name="tags"
-            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
+            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#4468a7]  mt-2 outline-0"
             placeholder="Tags"
             onChange={handleChange}
           />
@@ -82,7 +82,7 @@ export default function ProductDetails() {
           <input
             type="text"
             name="brand"
-            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
+            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#4468a7]  mt-2 outline-0"
             placeholder="Brand"
             onChange={handleChange}
           />
@@ -92,7 +92,7 @@ export default function ProductDetails() {
           <input
             type="text"
             name="country"
-            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
+            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#4468a7]  mt-2 outline-0"
             placeholder="San Jose"
             onChange={handleChange}
           />
@@ -105,7 +105,7 @@ export default function ProductDetails() {
           <input
             type="text"
             name="shipping"
-            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
+            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#4468a7]  mt-2 outline-0"
             placeholder="San Jose, California, USA"
             onChange={handleChange}
           />
@@ -115,7 +115,7 @@ export default function ProductDetails() {
           <input
             type="text"
             name="videoUrl"
-            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
+            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#4468a7]  mt-2 outline-0"
             placeholder="USA"
             onChange={handleChange}
           />

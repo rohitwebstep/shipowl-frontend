@@ -162,7 +162,7 @@ export default function BillingList() {
                     <table className="w-full ">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">
                                     <div className="flex lg:gap-7 gap-2">
                                         <label className="flex items-center cursor-pointer me-2">
                                             <input
@@ -177,14 +177,14 @@ export default function BillingList() {
                                     </div>
 
                                 </th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Txn Type<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium text-red-500">Ref No#<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Transaction ID<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Credit(₹)<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Debit(₹)<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Closing Balance(₹)<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Model<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Description<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Txn Type<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase text-red-500">Ref No#<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Transaction ID<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Credit(₹)<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Debit(₹)<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Closing Balance(₹)<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Model<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Description<i></i></th>
                             </tr>
                         </thead>
                         <tbody>

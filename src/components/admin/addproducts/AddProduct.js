@@ -19,7 +19,7 @@ const Tabs = () => {
     <div className="w-full xl:p-6">
       <div className="bg-white rounded-3xl p-5">
         <div className="w-full">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-lg font-semibold  text-gray-700">
             Select Supplier
           </label>
           <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm">

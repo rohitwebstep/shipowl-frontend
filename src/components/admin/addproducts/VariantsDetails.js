@@ -68,7 +68,7 @@ export default function VariantDetails() {
           <span className='text-orange-500 font-semibold whitespace-nowrap lg:hidden block'>Color</span>
             <select
               type="text"
-              className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]"
+              className="border p-2 rounded-xl text-[#4468a7] w-full border-[#DFEAF2]"
               value={variant.color}
               onChange={(e) => handleChange(index, 'color', e.target.value)}
             >
@@ -81,14 +81,14 @@ export default function VariantDetails() {
             <input
               type="text"
               placeholder="SKU"
-              className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2] mb-2 "
+              className="border p-2 rounded-xl text-[#4468a7] w-full border-[#DFEAF2] mb-2 "
               value={variant.sku}
               onChange={(e) => handleChange(index, 'sku', e.target.value)}
             />
             <input
               type="text"
               placeholder="QTY"
-              className="border p-2 rounded-xl text-[#718EBF] font-bold  border-[#DFEAF2] w-full"
+              className="border p-2 rounded-xl text-[#4468a7]  border-[#DFEAF2] w-full"
               value={variant.qty}
               onChange={(e) => handleChange(index, 'qty', e.target.value)}
             />
@@ -97,7 +97,7 @@ export default function VariantDetails() {
           <span className='text-orange-500 font-semibold whitespace-nowrap lg:hidden block'>Currency</span>
 
             <select
-              className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]"
+              className="border p-2 rounded-xl text-[#4468a7] w-full border-[#DFEAF2]"
               value={variant.currency}
               onChange={(e) => handleChange(index, 'currency', e.target.value)}
             >
@@ -107,20 +107,20 @@ export default function VariantDetails() {
           </div>
           <div className="md:flex flex-col gap-2 ">
           <span className='text-orange-500 font-semibold whitespace-nowrap lg:hidden block'>Warehouse Model</span>
-         <div><label htmlFor="" className='text-[#A3AED0] text-sm'>Suggested Price</label>   <button className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]  ">Product MRP</button></div>
-         <div><label htmlFor="" className='text-[#A3AED0] text-sm'>Suggested Price</label>   <button className="border p-2 rounded-xl text-[#718EBF] font-bold  border-[#DFEAF2]  w-full">B2B Price</button></div>
+         <div><label htmlFor="" className='text-[#A3AED0] text-sm'>Suggested Price</label>   <button className="border p-2 rounded-xl text-[#4468a7] w-full border-[#DFEAF2]  ">Product MRP</button></div>
+         <div><label htmlFor="" className='text-[#A3AED0] text-sm'>Suggested Price</label>   <button className="border p-2 rounded-xl text-[#4468a7]  border-[#DFEAF2]  w-full">B2B Price</button></div>
           </div>
           <div className="flex flex-col gap-2 ">
           <span className='text-orange-500 font-semibold whitespace-nowrap lg:hidden block'>RTO Model</span>
-         <div><label htmlFor="" className='text-[#A3AED0] text-sm'>Suggested Price</label>   <button className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]  ">Product MRP</button></div>
-         <div><label htmlFor="" className='text-[#A3AED0] text-sm'>Suggested Price</label>  <button className="border p-2 rounded-xl text-[#718EBF] font-bold  border-[#DFEAF2]  w-full">B2B Price</button></div>
+         <div><label htmlFor="" className='text-[#A3AED0] text-sm'>Suggested Price</label>   <button className="border p-2 rounded-xl text-[#4468a7] w-full border-[#DFEAF2]  ">Product MRP</button></div>
+         <div><label htmlFor="" className='text-[#A3AED0] text-sm'>Suggested Price</label>  <button className="border p-2 rounded-xl text-[#4468a7]  border-[#DFEAF2]  w-full">B2B Price</button></div>
           </div>
           <div className=''>
           <span className='text-orange-500 font-semibold whitespace-nowrap lg:hidden block'>Product Link</span>
             <input
               type="text"
               placeholder="Link"
-              className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]"
+              className="border p-2 rounded-xl text-[#4468a7] w-full border-[#DFEAF2]"
               value={variant.productLink}
               onChange={(e) => handleChange(index, 'productLink', e.target.value)}
             />
@@ -131,7 +131,7 @@ export default function VariantDetails() {
             <input
               type="text"
               placeholder="Link"
-              className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]"
+              className="border p-2 rounded-xl text-[#4468a7] w-full border-[#DFEAF2]"
               value={variant.articleId}
               onChange={(e) => handleChange(index, 'articleId', e.target.value)}
             />

@@ -120,7 +120,7 @@ export default function PendingRequests() {
                     <table className="w-full ">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
                                   <div className="flex lg:gap-14 gap-2">
                                   <label className="flex items-center cursor-pointer me-2">
                                     <input
@@ -135,10 +135,10 @@ export default function PendingRequests() {
                                   </div>
 
                                 </th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">Payment Cycle<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">Payable Amt. (B2B)<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">Wallet Balance<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">Model<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Payment Cycle<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Payable Amt. (B2B)<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Wallet Balance<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Model<i></i></th>
                             </tr>
                         </thead>
                         <tbody>

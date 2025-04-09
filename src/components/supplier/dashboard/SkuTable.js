@@ -19,6 +19,9 @@ const data = [
 ];
 
 export default function SkuTable() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
   const [selected, setSelected] = useState([]);
@@ -55,7 +58,7 @@ export default function SkuTable() {
               className="outline-0"
             />
           </button>
-          <button className="bg-[#F4F7FE] p-2 rounded-lg">
+          <button onClick={openModal} className="bg-[#F4F7FE] p-2 rounded-lg">
             <MoreHorizontal className="text-[#F98F5C]" />
           </button>
         </div>
@@ -63,17 +66,17 @@ export default function SkuTable() {
       <div className="overflow-x-auto py-3">
         <table className="w-full ">
           <thead>
-            <tr className="text-[#A3AED0] font-normal">
-              <th className="p-2 px-5 whitespace-nowrap font-normal text-left">NAME <i></i></th>
-              <th className="p-2 px-5 whitespace-nowrap font-normal text-left">SKU <i></i></th>
-              <th className="p-2 px-5 whitespace-nowrap font-normal text-left">QUANTITY <i></i></th>
-              <th className="p-2 px-5 whitespace-nowrap font-normal text-left">BOOKED <i></i></th>
+            <tr className="text-[#A3AED0]">
+              <th className="p-2 px-5 ps-0 whitespace-nowrap text-left uppercase">NAME <i></i></th>
+              <th className="p-2 px-5 whitespace-nowrap text-left uppercase">SKU <i></i></th>
+              <th className="p-2 px-5 whitespace-nowrap text-left uppercase">QUANTITY <i></i></th>
+              <th className="p-2 px-5 whitespace-nowrap text-left uppercase">BOOKED <i></i></th>
             </tr>
           </thead>
           <tbody>
             {currentData.map((item) => (
               <tr key={item.id} className="text-[#2B3674] font-semibold">
-                <td className="p-2 px-5 whitespace-nowrap  me-7 md:me-0">
+                <td className="p-2 px-5 whitespace-nowrap ps-0 me-7 md:me-0">
                   <div className="flex items-center">
                     <label className="flex items-center cursor-pointer me-2">
                       <input
@@ -142,6 +145,15 @@ export default function SkuTable() {
           ))}
         </select>
       </div>
+      {isModalOpen && (
+          <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
+            <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
+              <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+              <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
+              <p className="text-[#4A5568]">Add your content here.</p>
+            </div>
+          </div>
+        )}
     </div>
   );
 }

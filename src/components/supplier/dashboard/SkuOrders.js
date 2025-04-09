@@ -17,7 +17,9 @@ const initialData = [
 ];
 
 export default function SkuOrders() {
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   const [data, setData] = useState(initialData);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
@@ -56,7 +58,7 @@ export default function SkuOrders() {
               className="outline-0"
             />
           </button>
-          <button className="bg-[#F4F7FE] p-2 rounded-lg">
+          <button onClick={openModal} className="bg-[#F4F7FE] p-2 rounded-lg">
             <MoreHorizontal className="text-[#F98F5C]" />
           </button>
         </div>
@@ -67,25 +69,25 @@ export default function SkuOrders() {
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="text-[#A3AED0] border-b border-[#E9EDF7]">
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">NAME<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">Manifested<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal text-red-500">Cancelled<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal text-yellow-500">Pickup Pending<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">In Transit<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">Out For Delivery<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">NDR<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">Delivered<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">RTO In Transit<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">RTO In Delivered<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">Lost/Damaged<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">Delivered (%)<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left font-normal">RTO (%)<i></i></th>
+              <th className="px-5 ps-0 py-3 whitespace-nowrap text-left uppercase">NAME<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Manifested<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase text-red-500">Cancelled<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase text-yellow-500">Pickup Pending<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">In Transit<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Out For Delivery<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">NDR<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Delivered<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">RTO In Transit<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">RTO In Delivered<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Lost/Damaged<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Delivered (%)<i></i></th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">RTO (%)<i></i></th>
             </tr>
           </thead>
           <tbody>
             {currentData.map((item) => (
               <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                <td className="px-5 py-3 whitespace-nowrap">
+                <td className="px-5 ps-0 py-3 whitespace-nowrap">
                   <div className="flex items-center w-full gap-3">
                     <Image
                       src={item.productImage}
@@ -115,46 +117,56 @@ export default function SkuOrders() {
       </div>
 
       <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
-                    <div className="flex gap-1 items-center">
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            <MdKeyboardArrowLeft /> Previous
-                        </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentPage(index + 1)}
-                                className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
-                                    }`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            Next <MdKeyboardArrowRight />
-                        </button>
-                    </div>
+        <div className="flex gap-1 items-center">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
+          >
+            <MdKeyboardArrowLeft /> Previous
+          </button>
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentPage(index + 1)}
+              className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
+                }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
+          >
+            Next <MdKeyboardArrowRight />
+          </button>
+        </div>
 
-                    {/* Per Page Selection */}
-                    <select
-                        value={perPage}
-                        onChange={(e) => setPerPage(Number(e.target.value))}
-                        className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
-                    >
-                        {[5, 10, 15].map((num) => (
-                            <option key={num} value={num}>
-                                {num} /Per Page
-                            </option>
-                        ))}
-                    </select>
-                </div>
+        {/* Per Page Selection */}
+        <select
+          value={perPage}
+          onChange={(e) => setPerPage(Number(e.target.value))}
+          className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
+        >
+          {[5, 10, 15].map((num) => (
+            <option key={num} value={num}>
+              {num} /Per Page
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
+            <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
+            <p className="text-[#4A5568]">Add your content here.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

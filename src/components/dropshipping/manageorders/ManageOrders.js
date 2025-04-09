@@ -138,42 +138,42 @@ export default function ManageOrders() {
                     <button className="font-dm-sans bg-[#05CD99] text-white font-bold px-4 py-2 rounded-md text-sm">Export</button>
                 </div>
             </div>
-            <div className=" bg-white p-4 rounded-2xl my-5 font-dm-sans">
-                <div className="md:flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-[#2B3674] font-dm-sans">Order</h2>
-                    <div className="flex gap-3  flex-wrap items-center">
-                        <span className="font-bold text-[#2B3674]  font-dm-sans">Clear Filters</span>
-                        <span><IoMdRefresh className="text-red-600 text-xl" /></span>
-                        <span><IoSettingsOutline className="text-xl" /></span>
-                        <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
-                        <select
-                            value={filter}
-                            onChange={(e) => setFilter(e.target.value)}
-                            className="bg-[#4318FF] font-dm-sans text-sm outline-0 text-white md:w-[120px] font-normal  px-2 py-2 rounded-md"
-                        >
-                            <option value="Actual Ratio ">Bulk Action</option>
-                        </select>
-                        <button className="bg-[#F4F7FE] rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
+            {currentData.length > 0 && (
+                <div className=" bg-white p-4 rounded-2xl my-5 font-dm-sans">
+                    <div className="md:flex justify-between items-center mb-4">
+                        <h2 className="text-2xl font-bold text-[#2B3674] font-dm-sans">Order</h2>
+                        <div className="flex gap-3  flex-wrap items-center">
+                            <span className="font-bold text-[#2B3674]  font-dm-sans">Clear Filters</span>
+                            <span><IoMdRefresh className="text-red-600 text-xl" /></span>
+                            <span><IoSettingsOutline className="text-xl" /></span>
+                            <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
+                            <select
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                                className="bg-[#4318FF] font-dm-sans text-sm outline-0 text-white md:w-[120px] font-normal  px-2 py-2 rounded-md"
+                            >
+                                <option value="Actual Ratio ">Bulk Action</option>
+                            </select>
+                            <button className="bg-[#F4F7FE] rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
 
-                            {/* Month Input */}
-                            <input
-                                type="month"
-                                value={selectedMonth}
-                                onChange={(e) => setSelectedMonth(e.target.value)}
-                                className="outline-0 font-dm-sans"
-                            />
-                        </button>
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
-                            <MoreHorizontal className="text-[#F98F5C]" />
-                        </button>
+                                {/* Month Input */}
+                                <input
+                                    type="month"
+                                    value={selectedMonth}
+                                    onChange={(e) => setSelectedMonth(e.target.value)}
+                                    className="outline-0 font-dm-sans"
+                                />
+                            </button>
+                            <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                                <MoreHorizontal className="text-[#F98F5C]" />
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div className=" overflow-x-auto font-dm-sans">
-                    {currentData.length > 0 && (
+                    <div className=" overflow-x-auto font-dm-sans">
                         <table className=" w-full border-collapse">
                             <thead>
                                 <tr className=" text-[#A3AED0]">
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">
                                         <div className="flex items-center">
                                             <label className="flex items-center cursor-pointer me-2">
                                                 <input
@@ -190,19 +190,19 @@ export default function ManageOrders() {
                                         </div>
 
                                     </th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Order ID<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Items<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Payment Info<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Order Tags<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Seller Tags<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Shipment Details<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Action<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Order ID<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Items<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Payment Info<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Order Tags<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Seller Tags<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Shipment Details<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Action<i></i></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {currentData.map((order, index) => (
-                                    <tr key={index} className=" text-[#8F9BBA] align-sub">
-                                        <td className=" p-3 font-dm-sans whitespace-nowrap text-black font-bold">
+                                    <tr key={index} className=" text-[#2B3674] align-sub font-medium">
+                                        <td className=" p-3 font-dm-sans whitespace-nowrap ">
                                             <label className="flex items-center cursor-pointer me-2">
                                                 <input
                                                     type="checkbox"
@@ -216,14 +216,14 @@ export default function ManageOrders() {
                                                 </div>
                                                 <span className="ms-2">{order.channel}</span>
                                             </label></td>
-                                        <td className=" p-3 font-dm-sans whitespace-nowrap text-black font-bold">{order.order_id} <span className=" block text-[#8F9BBA]">{order.date_and_time}</span></td>
-                                        <td className=" p-3 font-dm-sans whitespace-nowrap font-bold text-[#2B3674]">{order.product_details.product_name} <span className=" block text-[#8F9BBA] ">SKU:{order.product_details.sku}</span><span className=" block text-[#8F9BBA] ">Qty:{order.product_details.Qty}</span></td>
-                                        <td className=" p-3 font-dm-sans whitespace-nowrap text-[#2B3674] font-bold">COD:{order.price} <span className=" block text-[#8F9BBA] font-bold">Order Value:{order.order_value}</span> <span className={` capitalize ${order.status == "unpaid" ? "text-[#E5252A]" : "text-green-500"}`}>{order.status}</span></td>
+                                        <td className=" p-3 font-dm-sans whitespace-nowrap ">{order.order_id} <span className=" block ">{order.date_and_time}</span></td>
+                                        <td className=" p-3 font-dm-sans whitespace-nowrap ">{order.product_details.product_name} <span className=" block  ">SKU:{order.product_details.sku}</span><span className=" block  ">Qty:{order.product_details.Qty}</span></td>
+                                        <td className=" p-3 font-dm-sans whitespace-nowrap ">COD:{order.price} <span className=" block  ">Order Value:{order.order_value}</span> <span className={` capitalize ${order.status == "unpaid" ? "text-[#E5252A]" : "text-green-500"}`}>{order.status}</span></td>
                                         <td className=" p-3 font-dm-sans whitespace-nowrap">
                                             {order.Order_Tags.map((tag, i) => (
                                                 <span
                                                     key={i}
-                                                    className={`text-xs text-center p-2 rounded-md font-bold block mb-1 ${tag === "Repeat Customer"
+                                                    className={`text-sm text-center p-2 rounded-md  block mb-1 ${tag === "Repeat Customer"
                                                         ? "bg-[#00b69b3d] text-[#00B69B]"
                                                         : tag === "Label Generated"
                                                             ? "text-[#F98F5C] bg-[#f98e5c48]"
@@ -236,10 +236,10 @@ export default function ManageOrders() {
                                         </td>
                                         <td className=" p-3 font-dm-sans whitespace-nowrap">{order.seller_tag || 'NA'}</td>
                                         <td className=" p-3 font-dm-sans whitespace-nowrap">
-                                            <span className="font-dm-sans text-black ">{order.shipment.id}</span><br />
-                                            <span className="font-dm-sans  text-[#05CD99]">{order.shipment.status}</span><br />
-                                            <span className="font-dm-sans font-medium text-[#718EBF]">{order.shipment.provider}</span><br />
-                                            <span className="font-dm-sans text-sm font-bold text-[#718EBF]">{order.shipment.date}</span>
+                                            <span className="font-dm-sans ">{order.shipment.id}</span><br />
+                                            <span className="font-dm-sans text-[#05CD99]">{order.shipment.status}</span><br />
+                                            <span className="font-dm-sans ">{order.shipment.provider}</span><br />
+                                            <span className="font-dm-sans text-sm ">{order.shipment.date}</span>
                                         </td>
                                         <td className=" p-3 whitespace-nowrap">
                                             <ul className=" flex gap-2 justify-between">
@@ -256,56 +256,57 @@ export default function ManageOrders() {
                                 ))}
                             </tbody>
                         </table>
-                    )}
-                    {currentData.length == 0 && (
 
-                        <p className=" text-center font-bold text-xl font-dm-sans">No Data Found</p>
-                    )}
-                </div>
-
-                {/* Pagination */}
-                <div className=" flex justify-end border-t border-[#E9EDF7] items-center mt-4 p-4 pt-">
-                    <div className=" flex gap-1 items-center">
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className=" px-3 py-1 font-dm-sans text-[#2B3674] rounded mx-1 disabled:opacity-50 flex items-center gap-1"
-                        >
-                            <MdKeyboardArrowLeft /> Previous
-                        </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentPage(index + 1)}
-                                className={`font-dm-sans px-3 py-1 text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
-                                    }`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className=" px-3 py-1 font-dm-sans text-[#2B3674] rounded mx-1 disabled:opacity-50 flex items-center gap-1"
-                        >
-                            Next <MdKeyboardArrowRight />
-                        </button>
                     </div>
 
-                    {/* Per Page Selection */}
-                    <select
-                        value={perPage}
-                        onChange={(e) => setPerPage(Number(e.target.value))}
-                        className=" border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
-                    >
-                        {[5, 10, 15].map((num) => (
-                            <option key={num} value={num}>
-                                {num} /Per Page
-                            </option>
-                        ))}
-                    </select>
+                    {/* Pagination */}
+                    <div className=" flex justify-end border-t border-[#E9EDF7] items-center mt-4 p-4 pt-">
+                        <div className=" flex gap-1 items-center">
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className=" px-3 py-1 font-dm-sans text-[#2B3674] rounded mx-1 disabled:opacity-50 flex items-center gap-1"
+                            >
+                                <MdKeyboardArrowLeft /> Previous
+                            </button>
+                            {[...Array(totalPages)].map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setCurrentPage(index + 1)}
+                                    className={`font-dm-sans px-3 py-1 text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
+                                        }`}
+                                >
+                                    {index + 1}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className=" px-3 py-1 font-dm-sans text-[#2B3674] rounded mx-1 disabled:opacity-50 flex items-center gap-1"
+                            >
+                                Next <MdKeyboardArrowRight />
+                            </button>
+                        </div>
+
+                        {/* Per Page Selection */}
+                        <select
+                            value={perPage}
+                            onChange={(e) => setPerPage(Number(e.target.value))}
+                            className=" border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
+                        >
+                            {[5, 10, 15].map((num) => (
+                                <option key={num} value={num}>
+                                    {num} /Per Page
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
-            </div>
+            )}
+            {currentData.length == 0 && (
+
+                <div className="bg-white p-4 rounded-md">  <p className="dm text-center font-medium text-xl">No Data Found</p></div>
+            )}
         </div>
     );
 }

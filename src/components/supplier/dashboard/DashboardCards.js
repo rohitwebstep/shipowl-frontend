@@ -8,18 +8,18 @@ const cardData = [
     value: "574",
     change: "+1%",
     changeText: "since last month",
-    iconColor: "bg-blue-500",
+    iconColor: "",
   },
   {
     title: "New Orders",
     value: "154",
-    iconColor: "bg-blue-500",
+    iconColor: "",
     icon: icon
   },
   {
     title: "Processed Shipment",
     value: "154",
-    iconColor: "bg-blue-500",
+    iconColor: "",
     icon: icon
   },
   {
@@ -31,7 +31,7 @@ const cardData = [
   {
     title: "Total no of delivered",
     value: "1,000",
-    iconColor: "bg-blue-500",
+    iconColor: "",
   },
 ];
 

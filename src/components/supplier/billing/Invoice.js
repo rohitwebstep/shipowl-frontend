@@ -109,7 +109,7 @@ export default function Invoice() {
                     <table className="w-full ">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium">
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">
                                     
                                 <div className="flex lg:gap-7 gap-2">
                                         <label className="flex items-center cursor-pointer me-2">
@@ -124,10 +124,10 @@ export default function Invoice() {
                                         </label><span>Invoice No. #<i></i></span>
                                     </div>
                                     </th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium">Invoice Date<i></i></th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium text-red-500">Invoice Period<i></i></th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium">Invoice Amount<i></i></th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium">Pdf File Link<i></i></th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Date<i></i></th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase text-red-500">Invoice Period<i></i></th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Amount<i></i></th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Pdf File Link<i></i></th>
                             </tr>
                         </thead>
                         <tbody>

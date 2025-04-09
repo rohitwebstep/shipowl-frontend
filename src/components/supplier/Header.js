@@ -28,7 +28,7 @@ export default function Header() {
   const currentPage = pageTitles[pathname] || "Dashboard";
 
   return (
-    <header className="md:flex items-center md:mt-16 mt-10 lg:mt-0 justify-between lg:p-7 p-2 md:py-8 pt-6">
+    <header className="md:flex items-center md:mt-16 mt-10 lg:mt-0 justify-between lg:py-7 px-3 p-2 pt-6">
       {/* Left: Breadcrumb & Title */}
       <div className="md:w-4/12">
         <p className="text-sm text-[#707EAE]">Pages / {currentPage}</p>
@@ -38,7 +38,7 @@ export default function Header() {
       {/* Right: Date Picker, Search, Notification, Profile */}
       <div className="flex  items-center mt-5 md:mt-0 justify-end space-x-4 md:w-8/12">
         {/* Date Picker */}
-        <button className="bg-white hidden md:flex px-10 py-2 gap-8 rounded-full font-semibold text-[#2B3674]  items-center space-x-2">
+        <button className="bg-white hidden md:flex px-10 py-4 gap-8 rounded-full font-semibold text-[#2B3674]  items-center space-x-2">
           <span>07/26/2024</span>
           <span><FaChevronDown /></span>
         </button>

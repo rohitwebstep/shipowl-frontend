@@ -54,7 +54,7 @@ export default function OrdersLineChart() {
             tick={{ fill: "#A3AED0", fontSize: 12, fontWeight: "bold" }}
           />
           <YAxis hide />
-          <Tooltip />
+          <Tooltip cursor={false}/>
           <Line type="monotone" dataKey="orders" stroke="#FF8C42" strokeWidth={3} dot={{ r: 5 }} />
           <Line type="monotone" dataKey="returns" stroke="#6AD2FF" strokeWidth={3} dot={{ r: 5 }} />
         </LineChart>

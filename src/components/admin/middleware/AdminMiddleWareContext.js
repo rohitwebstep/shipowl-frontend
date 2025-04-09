@@ -39,17 +39,6 @@ export default function AdminMiddleWareProvider({ children }) {
                 },
             });
 
-            if (!response.ok) {
-                localStorage.clear("shippingData");
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Session Expired",
-                    text: errorMessage.message || "Your session has expired. Please log in again.",
-                });
-                throw new Error(errorMessage || "Session expired");
-            }
-
             const result = await response.json();
 
             if (!result.status) {

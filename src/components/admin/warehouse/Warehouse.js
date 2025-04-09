@@ -83,7 +83,8 @@ export default function Warehouse() {
                         <tbody>
                             {currentData.map((item) => (
                                  <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                 <td className="p-2 whitespace-nowrap px-5"> <div className="flex items-center">
+                                 <td className="p-2 whitespace-nowrap px-5"> 
+                                  <div className="flex items-center">
                                    <label className="flex items-center cursor-pointer me-2">
                                      <input
                                        type="checkbox"
@@ -97,7 +98,9 @@ export default function Warehouse() {
                                      </div>
                                    </label>
                                    {item.name}
-                                 </div></td>
+                                 </div>
+                                 
+                                 </td>
                                  <td className="p-2 whitespace-nowrap px-5">{item.contact_name}<br />
                                    {item.contact_number}</td>
                                  <td className="p-2 whitespace-nowrap px-5">

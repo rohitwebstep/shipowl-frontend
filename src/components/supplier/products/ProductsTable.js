@@ -136,8 +136,8 @@ const ProductTable = () => {
                 </button>
             </div>
 
-            <div className="flex flex-wrap gap-4 items-end">
-                <div className="w-full md:w-5/12">
+            <div className="flex flex-wrap justify-between gap-4 items-end">
+                <div className="w-full md:w-4/12">
                     <label className="block text-sm font-medium text-gray-700">
                         RTO Address *
                     </label>
@@ -164,8 +164,7 @@ const ProductTable = () => {
                     </select>
                 </div>
 
-                {/* Save Button */}
-                <div className="flex justify-end items-end">
+                <div className="flex justify-end md:w-1/12 items-end">
                     <button className="bg-[#F98F5C] text-white px-6 py-3 rounded-lg text-sm">
                         Save
                     </button>
@@ -228,25 +227,25 @@ const ProductTable = () => {
                     <table className="md:w-full w-auto">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-normal">NAME<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-normal">SKU<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-normal text-red-500">Suggested Price<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-normal">Shipwoll Cost Price<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-normal">Quantity<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">NAME<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">SKU<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-red-500">Suggested Price<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Shipwoll Cost Price<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Quantity<i></i></th>
                                 {showRtoLiveCount && (
-                                    <th className="p-2 px-5 whitespace-nowrap text-left font-normal text-blue-500">Live RTO Stock<i></i></th>
+                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">Live RTO Stock<i></i></th>
                                 )}
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-normal">Order Auto Accept<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-normal">Status<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-normal">Admin Status<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Order Auto Accept<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Status<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Admin Status<i></i></th>
                                 {!showRtoLiveCount && (
-                                    <th className="p-2 px-5 whitespace-nowrap text-left font-normal">Model<i></i></th>
+                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Model<i></i></th>
                                 )}
                                 {showRtoLiveCount && (
-                                    <th className="p-2 px-5 whitespace-nowrap text-left font-normal">RTO Status<i></i></th>
+                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">RTO Status<i></i></th>
                                 )}
 
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-normal">Action<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Action<i></i></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -322,7 +321,7 @@ const ProductTable = () => {
                                     </td>
                                     <td className="p-2 px-5 whitespace-nowrap">
                                         <button
-                                            className={` py-2 text-white rounded-md text-sm p-3 uppercase font-normal min-w-[95px]
+                                            className={` py-2 text-white rounded-md text-sm p-3 uppercase  min-w-[95px]
     ${item.adminStatus === "Done" ? "bg-green-500" :
                                                     item.adminStatus === "Pending" ? "bg-[#FFB547]" :
                                                         "bg-red-500"}`}
@@ -334,7 +333,7 @@ const ProductTable = () => {
                                     {!showRtoLiveCount && (
                                         <td className="p-2 px-5 whitespace-nowrap">
                                             <button
-                                                className={` py-2 text-white rounded-md text-sm p-3 font-normal min-w-[95px] 
+                                                className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px] 
     ${item.model === "Warehouse" ? "bg-[#01B574]" :
                                                         "bg-[#5CA4F9]"}`}
                                             >
@@ -345,7 +344,7 @@ const ProductTable = () => {
                                     )}
                                     {showRtoLiveCount && (
                                         <td className="p-2 px-5 whitespace-nowrap"> <button
-                                            className={` py-2 text-white rounded-md text-sm p-3 font-normal min-w-[95px]
+                                            className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
     ${item.rtoStatus === "Free" ? "bg-green-500" :
                                                     item.rtoStatus === "Pending" ? "bg-[#FFB547]" :
                                                         "bg-red-500"}`}
@@ -353,7 +352,7 @@ const ProductTable = () => {
                                             {item.rtoStatus}
                                         </button></td>
                                     )}
-                                    <td className="p-2 px-5 whitespace-nowrap text-[#8F9BBA]"><MdModeEdit /></td>
+                                    <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]"><div className="flex justify-center"><MdModeEdit className="text-center"/></div></td>
                                 </tr>
                             ))}
                         </tbody>

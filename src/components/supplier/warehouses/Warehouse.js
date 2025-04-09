@@ -64,32 +64,35 @@ export default function Warehouse() {
           <table className="w-full">
             <thead>
               <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Warehouse Name<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Contact Name<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Address<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Pickup Address<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">RTO Address<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Action<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Warehouse Name<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Name<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Address<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pickup Address<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">RTO Address<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Action<i></i></th>
               </tr>
             </thead>
             <tbody>
               {currentData.map((item) => (
                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                  <td className="p-2 whitespace-nowrap px-5"> <div className="flex items-center">
-                    <label className="flex items-center cursor-pointer me-2">
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(item.id)}
-                        onChange={() => handleCheckboxChange(item.id)}
-                        className="peer hidden"
-                      />
-                      <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                  <td className="p-2 whitespace-nowrap px-5">
+                    <div className="flex items-center">
+                      <label className="flex items-center cursor-pointer me-2">
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(item.id)}
+                          onChange={() => handleCheckboxChange(item.id)}
+                          className="peer hidden"
+                        />
+                        <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
                                                             peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                        <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                      </div>
-                    </label>
-                    {item.name}
-                  </div></td>
+                          <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                        </div>
+                      </label>
+                      {item.name}
+                    </div>
+
+                  </td>
                   <td className="p-2 whitespace-nowrap px-5">{item.contact_name}<br />
                     {item.contact_number}</td>
                   <td className="p-2 whitespace-nowrap px-5">

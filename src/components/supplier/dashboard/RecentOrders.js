@@ -22,6 +22,9 @@ const statusColors = {
 };
 
 export default function RecentOrders() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
   const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -50,7 +53,7 @@ export default function RecentOrders() {
               className="outline-0"
             />
           </button>
-          <button className="bg-[#F4F7FE] p-2 rounded-lg">
+          <button onClick={openModal} className="bg-[#F4F7FE] p-2 rounded-lg">
             <MoreHorizontal className="text-[#F98F5C]" />
           </button>
         </div>
@@ -58,12 +61,12 @@ export default function RecentOrders() {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead className="">
-            <tr className="text-[#A3AED0] font-normal border-b  border-[#E9EDF7]">
-              <th className="p-3 px-4 whitespace-nowrap font-normal text-left">NAME <i></i></th>
-              <th className="p-3 px-4 whitespace-nowrap font-normal text-left">SKU<i></i></th>
-              <th className="p-3 px-4 whitespace-nowrap font-normal text-left">QUANTITY<i></i></th>
-              <th className="p-3 px-4 whitespace-nowrap font-normal text-left">STATUS<i></i></th>
-              <th className="p-3 px-4 whitespace-nowrap font-normal text-left">DATE<i></i></th>
+            <tr className="text-[#A3AED0] border-b  border-[#E9EDF7]">
+              <th className="p-3 px-4 whitespace-nowrap text-left">NAME <i></i></th>
+              <th className="p-3 px-4 whitespace-nowrap text-left">SKU<i></i></th>
+              <th className="p-3 px-4 whitespace-nowrap text-left">QUANTITY<i></i></th>
+              <th className="p-3 px-4 whitespace-nowrap text-left">STATUS<i></i></th>
+              <th className="p-3 px-4 whitespace-nowrap text-left">DATE<i></i></th>
             </tr>
           </thead>
           <tbody>
@@ -82,46 +85,55 @@ export default function RecentOrders() {
         </table>
       </div>
       <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
-                    <div className="flex gap-1 items-center">
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            <MdKeyboardArrowLeft /> Previous
-                        </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentPage(index + 1)}
-                                className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
-                                    }`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            Next <MdKeyboardArrowRight />
-                        </button>
-                    </div>
+        <div className="flex gap-1 items-center">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
+          >
+            <MdKeyboardArrowLeft /> Previous
+          </button>
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentPage(index + 1)}
+              className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
+                }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
+          >
+            Next <MdKeyboardArrowRight />
+          </button>
+        </div>
 
-                    {/* Per Page Selection */}
-                    <select
-                        value={perPage}
-                        onChange={(e) => setPerPage(Number(e.target.value))}
-                        className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
-                    >
-                        {[5, 10, 15].map((num) => (
-                            <option key={num} value={num}>
-                                {num} /Per Page
-                            </option>
-                        ))}
-                    </select>
-                </div>
+        {/* Per Page Selection */}
+        <select
+          value={perPage}
+          onChange={(e) => setPerPage(Number(e.target.value))}
+          className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
+        >
+          {[5, 10, 15].map((num) => (
+            <option key={num} value={num}>
+              {num} /Per Page
+            </option>
+          ))}
+        </select>
+      </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
+            <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
+            <p className="text-[#4A5568]">Add your content here.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
