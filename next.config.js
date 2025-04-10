@@ -4,9 +4,9 @@ const nextConfig = {
 
     images: {
         unoptimized: true, // ✅ Disable Next.js image optimization
+        domains: ['sleeping-owl-we0m.onrender.com'], // ✅ Allow external image domain
     },
-};
-module.exports = {
+
     reactStrictMode: false,
 };
 

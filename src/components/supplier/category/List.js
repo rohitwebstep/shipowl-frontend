@@ -11,6 +11,8 @@ import HashLoader from "react-spinners/HashLoader";
 import { useSupplier } from "../middleware/SupplierMiddleWareContext";
 import { CategoryContext } from "./CategoryContext";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -50,6 +52,92 @@ export default function List() {
     
         router.push('/supplier/category/create')
     };
+
+   
+    const handleDelete = async (id) => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+    
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/supplier/auth/login");
+            return;
+        }
+    
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/supplier/auth/login");
+            return;
+        }
+    
+        // Ask for confirmation before deleting
+        const confirmResult = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        });
+    
+        if (!confirmResult.isConfirmed) return;
+    
+        try {
+            // Show loading
+            Swal.fire({
+                title: 'Deleting...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+    
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/delete/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${suppliertoken}`,
+                    },
+                }
+            );
+    
+            Swal.close(); // Close loading
+    
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
+                });
+                return;
+            }
+    
+            const result = await response.json();
+    
+            Swal.fire({
+                icon: "success",
+                title: "Deleted!",
+                text: result.message || "Item has been deleted successfully.",
+            });
+    
+            // Optionally refresh data or remove from local state
+            // Example: fetchData();
+    
+        } catch (error) {
+            Swal.close();
+            console.error("Error:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        }
+    };
+    
 
     const totalPages = Math.ceil(categoryData.length / perPage);
     const indexOfLast = currentPage * perPage;
@@ -137,7 +225,7 @@ export default function List() {
                                                 <td className="p-2 px-5 text-[#8F9BBA]">
                                                     <div className="flex justify-center gap-2">
                                                         <MdModeEdit onClick={() => handleEdit(item)} className="cursor-pointer" />
-                                                        <AiOutlineDelete className="cursor-pointer" />
+                                                        <AiOutlineDelete onClick={()=> handleDelete(item.id)} className="cursor-pointer" />
                                                     </div>
 
                                                 </td>
