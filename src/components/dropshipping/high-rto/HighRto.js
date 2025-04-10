@@ -1,7 +1,8 @@
 // pages/high-rto.js
 "use client";
 import Image from "next/image";
-import rtoImage from "../public/rto-illustration.png"; // Save your image as rto-illustration.png in /public
+import rtoImage from "@/app/images/delivery-point.svg"; // Save your image as rto-illustration.png in /public
+import pincode from "@/app/images/pin-code-map.webp"; // Save your image as rto-illustration.png in /public
 
 export default function HighRto() {
   return (
@@ -49,7 +50,7 @@ export default function HighRto() {
 
         {/* Sample Screenshot */}
         <Image
-          src="/rto-location-guide.png" // save this screenshot as rto-location-guide.png in /public
+          src={pincode} // save this screenshot as rto-location-guide.png in /public
           alt="Facebook Location Guide"
           width={600}
           height={400}

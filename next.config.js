@@ -5,8 +5,9 @@ const nextConfig = {
     images: {
         unoptimized: true, // ✅ Disable Next.js image optimization
     },
-
-   
+};
+module.exports = {
+    reactStrictMode: false,
 };
 
 module.exports = nextConfig; // ✅ Correct way to export config

@@ -60,7 +60,6 @@ export default function Sidebar() {
 
             </div>
 
-            {/* Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
                     className="fixed inset-0  bg-opacity-30 z-40 lg:hidden"
@@ -68,12 +67,10 @@ export default function Sidebar() {
                 ></div>
             )}
 
-            {/* Sidebar Panel */}
             <aside
                 className={`fixed top-0 left-0 w-72 sidebar rounded-md   bg-white z-50 shadow-lg lg:w-full   transition-transform duration-300 ease-in-out 
                 ${isSidebarOpen ? "translate-x-0 lg:h-full h-[500px] overflow-auto " : "-translate-x-full lg:h-full"} lg:translate-x-0 lg:relative lg:h-full`}
             >
-                {/* Sidebar Header */}
                 <div className="flex items-center justify-between lg:justify-center p-5 border-b border-[#F4F7FE]">
                     <Image src={logo} alt="ShipOwl Logo" className="max-w-[150px]" />
                     <button
@@ -84,7 +81,6 @@ export default function Sidebar() {
                     </button>
                 </div>
 
-                {/* Sidebar Menu */}
                 <nav className="p-3 h-full">
                     <ul className="space-y-1">
                         {menuItems.map((item) => {

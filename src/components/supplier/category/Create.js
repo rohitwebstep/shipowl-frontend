@@ -5,19 +5,20 @@ import { CategoryContext } from './CategoryContext'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import { useSupplier } from '../middleware/SupplierMiddleWareContext'
+import Image from 'next/image'
 
 export default function Create() {
     const router = useRouter();
-    const { formData, setFormData } = useContext(CategoryContext);
+    const { formData, setFormData, isEdit } = useContext(CategoryContext);
     const [validationErrors, setValidationErrors] = useState({});
-
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { verifySupplierAuth } = useSupplier();
+
     useEffect(() => {
-        verifySupplierAuth()
-    }, [verifySupplierAuth])
+        verifySupplierAuth();
+    }, [verifySupplierAuth]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -35,12 +36,11 @@ export default function Create() {
         if (!formData.description || formData.description.trim() === '') {
             errors.description = 'Category description is required.';
         }
-        if (!file) {
+        if (!file && !formData?.image) {
             errors.image = 'Category image is required.';
         }
         return errors;
     };
-
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -74,9 +74,8 @@ export default function Create() {
         setValidationErrors({});
 
         try {
-            // Show SweetAlert loading
             Swal.fire({
-                title: 'Creating Category...',
+                title: isEdit ? 'Updating Category...' : 'Creating Category...',
                 text: 'Please wait while we save your category.',
                 allowOutsideClick: false,
                 didOpen: () => {
@@ -91,8 +90,12 @@ export default function Create() {
                 form.append('image', file);
             }
 
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/category/create`, {
-                method: "POST",
+            const url = isEdit
+                ? `https://sleeping-owl-we0m.onrender.com/api/category/${formData?.id}`
+                : "https://sleeping-owl-we0m.onrender.com/api/category";
+
+            const response = await fetch(url, {
+                method: isEdit ? "PUT" : "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                 },
@@ -100,29 +103,28 @@ export default function Create() {
             });
 
             if (!response.ok) {
-                Swal.close(); // Ensure loading is stopped
+                Swal.close();
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Creation Failed",
+                    title: isEdit ? "Update Failed" : "Creation Failed",
                     text: errorMessage.message || errorMessage.error || "An error occurred",
                 });
-                throw new Error(errorMessage.message || errorMessage.error || "Creation failed");
+                throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
             }
 
             const result = await response.json();
-
-            Swal.close(); // Success: close loading
+            Swal.close();
 
             if (result) {
                 Swal.fire({
                     icon: "success",
-                    title: "Category Created",
-                    text: "The category has been created successfully!",
+                    title: isEdit ? "Category Updated" : "Category Created",
+                    text: `The category has been ${isEdit ? "updated" : "created"} successfully!`,
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
-                        setFormData({ title: '', description: '' });
+                        setFormData({ name: '', description: '', image: '' });
                         setFile(null);
                         router.push("/supplier/category/list");
                     }
@@ -131,7 +133,7 @@ export default function Create() {
 
         } catch (error) {
             console.error("Error:", error);
-            Swal.close(); // Ensure loading is closed on catch
+            Swal.close();
             Swal.fire({
                 icon: "error",
                 title: "Submission Error",
@@ -143,12 +145,10 @@ export default function Create() {
         }
     };
 
-
     return (
         <section className="add-warehouse xl:w-8/12">
-            <div className="bg-white rounded-2xl p-5 ">
+            <div className="bg-white rounded-2xl p-5">
                 <form onSubmit={handleSubmit}>
-
                     <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
                         <div>
                             <label htmlFor="name" className="font-bold block text-[#232323]">
@@ -183,8 +183,8 @@ export default function Create() {
                                 <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
                             )}
                         </div>
-
                     </div>
+
                     <div className='mt-2'>
                         <label htmlFor="image" className="font-bold block text-[#232323]">
                             Category Image <span className='text-red-500 text-lg'>*</span>
@@ -196,15 +196,25 @@ export default function Create() {
                             id="image"
                             className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold"
                         />
+                        {isEdit && formData?.image && (
+                            <div className="mt-2">
+                                <Image
+                                    src={`https://sleeping-owl-we0m.onrender.com${formData.image}`}
+                                    alt="Current Category Image"
+                                    height={200}
+                                    width={200}
+                                    className="rounded"
+                                />
+                            </div>
+                        )}
                         {validationErrors.image && (
                             <p className="text-red-500 text-sm mt-1">{validationErrors.image}</p>
                         )}
                     </div>
 
-
                     <div className="flex flex-wrap gap-3 mt-5">
                         <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">
-                            {loading ? 'Saving...' : 'Save'}
+                            {loading ? 'Saving...' : isEdit ? 'UPDATE' : 'Save'}
                         </button>
                         <button type="button" className="bg-gray-500 text-white px-15 rounded-md p-3" onClick={() => router.back()}>
                             Cancel
