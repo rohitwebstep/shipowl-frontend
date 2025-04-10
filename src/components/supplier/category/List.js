@@ -47,28 +47,28 @@ export default function List() {
             name: item.name,
             description: item.description,
             id: item.id,
-            image:item.image
+            image: item.image
         });
-    
+
         router.push('/supplier/category/create')
     };
 
-   
+
     const handleDelete = async (id) => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-    
+
         if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/supplier/auth/login");
             return;
         }
-    
+
         const suppliertoken = supplierData?.security?.token;
         if (!suppliertoken) {
             router.push("/supplier/auth/login");
             return;
         }
-    
+
         // Ask for confirmation before deleting
         const confirmResult = await Swal.fire({
             title: 'Are you sure?',
@@ -80,9 +80,9 @@ export default function List() {
             confirmButtonText: 'Yes, delete it!',
             cancelButtonText: 'Cancel'
         });
-    
+
         if (!confirmResult.isConfirmed) return;
-    
+
         try {
             // Show loading
             Swal.fire({
@@ -92,7 +92,7 @@ export default function List() {
                     Swal.showLoading();
                 }
             });
-    
+
             const response = await fetch(
                 `https://sleeping-owl-we0m.onrender.com/api/delete/${id}`,
                 {
@@ -103,9 +103,9 @@ export default function List() {
                     },
                 }
             );
-    
+
             Swal.close(); // Close loading
-    
+
             if (!response.ok) {
                 const errorMessage = await response.json();
                 Swal.fire({
@@ -115,18 +115,17 @@ export default function List() {
                 });
                 return;
             }
-    
+
             const result = await response.json();
-    
+
             Swal.fire({
                 icon: "success",
                 title: "Deleted!",
                 text: result.message || "Item has been deleted successfully.",
             });
-    
-            // Optionally refresh data or remove from local state
-            // Example: fetchData();
-    
+
+            fetchCategory();
+
         } catch (error) {
             Swal.close();
             console.error("Error:", error);
@@ -137,7 +136,7 @@ export default function List() {
             });
         }
     };
-    
+
 
     const totalPages = Math.ceil(categoryData.length / perPage);
     const indexOfLast = currentPage * perPage;
@@ -161,7 +160,7 @@ export default function List() {
                             >
                                 <MoreHorizontal className="text-[#F98F5C]" />
                                 {isPopupOpen && (
-                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                    <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
                                         <ul className="py-2 text-sm text-[#2B3674]">
                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
@@ -225,7 +224,7 @@ export default function List() {
                                                 <td className="p-2 px-5 text-[#8F9BBA]">
                                                     <div className="flex justify-center gap-2">
                                                         <MdModeEdit onClick={() => handleEdit(item)} className="cursor-pointer" />
-                                                        <AiOutlineDelete onClick={()=> handleDelete(item.id)} className="cursor-pointer" />
+                                                        <AiOutlineDelete onClick={() => handleDelete(item.id)} className="cursor-pointer" />
                                                     </div>
 
                                                 </td>

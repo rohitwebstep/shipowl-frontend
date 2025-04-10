@@ -6,6 +6,7 @@ import Header from "./Header";
 import { ProfileProvider } from "./userprofile/ProfileContext";
 import SupplierMiddleWareProvider from "./middleware/SupplierMiddleWareContext";
 import { CategoryProvider } from "./category/CategoryContext";
+import { ApiProvider } from "../ApiContext";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
@@ -24,9 +25,11 @@ export default function LayoutWrapper({ children }) {
             {!isAuthPage && <Header />}
             <div className=" xl:p-3 md:pt-4 md:px-0">
               <SupplierMiddleWareProvider>
-                <CategoryProvider>
-                  <ProfileProvider>{children}</ProfileProvider>
-                </CategoryProvider>
+                <ApiProvider>
+                  <CategoryProvider>
+                    <ProfileProvider>{children}</ProfileProvider>
+                  </CategoryProvider>
+                </ApiProvider>
               </SupplierMiddleWareProvider>
 
             </div>
