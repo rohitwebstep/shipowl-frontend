@@ -12,45 +12,45 @@ export default function Invoice() {
     const warehouseData = [
         {
             id: 1,
-            invoice_no:'3198/2023/S-00241',
+            invoice_no: '3198/2023/S-00241',
             date: "27-06-2023",
             invoice_period: "JAN",
             invoice_amount: '₹161',
-            pdf_link:'3198/2023/S-00241',
+            pdf_link: '3198/2023/S-00241',
         },
         {
             id: 2,
-            invoice_no:'3198/2023/S-00241',
+            invoice_no: '3198/2023/S-00241',
             date: "27-06-2023",
             invoice_period: "JAN",
             invoice_amount: '₹161',
-            pdf_link:'3198/2023/S-00241',
+            pdf_link: '3198/2023/S-00241',
         },
         {
             id: 3,
-            invoice_no:'3198/2023/S-00241',
+            invoice_no: '3198/2023/S-00241',
             date: "27-06-2023",
             invoice_period: "JAN",
             invoice_amount: '₹161',
-            pdf_link:'3198/2023/S-00241',
+            pdf_link: '3198/2023/S-00241',
         },
         {
             id: 4,
-            invoice_no:'3198/2023/S-00241',
+            invoice_no: '3198/2023/S-00241',
             date: "27-06-2023",
             invoice_period: "JAN",
             invoice_amount: '₹161',
-            pdf_link:'3198/2023/S-00241',
+            pdf_link: '3198/2023/S-00241',
         },
         {
             id: 5,
-            invoice_no:'3198/2023/S-00241',
+            invoice_no: '3198/2023/S-00241',
             date: "27-06-2023",
             invoice_period: "JAN",
             invoice_amount: '₹161',
-            pdf_link:'3198/2023/S-00241',
+            pdf_link: '3198/2023/S-00241',
         },
-       
+
     ];
     const [selected, setSelected] = useState([]);
 
@@ -100,21 +100,21 @@ export default function Invoice() {
                             onChange={(e) => setSelectedMonth(e.target.value)}
                             className="outline-0 text-[#A3AED0] bg-[#F4F7FE] p-2 rounded-md"
                         />
-                         <button
-                                onClick={() => setIsPopupOpen((prev) => !prev)}
-                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
-                            >
-                                <MoreHorizontal className="text-[#F98F5C]" />
-                                {isPopupOpen && (
-                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
-                                        <ul className="py-2 text-sm text-[#2B3674]">
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                                        </ul>
-                                    </div>
-                                )}
-                            </button>
+                        <button
+                            onClick={() => setIsPopupOpen((prev) => !prev)}
+                            className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                        >
+                            <MoreHorizontal className="text-[#F98F5C]" />
+                            {isPopupOpen && (
+                                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                    <ul className="py-2 text-sm text-[#2B3674]">
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    </ul>
+                                </div>
+                            )}
+                        </button>
                     </div>
                 </div>
 
@@ -123,8 +123,8 @@ export default function Invoice() {
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-3 px-5 whitespace-nowrap text-left uppercase">
-                                    
-                                <div className="flex lg:gap-7 gap-2">
+
+                                    <div className="flex lg:gap-7 gap-2">
                                         <label className="flex items-center cursor-pointer me-2">
                                             <input
                                                 type="checkbox"
@@ -136,7 +136,7 @@ export default function Invoice() {
                                             </div>
                                         </label><span>Invoice No. #<i></i></span>
                                     </div>
-                                    </th>
+                                </th>
                                 <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Date<i></i></th>
                                 <th className="p-3 px-5 whitespace-nowrap text-left uppercase text-red-500">Invoice Period<i></i></th>
                                 <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Amount<i></i></th>
@@ -167,12 +167,12 @@ export default function Invoice() {
                                     </td>
                                     <td className="p-3 px-5 whitespace-nowrap">{item.invoice_amount}</td>
                                     <td className="p-3 px-5 whitespace-nowrap">
-                                    <div className="flex gap-2">
-                                    <FaFilePdf className="text-red-500 text-2xl "/>
-                                    {item.pdf_link}
-                                    </div>
-                                      </td>
-                                    
+                                        <div className="flex gap-2">
+                                            <FaFilePdf className="text-red-500 text-2xl " />
+                                            {item.pdf_link}
+                                        </div>
+                                    </td>
+
                                 </tr>
                             ))}
                         </tbody>
@@ -221,7 +221,7 @@ export default function Invoice() {
                     </select>
                 </div>
             </div>
-            
+
         </>
     )
 }

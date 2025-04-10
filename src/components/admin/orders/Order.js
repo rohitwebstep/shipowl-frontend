@@ -58,16 +58,8 @@ const orders = [
 ];
 
 export default function Orders() {
-    const [showModal, setShowModal] = useState(false);
     const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
-
-    const openMoreModal = () => {
-        setShowModal(true);
-    };
-
-    const closeModalBox = () => {
-        setShowModal(false);
-    };
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
@@ -91,8 +83,8 @@ export default function Orders() {
     };
     const handleSelect = (ranges) => {
         setRange([ranges.selection]);
-      };
-      
+    };
+
     const [range, setRange] = useState([
         {
             startDate: new Date(),
@@ -111,28 +103,28 @@ export default function Orders() {
                     </select>
                 </div>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 px-3 md:px-0 gap-4 mb-4">
-                <div className="relative">
-                    <label className="text-[#232323] mb-1 block">From Date:</label>
-                    <input
-                        readOnly
-                        onClick={() => setShowPicker(!showPicker)}
-                        value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
-                        className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full cursor-pointer"
-                        placeholder="Select date range"
-                    />
+                    <div className="relative">
+                        <label className="text-[#232323] mb-1 block">From Date:</label>
+                        <input
+                            readOnly
+                            onClick={() => setShowPicker(!showPicker)}
+                            value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                            className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full cursor-pointer"
+                            placeholder="Select date range"
+                        />
 
-                    {showPicker && (
-                        <div className="absolute z-50 mt-2">
-                            <DateRange
-                                editableDateInputs={true}
-                                onChange={handleSelect}
-                                moveRangeOnFirstSelection={false}
-                                ranges={range}
-                                className="shadow-xl"
-                            />
-                        </div>
-                    )}
-                </div>
+                        {showPicker && (
+                            <div className="absolute z-50 mt-2">
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={handleSelect}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={range}
+                                    className="shadow-xl"
+                                />
+                            </div>
+                        )}
+                    </div>
                     <div>
                         <label className='text-[#232323] font-medium block'>Order ID(s):</label>
                         <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" />
@@ -210,9 +202,21 @@ export default function Orders() {
                                 className="outline-0 font-dm-sans"
                             />
                         </button>
-                        <button onClick={openMoreModal} className="bg-[#F4F7FE] p-2 rounded-lg">
-                            <MoreHorizontal className="text-[#F98F5C]" />
-                        </button>
+                    <button
+                                             onClick={() => setIsPopupOpen((prev) => !prev)}
+                                             className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                                         >
+                                             <MoreHorizontal className="text-[#F98F5C]" />
+                                             {isPopupOpen && (
+                                                 <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                                     <ul className="py-2 text-sm text-[#2B3674]">
+                                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                                     </ul>
+                                                 </div>
+                                             )}
+                                         </button>
                     </div>
                 </div>
                 <div className="overflow-x-auto">
@@ -388,20 +392,7 @@ export default function Orders() {
                     </div>
                 </div>
             )}
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000085] bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md">
-                        <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Modal Title</h2>
-                        <p className="text-[#4A5568] mb-4">This is some modal content. You can put anything here.</p>
-                        <button
-                            onClick={closeModalBox}
-                            className="bg-[#2B3674] text-white px-4 py-2 rounded hover:bg-[#1a254b]"
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )}
+           
 
         </div>
     );

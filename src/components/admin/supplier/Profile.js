@@ -16,13 +16,13 @@ export default function Profile() {
   ];
   return (
     <div className="">
-      <div className={`flex border-b bg-white pt-5 xl:gap-8 overflow-auto px-4 rounded-tl-2xl rounded-tr-2xl  border-[#F4F5F7] ${activeTab== "profile-edit" ? "xl:w-10/12" :"w-full"}`}>
+      <div className={`flex border-b bg-white pt-5 xl:gap-8 overflow-auto px-4 rounded-tl-2xl rounded-tr-2xl  border-[#F4F5F7] ${activeTab == "profile-edit" ? "xl:w-10/12" : "w-full"}`}>
         {tabs.map((tab) => (
           <button
             key={tab.id}
             className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${activeTab === tab.id
-                ? "border-b-3 border-orange-500 text-orange-500"
-                : "text-[#718EBF]"
+              ? "border-b-3 border-orange-500 text-orange-500"
+              : "text-[#718EBF]"
               }`}
             onClick={() => setActiveTab(tab.id)}
           >

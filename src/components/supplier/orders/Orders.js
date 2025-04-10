@@ -84,7 +84,7 @@ export default function Orders() {
   const handleSelect = (ranges) => {
     setRange([ranges.selection]);
   };
-  
+
   const [showPicker, setShowPicker] = useState(false)
 
   const handleCheckboxChange = (id) => {
@@ -98,28 +98,28 @@ export default function Orders() {
       <div className='bg-white p-4 rounded-xl mb-4'>
         <div className="grid lg:grid-cols-4 md:grid-cols-2 px-3 md:px-0 gap-4 mb-4">
           {/* Input fields */}
-            <div className="relative">
-                      <label className="text-[#232323] mb-1 block">From Date:</label>
-                      <input
-                        readOnly
-                        onClick={() => setShowPicker(!showPicker)}
-                        value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
-                        className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full cursor-pointer"
-                        placeholder="Select date range"
-                      />
-          
-                      {showPicker && (
-                        <div className="absolute z-50 mt-2">
-                          <DateRange
-                            editableDateInputs={true}
-                            onChange={handleSelect}
-                            moveRangeOnFirstSelection={false}
-                            ranges={range}
-                            className="shadow-xl"
-                          />
-                        </div>
-                      )}
-                    </div>
+          <div className="relative">
+            <label className="text-[#232323] mb-1 block">From Date:</label>
+            <input
+              readOnly
+              onClick={() => setShowPicker(!showPicker)}
+              value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+              className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full cursor-pointer"
+              placeholder="Select date range"
+            />
+
+            {showPicker && (
+              <div className="absolute z-50 mt-2">
+                <DateRange
+                  editableDateInputs={true}
+                  onChange={handleSelect}
+                  moveRangeOnFirstSelection={false}
+                  ranges={range}
+                  className="shadow-xl"
+                />
+              </div>
+            )}
+          </div>
           <div>
             <label className='text-[#232323] font-medium block'>Order ID(s):</label>
             <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" />
@@ -176,7 +176,7 @@ export default function Orders() {
 
       <div className="bg-white p-4 rounded-2xl">
         <div className="flex flex-wrap justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold  font-dm-sans">RTO Order Details</h2>
+          <h2 className="text-2xl font-bold  font-dm-sans text-[#2B3674]">Order Details</h2>
           <div className="flex gap-2 flex-wrap items-center">
             <span className="font-bold  font-dm-sans">Clear Filters</span>
             <span><IoMdRefresh className="text-red-600 text-xl" /></span>
@@ -198,40 +198,40 @@ export default function Orders() {
               />
             </button>
             <button
-                                onClick={() => setIsPopupOpen((prev) => !prev)}
-                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
-                            >
-                                <MoreHorizontal className="text-[#F98F5C]" />
-                                {isPopupOpen && (
-                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
-                                        <ul className="py-2 text-sm text-[#2B3674]">
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                                        </ul>
-                                    </div>
-                                )}
-                            </button>
+              onClick={() => setIsPopupOpen((prev) => !prev)}
+              className="bg-[#F4F7FE] p-2 rounded-lg relative"
+            >
+              <MoreHorizontal className="text-[#F98F5C]" />
+              {isPopupOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                  <ul className="py-2 text-sm text-[#2B3674]">
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                  </ul>
+                </div>
+              )}
+            </button>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr className="text-[#A3AED0] border-b border-[#E9EDF7]">
-                <th className="p-2 whitespace-nowrap text-left uppercase">Order ID<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left uppercase">Name<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left uppercase">Payment Info<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left uppercase">Order Tags<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left uppercase">Seller Tags<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left uppercase">Shipment Details<i></i></th>
-                <th className="p-2 whitespace-nowrap text-left uppercase">SLA<i></i></th>
-                <th className="p-2 whitespace-nowrap text-center uppercase">Action<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Order ID<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Name<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Payment Info<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Order Tags<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Seller Tags<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Shipment Details<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">SLA<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action<i></i></th>
               </tr>
             </thead>
             <tbody>
               {currentData.map((order) => (
                 <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
-                  <td className="p-2 whitespace-nowrap">
+                  <td className="p-2 whitespace-nowrap px-5">
                     <div className="flex items-start">
                       <label className="flex mt-2 items-center cursor-pointer me-2">
                         <input
@@ -246,23 +246,23 @@ export default function Orders() {
                         </div>
                       </label>
                       <div><b className='text-black truncate'>{order.id}</b>
-                      <br />
-                      <span className="font-bold text-xs">{order.date}</span></div>
+                        <br />
+                        <span className="font-bold text-xs">{order.date}</span></div>
                     </div>
 
                   </td>
-                  <td className="p-2  whitespace-nowrap">
+                  <td className="p-2  whitespace-nowrap px-5">
                     <span className=''>{order.product}</span>
                     <br />
                     <span className="text-sm">SKU: {order.sku}<br /> Qty: {order.qty}</span>
                   </td>
-                  <td className="p-2  whitespace-nowrap">
+                  <td className="p-2  whitespace-nowrap px-5">
                     <span className=''>COD:{order.cod}</span>
                     <br />
                     <span className="">Order Value:{order.orderValue}</span>
                     <span className="text-red-500 block">{order.status}</span>
                   </td>
-                  <td className="p-2 space-y-1 whitespace-nowrap">
+                  <td className="p-2 space-y-1 whitespace-nowrap px-5">
                     {order.tags.map((tag, i) => (
                       <span
                         key={i}
@@ -276,10 +276,10 @@ export default function Orders() {
                       </span>
                     ))}
                   </td>
-                  <td className="p-2  whitespace-nowrap">
+                  <td className="p-2  whitespace-nowrap px-5">
                     <span className=' '>{order.seller_tags || 'NA'}</span>
                   </td>
-                  <td className="p-2 whitespace-nowrap">
+                  <td className="p-2 whitespace-nowrap px-5 ">
                     <span className=' '>{order.shipment.id}</span>
                     <br />
                     <span className="text-[#05CD99] ">{order.shipment.status}</span>
@@ -288,11 +288,11 @@ export default function Orders() {
                     <br />
                     <span className="text-sm ">{order.shipment.date}</span>
                   </td>
-                  <td className="p-2   whitespace-nowrap">
+                  <td className="p-2   whitespace-nowrap px-5">
                     {order.sla}
                     <span className='block text-green-400 '>{order.sla_date}</span>
                   </td>
-                  <td className="p-2 whitespace-nowrap">
+                  <td className="p-2 whitespace-nowrap px-5">
                     <ul className="flex gap-2 justify-between">
                       <li><RiFileEditFill className="text-black text-2xl" /></li>
                       <li><IoCloudDownloadOutline className="text-black text-2xl" /></li>

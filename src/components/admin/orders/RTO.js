@@ -57,7 +57,7 @@ const orders = [
   },
 ];
 export default function RTO() {
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [range, setRange] = useState([
@@ -71,7 +71,7 @@ export default function RTO() {
   const handleSelect = (ranges) => {
     setRange([ranges.selection]);
   };
-  
+
   const [showPicker, setShowPicker] = useState(false)
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
@@ -191,21 +191,21 @@ export default function RTO() {
                 className="outline-0 font-dm-sans"
               />
             </button>
-             <button
-                                onClick={() => setIsPopupOpen((prev) => !prev)}
-                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
-                            >
-                                <MoreHorizontal className="text-[#F98F5C]" />
-                                {isPopupOpen && (
-                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
-                                        <ul className="py-2 text-sm text-[#2B3674]">
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                                        </ul>
-                                    </div>
-                                )}
-                            </button>
+            <button
+              onClick={() => setIsPopupOpen((prev) => !prev)}
+              className="bg-[#F4F7FE] p-2 rounded-lg relative"
+            >
+              <MoreHorizontal className="text-[#F98F5C]" />
+              {isPopupOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                  <ul className="py-2 text-sm text-[#2B3674]">
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                  </ul>
+                </div>
+              )}
+            </button>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -382,7 +382,7 @@ export default function RTO() {
           </div>
         </div>
       )}
-      
+
     </div>
   );
 }

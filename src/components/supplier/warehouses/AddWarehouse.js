@@ -51,7 +51,6 @@ export default function AddWarehouse() {
                     </div>
                 </div>
             </section>
-
         </>
     )
 }

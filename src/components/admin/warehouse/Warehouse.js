@@ -7,16 +7,6 @@ import { MoreHorizontal } from "lucide-react";
 import Link from 'next/link';
 import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
 export default function Warehouse() {
-  const [showModal, setShowModal] = useState(false);
-
-  const openModalBox = () => {
-    setShowModal(true);
-  };
-
-  const closeModalBox = () => {
-    setShowModal(false);
-  };
-
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
   const warehouseData = [
@@ -40,6 +30,7 @@ export default function Warehouse() {
     }
   ];
   const [selected, setSelected] = useState([]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
 
   const handleCheckboxChange = (id) => {
@@ -72,8 +63,20 @@ export default function Warehouse() {
         <div className="flex flex-wrap justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-[#2B3674]">Warehouse</h2>
           <div className="flex gap-3  flex-wrap items-center">
-            <button onClick={openModalBox} className="bg-[#F4F7FE] p-2 rounded-lg">
+            <button
+              onClick={() => setIsPopupOpen((prev) => !prev)}
+              className="bg-[#F4F7FE] p-2 rounded-lg relative"
+            >
               <MoreHorizontal className="text-[#F98F5C]" />
+              {isPopupOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                  <ul className="py-2 text-sm text-[#2B3674]">
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                  </ul>
+                </div>
+              )}
             </button>
           </div>
         </div>
@@ -242,11 +245,6 @@ export default function Warehouse() {
           </select>
         </div>
       </div>
-      {/* Modal */}
-      
-
-
-
     </>
   )
 }

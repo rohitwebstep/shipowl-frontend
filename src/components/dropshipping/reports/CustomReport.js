@@ -17,7 +17,7 @@ function CustomReport() {
         },
         {
             title: 'Shipment',
-            options: ['Shipment Date', 'AWB Number', 'Shipment Status', 'Remittance ID', 'Pickup Time', 'Delivered Time',  'RTO Delivered Time', 'Charjed Date', 'Zone', 'Last Status Updated', 'Courier Name', 'Freight Charges', 'COD Charges'],
+            options: ['Shipment Date', 'AWB Number', 'Shipment Status', 'Remittance ID', 'Pickup Time', 'Delivered Time', 'RTO Delivered Time', 'Charjed Date', 'Zone', 'Last Status Updated', 'Courier Name', 'Freight Charges', 'COD Charges'],
         },
         {
             title: 'Warehouse',

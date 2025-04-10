@@ -191,7 +191,7 @@ const BusinessInfo = () => {
       </div>
       <div className='grid md:grid-cols-2 py-5 gap-3'>
 
-        
+
         <div>
           <label className="block text-[#232323] font-bold mb-1">Upload PAN card image</label>
           <input
@@ -217,38 +217,38 @@ const BusinessInfo = () => {
       <h3 className="font-semibold text-[#FF702C] underline text-sm pt-5">Additional Supporting Document</h3>
 
       <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 pt-3">
-        
-      <div>
-            <label className="block text-[#232323] font-bold mb-1">Document to upload</label>
-            <input
-              type="text"
-              name="panCardName"
-              value={formData.panCardName}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-            />
-          </div>
-          <div>
-            <label className="block text-[#232323] font-bold mb-1">Document ID</label>
-            <input
-              type="text"
-              name="panCardName"
-              value={formData.panCardName}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-            />
-          </div>
-          <div>
-            <label className="block text-[#232323] font-bold mb-1">Name of document</label>
-            <input
-              type="text"
-              name="panCardName"
-              value={formData.panCardName}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-            />
-          </div>
-          <div>
+
+        <div>
+          <label className="block text-[#232323] font-bold mb-1">Document to upload</label>
+          <input
+            type="text"
+            name="panCardName"
+            value={formData.panCardName}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
+          />
+        </div>
+        <div>
+          <label className="block text-[#232323] font-bold mb-1">Document ID</label>
+          <input
+            type="text"
+            name="panCardName"
+            value={formData.panCardName}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
+          />
+        </div>
+        <div>
+          <label className="block text-[#232323] font-bold mb-1">Name of document</label>
+          <input
+            type="text"
+            name="panCardName"
+            value={formData.panCardName}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
+          />
+        </div>
+        <div>
           <label className="block text-[#232323] font-bold mb-1">Document Image</label>
           <input
             type="file"

@@ -40,7 +40,6 @@ export default function Sidebar() {
             { name: "RTO Orders", icon: ClipboardList, href: "/admin/supplier/orders/rto-orders" },
             { name: "Billings", icon: BadgeDollarSign, href: "/admin/billing" },
             { name: "Payment", icon: CreditCard, href: "/admin/payments" },
-            { name: "Terms & Condition", icon: ShieldCheck, href: "/terms" },
           ],
         },
       ],
@@ -62,7 +61,6 @@ export default function Sidebar() {
             { name: "High RTO Pincode", icon: MapPin, href: "#" },
             { name: "Boosters", icon: Volume2, href: "#" },
             { name: "Integrations", icon: Settings, href: "#" },
-            { name: "Terms & Conditions", icon: FileText, href: "#" },
           ],
         },
       ],
@@ -84,6 +82,7 @@ export default function Sidebar() {
     { title: "Country Management", icon: SiGoogletagmanager, href: "/admin/country/list" },
     { title: "Profile", icon: User, href: "/admin/profile" },
     { title: "Settings", icon: Settings, href: "/admin/setting" },
+    { title: "Terms & Condition", icon: ShieldCheck, href: "/admin/terms" },
   ];
 
   return (

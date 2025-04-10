@@ -120,20 +120,20 @@ export default function ProductDetails() {
             onChange={handleChange}
           />
         </div>
-      <div className="mt-4">
-        <label className="block   text-[#232323] font-semibold">List As</label>
-        <div className="flex flex-wrap gap-4 mt-2">
-          <label className="flex items-center gap-2">
-            <input type="radio" name="listAs" value="warehouse" onChange={handleChange} /> Warehouse Model
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="radio" name="listAs" value="rto" onChange={handleChange} /> RTO Model
-          </label>
-          <label className="flex items-center gap-2">
-            <input type="radio" name="listAs" value="both" defaultChecked onChange={handleChange} /> Both
-          </label>
+        <div className="mt-4">
+          <label className="block   text-[#232323] font-semibold">List As</label>
+          <div className="flex flex-wrap gap-4 mt-2">
+            <label className="flex items-center gap-2">
+              <input type="radio" name="listAs" value="warehouse" onChange={handleChange} /> Warehouse Model
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="listAs" value="rto" onChange={handleChange} /> RTO Model
+            </label>
+            <label className="flex items-center gap-2">
+              <input type="radio" name="listAs" value="both" defaultChecked onChange={handleChange} /> Both
+            </label>
+          </div>
         </div>
-      </div>
       </div>
 
 

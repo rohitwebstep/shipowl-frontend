@@ -56,11 +56,11 @@ const ProductList = () => {
               </select>
             </div>
           </div>
-         
 
-            <div className="xl:w-[13%]  mt-3 lg:mt-0  flex items-end justify-end">
-              <button className="w-full bg-[#1D1F2C]  text-white p-3  px-2 rounded-md hover:bg-gray-800 public-sans lg:w-auto">Search Product</button>
-            </div>
+
+          <div className="xl:w-[13%]  mt-3 lg:mt-0  flex items-end justify-end">
+            <button className="w-full bg-[#1D1F2C]  text-white p-3  px-2 rounded-md hover:bg-gray-800 public-sans lg:w-auto">Search Product</button>
+          </div>
         </div>
 
         <div className="flex justify-between items-center my-4">

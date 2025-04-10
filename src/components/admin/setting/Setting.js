@@ -44,8 +44,8 @@ export default function Setting() {
                 <button
                   onClick={() => setNotifications(!notifications)}
                   className={`ml-auto transition ${notifications
-                      ? "text-green-500"
-                      : "text-gray-400"
+                    ? "text-green-500"
+                    : "text-gray-400"
                     }`}
                 >
                   <FiToggleRight size={24} />

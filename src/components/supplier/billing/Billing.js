@@ -16,22 +16,22 @@ export default function Billing() {
   ];
   return (
     <div>
-     <div className="bg-white rounded-2xl p-3">
-     <div className="flex border-b overflow-auto md:gap-8 gap-3 border-[#F4F5F7]">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`px-4 py-2 whitespace-nowrap text-lg  ${activeTab === tab.id
+      <div className="bg-white rounded-2xl p-3">
+        <div className="flex border-b overflow-auto md:gap-8 gap-3 border-[#F4F5F7]">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`px-4 py-2 whitespace-nowrap text-lg  ${activeTab === tab.id
                 ? "border-b-3 font-bold  border-orange-500 text-orange-500"
                 : "text-[#718EBF] font-medium"
-              }`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
+                }`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
-     </div>
 
       <div className="">
         {activeTab === "billing" && <BillingList />}

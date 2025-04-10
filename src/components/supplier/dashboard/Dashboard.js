@@ -17,11 +17,11 @@ export default function Dashboard() {
     verifySupplierAuth();
   }, [verifySupplierAuth]);
 
-  
+
   return (
     <>
       <div>
-        <div className="md:flex gap-4 justify-between items-baseline">
+        <div className="md:flex gap-4 justify-between items-start">
           <DashboardCards />
           <DailyDeliveryChart />
           <OrdersLineChart />

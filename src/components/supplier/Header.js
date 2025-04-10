@@ -6,9 +6,8 @@ import userImage from "@/app/images/userimage.png";
 import { FaSignOutAlt } from "react-icons/fa";
 
 export default function Header() {
-  const pathname = usePathname(); // Get current route
+  const pathname = usePathname(); 
 
-  // Map route to a more readable title
   const pageTitles = {
     "/supplier": "Dashboard",
     "/supplier/product/": "Product",
@@ -29,22 +28,18 @@ export default function Header() {
 
   return (
     <header className="md:flex items-center md:mt-16 mt-10 lg:mt-0 justify-between lg:py-7 px-3 p-2 pt-6">
-      {/* Left: Breadcrumb & Title */}
       <div className="md:w-4/12">
         <p className="text-sm text-[#707EAE]">Pages / {currentPage}</p>
         <h1 className="lg:text-4xl text-xl mt-3 font-bold text-[#2B3674]">{currentPage}</h1>
       </div>
 
-      {/* Right: Date Picker, Search, Notification, Profile */}
       <div className="flex  items-center mt-5 md:mt-0 justify-end space-x-4 md:w-8/12">
-        {/* Date Picker */}
         <button className="bg-white hidden md:flex px-10 py-4 gap-8 rounded-full font-semibold text-[#2B3674]  items-center space-x-2">
           <span>07/26/2024</span>
           <span><FaChevronDown /></span>
         </button>
 
         <div className="bg-white w-full md:w-auto rounded-full p-2 flex justify-baseline md:gap-4 gap-1">
-          {/* Search Input */}
           <div className="relative  w-9/12">
             <FaSearch className="absolute md:left-3 right-3 top-2.5 text-gray-400" />
             <input
@@ -54,13 +49,11 @@ export default function Header() {
             />
           </div>
 
-          {/* Notification Bell */}
           <button className="relative p-2">
             <FaBell className="text-gray-500" />
             <span className="absolute top-1 right-1 bg-red-500 w-2 h-2 rounded-full"></span>
           </button>
 
-          {/* Profile Picture */}
           <Image
             src={userImage}
             alt="User Avatar"

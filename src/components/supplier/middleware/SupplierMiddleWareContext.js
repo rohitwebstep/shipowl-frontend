@@ -17,10 +17,6 @@ export default function SupplierMiddleWareProvider({ children }) {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-
-
-
-    // ✅ Moved async logic to a stable function using useCallback
     const verifySupplierAuth = useCallback(async () => {
         setLoading(true);
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
@@ -74,7 +70,6 @@ export default function SupplierMiddleWareProvider({ children }) {
         }
     }, [router]);
 
-    // ✅ Run verifyDropShipperAuth when adminToken changes
 
 
     return (

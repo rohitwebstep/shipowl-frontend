@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { MoreHorizontal } from "lucide-react";
 import { MdModeEdit } from "react-icons/md";
 import Link from "next/link";
-import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
+import { FaCheck } from "react-icons/fa"; 
 import Image from "next/image";
 import productimage from '@/app/images/product1.png'
 import productimage2 from '@/app/images/product2.png'
@@ -13,9 +13,7 @@ import productimage4 from '@/app/images/product4.png'
 import productimage5 from '@/app/images/product5.png'
 const ProductTable = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-
     const [showRtoLiveCount, setShowRtoLiveCount] = useState(false);
-
     const data = [
         {
             id: 1,
@@ -93,26 +91,22 @@ const ProductTable = () => {
             productImage: productimage5,
         },
     ];
-
     const [selected, setSelected] = useState([]);
-
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const [selectedMonth, setSelectedMonth] = useState(() => {
         const today = new Date();
-        return today.toISOString().slice(0, 7); // YYYY-MM format
+        return today.toISOString().slice(0, 7); 
     });
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
     };
-
     const totalPages = Math.ceil(data.length / perPage);
     const indexOfLast = currentPage * perPage;
     const indexOfFirst = indexOfLast - perPage;
     const currentData = data.slice(indexOfFirst, indexOfLast);
-
 
     return (
         <div className="">
@@ -218,20 +212,20 @@ const ProductTable = () => {
                             />
                         </button>
                         <button
-                                onClick={() => setIsPopupOpen((prev) => !prev)}
-                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
-                            >
-                                <MoreHorizontal className="text-[#F98F5C]" />
-                                {isPopupOpen && (
-                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
-                                        <ul className="py-2 text-sm text-[#2B3674]">
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                                        </ul>
-                                    </div>
-                                )}
-                            </button>
+                            onClick={() => setIsPopupOpen((prev) => !prev)}
+                            className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                        >
+                            <MoreHorizontal className="text-[#F98F5C]" />
+                            {isPopupOpen && (
+                                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                    <ul className="py-2 text-sm text-[#2B3674]">
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    </ul>
+                                </div>
+                            )}
+                        </button>
                     </div>
                 </div>
 
@@ -365,7 +359,7 @@ const ProductTable = () => {
                                             {item.rtoStatus}
                                         </button></td>
                                     )}
-                                    <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]"><div className="flex justify-center"><MdModeEdit className="text-center"/></div></td>
+                                    <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]"><div className="flex justify-center"><MdModeEdit className="text-center" /></div></td>
                                 </tr>
                             ))}
                         </tbody>

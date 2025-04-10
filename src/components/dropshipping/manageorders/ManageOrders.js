@@ -13,7 +13,7 @@ import { FiDownloadCloud } from "react-icons/fi";
 import { FaFilter, FaCheck } from "react-icons/fa";
 
 export default function ManageOrders() {
-  const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
     const closeModalBox = () => {

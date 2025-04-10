@@ -19,22 +19,21 @@ const Tabs = () => {
     <div className="w-full xl:p-6">
       <div className="bg-white rounded-3xl p-5">
 
-      
-      <div className="flex border-b overflow-auto  border-[#F4F5F7]">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`px-4 py-2 text-lg whitespace-nowrap  ${
-              activeTab === tab.id
-                ? "border-b-3 border-orange-500  font-bold text-orange-500"
-                : "text-[#718EBF] font-medium"
-            }`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+
+        <div className="flex border-b overflow-auto  border-[#F4F5F7]">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`px-4 py-2 text-lg whitespace-nowrap  ${activeTab === tab.id
+                  ? "border-b-3 border-orange-500  font-bold text-orange-500"
+                  : "text-[#718EBF] font-medium"
+                }`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="">
         {activeTab === "product-details" && <ProductDetails />}

@@ -24,19 +24,19 @@ export default function Login() {
     useEffect(() => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
         const token = supplierData?.security?.token;
-    
+
         if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/supplier/auth/login");
             return;
         }
-    
+
         if (token && verifySupplierAuth()) {
             router.push("/supplier");
         }
-    
+
     }, []); // empty array = run only once
-    
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();

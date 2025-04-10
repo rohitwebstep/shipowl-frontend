@@ -39,17 +39,17 @@ export default function OtherDetails() {
         </div>
       </div>
       <div className="grid md:grid-cols-2 gap-4 mb-4">
-      <div>
-      <label htmlFor="rtoAddress" className='font-bold block '>RTO Address *</label>
-        <select className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full" value={formData.rtoAddress} onChange={(e) => handleChange('rtoAddress', e.target.value)}>
-          <option>RTO Address *</option>
-        </select>
+        <div>
+          <label htmlFor="rtoAddress" className='font-bold block '>RTO Address *</label>
+          <select className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full" value={formData.rtoAddress} onChange={(e) => handleChange('rtoAddress', e.target.value)}>
+            <option>RTO Address *</option>
+          </select>
         </div>
         <div>
-        <label htmlFor="pickupAddress" className='font-bold block '>Pickup Address *</label>
-        <select className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full" value={formData.pickupAddress} onChange={(e) => handleChange('pickupAddress', e.target.value)}>
-          <option>Pickup Address *</option>
-        </select>
+          <label htmlFor="pickupAddress" className='font-bold block '>Pickup Address *</label>
+          <select className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full" value={formData.pickupAddress} onChange={(e) => handleChange('pickupAddress', e.target.value)}>
+            <option>Pickup Address *</option>
+          </select>
         </div>
       </div>
       <div className="flex flex-wrap gap-4">

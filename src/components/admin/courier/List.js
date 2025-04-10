@@ -10,47 +10,46 @@ export default function List() {
     const [perPage, setPerPage] = useState(5);
     const Couriers = [
         {
-          id: 1,
-          name: "DTDC",
-          code: "DTDC",
-          website: "demo4.in",
-          contact_number: "+91 1234567890",
-          contact_email: "support@dd.in",
-          status: "active",
+            id: 1,
+            name: "DTDC",
+            code: "DTDC",
+            website: "demo4.in",
+            contact_number: "+91 1234567890",
+            contact_email: "support@dd.in",
+            status: "active",
         },
         {
-          id: 2,
-          name: "Blue Dart",
-          code: "BLUEDART",
-          website: "demo.com",
-          contact_number: "+91 9876543210",
-          contact_email: "contact@cc.com",
-          status: "inactive",
+            id: 2,
+            name: "Blue Dart",
+            code: "BLUEDART",
+            website: "demo.com",
+            contact_number: "+91 9876543210",
+            contact_email: "contact@cc.com",
+            status: "inactive",
         },
         {
-          id: 3,
-          name: "Delhivery",
-          code: "DELHIVERY",
-          website: "demo1.com",
-          contact_number: "+91 9876541230",
-          contact_email: "info@aa.com",
-          status: "active",
+            id: 3,
+            name: "Delhivery",
+            code: "DELHIVERY",
+            website: "demo1.com",
+            contact_number: "+91 9876541230",
+            contact_email: "info@aa.com",
+            status: "active",
         },
         {
-          id: 4,
-          name: "Ecom Express",
-          code: "ECOMEXP",
-          website: "demo3.in",
-          contact_number: "+91 9999988888",
-          contact_email: "support@bb.in",
-          status: "active",
+            id: 4,
+            name: "Ecom Express",
+            code: "ECOMEXP",
+            website: "demo3.in",
+            contact_number: "+91 9999988888",
+            contact_email: "support@bb.in",
+            status: "active",
         },
-      ];
-      
+    ];
+
     const [selected, setSelected] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const openPopup = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -69,8 +68,20 @@ export default function List() {
                 <div className="flex flex-wrap justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-[#2B3674]">Courier List</h2>
                     <div className="flex gap-3  flex-wrap items-center">
-                        <button onClick={openPopup} className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button
+                            onClick={() => setIsPopupOpen((prev) => !prev)}
+                            className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                        >
                             <MoreHorizontal className="text-[#F98F5C]" />
+                            {isPopupOpen && (
+                                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                    <ul className="py-2 text-sm text-[#2B3674]">
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    </ul>
+                                </div>
+                            )}
                         </button>
                         <div className="flex justify-start gap-5 items-end">
                             <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/courier/create">Add New</Link></button>
@@ -175,15 +186,7 @@ export default function List() {
                 </div>
             </div>
 
-            {isModalOpen && (
-        <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
-            <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-            <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
-            <p className="text-[#4A5568]">Add your content here.</p>
-          </div>
-        </div>
-      )}
+
         </>
     )
 }

@@ -46,7 +46,7 @@ export default function Setting() {
               checked={thermalPrinter}
               onChange={() => setThermalPrinter(!thermalPrinter)}
             />
-           <div
+            <div
               className={`relative w-12 h-7 rounded-full transition-colors duration-300 ${thermalPrinter ? "bg-[#16DBCC]" : "bg-gray-300"}`}
             >
               <div

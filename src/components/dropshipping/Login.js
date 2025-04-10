@@ -20,7 +20,7 @@ export default function Login() {
     const handlePasswordChange = (e) => setPassword(e.target.value);
     const handleEmailChange = (e) => setEmail(e.target.value);
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
-    
+
     useEffect(() => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
         const token = supplierData?.security?.token;
@@ -34,7 +34,7 @@ export default function Login() {
             router.push("/dropshipping");
         }
 
-    }, [verifyDropShipperAuth,router]);
+    }, [verifyDropShipperAuth, router]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

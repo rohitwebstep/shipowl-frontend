@@ -15,7 +15,9 @@ import product from '@/app/assets/product1.png'
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
 export default function ManageProducts() {
-    const [modalType, setModalType] = useState(null); // 'inventory' | 'moreOptions' | null
+    const [modalType, setModalType] = useState(null);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+
     const [range, setRange] = useState([
         {
             startDate: new Date(),
@@ -225,10 +227,19 @@ export default function ManageProducts() {
                             />
                         </button>
                         <button
-                            className="bg-[#F4F7FE] p-2 rounded-lg"
-                            onClick={() => setModalType('moreOptions')}
+                            onClick={() => setIsPopupOpen((prev) => !prev)}
+                            className="bg-[#F4F7FE] p-2 rounded-lg relative"
                         >
                             <MoreHorizontal className="text-[#F98F5C]" />
+                            {isPopupOpen && (
+                                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                    <ul className="py-2 text-sm text-[#2B3674]">
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    </ul>
+                                </div>
+                            )}
                         </button>
 
                     </div>
@@ -378,29 +389,6 @@ export default function ManageProducts() {
                     </div>
                 </div>
             )}
-
-            {/* More Options Modal */}
-            {modalType === 'moreOptions' && (
-                <div className="fixed inset-0 bg-[#0000008c] bg-opacity-40 z-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-xl shadow-lg w-[400px]">
-                        <h3 className="text-xl font-semibold mb-4">More Options</h3>
-                        <ul className="space-y-2 text-gray-800">
-                            <li className="hover:text-[#F98F5C] cursor-pointer">Export Data</li>
-                            <li className="hover:text-[#F98F5C] cursor-pointer">Change Columns</li>
-                            <li className="hover:text-[#F98F5C] cursor-pointer">Bulk Edit</li>
-                        </ul>
-                        <div className="flex justify-end mt-6">
-                            <button
-                                onClick={() => setModalType(null)}
-                                className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
         </div>
     );
 }

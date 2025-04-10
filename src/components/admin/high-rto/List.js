@@ -6,6 +6,8 @@ import { MoreHorizontal } from "lucide-react";
 import Link from 'next/link';
 import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
 export default function List() {
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const Couriers = [
@@ -36,9 +38,7 @@ export default function List() {
     ];
 
     const [selected, setSelected] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const openPopup = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -57,8 +57,20 @@ export default function List() {
                 <div className="flex flex-wrap justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-[#2B3674]">High RTO List</h2>
                     <div className="flex gap-3  flex-wrap items-center">
-                        <button onClick={openPopup} className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button
+                            onClick={() => setIsPopupOpen((prev) => !prev)}
+                            className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                        >
                             <MoreHorizontal className="text-[#F98F5C]" />
+                            {isPopupOpen && (
+                                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                    <ul className="py-2 text-sm text-[#2B3674]">
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    </ul>
+                                </div>
+                            )}
                         </button>
                         <div className="flex justify-start gap-5 items-end">
                             <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/high-rto/create">Add New</Link></button>
@@ -157,7 +169,7 @@ export default function List() {
                 </div>
             </div>
 
-            
+
         </>
     )
 }

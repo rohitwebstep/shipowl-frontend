@@ -4,14 +4,14 @@ import Image from 'next/image';
 function Banner() {
   return (
     <>
-    <section className='xl:pb-8 xl:px-4'>
+      <section className='xl:pb-8 xl:px-4'>
         <div className="container">
-            <div className="banner-image">
-            <Image src={bannerImage} className='w-full' alt="Banner Image"/>
-            </div>
+          <div className="banner-image">
+            <Image src={bannerImage} className='w-full' alt="Banner Image" />
+          </div>
         </div>
-    </section>
-    
+      </section>
+
     </>
   )
 }

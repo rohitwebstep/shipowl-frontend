@@ -9,7 +9,6 @@ import {
     Home,
     ShoppingCart,
     Package,
-    Gift,
     CreditCard,
     FileText,
     Settings,

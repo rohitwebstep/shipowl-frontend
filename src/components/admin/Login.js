@@ -36,7 +36,7 @@ export default function Login() {
             router.push("/admin");
         }
 
-    }, [verifyAdminAuth,router])
+    }, [verifyAdminAuth, router])
 
 
     const handleSubmit = async (e) => {

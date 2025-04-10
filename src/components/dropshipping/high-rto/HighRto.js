@@ -1,64 +1,69 @@
-"use client"
-import { useState } from 'react';
-
-const highRtoPincodes = [
-  { pincode: '110044', city: 'Delhi', reason: 'High return rate' },
-  { pincode: '400072', city: 'Mumbai', reason: 'Address not reachable' },
-  { pincode: '600001', city: 'Chennai', reason: 'Fake orders reported' },
-  { pincode: '700001', city: 'Kolkata', reason: 'COD refusals' },
-  { pincode: '500001', city: 'Hyderabad', reason: 'Frequent delivery issues' },
-];
+// pages/high-rto.js
+"use client";
+import Image from "next/image";
+import rtoImage from "../public/rto-illustration.png"; // Save your image as rto-illustration.png in /public
 
 export default function HighRto() {
-  const [filter, setFilter] = useState('');
-
-  const filteredPincodes = highRtoPincodes.filter((item) =>
-    item.pincode.includes(filter) || item.city.toLowerCase().includes(filter.toLowerCase())
-  );
-
   return (
-    <div className="p-6 max-w-5xl  bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">High RTO Pincodes</h1>
+    <div className="flex flex-col md:flex-row items-start justify-between gap-10 p-8 md:p-16 max-w-7xl mx-auto">
+      {/* Left Content */}
+      <div className="md:w-1/2 space-y-6">
+        <h1 className="text-3xl font-bold">High RTO Pincode List</h1>
+        <p className="text-gray-700 leading-relaxed">
+          Based on lakhs of historical orders, our algorithms have identified that certain pincodes are prone to very high RTO%. It is best to avoid targeting customers from these areas as it might lead to a waste of customer acquisition costs.
+        </p>
 
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search by pincode or city..."
-            className="w-full sm:w-80 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-500"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          />
+        <a
+          href="/downloads/high-rto-pincode-list.csv"
+          download
+          className="inline-flex items-center bg-black text-white px-5 py-3 rounded-md hover:bg-gray-800"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 16l4-5h-3V4h-2v7H8l4 5zm-8 2h16v2H4v-2z" />
+          </svg>
+          High RTO Pincode List
+        </a>
+
+        <div className="text-gray-700 space-y-4">
+          <p>These pincodes can be used as negative locations in Facebook’s Ad Manager</p>
+          <ol className="list-decimal pl-5 space-y-2">
+            <li>Download the list of pincodes from the above link.</li>
+            <li>
+              Collate the pincodes in a comma-separated form
+              <ol className="list-disc pl-5 mt-1 space-y-1 text-sm">
+                <li>You can do this in Excel itself using the <code className="bg-gray-100 px-1 rounded">textjoin</code> function.</li>
+                <li>Or use free sites like delim.co and paste the pincodes from the downloaded file.</li>
+                <li>Your output should look like this – <em>784514,784148,784529,784145</em>.</li>
+              </ol>
+            </li>
+            <li>
+              Open your Facebook Ad Manager and create your ads as you normally would
+              <ol className="list-disc pl-5 mt-1 space-y-1 text-sm">
+                <li>In the location section, choose <strong>Exclude</strong> and click on <strong>Add locations in bulk</strong>.</li>
+                <li>Choose the postal code option and paste the pincodes in a comma-separated form.</li>
+              </ol>
+            </li>
+            <li>That’s it. Facebook will now avoid showing ads to users in these pincodes.</li>
+          </ol>
         </div>
 
-        <div className="">
-          <table className="w-full text-left text-sm border rounded-md overflow-auto">
-            <thead className="bg-orange-400 text-white">
-              <tr>
-                <th className="px-4 py-3 border-l">Pincode</th>
-                <th className="px-4 py-3 border-l">City</th>
-                <th className="px-4 py-3 border-l">Reason</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPincodes.length > 0 ? (
-                filteredPincodes.map((item, index) => (
-                  <tr key={index} className="border-t">
-                    <td className="px-4 py-3 border-l font-medium">{item.pincode}</td>
-                    <td className="px-4 py-3 border-l">{item.city}</td>
-                    <td className="px-4 py-3 border-l text-gray-600">{item.reason}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={3} className="text-center py-4 text-gray-500">
-                    No matching pincodes found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        {/* Sample Screenshot */}
+        <Image
+          src="/rto-location-guide.png" // save this screenshot as rto-location-guide.png in /public
+          alt="Facebook Location Guide"
+          width={600}
+          height={400}
+          className="border rounded-lg shadow-sm mt-4"
+        />
+      </div>
+
+      {/* Right Image */}
+      <div className="md:w-1/2">
+        <Image
+          src={rtoImage}
+          alt="Delivery Illustration"
+          className="w-full h-auto"
+        />
       </div>
     </div>
   );

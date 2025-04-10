@@ -25,7 +25,7 @@ export default function LayoutWrapper({ children }) {
             <div className=" xl:p-3 md:pt-4 md:px-0">
               <SupplierMiddleWareProvider>
                 <CategoryProvider>
-                <ProfileProvider>{children}</ProfileProvider>
+                  <ProfileProvider>{children}</ProfileProvider>
                 </CategoryProvider>
               </SupplierMiddleWareProvider>
 

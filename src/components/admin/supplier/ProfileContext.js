@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, createContext} from 'react';
+import { useState, createContext } from 'react';
 
 const ProfileContext = createContext();
 

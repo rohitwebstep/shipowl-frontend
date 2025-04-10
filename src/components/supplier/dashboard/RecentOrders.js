@@ -22,9 +22,8 @@ const statusColors = {
 };
 
 export default function RecentOrders() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
   const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -53,8 +52,20 @@ export default function RecentOrders() {
               className="outline-0"
             />
           </button>
-          <button onClick={openModal} className="bg-[#F4F7FE] p-2 rounded-lg">
+          <button
+            onClick={() => setIsPopupOpen((prev) => !prev)}
+            className="bg-[#F4F7FE] p-2 rounded-lg relative"
+          >
             <MoreHorizontal className="text-[#F98F5C]" />
+            {isPopupOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                <ul className="py-2 text-sm text-[#2B3674]">
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                </ul>
+              </div>
+            )}
           </button>
         </div>
       </div>
@@ -125,15 +136,7 @@ export default function RecentOrders() {
           ))}
         </select>
       </div>
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
-            <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-            <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
-            <p className="text-[#4A5568]">Add your content here.</p>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

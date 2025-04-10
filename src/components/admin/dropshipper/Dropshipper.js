@@ -69,15 +69,9 @@ export default function Dropshipper() {
         }
     ];
 
-    const [showModal, setShowModal] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-    const openModalBox = () => {
-        setShowModal(true);
-    };
 
-    const closeModalBox = () => {
-        setShowModal(false);
-    };
 
     const [selected, setSelected] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -99,8 +93,20 @@ export default function Dropshipper() {
                 <div className="flex flex-wrap justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-[#2B3674]">Dropshippers List</h2>
                     <div className="flex gap-3  flex-wrap items-center">
-                        <button onClick={openModalBox} className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button
+                            onClick={() => setIsPopupOpen((prev) => !prev)}
+                            className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                        >
                             <MoreHorizontal className="text-[#F98F5C]" />
+                            {isPopupOpen && (
+                                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                    <ul className="py-2 text-sm text-[#2B3674]">
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    </ul>
+                                </div>
+                            )}
                         </button>
                     </div>
                 </div>
@@ -125,7 +131,7 @@ export default function Dropshipper() {
                             </tr>
                         </thead>
                         <tbody>
-                            {suppliers.map((item, index) => {
+                            {currentData.map((item, index) => {
                                 return (
                                     <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
 
@@ -216,21 +222,6 @@ export default function Dropshipper() {
                     </select>
                 </div>
             </div>
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000085] bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md">
-                        <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Modal Title</h2>
-                        <p className="text-[#4A5568] mb-4">This is some modal content. You can put anything here.</p>
-                        <button
-                            onClick={closeModalBox}
-                            className="bg-[#2B3674] text-white px-4 py-2 rounded hover:bg-[#1a254b]"
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )}
-
         </>
     )
 }
