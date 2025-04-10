@@ -146,7 +146,7 @@ select {
 
 @media(min-width:1024px) and (max-width:1580px) {
   .sidebar nav ul li button span, .sidebar nav ul li a {
-    font-size: 14px;
+    font-size: 14px !important;
   }
 
   .sidebar nav ul li button img {
@@ -175,5 +175,14 @@ table tr th:last-child {
   .main-wrapper{
     max-width: 1600px;
     margin: 0 auto;
+  }
+}
+@media(min-width:1224px) and (max-width:1380px) {
+
+  .leftbar{
+    width: 22%;
+  }
+  .main-outlet{
+    width: 78%;
   }
 }

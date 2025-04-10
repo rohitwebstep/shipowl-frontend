@@ -9,6 +9,8 @@ import {
   BadgeDollarSign, ShieldCheck, LayoutDashboard,
 } from "lucide-react";
 import logo from "@/app/images/Shipowllogo.png";
+import { LuLayoutDashboard } from "react-icons/lu";
+import { SiGoogletagmanager } from "react-icons/si";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -27,7 +29,7 @@ export default function Sidebar() {
       children: [
         {
           name: "Supplier Dashboard",
-          icon: ShoppingCart,
+          icon: LuLayoutDashboard,
           subMenu: [
             { icon: ClipboardList, name: "Add Supplier", href: "/admin/supplier/create" },
             { icon: ClipboardList, name: "Supplier List", href: "/admin/supplier/list" },
@@ -47,9 +49,9 @@ export default function Sidebar() {
       children: [
         {
           name: "Dropshipping Dashboard",
-          icon: ShoppingCart,
+          icon: LuLayoutDashboard,
           subMenu: [
-            { name: "Dropshippers Details", icon: ShoppingCart, href: "/admin/dropshipper/list" },
+            { name: "Dropshippers Details", icon: LuLayoutDashboard, href: "/admin/dropshipper/list" },
             { name: "Create Dropshippers", icon: ShoppingCart, href: "/admin/dropshipper/create" },
             { name: "Manage Orders", icon: ShoppingCart, href: "/admin/dropshipper/manage-orders" },
             { name: "Manage Products", icon: Package, href: "/admin/dropshipper/manage-products" },
@@ -65,8 +67,21 @@ export default function Sidebar() {
         },
       ],
     },
-    { title: "Shipping Dashboard", icon: LayoutDashboard, href: "/dropshipping" },
-    { title: "Country Management", icon: LayoutDashboard, href: "/dropshipping" },
+
+    {
+      children: [
+        {
+          name: "Shipping Dashboard",
+          icon: LuLayoutDashboard,
+          subMenu: [
+            { icon: ClipboardList, name: "Courier Company", href: "/admin/courier/list" },
+            { icon: ClipboardList, name: "Api Credentials", href: "/admin/api/list" },
+            { name: "High RTO", icon: Package, href: "/admin/high-rto/list" },
+          ],
+        },
+      ],
+    },
+    { title: "Country Management", icon: SiGoogletagmanager, href: "/admin/country/list" },
     { title: "Profile", icon: User, href: "/admin/profile" },
     { title: "Settings", icon: Settings, href: "/admin/setting" },
   ];
@@ -93,7 +108,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 w-72 md:w-full sidebar bg-white z-50 shadow-lg rounded-lg transition-transform duration-300 ease-in-out 
+        className={`fixed top-0 left-0 w-72 md:w-full sidebar bg-white z-50 shadow-lg xl:h-screen lg:h-full rounded-lg transition-transform duration-300 ease-in-out 
           ${isSidebarOpen ? "translate-x-0 h-[500px] overflow-auto" : "-translate-x-full"} 
           lg:translate-x-0 lg:relative lg:h-full`}
       >
@@ -106,18 +121,18 @@ export default function Sidebar() {
         </div>
 
         {/* Sidebar nav */}
-        <nav className="p-3 h-full">
+        <nav className="p-3 h-[80%] overflow-auto">
           <ul className="space-y-4">
             {/* Dashboard */}
             <li>
               <Link href="/admin">
                 <button
-                  className={`font-medium flex gap-2 border-l-4 items-center w-full p-2 rounded-lg hover:bg-[#2C3454] hover:text-white
-                    ${pathname === "/admin" || pathname === "/admin/" ? "bg-[#131a44] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44c9] text-[#2C3454]"}`}
+                  className={`font-medium flex gap-2 border-l-4 items-center hover:border-orange-500 w-full p-2 rounded-lg hover:bg-[#2C3454] hover:text-white
+                    ${pathname === "/admin" || pathname === "/admin/" ? "bg-[#131a44de] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44dec9] text-[#2C3454]"}`}
                   onClick={() => setIsSidebarOpen(false)}
                 >
                   <Home className="w-5 h-5" />
-                  <span className="font-medium text-lg">Dashboard</span>
+                  <span className="font-medium">Dashboard</span>
                 </button>
               </Link>
             </li>
@@ -128,12 +143,12 @@ export default function Sidebar() {
                 {section.title && (
                   <Link href={section.href}>
                     <div
-                      className={`font-medium flex gap-2 border-l-4 items-center w-full p-2 rounded-lg hover:bg-[#2C3454] hover:text-white
-                        ${pathname === section.href ? "bg-[#131a44] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44c9] text-[#2C3454]"}`}
+                      className={`font-medium flex gap-2 border-l-4 items-center w-full p-2 hover:border-orange-500 rounded-lg hover:bg-[#2C3454] hover:text-white
+                        ${pathname === section.href.concat('/') ? "bg-[#131a44de] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44dec9] text-[#2C3454]"}`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       <section.icon className="w-4 h-4" />
-                      <span className="font-medium text-lg">{section.title}</span>
+                      <span className="font-medium">{section.title}</span>
                     </div>
                   </Link>
                 )}
@@ -142,8 +157,8 @@ export default function Sidebar() {
                 {section.children?.map((item) => (
                   <div key={item.name} className="my-2">
                     <button
-                      className={`font-medium flex justify-between items-center gap-2 border-l-4 w-full p-2 rounded-lg hover:bg-[#2C3454] hover:text-white
-                        ${pathname.includes(item.name.toLowerCase()) || openSubMenus[item.name] ? "bg-[#131a44] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44c9] text-[#2C3454]"}`}
+                      className={`font-medium flex justify-between hover:border-orange-500 items-center gap-2 border-l-4 w-full p-2 rounded-lg hover:bg-[#2C3454] hover:text-white
+                        ${pathname.includes(item.name.toLowerCase()) || openSubMenus[item.name] ? "bg-[#131a44de] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44dec9] text-[#2C3454]"}`}
                       onClick={() => {
                         if (item.subMenu) {
                           toggleSubMenu(item.name);
@@ -154,10 +169,10 @@ export default function Sidebar() {
                     >
                       <div className="flex items-center gap-2">
                         <item.icon className="w-4 h-4" />
-                        <span className="font-medium text-lg">{item.name}</span>
+                        <span className="font-medium">{item.name}</span>
                       </div>
                       {item.subMenu && (
-                        <span className="font-medium text-lg">
+                        <span className="font-medium">
                           {openSubMenus[item.name] ? "−" : "+"}
                         </span>
                       )}
@@ -170,12 +185,12 @@ export default function Sidebar() {
                           <li key={subItem.name}>
                             <Link href={subItem.href}>
                               <div
-                                className={`font-medium flex gap-2 border-l-4 items-center w-full p-2 rounded-lg hover:bg-[#2C3454] hover:text-white
-                                  ${pathname === subItem.href.concat('/') ? "bg-[#131a44] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44c9] text-[#2C3454]"}`}
+                                className={`font-medium hover:border-orange-500 flex gap-2 border-l-4 items-center w-full p-2 rounded-lg hover:bg-[#2C3454] hover:text-white
+                                  ${pathname === subItem.href.concat('/') ? "bg-[#131a44de] border-orange-500 text-white" : "bg-[#F0F1F3] border-[#131a44dec9] text-[#2C3454]"}`}
                                 onClick={() => setIsSidebarOpen(false)}
                               >
                                 <subItem.icon className="w-4 h-4" />
-                                <span className="font-medium text-lg">{subItem.name}</span>
+                                <span className="font-medium">{subItem.name}</span>
                               </div>
                             </Link>
                           </li>

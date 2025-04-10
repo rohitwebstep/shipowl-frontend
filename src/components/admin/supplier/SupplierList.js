@@ -1,4 +1,5 @@
 "use client"
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 import { React, useState } from 'react'
 import { FaCheck } from 'react-icons/fa';
@@ -67,8 +68,24 @@ export default function SupplierList() {
             aadhar_card_id: "2345-6789-0123",
         }
     ];
-    const [selected, setSelected] = useState([]);
 
+    const [showModal, setShowModal] = useState(false);
+
+    const openModalBox = () => {
+        setShowModal(true);
+    };
+
+    const closeModalBox = () => {
+        setShowModal(false);
+    };
+
+    const [selected, setSelected] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [perPage, setPerPage] = useState(5);
+    const totalPages = Math.ceil(suppliers.length / perPage);
+    const indexOfLast = currentPage * perPage;
+    const indexOfFirst = indexOfLast - perPage;
+    const currentData = suppliers.slice(indexOfFirst, indexOfLast);
 
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
@@ -82,7 +99,7 @@ export default function SupplierList() {
                 <div className="flex flex-wrap justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-[#2B3674]">Supplier List</h2>
                     <div className="flex gap-3  flex-wrap items-center">
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button onClick={openModalBox} className="bg-[#F4F7FE] p-2 rounded-lg">
                             <MoreHorizontal className="text-[#F98F5C]" />
                         </button>
                     </div>
@@ -157,8 +174,62 @@ export default function SupplierList() {
                     </table>
 
                 </div>
-            </div>
+                <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
+                    <div className="flex gap-1 items-center">
+                        <button
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
+                        >
+                            <MdKeyboardArrowLeft /> Previous
+                        </button>
+                        {[...Array(totalPages)].map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrentPage(index + 1)}
+                                className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
+                                    }`}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
+                        >
+                            Next <MdKeyboardArrowRight />
+                        </button>
+                    </div>
 
+                    {/* Per Page Selection */}
+                    <select
+                        value={perPage}
+                        onChange={(e) => setPerPage(Number(e.target.value))}
+                        className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
+                    >
+                        {[5, 10, 15].map((num) => (
+                            <option key={num} value={num}>
+                                {num} /Per Page
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000085] bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md">
+                        <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Modal Title</h2>
+                        <p className="text-[#4A5568] mb-4">This is some modal content. You can put anything here.</p>
+                        <button
+                            onClick={closeModalBox}
+                            className="bg-[#2B3674] text-white px-4 py-2 rounded hover:bg-[#1a254b]"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
 
         </>
     )

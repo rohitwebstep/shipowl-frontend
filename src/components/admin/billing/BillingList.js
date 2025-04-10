@@ -3,8 +3,14 @@ import { useState } from 'react'
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
+import { DateRange } from 'react-date-range'
+import 'react-date-range/dist/styles.css' // main style file
+import 'react-date-range/dist/theme/default.css' // theme css file
+import { format } from 'date-fns'
 export default function BillingList() {
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openPopop = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const warehouseData = [
@@ -92,7 +98,14 @@ export default function BillingList() {
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
     };
-
+    const [range, setRange] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection'
+        }
+    ])
+    const [showPicker, setShowPicker] = useState(false)
 
     const totalPages = Math.ceil(warehouseData.length / perPage);
     const indexOfLast = currentPage * perPage;
@@ -102,9 +115,25 @@ export default function BillingList() {
         <>
             <div className="filtred-box py-5 xl:flex flex-wrap items-end justify-between">
                 <div className="grid md:grid-cols-3 xl:w-7/12  grid-cols-1 gap-3">
-                    <div>
-                        <label htmlFor="" className="text-[#232323] font-medium block">From Date:</label>
-                        <input type="text" name="" id="" placeholder="07/23/2024 - 07/30/2024" className="bg-white text-[#718EBF] border p-2 w-full font-bold border-[#DFEAF2] rounded-xl" />
+                    <div className="relative">
+                        <label htmlFor="daterange" className="text-[#232323] font-medium block ">From Date:</label>
+                        <input
+                            readOnly
+                            id="daterange"
+                            onClick={() => setShowPicker(!showPicker)}
+                            value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                            className="bg-white text-[#718EBF] border p-2 w-full font-bold border-[#DFEAF2] rounded-xl cursor-pointer"
+                        />
+                        {showPicker && (
+                            <div className="absolute z-10 shadow-md rounded-md mt-2">
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={item => setRange([item.selection])}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={range}
+                                />
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label htmlFor="" className="text-[#232323] font-medium block">Type:</label>
@@ -152,7 +181,7 @@ export default function BillingList() {
                             onChange={(e) => setSelectedMonth(e.target.value)}
                             className="outline-0 text-[#A3AED0] bg-[#F4F7FE] p-2 rounded-md"
                         />
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button onClick={openPopop} className="bg-[#F4F7FE] p-2 rounded-lg">
                             <MoreHorizontal className="text-[#F98F5C]" />
                         </button>
                     </div>
@@ -162,7 +191,7 @@ export default function BillingList() {
                     <table className="w-full ">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">
                                     <div className="flex lg:gap-7 gap-2">
                                         <label className="flex items-center cursor-pointer me-2">
                                             <input
@@ -177,14 +206,14 @@ export default function BillingList() {
                                     </div>
 
                                 </th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Txn Type<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium text-red-500">Ref No#<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Transaction ID<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Credit(₹)<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Debit(₹)<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Closing Balance(₹)<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Model<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left font-medium">Description<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Txn Type<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase text-red-500">Ref No#<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Transaction ID<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Credit(₹)<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Debit(₹)<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Closing Balance(₹)<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Model<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Description<i></i></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -270,6 +299,16 @@ export default function BillingList() {
                     </select>
                 </div>
             </div>
+
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
+                    <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
+                        <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                        <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
+                        <p className="text-[#4A5568]">Add your content here.</p>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

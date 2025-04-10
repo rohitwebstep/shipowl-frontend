@@ -18,7 +18,7 @@ export default function Billing() {
     <div>
      <div className="bg-white rounded-2xl p-3">
      <div className="w-full py-3">
-                <label className="block  font-bold text-gray-700">
+                <label className="block text-lg font-bold text-gray-700">
                     Select Supplier
                 </label>
                 <select className="w-full mt-1 px-3 py-2 border-[#DFEAF2] bg-white border rounded-lg ">

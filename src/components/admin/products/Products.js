@@ -134,7 +134,7 @@ const Products = () => {
                     Filters
                 </button>
             </div>
-            <div className="lg:flex justify-between">
+            <div className="lg:flex justify-between gap-2">
                 <div className="lg:w-11/12 grid xl:grid-cols-4 md:grid-cols-2 flex-wrap gap-4 items-end">
                     <div className="w-full">
                         <label className="block text-sm font-medium text-gray-700">

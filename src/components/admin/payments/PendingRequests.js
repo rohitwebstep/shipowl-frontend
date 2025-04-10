@@ -2,8 +2,22 @@ import { useState } from 'react'
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import { FaCheck } from "react-icons/fa";
+import { DateRange } from 'react-date-range'
+import 'react-date-range/dist/styles.css' // main style file
+import 'react-date-range/dist/theme/default.css' // theme css file
+import { format } from 'date-fns'
 export default function PendingRequests() {
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openPopop = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+    const [range, setRange] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection'
+        }
+    ])
+    const [showPicker, setShowPicker] = useState(false)
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const warehouseData = [
@@ -68,11 +82,27 @@ export default function PendingRequests() {
     const currentData = warehouseData.slice(indexOfFirst, indexOfLast);
     return (
         <>
-             <div className="filtred-box py-5 xl:flex md:px-0 px-4  items-end justify-between">
+            <div className="filtred-box py-5 xl:flex md:px-0 px-4  items-end justify-between">
                 <div className="xl:w-9/12 grid md:grid-cols-4 grid-cols-1 gap-3">
-                    <div>
-                        <label htmlFor="" className="text-[#232323] font-medium block">From Date:</label>
-                        <input type="text" name="" id="" placeholder="07/23/2024 - 07/30/2024" className="bg-white text-[#718EBF]  border lg:p-3 lg:py-2 p-2 w-full font-bold border-[#DFEAF2] rounded-xl" />
+                    <div className="relative">
+                        <label htmlFor="daterange" className="text-[#232323] font-medium block ">From Date:</label>
+                        <input
+                            readOnly
+                            id="daterange"
+                            onClick={() => setShowPicker(!showPicker)}
+                            value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                            className="bg-white text-[#718EBF] border p-2 w-full font-bold border-[#DFEAF2] rounded-xl cursor-pointer"
+                        />
+                        {showPicker && (
+                            <div className="absolute z-10 shadow-md rounded-md mt-2">
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={item => setRange([item.selection])}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={range}
+                                />
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label htmlFor="" className="text-[#232323] font-medium block">Payment ID:</label>
@@ -110,7 +140,7 @@ export default function PendingRequests() {
                             onChange={(e) => setSelectedMonth(e.target.value)}
                             className="outline-0 text-[#A3AED0] bg-[#F4F7FE] p-2 rounded-md"
                         />
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button onClick={openPopop} className="bg-[#F4F7FE] p-2 rounded-lg">
                             <MoreHorizontal className="text-[#F98F5C]" />
                         </button>
                     </div>
@@ -120,46 +150,46 @@ export default function PendingRequests() {
                     <table className="w-full ">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">
-                                  <div className="flex lg:gap-14 gap-2">
-                                  <label className="flex items-center cursor-pointer me-2">
-                                    <input
-                                        type="checkbox"
-                                        className="peer hidden"
-                                    />
-                                    <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                                            peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                        <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                    </div>
-                                </label><span className=''>Company Name<i></i></span>
-                                  </div>
-
-                                </th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">Payment Cycle<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">Payable Amt. (B2B)<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">Wallet Balance<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left font-medium">Model<i></i></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentData.map((item) => (
-                                <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                    <td className="p-2 px-5 whitespace-nowrap"> 
-                                        <div className="flex items-center  lg:gap-14 gap-2">
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                    <div className="flex lg:gap-14 gap-2">
                                         <label className="flex items-center cursor-pointer me-2">
                                             <input
                                                 type="checkbox"
-                                                checked={selected.includes(item.id)}
-                                                onChange={() => handleCheckboxChange(item.id)}
                                                 className="peer hidden"
                                             />
                                             <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
                                                                             peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
                                                 <FaCheck className=" peer-checked:block text-white w-3 h-3" />
                                             </div>
-                                        </label>
-                                        {item.company_name}
-                                    </div></td>
+                                        </label><span className=''>Company Name<i></i></span>
+                                    </div>
+
+                                </th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Payment Cycle<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Payable Amt. (B2B)<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Wallet Balance<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Model<i></i></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {currentData.map((item) => (
+                                <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                    <td className="p-2 px-5 whitespace-nowrap">
+                                        <div className="flex items-center  lg:gap-14 gap-2">
+                                            <label className="flex items-center cursor-pointer me-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected.includes(item.id)}
+                                                    onChange={() => handleCheckboxChange(item.id)}
+                                                    className="peer hidden"
+                                                />
+                                                <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                                                                            peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                    <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                                </div>
+                                            </label>
+                                            {item.company_name}
+                                        </div></td>
                                     <td className="p-2 px-5 whitespace-nowrap">{item.payment_cycle}</td>
                                     <td className="p-2 px-5 whitespace-nowrap">
                                         {item.payment_amout}</td>
@@ -217,6 +247,15 @@ export default function PendingRequests() {
                     </select>
                 </div>
             </div>
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
+                    <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
+                        <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                        <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
+                        <p className="text-[#4A5568]">Add your content here.</p>
+                    </div>
+                </div>
+            )}
 
         </>
     )

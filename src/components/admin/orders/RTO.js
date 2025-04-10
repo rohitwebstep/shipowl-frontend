@@ -1,5 +1,8 @@
 'use client';
-
+import { DateRange } from 'react-date-range'
+import 'react-date-range/dist/styles.css' // main style file
+import 'react-date-range/dist/theme/default.css' // theme css file
+import { format } from 'date-fns'
 import { useState } from 'react';
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { RiFileEditFill } from "react-icons/ri";
@@ -54,6 +57,22 @@ const orders = [
     },
 ];
 export default function RTO() {
+    const [showModal, setShowModal] = useState(false);
+    const openMoreModal = () => {
+      setShowModal(true);
+    };
+    const closeModalBox = () => {
+      setShowModal(false);
+    };
+    const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+    const [range, setRange] = useState([
+      {
+          startDate: new Date(),
+          endDate: new Date(),
+          key: 'selection'
+      }
+  ])
+  const [showPicker, setShowPicker] = useState(false)
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const [filter, setFilter] = useState("Actual Ratio");
@@ -74,7 +93,7 @@ export default function RTO() {
     };
     return (
         <div className='px-2 md:px-0'>
-            <div>
+            <div className='bg-white rounded-md p-3 mb-4'>
                 <div className="w-full py-2">
                     <label className="block  font-bold text-gray-700">
                         Select Supplier
@@ -84,13 +103,31 @@ export default function RTO() {
                     </select>
                 </div>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mb-4">
-                    <div> <label className='text-[#232323] font-semibold block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" /></div>
+ <div className="relative">
+                        <label htmlFor="daterange" className="text-[#232323] font-medium block ">From Date:</label>
+                        <input
+                            readOnly
+                            id="daterange"
+                            onClick={() => setShowPicker(!showPicker)}
+                            value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                            className="bg-white text-[#718EBF] border p-2 w-full font-bold border-[#DFEAF2] rounded-xl cursor-pointer"
+                        />
+                        {showPicker && (
+                            <div className="absolute z-10 shadow-md rounded-md mt-2">
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={item => setRange([item.selection])}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={range}
+                                />
+                            </div>
+                        )}
+                    </div>                    <div> <label className='text-[#232323] font-medium block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-medium block'>Product Name</label>  <input type="text" placeholder="Name" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-medium block'>Product SKU</label>  <input type="text" placeholder="SKU" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-medium block'>Tag:</label>  <input type="text" placeholder="ALL" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-medium block'>Article Id:</label>  <input type="text" placeholder="ID" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
+                    <div> <label className='text-[#232323] font-medium block'>Search Query:</label>  <input type="text" placeholder="Query" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
                     <div className="flex gap-2 items-end">
                         <button className="bg-blue-600 text-white px-6 py-2 rounded-md">Apply</button>
                         <button className="bg-red-500 text-white px-6 py-2 rounded-md">Reset</button>
@@ -102,17 +139,17 @@ export default function RTO() {
 
                     <div className="grid md:grid-cols-3 gap-3 lg:w-8/12 grid-cols-1 items-end justify-between">
                         <div>
-                            <label className='text-[#232323] font-semibold block'>Status:</label>
+                            <label className='text-[#232323] font-medium block'>Status:</label>
                             <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
                                 <option value="All">All</option>
                             </select>
                         </div>
-                        <div > <label className='text-[#232323] font-semibold block'>Select Model</label>
-                            <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full p-2 rounded-xl">
+                        <div > <label className='text-[#232323] font-medium block'>Select Model</label>
+                            <select type="text" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl">
                                 <option value="Warehouse Model">Warehouse Model</option>
                             </select>
                         </div>
-                        <div > <label className='text-[#232323] font-semibold block'>Select Dropshipper</label>
+                        <div > <label className='text-[#232323] font-medium block'>Select Dropshipper</label>
                             <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
                                 <option value="John Doe (john@gmail.com)">John Doe (john@gmail.com)</option>
                             </select>
@@ -127,9 +164,9 @@ export default function RTO() {
 
             <div className="bg-white p-4 rounded-2xl">
                 <div className="flex flex-wrap justify-between items-center mb-4 lg:px-3">
-                    <h2 className="text-2xl font-bold text-[#2B3674] font-dm-sans">RTO Order Details</h2>
+                    <h2 className="text-2xl font-bold  font-dm-sans">RTO Order Details</h2>
                     <div className="flex gap-3  flex-wrap items-center">
-                        <span className="font-bold text-[#2B3674]  font-dm-sans">Clear Filters</span>
+                        <span className="font-bold   font-dm-sans">Clear Filters</span>
                         <span><IoMdRefresh className="text-red-600 text-xl" /></span>
                         <span><IoSettingsOutline className="text-xl" /></span>
                         <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
@@ -150,7 +187,7 @@ export default function RTO() {
                                 className="outline-0 font-dm-sans"
                             />
                         </button>
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button onClick={openMoreModal} className="bg-[#F4F7FE] p-2 rounded-lg">
                             <MoreHorizontal className="text-[#F98F5C]" />
                         </button>
                     </div>
@@ -159,7 +196,7 @@ export default function RTO() {
                     <table className="w-full border-collapse">
                         <thead className="">
                             <tr className="text-[#A3AED0]  border-b  border-[#E9EDF7]">
-                                <th className="p-3 px-5 whitespace-nowrap font-medium text-left">
+                                <th className="p-3 px-5 whitespace-nowrap uppercase text-left">
                                     <div className='flex gap-2 items-center'>
 
                                         <label className="flex items-center  cursor-pointer me-2">
@@ -175,19 +212,19 @@ export default function RTO() {
                                         <span>Order ID <i></i></span>
                                     </div>
                                 </th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Name<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Payment Info<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Model<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Shipment Details<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Return tracking number<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Return status<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Return Date<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-center">Action<i></i></th>
+                                <th className="p-3 whitespace-nowrap uppercase text-left">Name<i></i></th>
+                                <th className="p-3 whitespace-nowrap uppercase text-left">Payment Info<i></i></th>
+                                <th className="p-3 whitespace-nowrap uppercase text-left">Model<i></i></th>
+                                <th className="p-3 whitespace-nowrap uppercase text-left">Shipment Details<i></i></th>
+                                <th className="p-3 whitespace-nowrap uppercase text-left">Return tracking number<i></i></th>
+                                <th className="p-3 whitespace-nowrap uppercase text-left">Return status<i></i></th>
+                                <th className="p-3 whitespace-nowrap uppercase text-left">Return Date<i></i></th>
+                                <th className="p-3 whitespace-nowrap uppercase text-center">Action<i></i></th>
                             </tr>
                         </thead>
                         <tbody>
                             {currentData.map((order) => (
-                                <tr key={order.id} className="text-[#8F9BBA] border-b align-top  border-[#E9EDF7]">
+                                <tr key={order.id} className=" border-b align-top text-[#304174] font-semibold  border-[#E9EDF7]">
 
                                     <td className="p-3 whitespace-nowrap px-5"> <div className="flex items-start  gap-2">
                                         <label className="flex items-center mt-2 cursor-pointer me-2">
@@ -202,8 +239,8 @@ export default function RTO() {
                                                 <FaCheck className=" peer-checked:block text-white w-3 h-3" />
                                             </div>
                                         </label>
-                                        <span className='text-black font-bold'>{order.id} <br />
-                                            <span className='text-[#8F9BBA]'>{order.date}</span>
+                                        <span className=' '>{order.id} <br />
+                                            <span className=''>{order.date}</span>
 
                                         </span>
 
@@ -212,13 +249,13 @@ export default function RTO() {
 
                                     </td>
 
-                                    <td className="p-3 font-bold whitespace-nowrap"><span className='text-[#2B3674]'>{order.product}</span><br /><span className=" text-sm">SKU: {order.sku}<br /> Qty: {order.qty}</span></td>
-                                    <td className="p-3 font-bold whitespace-nowrap"> <span className='text-[#2B3674]'>COD:{order.cod}</span><br /> <span className="text-[#8F9BBA]">Order Value:{order.orderValue}</span></td>
+                                    <td className="p-3 whitespace-nowrap"><span className=''>{order.product}</span><br /><span className=" text-sm">SKU: {order.sku}<br /> Qty: {order.qty}</span></td>
+                                    <td className="p-3 whitespace-nowrap"> <span className=''>COD:{order.cod}</span><br /> <span className="">Order Value:{order.orderValue}</span></td>
                                     <td className="p-3 space-y-1 whitespace-nowrap">
                                         {order.tags.map((tag, i) => (
                                             <span
                                                 key={i}
-                                                className={`text-sm text-center text-white p-2  rounded-xl font-bold block ${tag === "Warehouse" ? "bg-[#01B574]" : "bg-[#5CA4F9] mr-1"
+                                                className={`text-sm text-center text-white p-2  rounded-2xl  block ${tag === "Warehouse" ? "bg-[#01B574]" : "bg-[#5CA4F9] mr-1"
                                                     }`}
                                             >
                                                 {tag}
@@ -226,71 +263,123 @@ export default function RTO() {
                                         ))}
                                     </td>
 
-                                    <td className="whitespace-nowrap p-3 font-medium "><span className='text-[#2B3674] font-medium'>{order.shipment.id}</span><br />
-                                        <span className="text-[#05CD99] font-medium">{order.shipment.status}</span>
-                                        <br /><span className='font-medium'>{order.shipment.provider}</span><br /><span className="text-sm font-bold">{order.shipment.date}</span></td>
+                                    <td className="whitespace-nowrap p-3 "><span className=' '>{order.shipment.id}</span><br />
+                                        <span className="text-[#05CD99] ">{order.shipment.status}</span>
+                                        <br /><span className=''>{order.shipment.provider}</span><br /><span className="text-sm ">{order.shipment.date}</span></td>
 
-                                    <td className="p-3 text-[#2B3674] font-bold whitespace-nowrap">{order.returnTracking}</td>
-                                    <td className="p-3  whitespace-nowrap"><span className={`rounded-md p-2 px-3 ${order.returnStatus == "Returned" ? "bg-[#00b69b36] text-[#00B69B]" : "bg-[#f98e5c2c] text-[#F98F5C]"}`}>{order.returnStatus}</span></td>
-                                    <td className="p-3 font-bold whitespace-nowrap text-[#2B3674]">{order.returnDate}</td>
-                                    <td className=" p-3 whitespace-nowrap">
-                                        <ul className=" flex gap-2 justify-between">
-                                            <li><RiFileEditFill className=" text-black text-2xl" /></li>
-                                            <li><IoCloudDownloadOutline className=" text-black text-2xl" /></li>
-                                            <li><RxCrossCircled className=" text-black text-2xl" /></li>
-                                            <li><IoIosArrowDropdown className=" text-black text-2xl" /></li>
-                                        </ul>
-                                        <button className=" text-[#F98F5C] border rounded-md font-dm-sans  p-2 w-full mt-2 text-sm">
-                                            View / Add Notes
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
-                    <div className="flex gap-1 items-center">
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            <MdKeyboardArrowLeft /> Previous
-                        </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentPage(index + 1)}
-                                className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
-                                    }`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            Next <MdKeyboardArrowRight />
-                        </button>
-                    </div>
-
-                    {/* Per Page Selection */}
-                    <select
-                        value={perPage}
-                        onChange={(e) => setPerPage(Number(e.target.value))}
-                        className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
+                                    <td className="p-3 whitespace-nowrap">{order.returnTracking}</td>
+                                    <td className="p-3 whitespace-nowrap"><span className={`rounded-md p-2 px-3 ${order.returnStatus == "Returned" ? "bg-[#00b69b36] text-[#00B69B]" : "bg-[#f98e5c2c] text-[#F98F5C]"}`}>{order.returnStatus}</span></td>
+                                    <td className="p-3 whitespace-nowrap ">{order.returnDate}</td>
+                                    <td className="p-2 whitespace-nowrap">
+                    <ul className="flex gap-2 justify-between">
+                      <li><RiFileEditFill className="text-black text-2xl" /></li>
+                      <li><IoCloudDownloadOutline className="text-black text-2xl" /></li>
+                      <li><RxCrossCircled className="text-black text-2xl" /></li>
+                      <li><IoIosArrowDropdown className="text-black text-2xl" /></li>
+                    </ul>
+                    <button
+                      onClick={() => setIsNoteModalOpen(true)}
+                      className="text-[#F98F5C] border rounded-md font-dm-sans p-2 w-full mt-2 text-sm"
                     >
-                        {[5, 10, 15].map((num) => (
-                            <option key={num} value={num}>
-                                {num} /Per Page
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </div>
+                      View / Add Notes
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+        <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
+          <div className="flex gap-1 items-center">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border-[#2B3674] flex gap-1 items-center  rounded mx-1 disabled:opacity-50"
+            >
+              <MdKeyboardArrowLeft /> Previous
+            </button>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`px-3 hidden md:block py-1 border-[#2B3674]  rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""}`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border-[#2B3674] flex gap-1 items-center  rounded mx-1 disabled:opacity-50"
+            >
+              Next <MdKeyboardArrowRight />
+            </button>
+          </div>
+
+          {/* Per Page Selection */}
+          <select
+            value={perPage}
+            onChange={(e) => setPerPage(Number(e.target.value))}
+            className="border-[#2B3674] bg-[#F8FBFF]  rounded px-3 py-2 font-semibold"
+          >
+            {[5, 10, 15].map((num) => (
+              <option key={num} value={num}>
+                {num} /Per Page
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {isNoteModalOpen && (
+        <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+            <button
+              onClick={() => setIsNoteModalOpen(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black"
+            >
+              ✕
+            </button>
+            <h2 className="text-lg font-bold mb-4">Order Notes</h2>
+            <textarea
+              className="w-full border p-2 rounded-xl mb-4"
+              rows={4}
+              placeholder="Add your note here..."
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setIsNoteModalOpen(false)}
+                className="bg-gray-200 px-4 py-2 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  // Submit logic here
+                  setIsNoteModalOpen(false);
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+        {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000085] bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md">
+            <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Modal Title</h2>
+            <p className="text-[#4A5568] mb-4">This is some modal content. You can put anything here.</p>
+            <button
+              onClick={closeModalBox}
+              className="bg-[#2B3674] text-white px-4 py-2 rounded hover:bg-[#1a254b]"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+      </div>
     );
 }

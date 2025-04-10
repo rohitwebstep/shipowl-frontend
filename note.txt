@@ -6,6 +6,6 @@ country management - -[admin]
 BOOSTERS --TO BE ASK ON CLIOENT
 dropshipper user details add edit delete block
 supplier user details add edit delete block
-admin- shipping dahsboard   -[ e delivery  ] courior company   ,api details-textarea ,
+admin- shipping dahsboard     courior company   ,api details-textarea ,
 high rto (admin)   -[ e delivery  ] courior company   ,api details-textarea , 
-  (   excel  form  . ..)
+  (excel  form ...)

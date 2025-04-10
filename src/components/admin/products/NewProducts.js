@@ -48,13 +48,13 @@ export default function NewProducts() {
                         <div className="mt-3 p-3">
                             <div className='flex justify-between'>
                                 <div>
-                                    <h2 className="text-lg font-semibold nunito">{product.name}</h2></div>
+                                    <h2 className="text-lg font-semibold ">{product.name}</h2></div>
                                 <div>
-                                    <p className="text-black font-bold nunito text-right">₹ {product.price}</p>
-                                    <p className="text-sm text-[#202224] nunito text-right">Exp. Orders : {product.orders}</p>
+                                    <p className="text-black font-bold  text-right">₹ {product.price}</p>
+                                    <p className="text-sm text-[#202224]  text-right">Exp. Orders : {product.orders}</p>
                                 </div>
                             </div>
-                            <button className="mt-2 bg-blue-500 nunito text-white px-4 py-2 rounded w-auto font-semibold ">Add to list</button>
+                            <button className="mt-2 bg-blue-500  text-white px-4 py-2 rounded w-auto font-semibold ">Add to list</button>
                         </div>
                     </div>
                 ))}

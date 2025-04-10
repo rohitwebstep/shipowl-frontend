@@ -4,6 +4,14 @@ export default function AddWarehouse() {
         <>
             <section className="add-warehouse xl:w-8/12">
                 <div className="bg-white rounded-2xl p-5 ">
+                    <div className="w-full mb-2">
+                        <label className="block  font-bold text-[#232323]">
+                            Select Supplier
+                        </label>
+                        <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg ">
+                            <option></option>
+                        </select>
+                    </div>
                     <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
                         <div>
                             <label htmlFor="" className="font-bold block text-[#232323]">Warehouse Name </label>

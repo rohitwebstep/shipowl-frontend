@@ -5,7 +5,9 @@ import { FaFilePdf } from "react-icons/fa6";
 
 import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
 export default function Invoice() {
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openPopop = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const warehouseData = [
@@ -99,7 +101,7 @@ export default function Invoice() {
                             onChange={(e) => setSelectedMonth(e.target.value)}
                             className="outline-0 text-[#A3AED0] bg-[#F4F7FE] p-2 rounded-md"
                         />
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button onClick={openPopop} className="bg-[#F4F7FE] p-2 rounded-lg">
                             <MoreHorizontal className="text-[#F98F5C]" />
                         </button>
                     </div>
@@ -109,7 +111,7 @@ export default function Invoice() {
                     <table className="w-full ">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium">
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">
                                     
                                 <div className="flex lg:gap-7 gap-2">
                                         <label className="flex items-center cursor-pointer me-2">
@@ -124,10 +126,10 @@ export default function Invoice() {
                                         </label><span>Invoice No. #<i></i></span>
                                     </div>
                                     </th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium">Invoice Date<i></i></th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium text-red-500">Invoice Period<i></i></th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium">Invoice Amount<i></i></th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left font-medium">Pdf File Link<i></i></th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Date<i></i></th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase text-red-500">Invoice Period<i></i></th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Amount<i></i></th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Pdf File Link<i></i></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -208,6 +210,15 @@ export default function Invoice() {
                     </select>
                 </div>
             </div>
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
+                    <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
+                        <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                        <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
+                        <p className="text-[#4A5568]">Add your content here.</p>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

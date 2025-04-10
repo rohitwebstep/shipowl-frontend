@@ -1,5 +1,8 @@
 'use client';
-
+import { DateRange } from 'react-date-range'
+import 'react-date-range/dist/styles.css' // main style file
+import 'react-date-range/dist/theme/default.css' // theme css file
+import { format } from 'date-fns'
 import { useState } from 'react';
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { RiFileEditFill } from "react-icons/ri";
@@ -10,7 +13,7 @@ import { IoMdRefresh } from "react-icons/io";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FiDownloadCloud } from "react-icons/fi";
 import { MoreHorizontal } from "lucide-react";
-
+import { FaCheck } from 'react-icons/fa';
 const orders = [
     {
         id: '#ID285800',
@@ -53,7 +56,18 @@ const orders = [
         sla_date: 'Aug 18, 2024 05:11:54 pm',
     },
 ];
-export default function Order() {
+
+export default function Orders() {
+    const [showModal, setShowModal] = useState(false);
+
+    const openMoreModal = () => {
+        setShowModal(true);
+    };
+
+    const closeModalBox = () => {
+        setShowModal(false);
+    };
+
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const [filter, setFilter] = useState("Actual Ratio");
@@ -66,73 +80,124 @@ export default function Order() {
         return today.toISOString().slice(0, 7); // YYYY-MM format
     });
 
+    const [selected, setSelected] = useState([]);
+
+
+    const handleCheckboxChange = (id) => {
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+    };
+
+    const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+    const [range, setRange] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection'
+        }
+    ])
+    const [showPicker, setShowPicker] = useState(false)
     return (
         <div>
-            <div>
-            <div className="w-full py-3">
-                <label className="block  font-bold text-gray-700">
-                    Select Supplier
-                </label>
-                <select className="w-full mt-1 px-3 py-2 border-[#DFEAF2] bg-white border rounded-lg ">
-                    <option></option>
-                </select>
-            </div>
+            <div className='bg-white p-4 rounded-xl mb-4'>
+                <div className='w-full mb-3'>
+                    <label className='text-[#232323] text-lg font-medium block'>Select Supplier</label>
+                    <select className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl">
+                        <option value=""></option>
+                    </select>
+                </div>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 px-3 md:px-0 gap-4 mb-4">
-                    <div> <label className='text-[#232323] font-semibold block'>From Date:</label>  <input type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Product Name</label>  <input type="text" placeholder="Name" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Product SKU</label>  <input type="text" placeholder="SKU" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Tag:</label>  <input type="text" placeholder="ALL" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Article Id:</label>  <input type="text" placeholder="ID" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
-                    <div> <label className='text-[#232323] font-semibold block'>Search Query:</label>  <input type="text" placeholder="Query" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl" /></div>
+                    <div className="relative">
+                        <label htmlFor="daterange" className="text-[#232323] font-medium block ">From Date:</label>
+                        <input
+                            readOnly
+                            id="daterange"
+                            onClick={() => setShowPicker(!showPicker)}
+                            value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                            className="bg-white text-[#718EBF] border p-2 w-full font-bold border-[#DFEAF2] rounded-xl cursor-pointer"
+                        />
+                        {showPicker && (
+                            <div className="absolute z-10 shadow-md rounded-md mt-2">
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={item => setRange([item.selection])}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={range}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <label className='text-[#232323] font-medium block'>Order ID(s):</label>
+                        <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" />
+                    </div>
+                    <div>
+                        <label className='text-[#232323] font-medium block'>Product Name</label>
+                        <input type="text" placeholder="Name" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" />
+                    </div>
+                    <div>
+                        <label className='text-[#232323] font-medium block'>Product SKU</label>
+                        <input type="text" placeholder="SKU" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" />
+                    </div>
+                    <div>
+                        <label className='text-[#232323] font-medium block'>Tag:</label>
+                        <input type="text" placeholder="ALL" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" />
+                    </div>
+                    <div>
+                        <label className='text-[#232323] font-medium block'>Article Id:</label>
+                        <input type="text" placeholder="ID" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" />
+                    </div>
+                    <div>
+                        <label className='text-[#232323] font-medium block'>Search Query:</label>
+                        <input type="text" placeholder="Query" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" />
+                    </div>
                     <div className="flex gap-2 items-end">
                         <button className="bg-blue-600 text-white px-6 py-3 rounded-md">Apply</button>
                         <button className="bg-red-500 text-white px-6 py-3 rounded-md">Reset</button>
                     </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 mb-4 items-end justify-normal ">
+                <div className="flex flex-wrap gap-2 mb-4 items-end justify-normal">
                     <div className='lg:w-[150px]'>
-                        <label className='text-[#232323] font-semibold block'>Status:</label>
-                        <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl">
+                        <label className='text-[#232323] font-medium block'>Status:</label>
+                        <select className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl">
                             <option value="All">All</option>
                         </select>
                     </div>
-                    <div className='lg:w-2/12'> <label className='text-[#232323] font-semibold block'>Select Model</label>
-                        <select type="text" placeholder="07/23/2024 - 07/30/2024" className=" bg-white border text-[#718EBF]  border-[#DFEAF2] mt-2 w-full md:p-2 rounded-xl">
+                    <div className='lg:w-2/12'>
+                        <label className='text-[#232323] font-medium block'>Select Model</label>
+                        <select className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl">
                             <option value="Warehouse Model">Warehouse Model</option>
                         </select>
                     </div>
-
-                    <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md ">All Orders(10)</button>
-                    <button className="bg-[#EE5D50] text-white font-medium px-4 py-2 rounded-md ">Pending (10)</button>
-                    <button className="bg-[#4C82FF] text-white font-medium px-4 py-2 rounded-md ">Ready to Pickup (10)</button>
-                    <button className="bg-[#F98F5C] text-white font-medium px-4 py-2 rounded-md ">In Transit (10)</button>
-                    <button className="bg-[#05CD99] text-white font-medium px-4 py-2 rounded-md ">Delivered(10)</button>
-                    <button className="bg-[#FF6D60] text-white font-medium px-4 py-2 rounded-md ">Lost (10)</button>
-                    <button className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md ">Damaged (10)</button>
-                    <button className="bg-[#F98F5C] text-white font-medium px-4 py-2 rounded-md ">Export</button>
+                    <button className="bg-[#2B3674] text-white font-medium px-4 py-3 rounded-md text-sm">All Orders(10)</button>
+                    <button className="bg-[#EE5D50] text-white font-medium px-4 py-3 rounded-md text-sm">Pending (10)</button>
+                    <button className="bg-[#4C82FF] text-white font-medium px-4 py-3 rounded-md text-sm">Ready to Pickup (10)</button>
+                    <button className="bg-[#F98F5C] text-white font-medium px-4 py-3 rounded-md text-sm">In Transit (10)</button>
+                    <button className="bg-[#05CD99] text-white font-medium px-4 py-3 rounded-md text-sm">Delivered(10)</button>
+                    <button className="bg-[#FF6D60] text-white font-medium px-4 py-3 rounded-md text-sm">Lost (10)</button>
+                    <button className="bg-[#B71D21] text-white font-medium px-4 py-3 rounded-md text-sm">Damaged (10)</button>
+                    <button className="bg-[#F98F5C] text-white font-medium px-4 py-3 rounded-md text-sm">Export</button>
                 </div>
             </div>
 
             <div className="bg-white p-4 rounded-2xl">
                 <div className="flex flex-wrap justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-[#2B3674] font-dm-sans">RTO Order Details</h2>
-                    <div className="flex gap-3  flex-wrap items-center">
-                        <span className="font-bold text-[#2B3674]  font-dm-sans">Clear Filters</span>
+                    <h2 className="text-2xl font-bold  font-dm-sans">Order Details</h2>
+                    <div className="flex gap-2 flex-wrap items-center">
+                        <span className="font-bold  font-dm-sans">Clear Filters</span>
                         <span><IoMdRefresh className="text-red-600 text-xl" /></span>
                         <span><IoSettingsOutline className="text-xl" /></span>
                         <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
                         <select
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
-                            className="bg-[#4318FF] font-dm-sans outline-0 text-white md:w-[150px] font-bold  px-2 py-2 rounded-md"
+                            className="bg-[#4318FF] font-dm-sans outline-0 text-white md:w-[150px] font-bold px-2 py-2 rounded-md"
                         >
                             <option value="Actual Ratio ">Bulk Action</option>
                         </select>
-                        <button className="bg-[#F4F7FE] rela px-4 py-2  rounded-lg flex items-center text-[#A3AED0]">
-
-                            {/* Month Input */}
+                        <button className="bg-[#F4F7FE] px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
                             <input
                                 type="month"
                                 value={selectedMonth}
@@ -140,59 +205,99 @@ export default function Order() {
                                 className="outline-0 font-dm-sans"
                             />
                         </button>
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button onClick={openMoreModal} className="bg-[#F4F7FE] p-2 rounded-lg">
                             <MoreHorizontal className="text-[#F98F5C]" />
                         </button>
                     </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
-                        <thead className="">
-                            <tr className="text-[#A3AED0]  border-b  border-[#E9EDF7]">
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Order ID <i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Name<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Payment Info<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Order Tags<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Seller Tags<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">Shipment Details<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-left">SLA<i></i></th>
-                                <th className="p-3 whitespace-nowrap font-medium text-center">Action<i></i></th>
+                        <thead>
+                            <tr className="text-[#A3AED0] border-b border-[#E9EDF7]">
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Order ID<i></i></th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Name<i></i></th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Payment Info<i></i></th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Order Tags<i></i></th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Seller Tags<i></i></th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Shipment Details<i></i></th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">SLA<i></i></th>
+                                <th className="p-2 whitespace-nowrap text-center uppercase">Action<i></i></th>
                             </tr>
                         </thead>
                         <tbody>
                             {currentData.map((order) => (
-                                <tr key={order.id} className="text-[#8F9BBA]  border-b  border-[#E9EDF7] align-top">
-                                    <td className="p-3 whitespace-nowrap"><input type="checkbox" name="" id="" className='me-2' /><b className='text-black truncate'>{order.id}</b><br />
-                                        <span className="font-bold text-xs">
-                                            {order.date}</span></td>
-                                    <td className="p-3 font-bold whitespace-nowrap"><span className='text-[#2B3674]'>{order.product}</span><br /><span className=" ">SKU: {order.sku}<br /> Qty: {order.qty}</span></td>
-                                    <td className="p-3 font-bold whitespace-nowrap"> <span className='text-[#2B3674]'>COD:{order.cod}</span><br /> <span className="text-[#8F9BBA]">Order Value:{order.orderValue}</span><span className="text-red-500 block">{order.status}</span></td>
-                                    <td className="p-3 space-y-1 whitespace-nowrap">
+                                <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
+                                    <td className="p-2 whitespace-nowrap">
+                                        <div className="flex items-start">
+                                            <label className="flex mt-2 items-center cursor-pointer me-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected.includes(order.id)}
+                                                    onChange={() => handleCheckboxChange(order.id)}
+                                                    className="peer hidden"
+                                                />
+                                                <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                    <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                                </div>
+                                            </label>
+                                            <div><b className='text-black truncate'>{order.id}</b>
+                                                <br />
+                                                <span className="font-bold text-xs">{order.date}</span></div>
+                                        </div>
+
+                                    </td>
+                                    <td className="p-2  whitespace-nowrap">
+                                        <span className=''>{order.product}</span>
+                                        <br />
+                                        <span className="text-sm">SKU: {order.sku}<br /> Qty: {order.qty}</span>
+                                    </td>
+                                    <td className="p-2  whitespace-nowrap">
+                                        <span className=''>COD:{order.cod}</span>
+                                        <br />
+                                        <span className="">Order Value:{order.orderValue}</span>
+                                        <span className="text-red-500 block">{order.status}</span>
+                                    </td>
+                                    <td className="p-2 space-y-1 whitespace-nowrap">
                                         {order.tags.map((tag, i) => (
                                             <span
                                                 key={i}
-                                                className={` text-center  p-2 rounded-xl font-bold block 
-                          ${tag === "Repeat Customer" ? "bg-[#ccf0ebf6] text-[#00B69B]"
-                                                        : tag === "Label Generated" ? "bg-[#FEE9DE] text-[#F98F5C]"
-                                                            : "bg-[#5ca5f938] text-[#5CA4F9] mr-1"}`}
+                                                className={`text-sm text-center p-2 rounded-xl  block 
+                          ${tag === "Repeat Customer" ? "bg-[#ccf0ebf6] text-[#00B69B]" :
+                                                        tag === "Label Generated" ? "bg-[#FEE9DE] text-[#F98F5C]" :
+                                                            "bg-[#5ca5f938] text-[#5CA4F9] mr-1"
+                                                    }`}
                                             >
                                                 {tag}
                                             </span>
                                         ))}
                                     </td>
-                                    <td className="p-3 font-medium whitespace-nowrap"><span className='text-[#2B3674] font-medium'>{order.seller_tags || 'NA'}</span></td>
-                                    <td className="p-3 font-medium whitespace-nowrap"><span className='text-[#2B3674] font-medium'>{order.shipment.id}</span><br />
-                                        <span className="text-[#05CD99] font-medium">{order.shipment.status}</span>
-                                        <br /><span className='font-medium'>{order.shipment.provider}</span><br /><span className=" font-bold">{order.shipment.date}</span></td>
-                                    <td className="p-3 font-bold text-[#2B3674] whitespace-nowrap">{order.sla}<span className='block text-green-400 font-normal'>{order.sla_date}</span></td>
-                                    <td className=" p-3 whitespace-nowrap">
-                                        <ul className=" flex gap-2 justify-between">
-                                            <li><RiFileEditFill className=" text-black text-2xl" /></li>
-                                            <li><IoCloudDownloadOutline className=" text-black text-2xl" /></li>
-                                            <li><RxCrossCircled className=" text-black text-2xl" /></li>
-                                            <li><IoIosArrowDropdown className=" text-black text-2xl" /></li>
+                                    <td className="p-2  whitespace-nowrap">
+                                        <span className=' '>{order.seller_tags || 'NA'}</span>
+                                    </td>
+                                    <td className="p-2 whitespace-nowrap">
+                                        <span className=' '>{order.shipment.id}</span>
+                                        <br />
+                                        <span className="text-[#05CD99] ">{order.shipment.status}</span>
+                                        <br />
+                                        <span className=''>{order.shipment.provider}</span>
+                                        <br />
+                                        <span className="text-sm ">{order.shipment.date}</span>
+                                    </td>
+                                    <td className="p-2   whitespace-nowrap">
+                                        {order.sla}
+                                        <span className='block text-green-400 '>{order.sla_date}</span>
+                                    </td>
+                                    <td className="p-2 whitespace-nowrap">
+                                        <ul className="flex gap-2 justify-between">
+                                            <li><RiFileEditFill className="text-black text-2xl" /></li>
+                                            <li><IoCloudDownloadOutline className="text-black text-2xl" /></li>
+                                            <li><RxCrossCircled className="text-black text-2xl" /></li>
+                                            <li><IoIosArrowDropdown className="text-black text-2xl" /></li>
                                         </ul>
-                                        <button className=" text-[#F98F5C] border rounded-md font-dm-sans  p-2 w-full mt-2 ">
+                                        <button
+                                            onClick={() => setIsNoteModalOpen(true)}
+                                            className="text-[#F98F5C] border rounded-md font-dm-sans p-2 w-full mt-2 text-sm"
+                                        >
                                             View / Add Notes
                                         </button>
                                     </td>
@@ -206,7 +311,7 @@ export default function Order() {
                         <button
                             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
+                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center  rounded mx-1 disabled:opacity-50"
                         >
                             <MdKeyboardArrowLeft /> Previous
                         </button>
@@ -214,8 +319,7 @@ export default function Order() {
                             <button
                                 key={index}
                                 onClick={() => setCurrentPage(index + 1)}
-                                className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
-                                    }`}
+                                className={`px-3 hidden md:block py-1 border-[#2B3674]  rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""}`}
                             >
                                 {index + 1}
                             </button>
@@ -223,7 +327,7 @@ export default function Order() {
                         <button
                             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
+                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center  rounded mx-1 disabled:opacity-50"
                         >
                             Next <MdKeyboardArrowRight />
                         </button>
@@ -233,7 +337,7 @@ export default function Order() {
                     <select
                         value={perPage}
                         onChange={(e) => setPerPage(Number(e.target.value))}
-                        className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
+                        className="border-[#2B3674] bg-[#F8FBFF]  rounded px-3 py-2 font-semibold"
                     >
                         {[5, 10, 15].map((num) => (
                             <option key={num} value={num}>
@@ -243,6 +347,57 @@ export default function Order() {
                     </select>
                 </div>
             </div>
+
+            {isNoteModalOpen && (
+                <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+                        <button
+                            onClick={() => setIsNoteModalOpen(false)}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-black"
+                        >
+                            ✕
+                        </button>
+                        <h2 className="text-lg font-bold mb-4">Order Notes</h2>
+                        <textarea
+                            className="w-full border p-2 rounded-xl mb-4"
+                            rows={4}
+                            placeholder="Add your note here..."
+                        />
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => setIsNoteModalOpen(false)}
+                                className="bg-gray-200 px-4 py-2 rounded-md"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    // Submit logic here
+                                    setIsNoteModalOpen(false);
+                                }}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000085] bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md">
+                        <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Modal Title</h2>
+                        <p className="text-[#4A5568] mb-4">This is some modal content. You can put anything here.</p>
+                        <button
+                            onClick={closeModalBox}
+                            className="bg-[#2B3674] text-white px-4 py-2 rounded hover:bg-[#1a254b]"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
