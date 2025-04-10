@@ -5,6 +5,7 @@ import { FaFilePdf } from "react-icons/fa6";
 
 import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
 export default function Invoice() {
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
@@ -99,9 +100,21 @@ export default function Invoice() {
                             onChange={(e) => setSelectedMonth(e.target.value)}
                             className="outline-0 text-[#A3AED0] bg-[#F4F7FE] p-2 rounded-md"
                         />
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
-                            <MoreHorizontal className="text-[#F98F5C]" />
-                        </button>
+                         <button
+                                onClick={() => setIsPopupOpen((prev) => !prev)}
+                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                            >
+                                <MoreHorizontal className="text-[#F98F5C]" />
+                                {isPopupOpen && (
+                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                        <ul className="py-2 text-sm text-[#2B3674]">
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        </ul>
+                                    </div>
+                                )}
+                            </button>
                     </div>
                 </div>
 
@@ -208,6 +221,7 @@ export default function Invoice() {
                     </select>
                 </div>
             </div>
+            
         </>
     )
 }

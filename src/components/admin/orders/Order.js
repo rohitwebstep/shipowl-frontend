@@ -59,6 +59,7 @@ const orders = [
 
 export default function Orders() {
     const [showModal, setShowModal] = useState(false);
+    const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
     const openMoreModal = () => {
         setShowModal(true);
@@ -88,8 +89,10 @@ export default function Orders() {
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
     };
-
-    const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+    const handleSelect = (ranges) => {
+        setRange([ranges.selection]);
+      };
+      
     const [range, setRange] = useState([
         {
             startDate: new Date(),
@@ -108,26 +111,28 @@ export default function Orders() {
                     </select>
                 </div>
                 <div className="grid lg:grid-cols-4 md:grid-cols-2 px-3 md:px-0 gap-4 mb-4">
-                    <div className="relative">
-                        <label htmlFor="daterange" className="text-[#232323] font-medium block ">From Date:</label>
-                        <input
-                            readOnly
-                            id="daterange"
-                            onClick={() => setShowPicker(!showPicker)}
-                            value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
-                            className="bg-white text-[#718EBF] border p-2 w-full font-bold border-[#DFEAF2] rounded-xl cursor-pointer"
-                        />
-                        {showPicker && (
-                            <div className="absolute z-10 shadow-md rounded-md mt-2">
-                                <DateRange
-                                    editableDateInputs={true}
-                                    onChange={item => setRange([item.selection])}
-                                    moveRangeOnFirstSelection={false}
-                                    ranges={range}
-                                />
-                            </div>
-                        )}
-                    </div>
+                <div className="relative">
+                    <label className="text-[#232323] mb-1 block">From Date:</label>
+                    <input
+                        readOnly
+                        onClick={() => setShowPicker(!showPicker)}
+                        value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                        className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full cursor-pointer"
+                        placeholder="Select date range"
+                    />
+
+                    {showPicker && (
+                        <div className="absolute z-50 mt-2">
+                            <DateRange
+                                editableDateInputs={true}
+                                onChange={handleSelect}
+                                moveRangeOnFirstSelection={false}
+                                ranges={range}
+                                className="shadow-xl"
+                            />
+                        </div>
+                    )}
+                </div>
                     <div>
                         <label className='text-[#232323] font-medium block'>Order ID(s):</label>
                         <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" />

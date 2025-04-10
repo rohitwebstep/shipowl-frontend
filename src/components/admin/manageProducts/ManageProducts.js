@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { RiFileEditFill } from "react-icons/ri";
-
+import { DateRange } from 'react-date-range';
+import { format } from 'date-fns';
+import 'react-date-range/dist/styles.css'; // main style
+import 'react-date-range/dist/theme/default.css'; // theme css
 import { MoreHorizontal } from "lucide-react";
 import { IoMdRefresh } from "react-icons/io";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -12,6 +15,20 @@ import product from '@/app/assets/product1.png'
 import Image from "next/image";
 import { FaCheck } from "react-icons/fa";
 export default function ManageProducts() {
+    const [modalType, setModalType] = useState(null); // 'inventory' | 'moreOptions' | null
+    const [range, setRange] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection'
+        }
+    ]);
+
+    const [showPicker, setShowPicker] = useState(false);
+
+    const handleSelect = (ranges) => {
+        setRange([ranges.selection]);
+    };
     const [activeTab, setActiveTab] = useState("Pushed_To_platform");
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
@@ -129,43 +146,63 @@ export default function ManageProducts() {
                     </select>
                 </div>
             </div>
-            <div className="dm grid lg:grid-cols-5 md:grid-cols-3 gap-6 my-5 items-end justify-between">
+            <div className="flex items-end gap-3">
+                <div className="dm grid lg:grid-cols-4 md:grid-cols-3 gap-4 mt-5 xl:w-[80%] items-end justify-between">
 
 
-                <div>
-                    <label className="text-[#232323] mb-1 block">From Date:</label>
-                    <input className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full" type="text" name="" id="" placeholder="07/23/2024 - 07/30/2024" />
+                    <div className="relative">
+                        <label className="text-[#232323] mb-1 block">From Date:</label>
+                        <input
+                            readOnly
+                            onClick={() => setShowPicker(!showPicker)}
+                            value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                            className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full cursor-pointer"
+                            placeholder="Select date range"
+                        />
 
+                        {showPicker && (
+                            <div className="absolute z-50 mt-2">
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={handleSelect}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={range}
+                                    className="shadow-xl"
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <label className="text-[#232323] mb-1 block">Stock</label>
+                        <select
+                            name="" id=""
+
+                            className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full"
+                        >
+                            <option value="Stock">Stock</option>
+                            <option value="Percentage Ratio">Percentage Ratio</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="text-[#232323] mb-1 block">Name</label>
+                        <input className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full" type="text" name="" id="" placeholder="Name" />
+
+
+                    </div>
+                    <div>
+                        <label className="text-[#232323] mb-1 block">SKU</label>
+                        <input className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full" type="text" name="" id="" placeholder="SKU" />
+
+
+                    </div>
 
                 </div>
-                <div>
-                    <label className="text-[#232323] mb-1 block">Stock</label>
-                    <select
-                        name="" id=""
 
-                        className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full"
-                    >
-                        <option value="Stock">Stock</option>
-                        <option value="Percentage Ratio">Percentage Ratio</option>
-                    </select>
-                </div>
-                <div>
-                    <label className="text-[#232323] mb-1 block">Name</label>
-                    <input className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full" type="text" name="" id="" placeholder="Name" />
-
-
-                </div>
-                <div>
-                    <label className="text-[#232323] mb-1 block">SKU</label>
-                    <input className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full" type="text" name="" id="" placeholder="SKU" />
-
-
-                </div>
-                <div>
+                <div className="xl:w-[20%]">
 
                     <div className="flex gap-3 lg:justify-end justify-normal lg:mt-0 mt-3">
-                        <button className="dm bg-[#4285F4] text-white font-bold px-10 py-3 rounded-lg text-sm w-auto">Apply</button>
-                        <button className="dm bg-[#EA4335] text-white font-bold px-10 py-3 rounded-lg text-sm w-auto">Reset</button>
+                        <button className="dm bg-[#4285F4] text-white font-bold px-5  py-3 rounded-lg text-sm w-auto">Apply</button>
+                        <button className="dm bg-[#EA4335] text-white font-bold  py-3 px-5 rounded-lg text-sm w-auto">Reset</button>
                     </div>
                 </div>
             </div>
@@ -194,9 +231,13 @@ export default function ManageProducts() {
                                 className="outline-0"
                             />
                         </button>
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button
+                            className="bg-[#F4F7FE] p-2 rounded-lg"
+                            onClick={() => setModalType('moreOptions')}
+                        >
                             <MoreHorizontal className="text-[#F98F5C]" />
                         </button>
+
                     </div>
                 </div>
                 <div className="dm overflow-x-auto border-b border-[#E9EDF7]">
@@ -204,7 +245,7 @@ export default function ManageProducts() {
                         <table className="dm w-full border-collapse">
                             <thead>
                                 <tr className="dm text-[#A3AED0] border-t border-b border-[#E9EDF7]">
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap"> <div className="flex items-center">
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap"> <div className="flex items-center">
                                         <label className="flex items-center cursor-pointer me-2">
                                             <input
                                                 type="checkbox"
@@ -218,15 +259,15 @@ export default function ManageProducts() {
                                         </label>
                                         <span>Channel<i></i></span>
                                     </div></th>
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap">Model<i></i></th>
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap">SKU<i></i></th>
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap">Product Details<i></i></th>
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap">Delivery Ratio<i></i></th>
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap">Owl Price<i></i></th>
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap">Selling Price<i></i></th>
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap">Inventory<i></i></th>
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap">Pushed Date & Time<i></i></th>
-                                    <th className="dm p-3 text-left font-medium whitespace-nowrap">Action<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Model<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">SKU<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Product Details<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Delivery Ratio<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Owl Price<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Selling Price<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Inventory<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Pushed Date & Time<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Action<i></i></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -260,9 +301,13 @@ export default function ManageProducts() {
                                                 <li className="flex gap-1"><RiFileEditFill className="dm text-black text-2xl" /> Edit </li>
 
                                             </ul>
-                                            <button className="dm text-[#F98F5C] border rounded-md  p-2 w-full mt-2 text-sm">
+                                            <button
+                                                className="dm text-[#F98F5C] border rounded-md  p-2 w-full mt-2 text-sm"
+                                                onClick={() => setModalType('inventory')}
+                                            >
                                                 Request Inventory
                                             </button>
+
                                         </td>
                                     </tr>
                                 ))}
@@ -319,6 +364,50 @@ export default function ManageProducts() {
                     </select>
                 </div>
             </div>
+
+            {/* Inventory Modal */}
+            {modalType === 'inventory' && (
+                <div className="fixed inset-0 bg-[#0000008c] bg-opacity-40 z-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded-xl shadow-lg w-[400px]">
+                        <h3 className="text-xl font-semibold mb-4">Request Inventory</h3>
+                        <p className="text-sm text-gray-700 mb-6">You can request stock updates from your supplier here.</p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setModalType(null)}
+                                className="bg-gray-200 px-4 py-2 rounded-lg"
+                            >
+                                Cancel
+                            </button>
+                            <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg">
+                                Submit Request
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* More Options Modal */}
+            {modalType === 'moreOptions' && (
+                <div className="fixed inset-0 bg-[#0000008c] bg-opacity-40 z-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded-xl shadow-lg w-[400px]">
+                        <h3 className="text-xl font-semibold mb-4">More Options</h3>
+                        <ul className="space-y-2 text-gray-800">
+                            <li className="hover:text-[#F98F5C] cursor-pointer">Export Data</li>
+                            <li className="hover:text-[#F98F5C] cursor-pointer">Change Columns</li>
+                            <li className="hover:text-[#F98F5C] cursor-pointer">Bulk Edit</li>
+                        </ul>
+                        <div className="flex justify-end mt-6">
+                            <button
+                                onClick={() => setModalType(null)}
+                                className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

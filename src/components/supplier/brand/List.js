@@ -11,7 +11,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 
 import Image from 'next/image';
 export default function List() {
-
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const brandData = [
@@ -52,9 +52,22 @@ export default function List() {
                     <div className="flex flex-wrap justify-between items-center mb-4">
                         <h2 className="md:text-2xl font-bold text-[#2B3674]">Brand List</h2>
                         <div className="flex gap-3  flex-wrap items-center">
-                            <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                            <button
+                                onClick={() => setIsPopupOpen((prev) => !prev)}
+                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                            >
                                 <MoreHorizontal className="text-[#F98F5C]" />
+                                {isPopupOpen && (
+                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                        <ul className="py-2 text-sm text-[#2B3674]">
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        </ul>
+                                    </div>
+                                )}
                             </button>
+
                             <div className="flex justify-end">
                                 <button className='bg-[#4285F4] text-white rounded-md p-2 px-4'><Link href="/supplier/brand/create">Add brandogary</Link></button>
 
@@ -100,7 +113,7 @@ export default function List() {
                                         <td className="p-2 whitespace-nowrap px-5">
                                             {item.description}
                                         </td>
-                                        <td className="p-2 px-5 text-[#8F9BBA]"><div className="flex justify-center gap-2"><MdModeEdit /><AiOutlineDelete/></div></td>
+                                        <td className="p-2 px-5 text-[#8F9BBA]"><div className="flex justify-center gap-2"><MdModeEdit /><AiOutlineDelete /></div></td>
                                     </tr>
                                 ))}
                             </tbody>

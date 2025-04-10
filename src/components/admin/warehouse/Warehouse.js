@@ -243,20 +243,7 @@ export default function Warehouse() {
         </div>
       </div>
       {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000085] bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md">
-            <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Modal Title</h2>
-            <p className="text-[#4A5568] mb-4">This is some modal content. You can put anything here.</p>
-            <button
-              onClick={closeModalBox}
-              className="bg-[#2B3674] text-white px-4 py-2 rounded hover:bg-[#1a254b]"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      
 
 
 

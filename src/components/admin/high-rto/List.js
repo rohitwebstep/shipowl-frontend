@@ -157,15 +157,7 @@ export default function List() {
                 </div>
             </div>
 
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-[#0008] bg-opacity-30 z-50 flex justify-center items-center">
-                    <div className="bg-white rounded-xl shadow-xl p-6 w-11/12 md:w-1/3 relative">
-                        <button onClick={closeModal} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-                        <h2 className="text-xl font-bold text-[#2B3674] mb-4">More Options</h2>
-                        <p className="text-[#4A5568]">Add your content here.</p>
-                    </div>
-                </div>
-            )}
+            
         </>
     )
 }

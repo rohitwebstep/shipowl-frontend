@@ -11,6 +11,10 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { FiDownloadCloud } from "react-icons/fi";
 import { MoreHorizontal } from "lucide-react";
 import { FaCheck } from 'react-icons/fa';
+import { DateRange } from 'react-date-range'
+import 'react-date-range/dist/styles.css' // main style file
+import 'react-date-range/dist/theme/default.css' // theme css file
+import { format } from 'date-fns'
 const orders = [
   {
     id: '#ID285800',
@@ -66,9 +70,22 @@ export default function Orders() {
     const today = new Date();
     return today.toISOString().slice(0, 7); // YYYY-MM format
   });
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const [selected, setSelected] = useState([]);
+  const [range, setRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: 'selection'
+    }
+  ])
 
+  const handleSelect = (ranges) => {
+    setRange([ranges.selection]);
+  };
+  
+  const [showPicker, setShowPicker] = useState(false)
 
   const handleCheckboxChange = (id) => {
     setSelected((prev) =>
@@ -81,10 +98,28 @@ export default function Orders() {
       <div className='bg-white p-4 rounded-xl mb-4'>
         <div className="grid lg:grid-cols-4 md:grid-cols-2 px-3 md:px-0 gap-4 mb-4">
           {/* Input fields */}
-          <div>
-            <label className='text-[#232323] font-medium block'>From Date:</label>
-            <input type="text" placeholder="07/23/2024 - 07/30/2024" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" />
-          </div>
+            <div className="relative">
+                      <label className="text-[#232323] mb-1 block">From Date:</label>
+                      <input
+                        readOnly
+                        onClick={() => setShowPicker(!showPicker)}
+                        value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                        className="bg-white outline-0 text-[#718EBF] border border-[#DFEAF2] px-3 py-2 rounded-xl w-full cursor-pointer"
+                        placeholder="Select date range"
+                      />
+          
+                      {showPicker && (
+                        <div className="absolute z-50 mt-2">
+                          <DateRange
+                            editableDateInputs={true}
+                            onChange={handleSelect}
+                            moveRangeOnFirstSelection={false}
+                            ranges={range}
+                            className="shadow-xl"
+                          />
+                        </div>
+                      )}
+                    </div>
           <div>
             <label className='text-[#232323] font-medium block'>Order ID(s):</label>
             <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-2 w-full p-2 rounded-xl" />
@@ -162,9 +197,21 @@ export default function Orders() {
                 className="outline-0 font-dm-sans"
               />
             </button>
-            <button className="bg-[#F4F7FE] p-2 rounded-lg">
-              <MoreHorizontal className="text-[#F98F5C]" />
-            </button>
+            <button
+                                onClick={() => setIsPopupOpen((prev) => !prev)}
+                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                            >
+                                <MoreHorizontal className="text-[#F98F5C]" />
+                                {isPopupOpen && (
+                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                        <ul className="py-2 text-sm text-[#2B3674]">
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        </ul>
+                                    </div>
+                                )}
+                            </button>
           </div>
         </div>
         <div className="overflow-x-auto">

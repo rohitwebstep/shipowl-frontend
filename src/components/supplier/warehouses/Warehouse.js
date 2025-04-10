@@ -7,6 +7,7 @@ import { MoreHorizontal } from "lucide-react";
 import Link from 'next/link';
 import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
 export default function Warehouse() {
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
@@ -47,17 +48,30 @@ export default function Warehouse() {
 
   return (
     <>
-      <div className="flex justify-end mb-5">
-        <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/supplier/add-warehouse">Add New</Link></button>
+      <div className="flex justify-end gap-5 items-end mb-5">
+      
+        <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/supplier/warehouse/create">Add New</Link></button>
 
       </div>
       <div className="bg-white rounded-3xl p-5">
         <div className="flex flex-wrap justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-[#2B3674]">Warehouse</h2>
           <div className="flex gap-3  flex-wrap items-center">
-            <button className="bg-[#F4F7FE] p-2 rounded-lg">
-              <MoreHorizontal className="text-[#F98F5C]" />
-            </button>
+                          <button
+                                onClick={() => setIsPopupOpen((prev) => !prev)}
+                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                            >
+                                <MoreHorizontal className="text-[#F98F5C]" />
+                                {isPopupOpen && (
+                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                        <ul className="py-2 text-sm text-[#2B3674]">
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        </ul>
+                                    </div>
+                                )}
+                            </button>
           </div>
         </div>
         <div className="overflow-x-auto w-full relative">
@@ -85,7 +99,7 @@ export default function Warehouse() {
                           className="peer hidden"
                         />
                         <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                            peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                                           peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
                           <FaCheck className=" peer-checked:block text-white w-3 h-3" />
                         </div>
                       </label>
@@ -225,6 +239,9 @@ export default function Warehouse() {
           </select>
         </div>
       </div>
+      {/* Modal */}
+      
+
 
 
     </>

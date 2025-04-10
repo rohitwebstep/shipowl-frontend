@@ -2,8 +2,21 @@ import { useState } from 'react'
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import { FaCheck } from "react-icons/fa";
+import { DateRange } from 'react-date-range'
+import 'react-date-range/dist/styles.css' // main style file
+import 'react-date-range/dist/theme/default.css' // theme css file
+import { format } from 'date-fns'
 export default function CreatePayment() {
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
 
+    const [range, setRange] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection'
+        }
+    ])
+    const [showPicker, setShowPicker] = useState(false)
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const warehouseData = [
@@ -70,9 +83,25 @@ export default function CreatePayment() {
         <>
             <div className="filtred-box py-5 xl:flex md:px-0 px-4  items-end justify-between">
                 <div className="xl:w-9/12 grid md:grid-cols-4 grid-cols-1 gap-3">
-                    <div>
-                        <label htmlFor="" className="text-[#232323] font-medium block">From Date:</label>
-                        <input type="text" name="" id="" placeholder="07/23/2024 - 07/30/2024" className="bg-white text-[#718EBF]  border lg:p-3 lg:py-2 p-2 w-full font-bold border-[#DFEAF2] rounded-xl" />
+                    <div className="relative">
+                        <label htmlFor="daterange" className="text-[#232323] font-medium block ">From Date:</label>
+                        <input
+                            readOnly
+                            id="daterange"
+                            onClick={() => setShowPicker(!showPicker)}
+                            value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                            className="bg-white text-[#718EBF] border p-2 w-full font-bold border-[#DFEAF2] rounded-xl cursor-pointer"
+                        />
+                        {showPicker && (
+                            <div className="absolute z-10 shadow-md rounded-md mt-2">
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={item => setRange([item.selection])}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={range}
+                                />
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label htmlFor="" className="text-[#232323] font-medium block">Payment ID:</label>
@@ -110,9 +139,21 @@ export default function CreatePayment() {
                             onChange={(e) => setSelectedMonth(e.target.value)}
                             className="outline-0 text-[#A3AED0] bg-[#F4F7FE] p-2 rounded-md"
                         />
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
-                            <MoreHorizontal className="text-[#F98F5C]" />
-                        </button>
+                         <button
+                                onClick={() => setIsPopupOpen((prev) => !prev)}
+                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                            >
+                                <MoreHorizontal className="text-[#F98F5C]" />
+                                {isPopupOpen && (
+                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                        <ul className="py-2 text-sm text-[#2B3674]">
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        </ul>
+                                    </div>
+                                )}
+                            </button>
                     </div>
                 </div>
 
@@ -121,18 +162,17 @@ export default function CreatePayment() {
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                  <div className="flex lg:gap-14 gap-2">
-                                  <label className="flex items-center cursor-pointer me-2">
-                                    <input
-                                        type="checkbox"
-                                        className="peer hidden"
-                                    />
-                                    <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                                            peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                        <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                    <div className="flex lg:gap-14 gap-2">
+                                        <label className="flex items-center cursor-pointer me-2">
+                                            <input
+                                                type="checkbox"
+                                                className="peer hidden"
+                                            />
+                                            <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                            </div>
+                                        </label><span className=''>Company Name<i></i></span>
                                     </div>
-                                </label><span className=''>Company Name<i></i></span>
-                                  </div>
 
                                 </th>
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Payment Cycle<i></i></th>
@@ -144,22 +184,22 @@ export default function CreatePayment() {
                         <tbody>
                             {currentData.map((item) => (
                                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                    <td className="p-2 px-5 whitespace-nowrap"> 
+                                    <td className="p-2 px-5 whitespace-nowrap">
                                         <div className="flex items-center  lg:gap-14 gap-2">
-                                        <label className="flex items-center cursor-pointer me-2">
-                                            <input
-                                                type="checkbox"
-                                                checked={selected.includes(item.id)}
-                                                onChange={() => handleCheckboxChange(item.id)}
-                                                className="peer hidden"
-                                            />
-                                            <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                                            <label className="flex items-center cursor-pointer me-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected.includes(item.id)}
+                                                    onChange={() => handleCheckboxChange(item.id)}
+                                                    className="peer hidden"
+                                                />
+                                                <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
                                                                             peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                                <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                            </div>
-                                        </label>
-                                        {item.company_name}
-                                    </div></td>
+                                                    <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                                </div>
+                                            </label>
+                                            {item.company_name}
+                                        </div></td>
                                     <td className="p-2 px-5 whitespace-nowrap">{item.payment_cycle}</td>
                                     <td className="p-2 px-5 whitespace-nowrap">
                                         {item.payment_amout}</td>
@@ -217,6 +257,7 @@ export default function CreatePayment() {
                     </select>
                 </div>
             </div>
+            
 
         </>
     )

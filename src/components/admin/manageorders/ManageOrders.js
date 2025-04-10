@@ -13,6 +13,12 @@ import { FiDownloadCloud } from "react-icons/fi";
 import { FaFilter, FaCheck } from "react-icons/fa";
 
 export default function ManageOrders() {
+    const [showModal, setShowModal] = useState(false);
+    const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
+
+    const closeModalBox = () => {
+        setShowModal(false);
+    };
 
     const [selected, setSelected] = useState([]);
     const handleCheckboxChange = (id) => {
@@ -170,7 +176,7 @@ export default function ManageOrders() {
                                 className="outline-0 font-dm-sans"
                             />
                         </button>
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
+                        <button  onClick={() => setShowModal(true)} className="bg-[#F4F7FE] p-2 rounded-lg">
                             <MoreHorizontal className="text-[#F98F5C]" />
                         </button>
                     </div>
@@ -180,7 +186,7 @@ export default function ManageOrders() {
                         <table className=" w-full border-collapse">
                             <thead>
                                 <tr className=" text-[#A3AED0] border-b border-[#E9EDF7]">
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">
                                         <div className="flex items-center">
                                             <label className="flex items-center cursor-pointer me-2">
                                                 <input
@@ -197,18 +203,18 @@ export default function ManageOrders() {
                                         </div>
 
                                     </th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Order ID<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Items<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Payment Info<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Order Tags<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Seller Tags<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Shipment Details<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left font-medium">Action<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Order ID<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Items<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Payment Info<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Order Tags<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Seller Tags<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Shipment Details<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Action<i></i></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {currentData.map((order, index) => (
-                                    <tr key={index} className=" text-[#8F9BBA] align-sub border-b border-[#E9EDF7]">
+                                    <tr key={index} className=" text-[#8F9BBA] align-sub font-semibold border-b border-[#E9EDF7]">
                                         <td className=" p-3 font-dm-sans whitespace-nowrap text-black font-bold">
                                             <label className="flex items-center cursor-pointer me-2">
                                                 <input
@@ -223,14 +229,14 @@ export default function ManageOrders() {
                                                 </div>
                                                 <span className="ms-2">{order.channel}</span>
                                             </label></td>
-                                        <td className=" p-3 font-dm-sans whitespace-nowrap text-black font-bold">{order.order_id} <span className=" block text-[#8F9BBA]">{order.date_and_time}</span></td>
-                                        <td className=" p-3 font-dm-sans whitespace-nowrap font-bold text-[#2B3674]">{order.product_details.product_name} <span className=" block text-[#8F9BBA] ">SKU:{order.product_details.sku}</span><span className=" block text-[#8F9BBA] ">Qty:{order.product_details.Qty}</span></td>
-                                        <td className=" p-3 font-dm-sans whitespace-nowrap text-[#2B3674] font-bold">COD:{order.price} <span className=" block text-[#8F9BBA] font-bold">Order Value:{order.order_value}</span> <span className={` capitalize ${order.status == "unpaid" ? "text-[#E5252A]" : "text-green-500"}`}>{order.status}</span></td>
+                                        <td className=" p-3 font-dm-sans whitespace-nowrap text-black">{order.order_id} <span className=" block text-[#8F9BBA]">{order.date_and_time}</span></td>
+                                        <td className=" p-3 font-dm-sans whitespace-nowrap text-[#2B3674]">{order.product_details.product_name} <span className=" block text-[#8F9BBA] ">SKU:{order.product_details.sku}</span><span className=" block text-[#8F9BBA] ">Qty:{order.product_details.Qty}</span></td>
+                                        <td className=" p-3 font-dm-sans whitespace-nowrap text-[#2B3674]">COD:{order.price} <span className=" block text-[#8F9BBA]">Order Value:{order.order_value}</span> <span className={` capitalize ${order.status == "unpaid" ? "text-[#E5252A]" : "text-green-500"}`}>{order.status}</span></td>
                                         <td className=" p-3 font-dm-sans whitespace-nowrap">
                                             {order.Order_Tags.map((tag, i) => (
                                                 <span
                                                     key={i}
-                                                    className={`text-xs text-center p-2 rounded-md font-bold block mb-1 ${tag === "Repeat Customer"
+                                                    className={`text-xs text-center p-2 rounded-md block mb-1 ${tag === "Repeat Customer"
                                                         ? "bg-[#00b69b3d] text-[#00B69B]"
                                                         : tag === "Label Generated"
                                                             ? "text-[#F98F5C] bg-[#f98e5c48]"
@@ -245,8 +251,8 @@ export default function ManageOrders() {
                                         <td className=" p-3 font-dm-sans whitespace-nowrap">
                                             <span className="font-dm-sans text-black ">{order.shipment.id}</span><br />
                                             <span className="font-dm-sans  text-[#05CD99]">{order.shipment.status}</span><br />
-                                            <span className="font-dm-sans font-medium text-[#718EBF]">{order.shipment.provider}</span><br />
-                                            <span className="font-dm-sans text-sm font-bold text-[#718EBF]">{order.shipment.date}</span>
+                                            <span className="font-dm-sans  text-[#718EBF]">{order.shipment.provider}</span><br />
+                                            <span className="font-dm-sans text-sm text-[#718EBF]">{order.shipment.date}</span>
                                         </td>
                                         <td className=" p-3 whitespace-nowrap">
                                             <ul className=" flex gap-2 justify-between">
@@ -255,7 +261,7 @@ export default function ManageOrders() {
                                                 <li><RxCrossCircled className=" text-black text-2xl" /></li>
                                                 <li><IoIosArrowDropdown className=" text-black text-2xl" /></li>
                                             </ul>
-                                            <button className=" text-[#F98F5C] border rounded-md font-dm-sans  p-1 px-2 w-full  mt-2 text-sm">
+                                            <button  onClick={() => setIsNoteModalOpen(true)} className=" text-[#F98F5C] border rounded-md font-dm-sans  p-1 px-2 w-full  mt-2 text-sm">
                                                 View / Add Notes
                                             </button>
                                         </td>
@@ -313,6 +319,56 @@ export default function ManageOrders() {
                     </select>
                 </div>
             </div>
+
+            {isNoteModalOpen && (
+                <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+                        <button
+                            onClick={() => setIsNoteModalOpen(false)}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-black"
+                        >
+                            ✕
+                        </button>
+                        <h2 className="text-lg font-bold mb-4">Order Notes</h2>
+                        <textarea
+                            className="w-full border p-2 rounded-xl mb-4"
+                            rows={4}
+                            placeholder="Add your note here..."
+                        />
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={() => setIsNoteModalOpen(false)}
+                                className="bg-gray-200 px-4 py-2 rounded-md"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    // Submit logic here
+                                    setIsNoteModalOpen(false);
+                                }}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                            >
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000085] bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md">
+                        <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Modal Title</h2>
+                        <p className="text-[#4A5568] mb-4">This is some modal content. You can put anything here.</p>
+                        <button
+                            onClick={closeModalBox}
+                            className="bg-[#2B3674] text-white px-4 py-2 rounded hover:bg-[#1a254b]"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

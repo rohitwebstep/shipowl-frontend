@@ -3,8 +3,12 @@ import { useState } from 'react'
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
+import { DateRange } from 'react-date-range'
+import 'react-date-range/dist/styles.css' // main style file
+import 'react-date-range/dist/theme/default.css' // theme css file
+import { format } from 'date-fns'
 export default function BillingList() {
-
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const warehouseData = [
@@ -92,7 +96,14 @@ export default function BillingList() {
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
     };
-
+    const [range, setRange] = useState([
+        {
+            startDate: new Date(),
+            endDate: new Date(),
+            key: 'selection'
+        }
+    ])
+    const [showPicker, setShowPicker] = useState(false)
 
     const totalPages = Math.ceil(warehouseData.length / perPage);
     const indexOfLast = currentPage * perPage;
@@ -102,9 +113,25 @@ export default function BillingList() {
         <>
             <div className="filtred-box py-5 xl:flex flex-wrap items-end justify-between">
                 <div className="grid md:grid-cols-3 xl:w-7/12  grid-cols-1 gap-3">
-                    <div>
-                        <label htmlFor="" className="text-[#232323] font-medium block">From Date:</label>
-                        <input type="text" name="" id="" placeholder="07/23/2024 - 07/30/2024" className="bg-white text-[#718EBF] border p-2 w-full font-bold border-[#DFEAF2] rounded-xl" />
+                    <div className="relative">
+                        <label htmlFor="daterange" className="text-[#232323] font-medium block ">From Date:</label>
+                        <input
+                            readOnly
+                            id="daterange"
+                            onClick={() => setShowPicker(!showPicker)}
+                            value={`${format(range[0].startDate, 'MM/dd/yyyy')} - ${format(range[0].endDate, 'MM/dd/yyyy')}`}
+                            className="bg-white text-[#718EBF] border p-2 w-full font-bold border-[#DFEAF2] rounded-xl cursor-pointer"
+                        />
+                        {showPicker && (
+                            <div className="absolute z-10 shadow-md rounded-md mt-2">
+                                <DateRange
+                                    editableDateInputs={true}
+                                    onChange={item => setRange([item.selection])}
+                                    moveRangeOnFirstSelection={false}
+                                    ranges={range}
+                                />
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label htmlFor="" className="text-[#232323] font-medium block">Type:</label>
@@ -152,9 +179,21 @@ export default function BillingList() {
                             onChange={(e) => setSelectedMonth(e.target.value)}
                             className="outline-0 text-[#A3AED0] bg-[#F4F7FE] p-2 rounded-md"
                         />
-                        <button className="bg-[#F4F7FE] p-2 rounded-lg">
-                            <MoreHorizontal className="text-[#F98F5C]" />
-                        </button>
+                       <button
+                                onClick={() => setIsPopupOpen((prev) => !prev)}
+                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                            >
+                                <MoreHorizontal className="text-[#F98F5C]" />
+                                {isPopupOpen && (
+                                    <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg z-10">
+                                        <ul className="py-2 text-sm text-[#2B3674]">
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                        </ul>
+                                    </div>
+                                )}
+                            </button>
                     </div>
                 </div>
 
@@ -270,6 +309,8 @@ export default function BillingList() {
                     </select>
                 </div>
             </div>
+
+            
         </>
     )
 }
