@@ -53,10 +53,8 @@ export default function List() {
         router.push('/supplier/category/create')
     };
 
-
-    const handleDelete = async (id) => {
+ const handleDelete = async (id) => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-
         if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/supplier/auth/login");
@@ -69,7 +67,6 @@ export default function List() {
             return;
         }
 
-        // Ask for confirmation before deleting
         const confirmResult = await Swal.fire({
             title: 'Are you sure?',
             text: "You won't be able to revert this!",
@@ -84,7 +81,6 @@ export default function List() {
         if (!confirmResult.isConfirmed) return;
 
         try {
-            // Show loading
             Swal.fire({
                 title: 'Deleting...',
                 allowOutsideClick: false,
@@ -94,7 +90,7 @@ export default function List() {
             });
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/delete/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/category/${id}`,
                 {
                     method: "DELETE",
                     headers: {
