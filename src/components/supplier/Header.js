@@ -22,6 +22,12 @@ export default function Header() {
     "/supplier/terms/": "Terms & Conditions",
     "/supplier/add-warehouse/": "Add Warehouse",
     "/supplier/add-product/": "Add Product",
+    "/supplier/brand/create/": "Add Brand",
+    "/supplier/brand/list/": "Brand List",
+    "/supplier/brand/update/": "Brand Update",
+    "/supplier/category/create/": "Add Category",
+    "/supplier/category/update/": "Update Category",
+    "/supplier/category/list/": "Category List",
   };
 
   const currentPage = pageTitles[pathname] || "Dashboard";

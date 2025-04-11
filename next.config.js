@@ -1,13 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    trailingSlash: true, // Ensures static HTML file creation
-
+    trailingSlash: true,
+  
     images: {
-        unoptimized: true, // ✅ Disable Next.js image optimization
-        domains: ['sleeping-owl-we0m.onrender.com'], // ✅ Allow external image domain
+      unoptimized: true,
+      domains: ['sleeping-owl-we0m.onrender.com'],
     },
-
+  
     reactStrictMode: false,
-};
-
-module.exports = nextConfig; // ✅ Correct way to export config
+  
+    webpack: (config, { isServer }) => {
+      // Prevent server-side errors from DataTables
+      if (!isServer) {
+        config.resolve.fallback = {
+          ...config.resolve.fallback,
+          fs: false,
+        };
+      }
+  
+      return config;
+    },
+  };
+  
+  module.exports = nextConfig;
+  

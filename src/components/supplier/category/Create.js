@@ -5,13 +5,12 @@ import { CategoryContext } from './CategoryContext'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import { useSupplier } from '../middleware/SupplierMiddleWareContext'
-import Image from 'next/image'
 
 export default function Create() {
     const router = useRouter();
     const { formData, setFormData, isEdit } = useContext(CategoryContext);
     const [validationErrors, setValidationErrors] = useState({});
-    const [file, setFile] = useState(null);
+    const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { verifySupplierAuth } = useSupplier();
@@ -21,30 +20,34 @@ export default function Create() {
     }, [verifySupplierAuth]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, type, value, checked } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: value
+            [name]: type === 'checkbox' ? (checked ? true : false) : value
         }));
     };
 
+
     const validate = () => {
         const errors = {};
+
         if (!formData.name || formData.name.trim() === '') {
             errors.name = 'Category name is required.';
         }
         if (!formData.description || formData.description.trim() === '') {
             errors.description = 'Category description is required.';
         }
-        if (!file && !formData?.image) {
-            errors.image = 'Category image is required.';
+        if (!files || files.length === 0) {
+            errors.image = 'At least one category image is required.';
         }
+
         return errors;
     };
 
+
     const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0];
-        setFile(selectedFile);
+        const selectedFiles = Array.from(e.target.files);
+        setFiles(selectedFiles);
     };
 
     const handleSubmit = async (e) => {
@@ -86,16 +89,17 @@ export default function Create() {
             const form = new FormData();
             form.append('name', formData.name);
             form.append('description', formData.description);
-            if (file) {
-                form.append('image', file);
+            form.append('status', formData.status);
+            if (files.length > 0) {
+                files.forEach((file, index) => {
+                    form.append('image', file); // use 'images[]' if backend expects an array
+                });
             }
 
-            const url = isEdit
-                ? `https://sleeping-owl-we0m.onrender.com/api/category/${formData?.id}`
-                : "https://sleeping-owl-we0m.onrender.com/api/category";
+            const url ="https://sleeping-owl-we0m.onrender.com/api/category";
 
             const response = await fetch(url, {
-                method: isEdit ? "PUT" : "POST",
+                method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                 },
@@ -107,7 +111,7 @@ export default function Create() {
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: isEdit ? "Update Failed" : "Creation Failed",
+                    title: "Creation Failed",
                     text: errorMessage.message || errorMessage.error || "An error occurred",
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
@@ -119,13 +123,13 @@ export default function Create() {
             if (result) {
                 Swal.fire({
                     icon: "success",
-                    title: isEdit ? "Category Updated" : "Category Created",
-                    text: `The category has been ${isEdit ? "updated" : "created"} successfully!`,
+                    title: "Category Created",
+                    text: `The category has been created successfully!`,
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
                         setFormData({ name: '', description: '', image: '' });
-                        setFile(null);
+                        setFiles(null);
                         router.push("/supplier/category/list");
                     }
                 });
@@ -160,8 +164,8 @@ export default function Create() {
                                 value={formData?.name}
                                 id="name"
                                 onChange={handleChange}
-                                className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold"
-                            />
+                                className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.name ? "border-red-500" : "border-[#E0E5F2]"
+                                    } `} />
                             {validationErrors.name && (
                                 <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
                             )}
@@ -177,7 +181,8 @@ export default function Create() {
                                 value={formData.description}
                                 id="description"
                                 onChange={handleChange}
-                                className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold"
+                                className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.description ? "border-red-500" : "border-[#E0E5F2]"
+                                    } `}
                             />
                             {validationErrors.description && (
                                 <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
@@ -193,28 +198,43 @@ export default function Create() {
                             type="file"
                             onChange={handleFileChange}
                             name="image"
+                            multiple
                             id="image"
-                            className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold"
-                        />
-                        {isEdit && formData?.image && (
-                            <div className="mt-2">
-                                <Image
-                                    src={`https://sleeping-owl-we0m.onrender.com${formData.image}`}
-                                    alt="Current Category Image"
-                                    height={200}
-                                    width={200}
-                                    className="rounded"
-                                />
-                            </div>
-                        )}
+                            className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.image ? "border-red-500" : "border-[#E0E5F2]"
+                                } `} />
+
                         {validationErrors.image && (
                             <p className="text-red-500 text-sm mt-1">{validationErrors.image}</p>
                         )}
                     </div>
+                    <div>
+
+                        <label className="flex mt-2 items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name='status'
+                                className="sr-only"
+                                checked={formData.status}
+                                onChange={handleChange}
+                            />
+                            <div
+                                className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${formData.status ? "bg-orange-500" : ""
+                                    }`}
+                            >
+                                <div
+                                    className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${formData.status ? "translate-x-5" : ""
+                                        }`}
+                                ></div>
+                            </div>
+                            <span className="ms-2 text-sm text-gray-600">
+                                Status
+                            </span>
+                        </label>
+                    </div>
 
                     <div className="flex flex-wrap gap-3 mt-5">
                         <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">
-                            {loading ? 'Saving...' : isEdit ? 'UPDATE' : 'Save'}
+                            {loading ? 'Saving...' : 'Save'}
                         </button>
                         <button type="button" className="bg-gray-500 text-white px-15 rounded-md p-3" onClick={() => router.back()}>
                             Cancel

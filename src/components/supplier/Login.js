@@ -19,6 +19,7 @@ export default function Login() {
     const handlePasswordChange = (e) => setPassword(e.target.value);
     const handleEmailChange = (e) => setEmail(e.target.value);
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
+    const [formErrors, setFormErrors] = useState({});
 
 
     useEffect(() => {
@@ -36,11 +37,42 @@ export default function Login() {
         }
 
     }, []); // empty array = run only once
+    const validateForm = () => {
+        const errors = {};
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            errors.email = "Email is required";
+        } else if (!emailRegex.test(email)) {
+            errors.email = "Please enter a valid email address.";
+        }
+        if (!password) {
+            errors.password = "Password is required";
+        }
+
+
+
+        else if (password.length < 6) {
+            errors.password = "Password must be at least 6 characters.";
+        }
+
+        return errors
+    };
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
+
+        const validationError = validateForm(); // returns an object
+        console.log('validationError', validationError)
+
+        if (Object.keys(validationError).length > 0) {
+            setFormErrors(validationError);
+            return; // ✅ Stop here if validation fails
+        }
+        console.log('formerror', formErrors);
+
+        setFormErrors({})
         setLoading(true);
 
         try {
@@ -63,16 +95,13 @@ export default function Login() {
             const result = await response.json();
             const { token, admin } = result;
 
-
-
-            // ✅ Store user session data in localStorage
             const shippingData = {
                 project: {
                     name: "Shipping OWL",
                     environment: "production",
                     active_panel: "supplier",
                 },
-                supplier: admin, // Direct assignment as admin object
+                supplier: admin,
                 session: {
                     is_authenticated: true,
                     last_active_at: new Date().toISOString(),
@@ -81,6 +110,7 @@ export default function Login() {
                     token: token,
                 },
             };
+
             localStorage.setItem("shippingData", JSON.stringify(shippingData));
             router.push("/supplier");
 
@@ -95,10 +125,10 @@ export default function Login() {
         } finally {
             setLoading(false);
         }
+
+
+
     };
-
-
-
 
     return (
         <div className="md:flex h-screen w-full ">
@@ -124,10 +154,14 @@ export default function Login() {
                                 placeholder="mail@shipowl.com"
                                 value={email}
                                 onChange={handleEmailChange}
-                                required
-                                className="w-full px-4 py-2 mt-1 border border-[#E0E5F2] text-[#A3AED0] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className={`w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${formErrors.email ? "border-red-500" : "border-[#E0E5F2]"
+                                    } text-[#A3AED0]`}
                             />
+                            {formErrors.email && (
+                                <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+                            )}
                         </div>
+
 
                         <div>
                             <label className="block text-sm font-medium text-[#2B3674]">
@@ -139,10 +173,9 @@ export default function Login() {
                                     placeholder="Min. 6 characters"
                                     value={password}
                                     onChange={handlePasswordChange}
-                                    required
-                                    className="w-full px-4 py-2 mt-1 border border-[#E0E5F2] text-[#A3AED0] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                                    className={`w-full px-4 py-2 mt-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 ${formErrors.password ? "border-red-500" : "border-[#E0E5F2]"
+                                        } text-[#A3AED0]`}
                                 />
-                                {/* Eye Icon Button */}
                                 <button
                                     type="button"
                                     onClick={togglePasswordVisibility}
@@ -151,7 +184,11 @@ export default function Login() {
                                     {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
                                 </button>
                             </div>
+                            {formErrors.password && (
+                                <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>
+                            )}
                         </div>
+
 
                         <div className="flex justify-between items-center">
                             <label className="flex items-center space-x-2">

@@ -7,6 +7,7 @@ import { ProfileProvider } from "./userprofile/ProfileContext";
 import SupplierMiddleWareProvider from "./middleware/SupplierMiddleWareContext";
 import { CategoryProvider } from "./category/CategoryContext";
 import { ApiProvider } from "../ApiContext";
+import { BrandProvider } from "./brand/BrandContext";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
@@ -27,7 +28,9 @@ export default function LayoutWrapper({ children }) {
               <SupplierMiddleWareProvider>
                 <ApiProvider>
                   <CategoryProvider>
-                    <ProfileProvider>{children}</ProfileProvider>
+                    <BrandProvider>
+                      <ProfileProvider>{children}</ProfileProvider>
+                    </BrandProvider>
                   </CategoryProvider>
                 </ApiProvider>
               </SupplierMiddleWareProvider>

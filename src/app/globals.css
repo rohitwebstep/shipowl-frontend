@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 @import "tailwindcss";
@@ -145,7 +144,9 @@ select {
 }
 
 @media(min-width:1024px) and (max-width:1580px) {
-  .sidebar nav ul li button span, .sidebar nav ul li a {
+
+  .sidebar nav ul li button span,
+  .sidebar nav ul li a {
     font-size: 14px !important;
   }
 
@@ -170,19 +171,78 @@ table tr th:last-child i {
 
 table tr th:last-child {
   position: relative;
+  text-align: center !important;
 }
-@media(min-width:2000px){
-  .main-wrapper{
+
+@media(min-width:2000px) {
+  .main-wrapper {
     max-width: 1600px;
     margin: 0 auto;
   }
 }
+
 @media(min-width:1224px) and (max-width:1380px) {
 
-  .leftbar{
+  .leftbar {
     width: 22%;
   }
-  .main-outlet{
+
+  .main-outlet {
     width: 78%;
   }
+}
+
+/* Remove background, borders, and hover styles */
+.main-outer-wrapper .dt-length label {
+  text-transform: capitalize;
+  color: #2b3674;
+  font-weight: 500;
+}
+.main-outer-wrapper .dt-info {
+  color: #2b3674;
+  font-weight: 500;
+}
+.main-tables {
+  border: none !important;
+  background: transparent !important;
+}
+.main-outer-wrapper .dt-paging.paging_full_numbers button.dt-paging-button.current {
+  box-shadow: none;
+  background-color: #2B3674 !important;
+  color: #fff !important;
+  border-radius: 7px !important;
+}
+
+.main-tables thead th,
+.main-tables tbody td {
+  border: none !important;
+  background: none !important;
+  box-shadow: none;
+}
+
+.main-tables thead th,
+.main-tables tbody td {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+/* Optional: remove pagination button styles */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: none !important;
+  border: none !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+.mySwiper{
+  margin-left: 1px !important;
+}
+
+.swiper-button-prev, .swiper-button-next {
+  color: orange !important;
+}
+
+.swiper-button-prev:after, .swiper-button-next:after {
+  font-size: 17px !important;
 }

@@ -9,7 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "datatables.net": "^2.2.2",
+    "datatables.net-buttons": "^3.2.2",
+    "datatables.net-buttons-dt": "^3.2.2",
+    "datatables.net-dt": "^2.2.2",
     "date-fns": "^4.1.0",
+    "jquery": "^3.7.1",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.483.0",
     "next": "15.2.3",
     "react": "^19.0.0",
