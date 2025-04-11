@@ -149,7 +149,7 @@ export default function List() {
             setLoading(false);
         };
         fetchData();
-    }, [fetchCategory]);
+    }, [fetchCategory, verifySupplierAuth]);
 
     useEffect(() => {
         if (typeof window !== 'undefined' && categoryData.length > 0 && !loading) {
