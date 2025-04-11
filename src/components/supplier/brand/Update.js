@@ -113,7 +113,7 @@ export default function Update() {
         } finally {
             setLoading(false);
         }
-    }, [router]);
+    }, [router, id, setFormData]);
     useEffect(() => {
         fetchCategory();
     }, [fetchCategory])
