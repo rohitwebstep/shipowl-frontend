@@ -41,26 +41,26 @@ export default function Update() {
         const errors = {};
 
         if (!formData.name || formData.name.trim() === '') {
-            errors.name = 'Category name is required.';
+            errors.name = 'Brand name is required.';
         }
         if (!formData.description || formData.description.trim() === '') {
-            errors.description = 'Category description is required.';
+            errors.description = 'Brand description is required.';
         }
         if ((!files || files.length === 0) && (!formData.image || formData.image.trim() === '')) {
-            errors.image = 'At least one category image is required.';
+            errors.image = 'At least one brand image is required.';
         }
 
         return errors;
     };
 
-    const fetchCategory = useCallback(async () => {
+    const fetchBrand = useCallback(async () => {
         if (!id) {
             Swal.fire({
                 icon: "error",
-                title: "Invalid Category",
-                text: "No category ID provided.",
+                title: "Invalid Brand",
+                text: "No brand ID provided.",
             });
-            router.push("/supplier/category/list");
+            router.push("/supplier/brand/list");
             return;
         }
 
@@ -81,7 +81,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`, // Adjusted to brand endpoint
                 {
                     method: "GET",
                     headers: {
@@ -107,26 +107,26 @@ export default function Update() {
             }
 
             const result = await response.json();
-            if (result && result.category) {
-                const currentCat = result.category;
-                console.log('currentCat', currentCat);
+            if (result && result.brand) { // Adjusted to expect 'brand' key
+                const currentBrand = result.brand;
+                console.log('currentBrand', currentBrand);
                 setFormData({
-                    name: currentCat.name || '',
-                    description: currentCat.description || '',
-                    status: currentCat.status || false,
-                    image: currentCat.image || ''
+                    name: currentBrand.name || '',
+                    description: currentBrand.description || '',
+                    status: currentBrand.status || false,
+                    image: currentBrand.image || ''
                 });
             }
         } catch (error) {
-            console.error("Error fetching category:", error);
+            console.error("Error fetching brand:", error);
         } finally {
             setLoading(false);
         }
     }, [router, id, setFormData]);
 
     useEffect(() => {
-        fetchCategory();
-    }, [fetchCategory]);
+        fetchBrand();
+    }, [fetchBrand]);
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
@@ -161,8 +161,8 @@ export default function Update() {
 
         try {
             Swal.fire({
-                title: 'Updating Category...',
-                text: 'Please wait while we save your category.',
+                title: 'Updating Brand...',
+                text: 'Please wait while we save your brand.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -179,7 +179,7 @@ export default function Update() {
                 });
             }
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`; // Adjusted to brand endpoint
 
             const response = await fetch(url, {
                 method: "PUT",
@@ -206,14 +206,14 @@ export default function Update() {
             if (result) {
                 Swal.fire({
                     icon: "success",
-                    title: "Category Updated",
-                    text: `The category has been updated successfully!`,
+                    title: "Brand Updated",
+                    text: `The brand has been updated successfully!`,
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
                         setFormData({ name: '', description: '', image: '', status: false });
                         setFiles([]);
-                        router.push("/supplier/category/list");
+                        router.push("/supplier/brand/list");
                     }
                 });
             }
@@ -257,7 +257,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}/image/${index}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}/image/${index}`; // Adjusted to brand endpoint
 
             const response = await fetch(url, {
                 method: "DELETE",
@@ -288,7 +288,7 @@ export default function Update() {
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
-                        fetchCategory(); // Refresh formData with updated images
+                        fetchBrand(); // Refresh formData with updated images
                     }
                 });
             }
@@ -319,7 +319,7 @@ export default function Update() {
                             <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
                                 <div>
                                     <label htmlFor="name" className="font-bold block text-[#232323]">
-                                        Category Name <span className="text-red-500 text-lg">*</span>
+                                        Brand Name <span className="text-red-500 text-lg">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -337,7 +337,7 @@ export default function Update() {
 
                                 <div>
                                     <label htmlFor="description" className="font-bold block text-[#232323]">
-                                        Category Description <span className="text-red-500 text-lg">*</span>
+                                        Brand Description <span className="text-red-500 text-lg">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -356,7 +356,7 @@ export default function Update() {
 
                             <div className="mt-2">
                                 <label htmlFor="image" className="font-bold block text-[#232323]">
-                                    Category Image <span className="text-red-500 text-lg">*</span>
+                                    Brand Image <span className="text-red-500 text-lg">*</span>
                                 </label>
                                 <input
                                     type="file"
