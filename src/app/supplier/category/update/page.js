@@ -1,12 +1,10 @@
 import Update from '@/components/supplier/category/Update'
 import React from 'react'
 
-function page() {
+export default function page() {
     return (
-        <Update />
+        <>
+            <Update />
+        </>
     )
 }
-
-
-
-export default page
