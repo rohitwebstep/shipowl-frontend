@@ -41,26 +41,26 @@ export default function Update() {
         const errors = {};
 
         if (!formData.name || formData.name.trim() === '') {
-            errors.name = 'Brand name is required.';
+            errors.name = 'Category name is required.';
         }
         if (!formData.description || formData.description.trim() === '') {
-            errors.description = 'Brand description is required.';
+            errors.description = 'Category description is required.';
         }
         if ((!files || files.length === 0) && (!formData.image || formData.image.trim() === '')) {
-            errors.image = 'At least one brand image is required.';
+            errors.image = 'At least one category image is required.';
         }
 
         return errors;
     };
 
-    const fetchBrand = useCallback(async () => {
+    const fetchCategory = useCallback(async () => {
         if (!id) {
             Swal.fire({
                 icon: "error",
-                title: "Invalid Brand",
-                text: "No brand ID provided.",
+                title: "Invalid Category",
+                text: "No category ID provided.",
             });
-            router.push("/supplier/brand/list");
+            router.push("/supplier/category/list");
             return;
         }
 
@@ -81,7 +81,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`, // Adjusted to brand endpoint
+                `https://sleeping-owl-we0m.onrender.com/api/category/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -107,26 +107,26 @@ export default function Update() {
             }
 
             const result = await response.json();
-            if (result && result.brand) { // Adjusted to expect 'brand' key
-                const currentBrand = result.brand;
-                console.log('currentBrand', currentBrand);
+            if (result && result.category) {
+                const currentCat = result.category;
+                console.log('currentCat', currentCat);
                 setFormData({
-                    name: currentBrand.name || '',
-                    description: currentBrand.description || '',
-                    status: currentBrand.status || false,
-                    image: currentBrand.image || ''
+                    name: currentCat.name || '',
+                    description: currentCat.description || '',
+                    status: currentCat.status || false,
+                    image: currentCat.image || ''
                 });
             }
         } catch (error) {
-            console.error("Error fetching brand:", error);
+            console.error("Error fetching category:", error);
         } finally {
             setLoading(false);
         }
     }, [router, id, setFormData]);
 
     useEffect(() => {
-        fetchBrand();
-    }, [fetchBrand]);
+        fetchCategory();
+    }, [fetchCategory]);
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
@@ -161,8 +161,8 @@ export default function Update() {
 
         try {
             Swal.fire({
-                title: 'Updating Brand...',
-                text: 'Please wait while we save your brand.',
+                title: 'Updating Category...',
+                text: 'Please wait while we save your category.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -179,7 +179,7 @@ export default function Update() {
                 });
             }
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`; // Adjusted to brand endpoint
+            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}`;
 
             const response = await fetch(url, {
                 method: "PUT",
@@ -206,14 +206,14 @@ export default function Update() {
             if (result) {
                 Swal.fire({
                     icon: "success",
-                    title: "Brand Updated",
-                    text: `The brand has been updated successfully!`,
+                    title: "Category Updated",
+                    text: `The category has been updated successfully!`,
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
                         setFormData({ name: '', description: '', image: '', status: false });
                         setFiles([]);
-                        router.push("/supplier/brand/list");
+                        router.push("/supplier/category/list");
                     }
                 });
             }
@@ -257,7 +257,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}/image/${index}`; // Adjusted to brand endpoint
+            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}/image/${index}`;
 
             const response = await fetch(url, {
                 method: "DELETE",
@@ -288,7 +288,7 @@ export default function Update() {
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
-                        fetchBrand(); // Refresh formData with updated images
+                        fetchCategory(); // Refresh formData with updated images
                     }
                 });
             }
@@ -319,7 +319,7 @@ export default function Update() {
                             <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
                                 <div>
                                     <label htmlFor="name" className="font-bold block text-[#232323]">
-                                        Brand Name <span className="text-red-500 text-lg">*</span>
+                                        Category Name <span className="text-red-500 text-lg">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -337,7 +337,7 @@ export default function Update() {
 
                                 <div>
                                     <label htmlFor="description" className="font-bold block text-[#232323]">
-                                        Brand Description <span className="text-red-500 text-lg">*</span>
+                                        Category Description <span className="text-red-500 text-lg">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -356,65 +356,45 @@ export default function Update() {
 
                             <div className="mt-2">
                                 <label htmlFor="image" className="font-bold block text-[#232323]">
-                                    Brand Image <span className="text-red-500 text-lg">*</span>
+                                    Upload Category Images <span className="text-red-500 text-lg">*</span>
                                 </label>
                                 <input
                                     type="file"
-                                    onChange={handleFileChange}
+                                    id="image"
                                     name="image"
                                     multiple
-                                    id="image"
+                                    onChange={handleFileChange}
                                     className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold ${validationErrors.image ? "border-red-500" : "border-[#E0E5F2]"
                                         }`}
                                 />
-                                {formData?.image && typeof formData.image === 'string' && (
-                                    <div className="mt-2">
-                                        <Swiper
-                                            key={formData.id || id}
-                                            modules={[Navigation]}
-                                            slidesPerView={2}
-                                            loop={formData.image.split(',').filter(img => img.trim()).length > 1}
-                                            navigation={true}
-                                            className="mySwiper w-full ms-2"
-                                        >
-                                            {formData.image.split(',').filter(img => img.trim()).map((img, index) => (
-                                                <SwiperSlide key={index} className="relative gap-3">
-                                                    <button
-                                                        type="button"
-                                                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                                                        onClick={() => {
-                                                            Swal.fire({
-                                                                title: 'Are you sure?',
-                                                                text: `Do you want to delete this image?`,
-                                                                icon: 'warning',
-                                                                showCancelButton: true,
-                                                                confirmButtonColor: '#d33',
-                                                                cancelButtonColor: '#3085d6',
-                                                                confirmButtonText: 'Yes, delete it!'
-                                                            }).then((result) => {
-                                                                if (result.isConfirmed) {
-                                                                    handleImageDelete(index);
-                                                                }
-                                                            });
-                                                        }}
-                                                    >
-                                                        ✕
-                                                    </button>
-                                                    <Image
-                                                        src={img.trim() || `https://placehold.co/600x400?text=${index + 1}`}
-                                                        alt={`Image ${index + 1}`}
-                                                        width={500}
-                                                        height={500}
-                                                        className="me-3 p-2 object-cover rounded"
-                                                    />
-                                                </SwiperSlide>
-                                            ))}
-                                        </Swiper>
-                                    </div>
-                                )}
                                 {validationErrors.image && (
                                     <p className="text-red-500 text-sm mt-1">{validationErrors.image}</p>
                                 )}
+
+                                {formData.image && Array.isArray(formData.image) && formData.image.length > 0 && (
+                                    <div className="grid grid-cols-3 gap-4 mt-4">
+                                        {formData.image.map((img, index) => (
+                                            <div key={index} className="relative">
+                                                <Image
+                                                    src={img}
+                                                    alt={`Category Image ${index + 1}`}
+                                                    width={100}
+                                                    height={100}
+                                                    className="rounded-md object-cover"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleImageDelete(index)}
+                                                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                                                    title="Delete Image"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
                             </div>
                             <div>
                                 <label className="flex mt-2 items-center cursor-pointer">
