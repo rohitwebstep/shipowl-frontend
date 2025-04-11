@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useCallback, useState } from 'react';
-import { CategoryContext } from './CategoryContext';
+import { BrandContext } from './BrandContext';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
@@ -15,7 +15,7 @@ import HashLoader from "react-spinners/HashLoader";
 
 export default function Update() {
     const router = useRouter();
-    const { formData, setFormData, isEdit } = useContext(CategoryContext);
+    const { formData, setFormData, isEdit } = useContext(BrandContext);
     const [validationErrors, setValidationErrors] = useState({});
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
