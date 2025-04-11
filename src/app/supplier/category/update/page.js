@@ -1,10 +1,14 @@
-"use client";
+'use client'
 
+import React, { Suspense } from 'react';
 import Update from '@/components/supplier/category/Update';
-import React from 'react';
 
 function Page() {
-    return <Update />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Update />
+    </Suspense>
+  );
 }
 
 export default Page;
