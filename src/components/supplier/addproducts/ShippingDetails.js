@@ -13,7 +13,7 @@ export default function ShippingDetails() {
     chargeableWeight: 'Weight',
 
   });
-  const [files, setFiles] = useState({});
+  const [files, setFiles] = useState([]);
 
   const handleFileChange = (event, key) => {
     const file = event.target.files[0];
