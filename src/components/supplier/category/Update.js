@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
+import { Navigation } from 'swiper/modules'; // 👈 Import Navigation module
 import 'swiper/css';
 import 'swiper/css/navigation';
 import { useSearchParams } from 'next/navigation';
@@ -30,13 +30,13 @@ export default function Update() {
         const { name, type, value, checked } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: type === 'checkbox' ? (checked ? true : false) : value
         }));
     };
 
+
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
-
     const validate = () => {
         const errors = {};
 
@@ -46,24 +46,15 @@ export default function Update() {
         if (!formData.description || formData.description.trim() === '') {
             errors.description = 'Category description is required.';
         }
-        if ((!files || files.length === 0) && (!formData.image || formData.image.trim() === '')) {
+        if (!files || files.length === 0) {
             errors.image = 'At least one category image is required.';
         }
 
         return errors;
     };
 
-    const fetchCategory = useCallback(async () => {
-        if (!id) {
-            Swal.fire({
-                icon: "error",
-                title: "Invalid Category",
-                text: "No category ID provided.",
-            });
-            router.push("/supplier/category/list");
-            return;
-        }
 
+    const fetchCategory = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
         if (supplierData?.project?.active_panel !== "supplier") {
@@ -107,26 +98,25 @@ export default function Update() {
             }
 
             const result = await response.json();
-            if (result && result.category) {
-                const currentCat = result.category;
-                console.log('currentCat', currentCat);
+            if (result) {
+                const currentCat = result?.category || [];
+                console.log('currentCat', currentCat)
                 setFormData({
                     name: currentCat.name || '',
                     description: currentCat.description || '',
-                    status: currentCat.status || false,
+                    status: currentCat.status || '',
                     image: currentCat.image || ''
-                });
+                })
             }
         } catch (error) {
-            console.error("Error fetching category:", error);
+            console.error("Error fetching categories:", error);
         } finally {
             setLoading(false);
         }
     }, [router, id, setFormData]);
-
     useEffect(() => {
         fetchCategory();
-    }, [fetchCategory]);
+    }, [fetchCategory])
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
@@ -138,8 +128,8 @@ export default function Update() {
         setLoading(true);
 
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (dropshipperData?.project?.active_panel !== "supplier") {
-            localStorage.removeItem("shippingData");
+        if (!dropshipperData?.project?.active_panel === "supplier") {
+            localStorage.clear("shippingData");
             router.push("/supplier/auth/login");
             return;
         }
@@ -161,7 +151,7 @@ export default function Update() {
 
         try {
             Swal.fire({
-                title: 'Updating Category...',
+                title: isEdit ? 'Updating Category...' : 'Creating Category...',
                 text: 'Please wait while we save your category.',
                 allowOutsideClick: false,
                 didOpen: () => {
@@ -174,17 +164,17 @@ export default function Update() {
             form.append('description', formData.description);
             form.append('status', formData.status);
             if (files.length > 0) {
-                files.forEach((file) => {
-                    form.append('images[]', file); // Adjust based on backend requirements
+                files.forEach((file, index) => {
+                    form.append('image', file); // use 'images[]' if backend expects an array
                 });
             }
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}`
 
             const response = await fetch(url, {
                 method: "PUT",
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    "Authorization": `Bearer ${token}`,
                 },
                 body: form,
             });
@@ -211,12 +201,13 @@ export default function Update() {
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
-                        setFormData({ name: '', description: '', image: '', status: false });
-                        setFiles([]);
+                        setFormData({ name: '', description: '', image: '' });
+                        setFiles(null);
                         router.push("/supplier/category/list");
                     }
                 });
             }
+
         } catch (error) {
             console.error("Error:", error);
             Swal.close();
@@ -231,12 +222,13 @@ export default function Update() {
         }
     };
 
+
     const handleImageDelete = async (index) => {
         setLoading(true);
 
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (dropshipperData?.project?.active_panel !== "supplier") {
-            localStorage.removeItem("shippingData");
+        if (!dropshipperData?.project?.active_panel === "supplier") {
+            localStorage.clear("shippingData");
             router.push("/supplier/auth/login");
             return;
         }
@@ -249,20 +241,20 @@ export default function Update() {
 
         try {
             Swal.fire({
-                title: 'Deleting Image...',
-                text: 'Please wait while we remove the image.',
+                title: 'Updating Category...',
+                text: 'Please wait while we save your category.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}/image/${index}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}/image/${index}`
 
             const response = await fetch(url, {
                 method: "DELETE",
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    "Authorization": `Bearer ${token}`,
                 },
             });
 
@@ -271,7 +263,7 @@ export default function Update() {
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Delete Failed",
+                    title: "Update Failed",
                     text: errorMessage.message || errorMessage.error || "An error occurred",
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
@@ -284,14 +276,17 @@ export default function Update() {
                 Swal.fire({
                     icon: "success",
                     title: "Image Deleted",
-                    text: `The image has been deleted successfully!`,
+                    text: `The Image has been updated successfully!`,
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
-                        fetchCategory(); // Refresh formData with updated images
+                        setFormData({ name: '', description: '', image: '' });
+                        setFiles(null);
+                        fetchCategory();
                     }
                 });
             }
+
         } catch (error) {
             console.error("Error:", error);
             Swal.close();
@@ -304,7 +299,8 @@ export default function Update() {
         } finally {
             setLoading(false);
         }
-    };
+    }
+
 
     return (
         <>
@@ -319,17 +315,16 @@ export default function Update() {
                             <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
                                 <div>
                                     <label htmlFor="name" className="font-bold block text-[#232323]">
-                                        Category Name <span className="text-red-500 text-lg">*</span>
+                                        Category Name <span className='text-red-500 text-lg'>*</span>
                                     </label>
                                     <input
                                         type="text"
                                         name="name"
-                                        value={formData?.name || ''}
+                                        value={formData?.name}
                                         id="name"
                                         onChange={handleChange}
-                                        className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold ${validationErrors.name ? "border-red-500" : "border-[#E0E5F2]"
-                                            }`}
-                                    />
+                                        className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.name ? "border-red-500" : "border-[#E0E5F2]"
+                                            } `} />
                                     {validationErrors.name && (
                                         <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
                                     )}
@@ -337,16 +332,16 @@ export default function Update() {
 
                                 <div>
                                     <label htmlFor="description" className="font-bold block text-[#232323]">
-                                        Category Description <span className="text-red-500 text-lg">*</span>
+                                        Category Description <span className='text-red-500 text-lg'>*</span>
                                     </label>
                                     <input
                                         type="text"
                                         name="description"
-                                        value={formData.description || ''}
+                                        value={formData.description}
                                         id="description"
                                         onChange={handleChange}
-                                        className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold ${validationErrors.description ? "border-red-500" : "border-[#E0E5F2]"
-                                            }`}
+                                        className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.description ? "border-red-500" : "border-[#E0E5F2]"
+                                            } `}
                                     />
                                     {validationErrors.description && (
                                         <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
@@ -354,9 +349,9 @@ export default function Update() {
                                 </div>
                             </div>
 
-                            <div className="mt-2">
+                            <div className='mt-2'>
                                 <label htmlFor="image" className="font-bold block text-[#232323]">
-                                    Category Image <span className="text-red-500 text-lg">*</span>
+                                    Category Image <span className='text-red-500 text-lg'>*</span>
                                 </label>
                                 <input
                                     type="file"
@@ -364,21 +359,21 @@ export default function Update() {
                                     name="image"
                                     multiple
                                     id="image"
-                                    className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold ${validationErrors.image ? "border-red-500" : "border-[#E0E5F2]"
-                                        }`}
-                                />
-                                {formData?.image && typeof formData.image === 'string' && (
+                                    className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.image ? "border-red-500" : "border-[#E0E5F2]"
+                                        } `} />
+                                {formData?.image && (
                                     <div className="mt-2">
                                         <Swiper
-                                            key={formData.id || id}
+                                            key={formData.id}
                                             modules={[Navigation]}
                                             slidesPerView={2}
-                                            loop={formData.image.split(',').filter(img => img.trim()).length > 1}
+                                            loop={formData.image?.split(',').length > 1}
                                             navigation={true}
                                             className="mySwiper w-full ms-2"
                                         >
-                                            {formData.image.split(',').filter(img => img.trim()).map((img, index) => (
+                                            {formData.image?.split(',').map((img, index) => (
                                                 <SwiperSlide key={index} className="relative gap-3">
+                                                    {/* Delete Button */}
                                                     <button
                                                         type="button"
                                                         className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
@@ -393,15 +388,18 @@ export default function Update() {
                                                                 confirmButtonText: 'Yes, delete it!'
                                                             }).then((result) => {
                                                                 if (result.isConfirmed) {
-                                                                    handleImageDelete(index);
+
+                                                                    handleImageDelete(index); // Call your delete function
                                                                 }
                                                             });
                                                         }}
                                                     >
                                                         ✕
                                                     </button>
+
+                                                    {/* Image */}
                                                     <Image
-                                                        src={img.trim() || `https://placehold.co/600x400?text=${index + 1}`}
+                                                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
                                                         alt={`Image ${index + 1}`}
                                                         width={500}
                                                         height={500}
@@ -411,18 +409,20 @@ export default function Update() {
                                             ))}
                                         </Swiper>
                                     </div>
+
                                 )}
                                 {validationErrors.image && (
                                     <p className="text-red-500 text-sm mt-1">{validationErrors.image}</p>
                                 )}
                             </div>
                             <div>
+
                                 <label className="flex mt-2 items-center cursor-pointer">
                                     <input
                                         type="checkbox"
-                                        name="status"
+                                        name='status'
                                         className="sr-only"
-                                        checked={formData.status || false}
+                                        checked={formData.status}
                                         onChange={handleChange}
                                     />
                                     <div
@@ -434,7 +434,9 @@ export default function Update() {
                                                 }`}
                                         ></div>
                                     </div>
-                                    <span className="ms-2 text-sm text-gray-600">Status</span>
+                                    <span className="ms-2 text-sm text-gray-600">
+                                        Status
+                                    </span>
                                 </label>
                             </div>
 
@@ -442,11 +444,7 @@ export default function Update() {
                                 <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">
                                     UPDATE
                                 </button>
-                                <button
-                                    type="button"
-                                    className="bg-gray-500 text-white px-15 rounded-md p-3"
-                                    onClick={() => router.back()}
-                                >
+                                <button type="button" className="bg-gray-500 text-white px-15 rounded-md p-3" onClick={() => router.back()}>
                                     Cancel
                                 </button>
                             </div>
