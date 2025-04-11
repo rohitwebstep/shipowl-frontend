@@ -36,7 +36,7 @@ export default function Login() {
             router.push("/supplier");
         }
 
-    }, []); // empty array = run only once
+    }, [router, verifySupplierAuth]); // empty array = run only once
     const validateForm = () => {
         const errors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
