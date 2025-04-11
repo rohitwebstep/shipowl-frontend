@@ -23,7 +23,7 @@ export default function List() {
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState([]);
     const { verifySupplierAuth } = useSupplier();
-    const { brandData, setCategoryData, setFormData, setIsEdit } = useContext(BrandContext);
+    const { brandData, setBrandData, setFormData, setIsEdit } = useContext(BrandContext);
     const router = useRouter();
 
     const handleCheckboxChange = (id) => {
@@ -77,14 +77,14 @@ export default function List() {
 
             const result = await response.json();
             if (result) {
-                setCategoryData(result?.Brand || []);
+                setBrandData(result?.brands || []);
             }
         } catch (error) {
             console.error("Error fetching Brand:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, setCategoryData]);
+    }, [router, setBrandData]);
 
     const trashBrands = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -131,14 +131,14 @@ export default function List() {
 
             const result = await response.json();
             if (result) {
-                setCategoryData(result?.Brand || []);
+                setBrandData(result?.Brand || []);
             }
         } catch (error) {
             console.error("Error fetching trashed Brand:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, setCategoryData]);
+    }, [router, setBrandData]);
 
     useEffect(() => {
         const fetchData = async () => {
