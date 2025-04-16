@@ -1,11 +1,12 @@
-
 "use client"
-import {useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import { useSupplier } from '../middleware/SupplierMiddleWareContext'
+import { useSearchParams } from 'next/navigation'
+import { HashLoader } from 'react-spinners'
 
-export default function AddWarehouse() {
+export default function Update() {
     const [formData, setFormData] = useState({
         name: '',
         gst_number: '',
@@ -18,10 +19,11 @@ export default function AddWarehouse() {
         postal_code: ''
     });
 
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
     const [validationErrors, setValidationErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [files, setFiles] = useState(null); // if needed later
 
     const { verifySupplierAuth } = useSupplier();
     const router = useRouter();
@@ -32,7 +34,6 @@ export default function AddWarehouse() {
 
     const validate = () => {
         const errors = {};
-
         if (!formData.name.trim()) errors.name = 'Warehouse name is required.';
         if (!formData.gst_number.trim()) errors.gst_number = 'GST number is required.';
         if (!formData.contact_name.trim()) errors.contact_name = 'Contact name is required.';
@@ -41,7 +42,6 @@ export default function AddWarehouse() {
         if (!formData.city.trim()) errors.city = 'City is required.';
         if (!formData.state.trim()) errors.state = 'State is required.';
         if (!formData.postal_code.trim()) errors.postal_code = 'Postal code is required.';
-
         return errors;
     };
 
@@ -53,12 +53,75 @@ export default function AddWarehouse() {
         }));
     };
 
+    const fetchwarehouse = useCallback(async () => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${suppliertoken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Session Expired",
+                    text: errorMessage.message || "Your session has expired. Please log in again.",
+                });
+                throw new Error(errorMessage.message);
+            }
+
+            const result = await response.json();
+            const warehouse = result?.warehouse || {};
+
+            setFormData({
+                name: warehouse.name || '',
+                gst_number: warehouse.gst_number || '',
+                contact_name: warehouse.contact_name || '',
+                contact_number: warehouse.contact_number || '',
+                address_line_1: warehouse.address_line_1 || '',
+                address_line_2: warehouse.address_line_2 || '',
+                city: warehouse.cityId || '',
+                state: warehouse.stateId || '',
+                postal_code: warehouse.postal_code || ''
+            });
+        } catch (error) {
+            console.error("Error fetching warehouse:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, id]);
+
+    useEffect(() => {
+        fetchwarehouse();
+    }, [fetchwarehouse]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        if (!supplierData?.project?.active_panel === "supplier") {
+        if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.clear("shippingData");
             router.push("/supplier/auth/login");
             return;
@@ -81,71 +144,63 @@ export default function AddWarehouse() {
 
         try {
             Swal.fire({
-                title: 'Creating Warehouse...',
+                title: 'Updating Warehouse...',
                 text: 'Please wait while we save your warehouse.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
-        
-            const url = "https://sleeping-owl-we0m.onrender.com/api/warehouse";
-        
+
+            const url = `https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`;
             const form = new FormData();
             for (const key in formData) {
-                if (formData[key] !== undefined && formData[key] !== null) {
+                if (formData[key]) {
                     form.append(key, formData[key]);
                 }
             }
-        
+
             const response = await fetch(url, {
-                method: "POST",
+                method: "PUT",
                 headers: {
-                    "Authorization": `Bearer ${token}`
-                    // ❌ Don't set Content-Type when using FormData
+                    Authorization: `Bearer ${token}`
                 },
                 body: form,
             });
-        
+
             if (!response.ok) {
                 Swal.close();
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Creation Failed",
-                    text: errorMessage.message || errorMessage.error || "An error occurred",
+                    title: "Update Failed",
+                    text: errorMessage.message || "An error occurred",
                 });
-                throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+                throw new Error(errorMessage.message || "Update failed");
             }
-        
-            const result = await response.json();
+
             Swal.close();
-        
-            if (result) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Warehouse Created",
-                    text: `The warehouse has been created successfully!`,
-                    showConfirmButton: true,
-                }).then((res) => {
-                    if (res.isConfirmed) {
-                        setFormData({
-                            name: '',
-                            gst_number: '',
-                            contact_name: '',
-                            contact_number: '',
-                            address_line_1: '',
-                            address_line_2: '',
-                            city: '',
-                            state: '',
-                            postal_code: ''
-                        });
-                        setFiles(null);
-                        router.push("/supplier/warehouse");
-                    }
-                });
-            }
-        
+            Swal.fire({
+                icon: "success",
+                title: "Warehouse Updated",
+                text: `The warehouse has been updated successfully!`,
+                showConfirmButton: true,
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    setFormData({
+                        name: '',
+                        gst_number: '',
+                        contact_name: '',
+                        contact_number: '',
+                        address_line_1: '',
+                        address_line_2: '',
+                        city: '',
+                        state: '',
+                        postal_code: ''
+                    });
+                    router.push("/supplier/warehouse");
+                }
+            });
         } catch (error) {
             console.error("Error:", error);
             Swal.close();
@@ -158,8 +213,15 @@ export default function AddWarehouse() {
         } finally {
             setLoading(false);
         }
-        
     };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
+    }
 
     return (
         <section className="add-warehouse xl:w-8/12">
@@ -168,60 +230,61 @@ export default function AddWarehouse() {
                     <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
                         <div>
                             <label className="font-bold block text-[#232323]">Warehouse Name</label>
-                            <input type="text" onChange={handleChange} id="name" name="name" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="Charlene Store House" />
+                            <input type="text" onChange={handleChange} value={formData?.name} id="name" name="name" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="Charlene Store House" />
                             {validationErrors.name && <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>}
                         </div>
                         <div>
                             <label className="font-bold block text-[#232323]">Warehouse GST Number</label>
-                            <input type="text" onChange={handleChange} name="gst_number" id="gst_number" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="GST289571412" />
+                            <input type="text" value={formData?.gst_number} onChange={handleChange} name="gst_number" id="gst_number" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="GST289571412" />
                             {validationErrors.gst_number && <p className="text-red-500 text-sm mt-1">{validationErrors.gst_number}</p>}
                         </div>
                         <div>
                             <label className="font-bold block text-[#232323]">Contact Name</label>
-                            <input type="text" onChange={handleChange} name="contact_name" id="contact_name" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="Charlene Reed " />
+                            <input type="text" value={formData?.contact_name} onChange={handleChange} name="contact_name" id="contact_name" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="Charlene Reed " />
                             {validationErrors.contact_name && <p className="text-red-500 text-sm mt-1">{validationErrors.contact_name}</p>}
                         </div>
                         <div>
                             <label className="font-bold block text-[#232323]">Contact No</label>
-                            <input type="text" onChange={handleChange} name="contact_number" id="contact_number" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="+9876543210" />
+                            <input type="text" value={formData?.contact_number} onChange={handleChange} name="contact_number" id="contact_number" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="+9876543210" />
                             {validationErrors.contact_number && <p className="text-red-500 text-sm mt-1">{validationErrors.contact_number}</p>}
                         </div>
                     </div>
 
                     <div>
                         <label className="font-bold block text-[#232323]">Address Line 1</label>
-                        <textarea name="address_line_1" onChange={handleChange} id="address_line_1" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="San Jose, California, USA" />
+                        <textarea name="address_line_1" value={formData?.address_line_1} onChange={handleChange} id="address_line_1" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="San Jose, California, USA" />
                         {validationErrors.address_line_1 && <p className="text-red-500 text-sm mt-1">{validationErrors.address_line_1}</p>}
                     </div>
 
                     <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
                         <div>
                             <label className="font-bold block text-[#232323]">Address Line 2</label>
-                            <input type="text" onChange={handleChange} name="address_line_2" id="address_line_2" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="San Jose, California, USA" />
+                            <input type="text" value={formData?.address_line_2} onChange={handleChange} name="address_line_2" id="address_line_2" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="San Jose, California, USA" />
                         </div>
                         <div>
                             <label className="font-bold block text-[#232323]">City</label>
-                            <input type="number" onChange={handleChange} name="city" id="city" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="San Jose" />
+                            <input type="number" value={formData?.city} onChange={handleChange} name="city" id="city" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="San Jose" />
                             {validationErrors.city && <p className="text-red-500 text-sm mt-1">{validationErrors.city}</p>}
                         </div>
                         <div>
                             <label className="font-bold block text-[#232323]">Postal Code</label>
-                            <input type="text" onChange={handleChange} name="postal_code" id="postal_code" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="45962 " />
+                            <input type="text" value={formData?.postal_code} onChange={handleChange} name="postal_code" id="postal_code" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="45962 " />
                             {validationErrors.postal_code && <p className="text-red-500 text-sm mt-1">{validationErrors.postal_code}</p>}
                         </div>
                         <div>
                             <label className="font-bold block text-[#232323]">State</label>
-                            <input type="number" onChange={handleChange} name="state" id="state" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="USA" />
+                            <input type="number" value={formData?.state} onChange={handleChange} name="state" id="state" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="USA" />
                             {validationErrors.state && <p className="text-red-500 text-sm mt-1">{validationErrors.state}</p>}
                         </div>
                     </div>
 
                     <div className="flex flex-wrap gap-3 mt-5">
-                        <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">Save</button>
+                        <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">Update</button>
                         <button
                             type="button"
                             className="bg-gray-500 text-white px-15 rounded-md p-3"
-                            onClick={() => router.back()}>
+                            onClick={() => router.back()}
+                        >
                             Cancel
                         </button>
                     </div>

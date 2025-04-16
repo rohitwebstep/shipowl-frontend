@@ -160,7 +160,7 @@ export default function Login() {
                                 <input type="checkbox" className="form-checkbox text-[#2B3674]" />
                                 <span className="text-sm text-[#2B3674]">Keep me logged in</span>
                             </label>
-                            <Link href="/" className="text-sm text-[#F98F5C] hover:underline">
+                            <Link href="/admin/auth/password/forget" className="text-sm text-[#F98F5C] hover:underline">
                                 Forgot password?
                             </Link>
                         </div>

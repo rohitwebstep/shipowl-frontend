@@ -11,7 +11,7 @@ import { BrandProvider } from "./brand/BrandContext";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
-  const isAuthPage = pathname.includes('/admin') || pathname.includes('/dropshipping') || pathname.includes('/supplier/auth/login') || pathname == "/";
+  const isAuthPage = pathname.includes('/admin') || pathname.includes('/dropshipping') || pathname.includes('/supplier/auth/login') ||pathname.includes('/supplier/auth/password/forget/') ||pathname.includes('/supplier/auth/password/reset/') || pathname == "/";
 
   return (
     <div className="main">

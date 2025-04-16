@@ -5,12 +5,11 @@ import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
 import { AiOutlineDelete } from "react-icons/ai";
-import Image from "next/image";
 import HashLoader from "react-spinners/HashLoader";
-import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
+import { useAdmin } from "../middleware/AdminMiddleWareContext";
 
 
 export default function List() {
@@ -18,7 +17,7 @@ export default function List() {
     const [isTrashed, setIsTrashed] = useState(false);
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState([]);
-    const [countryData, setCountryData] = useState([]);
+    const [cityData, setCityData] = useState([]);
     const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
 
@@ -28,17 +27,17 @@ export default function List() {
         );
     };
 
-    const fetchcountry = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    const fetchCity = useCallback(async () => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (adminData?.project?.active_panel !== "admin") {
+        if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -46,12 +45,12 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country`,
+                `https://sleeping-owl-we0m.onrender.com/api/city`,
                 {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
+                        Authorization: `Bearer ${suppliertoken}`,
                     },
                 }
             );
@@ -73,26 +72,26 @@ export default function List() {
 
             const result = await response.json();
             if (result) {
-                setCountryData(result?.categories || []);
+                setCityData(result?.citys || []);
             }
         } catch (error) {
-            console.error("Error fetching categories:", error);
+            console.error("Error fetching city:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, setCountryData]);
+    }, [router, setCityData]);
 
-    const trashedCategories = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    const trashCity = useCallback(async () => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (adminData?.project?.active_panel !== "admin") {
+        if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -100,12 +99,12 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country/trashed`,
+                `https://sleeping-owl-we0m.onrender.com/api/city/trashed`,
                 {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
+                        Authorization: `Bearer ${suppliertoken}`,
                     },
                 }
             );
@@ -127,28 +126,28 @@ export default function List() {
 
             const result = await response.json();
             if (result) {
-                setCountryData(result?.categories || []);
+                setCityData(result?.city || []);
             }
         } catch (error) {
-            console.error("Error fetching trashed categories:", error);
+            console.error("Error fetching trashed city:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, setCountryData]);
+    }, [router, setCityData]);
 
     useEffect(() => {
         const fetchData = async () => {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
-            await fetchcountry();
+            await fetchCity();
             setLoading(false);
         };
         fetchData();
-    }, [fetchcountry, verifyAdminAuth]);
+    }, [fetchCity, verifyAdminAuth]);
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && countryData.length > 0 && !loading) {
+        if (typeof window !== 'undefined' && cityData.length > 0 && !loading) {
             let table = null;
 
             Promise.all([
@@ -161,42 +160,42 @@ export default function List() {
                 window.jQuery = window.$ = jQuery.default;
 
                 // Destroy existing DataTable if it exists
-                if ($.fn.DataTable.isDataTable('#countryTable')) {
-                    $('#countryTable').DataTable().destroy();
-                    $('#countryTable').empty();
+                if ($.fn.DataTable.isDataTable('#citytable')) {
+                    $('#citytable').DataTable().destroy();
+                    $('#citytable').empty();
                 }
 
                 // Reinitialize DataTable with new data
-                table = $('#countryTable').DataTable();
+                table = $('#citytable').DataTable();
 
                 return () => {
                     if (table) {
                         table.destroy();
-                        $('#countryTable').empty();
+                        $('#citytable').empty();
                     }
                 };
             }).catch((error) => {
                 console.error('Failed to load DataTables dependencies:', error);
             });
         }
-    }, [countryData, loading]);
+    }, [cityData, loading]);
 
     const handleEditItem = (item) => {
         setIsEdit(true)
-        router.push(`/admin/country/update?id=${item.id}`);
+        router.push(`/supplier/city/update?id=${item.id}`);
     };
 
 
     const handleDelete = async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        if (adminData?.project?.active_panel !== "admin") {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -226,12 +225,12 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/city/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
+                        Authorization: `Bearer ${suppliertoken}`,
                     },
                 }
             );
@@ -257,7 +256,7 @@ export default function List() {
                 text: result.message || `${item.name} has been Trashed successfully.`,
             });
 
-            await fetchcountry();
+            await fetchCity();
         } catch (error) {
             Swal.close();
             Swal.fire({
@@ -278,7 +277,7 @@ export default function List() {
 
         const confirmResult = await Swal.fire({
             title: "Are you sure?",
-            text: `You will delete ${selected.length} categories!`,
+            text: `You will delete ${selected.length} city!`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",
@@ -288,8 +287,8 @@ export default function List() {
 
         if (!confirmResult.isConfirmed) return;
 
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        const admintoken = adminData?.security?.token;
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        const suppliertoken = supplierData?.security?.token;
 
         try {
             Swal.fire({ title: "Deleting...", didOpen: () => Swal.showLoading() });
@@ -297,20 +296,20 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/country/${id}`, {
+                    fetch(`https://sleeping-owl-we0m.onrender.com/api/city/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${admintoken}`,
+                            Authorization: `Bearer ${suppliertoken}`,
                         },
                     })
                 )
             );
 
             Swal.close();
-            await fetchcountry();
+            await fetchCity();
             setSelected([]);
-            Swal.fire("Deleted!", `${results.length} categories were deleted.`, "success");
+            Swal.fire("Deleted!", `${results.length} city were deleted.`, "success");
         } catch (error) {
             Swal.close();
             Swal.fire("Error", error.message || "Failed to delete", "error");
@@ -320,21 +319,21 @@ export default function List() {
     };
 
     const exportCsv = () => {
-        const table = $('#countryTable').DataTable();
+        const table = $('#citytable').DataTable();
         table.button('.buttons-csv').trigger();
     };
 
     const handleRestore = useCallback(async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (adminData?.project?.active_panel !== "admin") {
+        if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -342,12 +341,12 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/city/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
+                        Authorization: `Bearer ${suppliertoken}`,
                     },
                 }
             );
@@ -374,25 +373,25 @@ export default function List() {
                     title: `${item.name} Has Been Restored Successfully !`,
                     text: result.message,
                 });
-                await trashedCategories();
+                await trashCity();
             }
         } catch (error) {
             console.error("Error:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, trashedCategories]);
+    }, [router, trashCity]);
 
     const handlePermanentDelete = async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        if (adminData?.project?.active_panel !== "admin") {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -422,12 +421,12 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/city/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
+                        Authorization: `Bearer ${suppliertoken}`,
                     },
                 }
             );
@@ -453,7 +452,7 @@ export default function List() {
                 text: result.message || `${item.name} has been deleted successfully.`,
             });
 
-            await trashedCategories();
+            await trashCity();
         } catch (error) {
             Swal.close();
             Swal.fire({
@@ -476,7 +475,7 @@ export default function List() {
                 <div className="bg-white rounded-3xl p-5 main-outer-wrapper">
                     <div className="flex flex-wrap justify-between items-center mb-4">
                         <h2 className="md:text-2xl font-bold text-[#2B3674]">
-                            {isTrashed ? "Trashed country List" : "country List"}
+                            {isTrashed ? "Trashed city List" : "city List"}
                         </h2>
                         <div className="flex gap-3 flex-wrap items-center">
                             <button
@@ -504,39 +503,37 @@ export default function List() {
                                     onClick={async () => {
                                         if (isTrashed) {
                                             setIsTrashed(false);
-                                            await fetchcountry();
+                                            await fetchCity();
                                         } else {
                                             setIsTrashed(true);
-                                            await trashedCategories();
+                                            await trashCity();
                                         }
                                     }}
                                 >
-                                    {isTrashed ? "country Listing (Simple)" : "Trashed country"}
+                                    {isTrashed ? "city Listing (Simple)" : "Trashed city"}
                                 </button>
                                 <button
-                                  
                                     className="bg-[#4285F4] text-white rounded-md p-2 px-4"
                                 >
-                                    <Link href="/admin/country/create">Add country</Link>
+                                    <Link href="/admin/city/create">Add City</Link>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    {countryData.length > 0 ? (
+                    {cityData.length > 0 ? (
                         <div className="overflow-x-auto w-full relative">
-                            <table id="countryTable" className="display main-tables">
+                            <table id="citytable" className="display main-tables">
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">country Name</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Image</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Description</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status</th>
+                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">City Name</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">city Code</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country Code</th>
                                         <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {countryData.map((item) => (
+                                    {cityData.map((item) => (
                                         <tr key={item.id} className="bg-transparent border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
                                             <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
                                                 <div className="flex items-center">
@@ -554,7 +551,7 @@ export default function List() {
                                                     {item.name}
                                                 </div>
                                             </td>
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.description}</td>
+                                           
                                             <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.description}</td>
                                             <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
                                                 {item.status ? (
@@ -585,7 +582,7 @@ export default function List() {
                         </div>
                     ) : (
                         <div className="text-center py-20 text-[#A3AED0] text-lg font-medium">
-                            No country found.
+                            No city found.
                         </div>
                     )}
                 </div>

@@ -1,0 +1,242 @@
+"use client"
+import { useEffect, useState, useCallback } from 'react'
+import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { HashLoader } from 'react-spinners'
+import { useAdmin } from '../middleware/AdminMiddleWareContext'
+
+export default function Update() {
+    const [formData, setFormData] = useState({
+            name: "",
+            state_id: "",
+            country_id: "",
+          });
+
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
+    const [validationErrors, setValidationErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const { verifyAdminAuth } = useAdmin();
+    const router = useRouter();
+
+    useEffect(() => {
+        verifyAdminAuth();
+    }, [verifyAdminAuth]);
+
+    const validate = () => {
+        const errors = {};
+        if (!formData.name.trim()) errors.name = ' name is required.';
+        if (!formData.state_id.trim()) errors.gst_number = 'State Id is required.';
+        if (!formData.country_id.trim()) errors.contact_name = 'Country Id is required.';
+        return errors;
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const fetchwarehouse = useCallback(async () => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${suppliertoken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Session Expired",
+                    text: errorMessage.message || "Your session has expired. Please log in again.",
+                });
+                throw new Error(errorMessage.message);
+            }
+
+            const result = await response.json();
+            const cityData = result?.city || {};
+
+            setFormData({
+                name:cityData?.name || "",
+                state_id:cityData?.state_id || "",
+                country_id:cityData?.country_id|| "",
+              });
+        } catch (error) {
+            console.error("Error fetching warehouse:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, id]);
+
+    useEffect(() => {
+        fetchwarehouse();
+    }, [fetchwarehouse]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.clear("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const token = supplierData?.security?.token;
+        if (!token) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const errors = validate();
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            setLoading(false);
+            return;
+        }
+
+        setValidationErrors({});
+
+        try {
+            Swal.fire({
+                title: 'Updating Warehouse...',
+                text: 'Please wait while we save your warehouse.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const url = `https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`;
+            const form = new FormData();
+            for (const key in formData) {
+                if (formData[key]) {
+                    form.append(key, formData[key]);
+                }
+            }
+
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                body: form,
+            });
+
+            if (!response.ok) {
+                Swal.close();
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Update Failed",
+                    text: errorMessage.message || "An error occurred",
+                });
+                throw new Error(errorMessage.message || "Update failed");
+            }
+
+            Swal.close();
+            Swal.fire({
+                icon: "success",
+                title: "Warehouse Updated",
+                text: `The warehouse has been updated successfully!`,
+                showConfirmButton: true,
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    setFormData({
+                        name: '',
+                        state_id: '',
+                        country_id: '',
+                    });
+                    router.push("/supplier/warehouse");
+                }
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Submission Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+            setError(error.message || "Submission failed.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
+    }
+
+    return (
+        <section className="add-warehouse xl:w-8/12">
+            <form onSubmit={handleSubmit}>
+                <div className="bg-white rounded-2xl p-5 ">
+                    <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
+                        <div>
+                            <label className="font-bold block text-[#232323]">Warehouse Name</label>
+                            <input type="text" onChange={handleChange} value={formData?.name} id="name" name="name" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="Charlene Store House" />
+                            {validationErrors.name && <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>}
+                        </div>
+                        <div>
+                            <label className="font-bold block text-[#232323]">Country Id</label>
+                            <input type="text" value={formData?.country_id} onChange={handleChange} name="country_id" id="country_id" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="GST289571412" />
+                            {validationErrors.country_id && <p className="text-red-500 text-sm mt-1">{validationErrors.country_id}</p>}
+                        </div>
+                        <div>
+                            <label className="font-bold block text-[#232323]">State Id</label>
+                            <input type="text" value={formData?.state_id} onChange={handleChange} name="state_id" id="state_id" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="Charlene Reed " />
+                            {validationErrors.state_id && <p className="text-red-500 text-sm mt-1">{validationErrors.state_id}</p>}
+                        </div>
+                        </div>
+
+
+                 
+
+                    <div className="flex flex-wrap gap-3 mt-5">
+                        <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">Update</button>
+                        <button
+                            type="button"
+                            className="bg-gray-500 text-white px-15 rounded-md p-3"
+                            onClick={() => router.back()}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    );
+}

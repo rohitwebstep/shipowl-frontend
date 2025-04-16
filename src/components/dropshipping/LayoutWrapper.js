@@ -7,7 +7,7 @@ import DropshipperMiddleWareProvider from "./middleware/DropshipperMiddleWareCon
 
 export default function LayoutWrapper({ children }) {
     const pathname = usePathname();
-    const isAuthPage = pathname === '/dropshipping/auth/login/';
+    const isAuthPage = pathname === '/dropshipping/auth/login/' || pathname === '/dropshipping/auth/password/forget/' || pathname === '/dropshipping/auth/password/reset/';
 
     return (
         <div className="main">

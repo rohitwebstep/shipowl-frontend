@@ -9,7 +9,7 @@ import AdminMiddleWareProvider from "./middleware/AdminMiddleWareContext";
 import { DropshipperProfileProvider } from "./dropshipper/DropshipperProfileContext";
 export default function LayoutWrapper({ children }) {
     const pathname = usePathname();
-    const isAuthPage = pathname === '/admin/auth/login/';
+    const isAuthPage = pathname === '/admin/auth/login/' ||pathname === '/admin/auth/password/forget/' || pathname === '/admin/auth/password/reset/';
 
     return (
         <div className="main">

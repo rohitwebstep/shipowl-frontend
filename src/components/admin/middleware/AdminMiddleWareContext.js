@@ -24,7 +24,7 @@ export default function AdminMiddleWareProvider({ children }) {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
         if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData"); // Correct way to remove a specific item
-            router.push("/admin/auth/login");        // Redirect to login
+            // router.push("/admin/auth/login");        // Redirect to login
         }
 
         const admin_token = adminData?.security?.token;
@@ -57,7 +57,7 @@ export default function AdminMiddleWareProvider({ children }) {
         } catch (error) {
             console.error("Error:", error);
             setError(error.message || "Something went wrong");
-            router.push("/admin/auth/login");
+            // router.push("/admin/auth/login");
         } finally {
             setLoading(false);
         }

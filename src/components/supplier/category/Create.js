@@ -78,7 +78,7 @@ export default function Create() {
 
         try {
             Swal.fire({
-                title: isEdit ? 'Updating Category...' : 'Creating Category...',
+                title:  'Creating Category...',
                 text: 'Please wait while we save your category.',
                 allowOutsideClick: false,
                 didOpen: () => {

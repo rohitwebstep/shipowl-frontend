@@ -1,60 +1,59 @@
-"use client";
-
-import { useContext, useEffect, useCallback, useState } from 'react';
-import { CategoryContext } from './CategoryContext';
-import Swal from 'sweetalert2';
-import { useRouter } from 'next/navigation';
-import { useSupplier } from '../middleware/SupplierMiddleWareContext';
-import Image from 'next/image';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules'; // 👈 Import Navigation module
-import 'swiper/css';
-import 'swiper/css/navigation';
-import { useSearchParams } from 'next/navigation';
-import HashLoader from "react-spinners/HashLoader";
+"use client"
+import { useEffect, useState, useCallback } from 'react'
+import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
+import { useSupplier } from '../middleware/SupplierMiddleWareContext'
+import { useSearchParams } from 'next/navigation'
+import { HashLoader } from 'react-spinners'
 
 export default function Update() {
-    const router = useRouter();
-    const { formData, setFormData, isEdit } = useContext(CategoryContext);
+    const [formData, setFormData] = useState({
+        name: '',
+        gst_number: '',
+        contact_name: '',
+        contact_number: '',
+        address_line_1: '',
+        address_line_2: '',
+        city: '',
+        state: '',
+        postal_code: ''
+    });
+
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
     const [validationErrors, setValidationErrors] = useState({});
-    const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState(null);
+
     const { verifySupplierAuth } = useSupplier();
+    const router = useRouter();
 
     useEffect(() => {
         verifySupplierAuth();
     }, [verifySupplierAuth]);
 
-    const handleChange = (e) => {
-        const { name, type, value, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? (checked ? true : false) : value
-        }));
-    };
-
-
-    const searchParams = useSearchParams();
-    const id = searchParams.get('id');
     const validate = () => {
         const errors = {};
-
-        if (!formData.name || formData.name.trim() === '') {
-            errors.name = 'Category name is required.';
-        }
-        if (!formData.description || formData.description.trim() === '') {
-            errors.description = 'Category description is required.';
-        }
-        if (!files || files.length === 0) {
-            errors.image = 'At least one category image is required.';
-        }
-
+        if (!formData.name.trim()) errors.name = 'Warehouse name is required.';
+        if (!formData.gst_number.trim()) errors.gst_number = 'GST number is required.';
+        if (!formData.contact_name.trim()) errors.contact_name = 'Contact name is required.';
+        if (!formData.contact_number.trim()) errors.contact_number = 'Contact number is required.';
+        if (!formData.address_line_1.trim()) errors.address_line_1 = 'Address Line 1 is required.';
+        if (!formData.city.trim()) errors.city = 'City is required.';
+        if (!formData.state.trim()) errors.state = 'State is required.';
+        if (!formData.postal_code.trim()) errors.postal_code = 'Postal code is required.';
         return errors;
     };
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
-    const fetchCategory = useCallback(async () => {
+    const fetchwarehouse = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
         if (supplierData?.project?.active_panel !== "supplier") {
@@ -72,7 +71,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -87,54 +86,48 @@ export default function Update() {
                 Swal.fire({
                     icon: "error",
                     title: "Session Expired",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                    text: errorMessage.message || "Your session has expired. Please log in again.",
                 });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Session expired"
-                );
+                throw new Error(errorMessage.message);
             }
 
             const result = await response.json();
-            if (result) {
-                const currentCat = result?.category || [];
-                console.log('currentCat', currentCat)
-                setFormData({
-                    name: currentCat.name || '',
-                    description: currentCat.description || '',
-                    status: currentCat.status || '',
-                    image: currentCat.image || ''
-                })
-            }
+            const warehouse = result?.warehouse || {};
+
+            setFormData({
+                name: warehouse.name || '',
+                gst_number: warehouse.gst_number || '',
+                contact_name: warehouse.contact_name || '',
+                contact_number: warehouse.contact_number || '',
+                address_line_1: warehouse.address_line_1 || '',
+                address_line_2: warehouse.address_line_2 || '',
+                city: warehouse.city || '',
+                state: warehouse.state || '',
+                postal_code: warehouse.postal_code || ''
+            });
         } catch (error) {
-            console.error("Error fetching categories:", error);
+            console.error("Error fetching warehouse:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, id, setFormData]);
-    useEffect(() => {
-        fetchCategory();
-    }, [fetchCategory])
+    }, [router, id]);
 
-    const handleFileChange = (e) => {
-        const selectedFiles = Array.from(e.target.files);
-        setFiles(selectedFiles);
-    };
+    useEffect(() => {
+        fetchwarehouse();
+    }, [fetchwarehouse]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (!dropshipperData?.project?.active_panel === "supplier") {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.clear("shippingData");
             router.push("/supplier/auth/login");
             return;
         }
 
-        const token = dropshipperData?.security?.token;
+        const token = supplierData?.security?.token;
         if (!token) {
             router.push("/supplier/auth/login");
             return;
@@ -151,30 +144,26 @@ export default function Update() {
 
         try {
             Swal.fire({
-                title: isEdit ? 'Updating Category...' : 'Creating Category...',
-                text: 'Please wait while we save your category.',
+                title: 'Updating Warehouse...',
+                text: 'Please wait while we save your warehouse.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
+            const url = `https://sleeping-owl-we0m.onrender.com/api/warehouse${id}`;
             const form = new FormData();
-            form.append('name', formData.name);
-            form.append('description', formData.description);
-            form.append('status', formData.status);
-            if (files.length > 0) {
-                files.forEach((file, index) => {
-                    form.append('image', file); // use 'images[]' if backend expects an array
-                });
+            for (const key in formData) {
+                if (formData[key]) {
+                    form.append(key, formData[key]);
+                }
             }
-
-            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}`
 
             const response = await fetch(url, {
                 method: "PUT",
                 headers: {
-                    "Authorization": `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`
                 },
                 body: form,
             });
@@ -185,29 +174,33 @@ export default function Update() {
                 Swal.fire({
                     icon: "error",
                     title: "Update Failed",
-                    text: errorMessage.message || errorMessage.error || "An error occurred",
+                    text: errorMessage.message || "An error occurred",
                 });
-                throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+                throw new Error(errorMessage.message || "Update failed");
             }
 
-            const result = await response.json();
             Swal.close();
-
-            if (result) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Category Updated",
-                    text: `The category has been updated successfully!`,
-                    showConfirmButton: true,
-                }).then((res) => {
-                    if (res.isConfirmed) {
-                        setFormData({ name: '', description: '', image: '' });
-                        setFiles(null);
-                        router.push("/supplier/category/list");
-                    }
-                });
-            }
-
+            Swal.fire({
+                icon: "success",
+                title: "Warehouse Updated",
+                text: `The warehouse has been updated successfully!`,
+                showConfirmButton: true,
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    setFormData({
+                        name: '',
+                        gst_number: '',
+                        contact_name: '',
+                        contact_number: '',
+                        address_line_1: '',
+                        address_line_2: '',
+                        city: '',
+                        state: '',
+                        postal_code: ''
+                    });
+                    router.push("/supplier/warehouse");
+                }
+            });
         } catch (error) {
             console.error("Error:", error);
             Swal.close();
@@ -222,83 +215,12 @@ export default function Update() {
         }
     };
 
-
-    const handleImageDelete = async (index) => {
-        setLoading(true);
-
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (!dropshipperData?.project?.active_panel === "supplier") {
-            localStorage.clear("shippingData");
-            router.push("/supplier/auth/login");
-            return;
-        }
-
-        const token = dropshipperData?.security?.token;
-        if (!token) {
-            router.push("/supplier/auth/login");
-            return;
-        }
-
-        try {
-            Swal.fire({
-                title: 'Updating Category...',
-                text: 'Please wait while we save your category.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}/image/${index}`
-
-            const response = await fetch(url, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                },
-            });
-
-            if (!response.ok) {
-                Swal.close();
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Update Failed",
-                    text: errorMessage.message || errorMessage.error || "An error occurred",
-                });
-                throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
-            }
-
-            const result = await response.json();
-            Swal.close();
-
-            if (result) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Image Deleted",
-                    text: `The Image has been updated successfully!`,
-                    showConfirmButton: true,
-                }).then((res) => {
-                    if (res.isConfirmed) {
-                        setFormData({ name: '', description: '', image: '' });
-                        setFiles(null);
-                        fetchCategory();
-                    }
-                });
-            }
-
-        } catch (error) {
-            console.error("Error:", error);
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Submission Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-            setError(error.message || "Submission failed.");
-        } finally {
-            setLoading(false);
-        }
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
     }
 
 
