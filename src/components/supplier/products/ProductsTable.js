@@ -117,7 +117,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product`, {
+            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/product`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -163,7 +163,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
+            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/product/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -274,7 +274,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
+                `https://shipping-owl-vd4s.vercel.app/api/product/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -356,7 +356,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category/${item.id}/destroy`,
+                `https://shipping-owl-vd4s.vercel.app/api/category/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -418,7 +418,7 @@ const ProductTable = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
+                    `https://shipping-owl-vd4s.vercel.app/api/product/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {

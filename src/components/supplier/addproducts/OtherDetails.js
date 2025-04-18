@@ -68,7 +68,7 @@ export default function OtherDetails() {
         },
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/product/${id}`;
+      const url = `https://shipping-owl-vd4s.vercel.app/api/product/${id}`;
       const form = new FormData();
       for (const key in formData) {
         if (formData[key] !== undefined && formData[key] !== null) {
