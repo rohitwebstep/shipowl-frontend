@@ -9,7 +9,7 @@ export default function Update() {
   const [formData, setFormData] = useState({
     name: "",
     iso2: "",
-    countryId: "",
+    country: "",
     type: "",
   });
 
@@ -31,7 +31,7 @@ export default function Update() {
     const errors = {};
     if (!formData.name.trim()) errors.name = "State name is required.";
     if (!formData.iso2.trim()) errors.iso2 = "ISO 2 code is required.";
-    if (!formData.countryId.trim()) errors.countryId = "Country ID is required.";
+    if (!formData.country.trim()) errors.country = "Country ID is required.";
     if (!formData.type.trim()) errors.type = "Type is required.";
     return errors;
   };
@@ -87,7 +87,7 @@ export default function Update() {
       setFormData({
         name: state.name || "",
         iso2: state.iso2 || "",
-        countryId: state.countryId || "",
+        country: state.countryId|| "",
         type: state.type || "",
       });
     } catch (error) {
@@ -273,8 +273,8 @@ export default function Update() {
             <div>
               <label className="font-bold block text-[#232323]">Country</label>
               <select
-                name="countryId"
-                value={formData.countryId}
+                name="country"
+                value={formData.country}
                 onChange={handleChange}
                 className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
               >
@@ -285,8 +285,8 @@ export default function Update() {
                   </option>
                 ))}
               </select>
-              {validationErrors.countryId && (
-                <p className="text-red-500 text-sm mt-1">{validationErrors.countryId}</p>
+              {validationErrors.country && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.country}</p>
               )}
             </div>
             <div>

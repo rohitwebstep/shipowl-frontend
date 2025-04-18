@@ -5,7 +5,12 @@ import { useRouter } from 'next/navigation'
 import { useSupplier } from '../middleware/SupplierMiddleWareContext'
 import { useSearchParams } from 'next/navigation'
 import { HashLoader } from 'react-spinners'
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import Image from "next/image";
 
+import 'swiper/css/navigation';
 export default function Update() {
     const [formData, setFormData] = useState({
         name: '',
