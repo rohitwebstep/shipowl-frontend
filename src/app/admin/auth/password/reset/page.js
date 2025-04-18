@@ -1,9 +1,9 @@
 import ResetPassword from '@/components/admin/ResetPassword'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 export default function page() {
   return (
-    <><ResetPassword/></>
+    <Suspense><ResetPassword/></Suspense>
   )
 }
 
