@@ -1,8 +1,10 @@
 import ResetPassword from '@/components/dropshipping/ResetPassword'
-import React from 'react'
+import {Suspense} from 'react'
 
 export default function page() {
   return (
-    <><ResetPassword/></>
+    <Suspense fallback={<div>Loading...</div>}>
+         <Update />
+       </Suspense>
   )
 }
