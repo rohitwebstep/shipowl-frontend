@@ -1,9 +1,8 @@
 "use client";
-import { useContext, useEffect, useCallback, useState } from "react";
+import {useEffect, useCallback, useState } from "react";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { FaCheck } from "react-icons/fa";
 import { AiOutlineDelete } from "react-icons/ai";
 import HashLoader from "react-spinners/HashLoader";
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
@@ -18,6 +17,7 @@ export default function List() {
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState([]);
     const [stateData, setStateData] = useState([]);
+    const [country, setCountry] = useState([]);
     const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
 
@@ -28,16 +28,16 @@ export default function List() {
     };
 
     const fetchState = useCallback(async () => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -45,12 +45,12 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/state`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/state`,
                 {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -73,6 +73,7 @@ export default function List() {
             const result = await response.json();
             if (result) {
                 setStateData(result?.states || []);
+                setCountry(result?.countries || []);
             }
         } catch (error) {
             console.error("Error fetching state:", error);
@@ -82,16 +83,16 @@ export default function List() {
     }, [router, setStateData]);
 
     const trashState = useCallback(async () => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -99,12 +100,12 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/state/trashed`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/state/trashed`,
                 {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -126,7 +127,9 @@ export default function List() {
 
             const result = await response.json();
             if (result) {
-                setStateData(result?.state || []);
+                setStateData(result?.states || []);
+                setCountry(result?.countries || []);
+
             }
         } catch (error) {
             console.error("Error fetching trashed state:", error);
@@ -181,21 +184,20 @@ export default function List() {
     }, [stateData, loading]);
 
     const handleEditItem = (item) => {
-        setIsEdit(true)
-        router.push(`/supplier/state/update?id=${item.id}`);
+        router.push(`/admin/state/update?id=${item.id}`);
     };
 
 
     const handleDelete = async (item) => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        if (supplierData?.project?.active_panel !== "supplier") {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -225,12 +227,12 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/state/${item.id}`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/state/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -287,8 +289,8 @@ export default function List() {
 
         if (!confirmResult.isConfirmed) return;
 
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        const suppliertoken = supplierData?.security?.token;
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        const admintoken = adminData?.security?.token;
 
         try {
             Swal.fire({ title: "Deleting...", didOpen: () => Swal.showLoading() });
@@ -296,11 +298,11 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/state/${id}`, {
+                    fetch(`https://shipping-owl-vd4s.vercel.app/api/location/state/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${suppliertoken}`,
+                            Authorization: `Bearer ${admintoken}`,
                         },
                     })
                 )
@@ -324,16 +326,16 @@ export default function List() {
     };
 
     const handleRestore = useCallback(async (item) => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -341,12 +343,12 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/state/${item?.id}/restore`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/state/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -383,15 +385,15 @@ export default function List() {
     }, [router, trashState]);
 
     const handlePermanentDelete = async (item) => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        if (supplierData?.project?.active_panel !== "supplier") {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -421,12 +423,12 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/state/${item.id}/destroy`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/state/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -523,34 +525,75 @@ export default function List() {
                     </div>
 
                     {stateData.length > 0 ? (
-                        <div className="overflow-x-auto w-full relative">
-                            <table id="statetable" className="display main-tables">
-                                <thead>
-                                    <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">State Name</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">ISO 2 CODE</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country id</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Type</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <tr key={index} className="bg-white border-b">
-                                <td className="px-6 py-4">{item.name}</td>
-                                <td className="px-6 py-4">{item.iso_2}</td>
-                                <td className="px-6 py-4">{item.country_id}</td>
-                                <td className="px-6 py-4">{item.type}</td>
-                                </tr>
-                        </tbody>
+  <div className="overflow-x-auto w-full relative">
+    <table id="statetable" className="display main-tables w-full">
+      <thead>
+        <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+          <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">State Name</th>
+          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">ISO 2 CODE</th>
+          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
+          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Type</th>
+          <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {stateData.map((item, index) => (
+          <tr key={index} className="bg-white border-b border-[#E9EDF7] hover:bg-gray-50">
+            <td className="px-6 py-4">{item.name}</td>
+            <td className="px-6 py-4">{item.iso2}</td>
+            <td className="px-6 py-4">
+  {
+    (() => {
+      console.log('item:', item);
+      const filtered = country.filter((c) => {
+        const match = c.id === item.countryId;
+        console.log(`Checking if country ID ${c.id} === item.countryId ${item.countryId}:`, match);
+        return match;
+      });
 
-                            </table>
-                        </div>
+      console.log('Filtered result:', filtered);
+
+      const names = filtered.map((c) => {
+        console.log('Mapping country to name:', c.name);
+        return c.name;
+      });
+
+      console.log('Final names array:', names);
+
+      return names.join(', ');
+    })()
+  }
+</td>
+
+
+
+            <td className="px-6 py-4">{item.type}</td>
+               <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
+                <div className="flex justify-center gap-2">
+                    {isTrashed ? (
+                        <>
+                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                        </>
                     ) : (
-                        <div className="text-center py-20 text-[#A3AED0] text-lg font-medium">
-                            No state found.
-                        </div>
+                        <>
+                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
+                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                        </>
                     )}
+                </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+                    ) : (
+                    <div className="text-center py-20 text-[#A3AED0] text-lg font-medium">
+                        No State found.
+                    </div>
+                    )}
+
                 </div>
             )}
         </div>

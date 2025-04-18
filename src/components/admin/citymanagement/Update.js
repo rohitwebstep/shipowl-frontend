@@ -60,7 +60,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`,
+                `https://shipping-owl-vd4s.vercel.app/api/warehouse/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -135,7 +135,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`;
+            const url = `https://shipping-owl-vd4s.vercel.app/api/warehouse/${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {
@@ -202,41 +202,77 @@ export default function Update() {
 
     return (
         <section className="add-warehouse xl:w-8/12">
-            <form onSubmit={handleSubmit}>
-                <div className="bg-white rounded-2xl p-5 ">
-                    <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
-                        <div>
-                            <label className="font-bold block text-[#232323]">Warehouse Name</label>
-                            <input type="text" onChange={handleChange} value={formData?.name} id="name" name="name" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="Charlene Store House" />
-                            {validationErrors.name && <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>}
-                        </div>
-                        <div>
-                            <label className="font-bold block text-[#232323]">Country Id</label>
-                            <input type="text" value={formData?.country_id} onChange={handleChange} name="country_id" id="country_id" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="GST289571412" />
-                            {validationErrors.country_id && <p className="text-red-500 text-sm mt-1">{validationErrors.country_id}</p>}
-                        </div>
-                        <div>
-                            <label className="font-bold block text-[#232323]">State Id</label>
-                            <input type="text" value={formData?.state_id} onChange={handleChange} name="state_id" id="state_id" className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold" placeholder="Charlene Reed " />
-                            {validationErrors.state_id && <p className="text-red-500 text-sm mt-1">{validationErrors.state_id}</p>}
-                        </div>
-                        </div>
+              <form onSubmit={handleSubmit} className="p-4 rounded-md bg-white shadow">
+              <div>
+            <label className="font-bold block text-[#232323]">Country</label>
+            <Select
+              name="countryId"
+              value={countryOptions.find((option) => option.value === formData.countryId)}
+              onChange={(selectedOption) =>
+                handleChange({ target: { name: 'countryId', value: selectedOption?.value } })
+              }
+              options={countryOptions}
+              placeholder="Select a country"
+              className="mt-1"
+              classNamePrefix="react-select"
+            />
+            {validationErrors.countryId && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.countryId}</p>
+            )}
+          </div>
+          <div className="pt-2">
+              <label className="font-bold block text-[#232323]">State</label>
+              <select
+                name="stateId"
+                value={formData.stateId}
+                onChange={handleChange}
+                className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
+              >
+                <option value="">Select a state</option>
+                {stateData.map((item) => (
+                  <option key={item.id || item._id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+              {validationErrors.stateId && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.countryId}</p>
+              )}
+            </div>
+          <div className="pt-2">
+              <label className="font-bold block text-[#232323]">City</label>
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
+              />
+               
+              {validationErrors.name && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
+              )}
+            </div>
+          <div>
 
+        
 
-                 
-
-                    <div className="flex flex-wrap gap-3 mt-5">
-                        <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">Update</button>
-                        <button
-                            type="button"
-                            className="bg-gray-500 text-white px-15 rounded-md p-3"
-                            onClick={() => router.back()}
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            </form>
+          <div className="flex flex-wrap gap-3 mt-5">
+            <button
+              type="submit"
+              className="bg-orange-500 text-white px-6 rounded-md p-3"
+            >
+              Update
+            </button>
+            <button
+              type="button"
+              className="bg-gray-500 text-white px-6 rounded-md p-3"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </form>
         </section>
     );
 }

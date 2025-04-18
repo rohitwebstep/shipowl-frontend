@@ -46,7 +46,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/country`,
                 {
                     method: "GET",
                     headers: {
@@ -73,7 +73,7 @@ export default function List() {
 
             const result = await response.json();
             if (result) {
-                setCountryData(result?.categories || []);
+                setCountryData(result?.countries || []);
             }
         } catch (error) {
             console.error("Error fetching categories:", error);
@@ -82,7 +82,7 @@ export default function List() {
         }
     }, [router, setCountryData]);
 
-    const trashedCategories = useCallback(async () => {
+    const trashCountry = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
         if (adminData?.project?.active_panel !== "admin") {
@@ -100,7 +100,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country/trashed`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/country/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -127,7 +127,7 @@ export default function List() {
 
             const result = await response.json();
             if (result) {
-                setCountryData(result?.categories || []);
+                setCountryData(result?.countries || []);
             }
         } catch (error) {
             console.error("Error fetching trashed categories:", error);
@@ -166,8 +166,16 @@ export default function List() {
                     $('#countryTable').empty();
                 }
 
+                table = $('#countryTable').DataTable({
+                    // don't include "columns" since you're rendering with JSX
+                    pageLength: 10,
+                    responsive: true,
+                    ordering: true,
+                    searching: true,
+                    destroy: true,
+                });
+                
                 // Reinitialize DataTable with new data
-                table = $('#countryTable').DataTable();
 
                 return () => {
                     if (table) {
@@ -182,7 +190,6 @@ export default function List() {
     }, [countryData, loading]);
 
     const handleEditItem = (item) => {
-        setIsEdit(true)
         router.push(`/admin/country/update?id=${item.id}`);
     };
 
@@ -226,7 +233,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country/${item.id}`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/country/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -297,7 +304,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/country/${id}`, {
+                    fetch(`https://shipping-owl-vd4s.vercel.app/api/location/country/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -342,7 +349,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country/${item?.id}/restore`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/country/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -374,14 +381,14 @@ export default function List() {
                     title: `${item.name} Has Been Restored Successfully !`,
                     text: result.message,
                 });
-                await trashedCategories();
+                await trashCountry();
             }
         } catch (error) {
             console.error("Error:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, trashedCategories]);
+    }, [router, trashCountry]);
 
     const handlePermanentDelete = async (item) => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -422,7 +429,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/country/${item.id}/destroy`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/country/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -453,7 +460,7 @@ export default function List() {
                 text: result.message || `${item.name} has been deleted successfully.`,
             });
 
-            await trashedCategories();
+            await trashCountry();
         } catch (error) {
             Swal.close();
             Swal.fire({
@@ -476,7 +483,7 @@ export default function List() {
                 <div className="bg-white rounded-3xl p-5 main-outer-wrapper">
                     <div className="flex flex-wrap justify-between items-center mb-4">
                         <h2 className="md:text-2xl font-bold text-[#2B3674]">
-                            {isTrashed ? "Trashed country List" : "country List"}
+                            {isTrashed ? "Trashed Country List" : "Country List"}
                         </h2>
                         <div className="flex gap-3 flex-wrap items-center">
                             <button
@@ -507,11 +514,11 @@ export default function List() {
                                             await fetchcountry();
                                         } else {
                                             setIsTrashed(true);
-                                            await trashedCategories();
+                                            await trashCountry();
                                         }
                                     }}
                                 >
-                                    {isTrashed ? "country Listing (Simple)" : "Trashed country"}
+                                    {isTrashed ? "Country Listing (Simple)" : "Trashed Country"}
                                 </button>
                                 <button
                                   
@@ -528,17 +535,19 @@ export default function List() {
                             <table id="countryTable" className="display main-tables">
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">country Name</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Image</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Description</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status</th>
+                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">Name</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">ISO2 Code</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">iso3 code</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">phonecode</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">currency</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">nationality</th>
                                         <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {countryData.map((item) => (
-                                        <tr key={item.id} className="bg-transparent border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                            <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
+                                        <tr key={item.id} className=" text-left bg-transparent border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                            <td className="p-2 bg-transparent text-start whitespace-nowrap border-0 pe-5">
                                                 <div className="flex items-center">
                                                     <label className="flex items-center cursor-pointer me-2">
                                                         <input
@@ -554,16 +563,13 @@ export default function List() {
                                                     {item.name}
                                                 </div>
                                             </td>
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.description}</td>
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.description}</td>
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
-                                                {item.status ? (
-                                                    <span className="bg-green-100 text-green-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
-                                                ) : (
-                                                    <span className="bg-red-100 text-red-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
-                                                )}
-                                            </td>
-                                            <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
+                                            <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.iso2}</td>
+                                            <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.iso3}</td>
+                                            <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.phonecode}</td>
+                                            <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.currency}</td>
+                                            <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.nationality}</td>
+                                           
+                                            <td className="p-2 bg-transparent text-start px-5 text-[#8F9BBA] border-0">
                                                 <div className="flex justify-center gap-2">
                                                     {isTrashed ? (
                                                         <>

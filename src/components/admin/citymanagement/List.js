@@ -27,71 +27,65 @@ export default function List() {
         );
     };
 
-    const fetchCity = useCallback(async () => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+    const fetchCity = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
-
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+    
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
-
+    
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/city`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/city`,
                 {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
-
+    
+            const result = await response.json();
+    
             if (!response.ok) {
-                const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
                     title: "Session Expired",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
+                    text: result.message || result.error || "Your session has expired. Please log in again.",
                 });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Session expired"
-                );
+                throw new Error(result.message || result.error || "Session expired");
             }
-
-            const result = await response.json();
-            if (result) {
-                setCityData(result?.citys || []);
-            }
+    
+            setCityData(result?.cities || []);
         } catch (error) {
-            console.error("Error fetching city:", error);
+            console.error("Error fetching cities:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, setCityData]);
-
+    }, [router]);
+    
     const trashCity = useCallback(async () => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -99,12 +93,12 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/city/trashed`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/city/trashed`,
                 {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -182,20 +176,20 @@ export default function List() {
 
     const handleEditItem = (item) => {
         setIsEdit(true)
-        router.push(`/supplier/city/update?id=${item.id}`);
+        router.push(`/admin/city/update?id=${item.id}`);
     };
 
 
     const handleDelete = async (item) => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        if (supplierData?.project?.active_panel !== "supplier") {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -225,12 +219,12 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/city/${item.id}`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/city/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -287,8 +281,8 @@ export default function List() {
 
         if (!confirmResult.isConfirmed) return;
 
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        const suppliertoken = supplierData?.security?.token;
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        const admintoken = adminData?.security?.token;
 
         try {
             Swal.fire({ title: "Deleting...", didOpen: () => Swal.showLoading() });
@@ -296,11 +290,11 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/city/${id}`, {
+                    fetch(`https://shipping-owl-vd4s.vercel.app/api/location/city/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${suppliertoken}`,
+                            Authorization: `Bearer ${admintoken}`,
                         },
                     })
                 )
@@ -324,16 +318,16 @@ export default function List() {
     };
 
     const handleRestore = useCallback(async (item) => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -341,12 +335,12 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/city/${item?.id}/restore`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/city/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -383,15 +377,15 @@ export default function List() {
     }, [router, trashCity]);
 
     const handlePermanentDelete = async (item) => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        if (supplierData?.project?.active_panel !== "supplier") {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -421,12 +415,12 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/city/${item.id}/destroy`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/city/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -475,7 +469,7 @@ export default function List() {
                 <div className="bg-white rounded-3xl p-5 main-outer-wrapper">
                     <div className="flex flex-wrap justify-between items-center mb-4">
                         <h2 className="md:text-2xl font-bold text-[#2B3674]">
-                            {isTrashed ? "Trashed city List" : "city List"}
+                            {isTrashed ? "Trashed City List" : "City List"}
                         </h2>
                         <div className="flex gap-3 flex-wrap items-center">
                             <button
@@ -510,7 +504,7 @@ export default function List() {
                                         }
                                     }}
                                 >
-                                    {isTrashed ? "city Listing (Simple)" : "Trashed city"}
+                                    {isTrashed ? "City Listing (Simple)" : "Trashed City"}
                                 </button>
                                 <button
                                     className="bg-[#4285F4] text-white rounded-md p-2 px-4"
@@ -582,7 +576,7 @@ export default function List() {
                         </div>
                     ) : (
                         <div className="text-center py-20 text-[#A3AED0] text-lg font-medium">
-                            No city found.
+                            No City found.
                         </div>
                     )}
                 </div>

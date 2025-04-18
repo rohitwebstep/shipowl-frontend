@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState,useCallback } from "react";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
@@ -11,16 +11,15 @@ export default function Create() {
 
   const [validationErrors, setValidationErrors] = useState({});
   const [files, setFiles] = useState([]);
+  const [countryData, setCountryData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
-    iso_2: "",
-    country_id: "",
+    iso2: "",
+    country: "",
     type: "",
-    status: "active",
   });
 
   useEffect(() => {
@@ -40,19 +39,74 @@ export default function Create() {
   const validate = () => {
     const errors = {};
     if (!formData.name.trim()) errors.name = "State name is required.";
-    if (!formData.iso_2.trim()) errors.iso_2 = "ISO 2 code is required.";
-    if (!formData.country_id.trim()) errors.country_id = "Country ID is required.";
+    if (!formData.iso2.trim()) errors.iso2 = "ISO 2 code is required.";
+    if (!formData.country.trim()) errors.country = "Country ID is required.";
     if (!formData.type.trim()) errors.type = "Type is required.";
-    if (!formData.status.trim()) errors.status = "status is required.";
     return errors;
   };
+     const fetchcountry = useCallback(async () => {
+          const adminData = JSON.parse(localStorage.getItem("shippingData"));
+  
+          if (adminData?.project?.active_panel !== "admin") {
+              localStorage.removeItem("shippingData");
+              router.push("/admin/auth/login");
+              return;
+          }
+  
+          const admintoken = adminData?.security?.token;
+          if (!admintoken) {
+              router.push("/admin/auth/login");
+              return;
+          }
+  
+          try {
+              setLoading(true);
+              const response = await fetch(
+                  `https://shipping-owl-vd4s.vercel.app/api/location/country`,
+                  {
+                      method: "GET",
+                      headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${admintoken}`,
+                      },
+                  }
+              );
+  
+              if (!response.ok) {
+                  const errorMessage = await response.json();
+                  Swal.fire({
+                      icon: "error",
+                      title: "Session Expired",
+                      text:
+                          errorMessage.error ||
+                          errorMessage.message ||
+                          "Your session has expired. Please log in again.",
+                  });
+                  throw new Error(
+                      errorMessage.message || errorMessage.error || "Session expired"
+                  );
+              }
+  
+              const result = await response.json();
+              if (result) {
+                  setCountryData(result?.countries || []);
+              }
+          } catch (error) {
+              console.error("Error fetching categories:", error);
+          } finally {
+              setLoading(false);
+          }
+      }, [router, setCountryData]);
+  useEffect(()=>{
+    fetchcountry();
+  },[fetchcountry])
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-    if (!dropshipperData?.project?.active_panel === "supplier") {
+    if (!dropshipperData?.project?.active_panel === "admin") {
       localStorage.clear("shippingData");
       router.push("/admin/auth/login");
       return;
@@ -89,7 +143,7 @@ export default function Create() {
         form.append("image", file);
       });
 
-      const response = await fetch("https://sleeping-owl-we0m.onrender.com/api/state", {
+      const response = await fetch("https://shipping-owl-vd4s.vercel.app/api/location/state", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -120,13 +174,12 @@ export default function Create() {
           if (res.isConfirmed) {
             setFormData({
               name: "",
-              iso_2: "",
-              country_id: "",
+              iso2: "",
+              country: "",
               type: "",
-              status: "active",
             });
             setFiles([]);
-            router.push("/supplier/state/list");
+            router.push("/admin/state/list");
           }
         });
       }
@@ -150,8 +203,7 @@ export default function Create() {
           <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
             {[
               { label: "State Name", name: "name" },
-              { label: "ISO 2 Code", name: "iso_2" },
-              { label: "Country ID", name: "country_id" },
+              { label: "ISO 2 Code", name: "iso2" },
               { label: "Type", name: "type" },
             ].map(({ label, name }) => (
               <div key={name}>
@@ -173,26 +225,33 @@ export default function Create() {
                 )}
               </div>
             ))}
-            </div>
-            <div>
-            <label className="block font-medium">Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
 
+            <div>
+              <label className="block font-medium">Country</label>
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
+              >
+                {
+                  countryData.map((item)=>{
+                    return (
+
+                      <option key={item.id} value={item.id}>{item.name}</option>
+                    )
+
+                  })
+                }
+              </select>
+            </div>
            
+        </div>
           
 
           <div className="flex flex-wrap gap-3 mt-5">
             <button type="submit" className="bg-orange-500 text-white px-6 rounded-md p-3">
-              {loading ? "Saving..." : "Save"}
+            Save
             </button>
             <button type="button" className="bg-gray-500 text-white px-6 rounded-md p-3" onClick={() => router.back()}>
               Cancel

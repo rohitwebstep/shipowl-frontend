@@ -89,7 +89,7 @@ export default function AddWarehouse() {
                 }
             });
         
-            const url = "https://sleeping-owl-we0m.onrender.com/api/warehouse";
+            const url = "https://shipping-owl-vd4s.vercel.app/api/warehouse";
         
             const form = new FormData();
             for (const key in formData) {

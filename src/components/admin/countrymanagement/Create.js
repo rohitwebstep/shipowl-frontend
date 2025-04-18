@@ -83,7 +83,7 @@ export default function Create() {
         form.append(key, formData[key]);
       }
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/location/country";
+      const url = "https://shipping-owl-vd4s.vercel.app/api/location/country";
 
       const response = await fetch(url, {
         method: "POST",
@@ -139,6 +139,8 @@ export default function Create() {
       setLoading(false);
     }
   };
+  
+   
 
   return (
     <div className="p-6 lg:w-10/12 space-y-6">

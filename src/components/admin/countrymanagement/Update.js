@@ -1,24 +1,28 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useCallback, useEffect } from "react";
+import { HashLoader } from 'react-spinners';
+import Swal from "sweetalert2";
 
-export default function Create() {
+export default function Update() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
 
-  const [countries, setCountries] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
-    iso_2: "",
-    iso_3: "",
-    form_code: "",
+    iso2: "",
+    iso3: "",
+    phonecode: "",
     currency: "",
-    currency_name: "",
-    currency_symbol: "",
+    currencyName: "",
+    currencySymbol: "",
     nationality: "",
     status: "active",
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,146 +38,215 @@ export default function Create() {
   const validate = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Country name is required.";
-    if (!formData.iso_2.trim()) newErrors.iso_2 = "ISO 2 code is required.";
-    if (!formData.iso_3.trim()) newErrors.iso_3 = "ISO 3 code is required.";
+    if (!formData.iso2.trim()) newErrors.iso2 = "ISO 2 code is required.";
+    if (!formData.iso3.trim()) newErrors.iso3 = "ISO 3 code is required.";
     if (!formData.currency.trim()) newErrors.currency = "Currency is required.";
-    if (!formData.currency_name.trim()) newErrors.currency_name = "Currency name is required.";
-    if (!formData.currency_symbol.trim()) newErrors.currency_symbol = "Currency symbol is required.";
+    if (!formData.currencyName.trim()) newErrors.currencyName = "Currency name is required.";
+    if (!formData.currencySymbol.trim()) newErrors.currencySymbol = "Currency symbol is required.";
     if (!formData.nationality.trim()) newErrors.nationality = "Nationality is required.";
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+  const fetchcountry = useCallback(async () => {
+    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+
+    if (adminData?.project?.active_panel !== "admin") {
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
       return;
     }
 
-    setCountries([...countries, formData]);
-    setFormData({
-      name: "",
-      iso_2: "",
-      iso_3: "",
-      form_code: "",
-      currency: "",
-      currency_name: "",
-      currency_symbol: "",
-      nationality: "",
-      status: "active",
-    });
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${admintoken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Session Expired",
+          text: errorMessage.message || "Your session has expired. Please log in again.",
+        });
+        throw new Error(errorMessage.message);
+      }
+
+      const result = await response.json();
+      const country = result?.country || {};
+
+      setFormData({
+        name: country.name || "",
+        iso2: country.iso2 || "",
+        iso3: country.iso3 || "",
+        phonecode: country.phonecode || "",
+        currency: country.currency || "",
+        currencyName: country.currencyName || "",
+        currencySymbol: country.currencySymbol || "",
+        nationality: country.nationality || "",
+        status: country.status || "active",
+      });
+    } catch (error) {
+      console.error("Error fetching country:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [router, id]);
+
+  useEffect(() => {
+    fetchcountry();
+  }, [fetchcountry]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    if (adminData?.project?.active_panel !== "admin") {
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    const token = adminData?.security?.token;
+    if (!token) {
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setLoading(false);
+      return;
+    }
+
     setErrors({});
+
+    try {
+      Swal.fire({
+        title: 'Updating Country...',
+        text: 'Please wait while we save your country.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const url = `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}`;
+      const form = new FormData();
+      for (const key in formData) {
+        if (formData[key]) {
+          form.append(key, formData[key]);
+        }
+      }
+
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: form,
+      });
+
+      if (!response.ok) {
+        Swal.close();
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: errorMessage.message || "An error occurred",
+        });
+        throw new Error(errorMessage.message || "Update failed");
+      }
+
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Country Updated",
+        text: `The country has been updated successfully!`,
+        showConfirmButton: true,
+      }).then((res) => {
+        if (res.isConfirmed) {
+          setFormData({
+            name: "",
+            iso2: "",
+            iso3: "",
+            phonecode: "",
+            currency: "",
+            currencyName: "",
+            currencySymbol: "",
+            nationality: "",
+            status: "active",
+          });
+          router.push("/admin/country/list");
+        }
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Submission Error",
+        text: error.message || "Something went wrong. Please try again.",
+      });
+      setErrors({ general: error.message || "Submission failed." });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <HashLoader size={60} color="#F97316" loading={true} />
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 lg:w-10/12 space-y-6">
       <h2 className="text-2xl font-semibold">Country Management</h2>
       <form onSubmit={handleSubmit} className="p-4 rounded-md bg-white shadow space-y-4">
         <div className="grid grid-cols-2 gap-4">
-
-          <div>
-            <label className="block font-medium">Country Name <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Country Name"
-              className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-            />
-            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-          </div>
-
-          <div>
-            <label className="block font-medium">ISO 2 Code <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              name="iso_2"
-              value={formData.iso_2}
-              onChange={handleChange}
-              placeholder="ISO 2 Code"
-              className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-            />
-            {errors.iso_2 && <p className="text-red-500 text-sm">{errors.iso_2}</p>}
-          </div>
-
-          <div>
-            <label className="block font-medium">ISO 3 Code <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              name="iso_3"
-              value={formData.iso_3}
-              onChange={handleChange}
-              placeholder="ISO 3 Code"
-              className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-            />
-            {errors.iso_3 && <p className="text-red-500 text-sm">{errors.iso_3}</p>}
-          </div>
-
-          <div>
-            <label className="block font-medium">Form Code</label>
-            <input
-              type="text"
-              name="form_code"
-              value={formData.form_code}
-              onChange={handleChange}
-              placeholder="Form Code"
-              className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="block font-medium">Currency <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              name="currency"
-              value={formData.currency}
-              onChange={handleChange}
-              placeholder="Currency"
-              className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-            />
-            {errors.currency && <p className="text-red-500 text-sm">{errors.currency}</p>}
-          </div>
-
-          <div>
-            <label className="block font-medium">Currency Name <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              name="currency_name"
-              value={formData.currency_name}
-              onChange={handleChange}
-              placeholder="Currency Name"
-              className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-            />
-            {errors.currency_name && <p className="text-red-500 text-sm">{errors.currency_name}</p>}
-          </div>
-
-          <div>
-            <label className="block font-medium">Currency Symbol <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              name="currency_symbol"
-              value={formData.currency_symbol}
-              onChange={handleChange}
-              placeholder="Currency Symbol"
-              className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-            />
-            {errors.currency_symbol && <p className="text-red-500 text-sm">{errors.currency_symbol}</p>}
-          </div>
-
-          <div>
-            <label className="block font-medium">Nationality <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              name="nationality"
-              value={formData.nationality}
-              onChange={handleChange}
-              placeholder="Nationality"
-              className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-            />
-            {errors.nationality && <p className="text-red-500 text-sm">{errors.nationality}</p>}
-          </div>
+          {[
+            { label: "Country Name", name: "name", required: true },
+            { label: "ISO 2 Code", name: "iso2", required: true },
+            { label: "ISO 3 Code", name: "iso3", required: true },
+            { label: "Phone Code", name: "phonecode" },
+            { label: "Currency", name: "currency", required: true },
+            { label: "Currency Name", name: "currencyName", required: true },
+            { label: "Currency Symbol", name: "currencySymbol", required: true },
+            { label: "Nationality", name: "nationality", required: true },
+          ].map(({ label, name, required }) => (
+            <div key={name}>
+              <label className="block font-medium">
+                {label} {required && <span className="text-red-500">*</span>}
+              </label>
+              <input
+                type="text"
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                placeholder={label}
+                className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
+              />
+              {errors[name] && <p className="text-red-500 text-sm">{errors[name]}</p>}
+            </div>
+          ))}
         </div>
 
         <div>
@@ -189,9 +262,11 @@ export default function Create() {
           </select>
         </div>
 
+        {errors.general && <p className="text-red-500 text-sm mt-2">{errors.general}</p>}
+
         <div className="flex flex-wrap gap-3 mt-5">
           <button type="submit" className="bg-orange-500 text-white px-6 rounded-md p-3">
-            Save
+            Update
           </button>
           <button type="button" className="bg-gray-500 text-white px-6 rounded-md p-3" onClick={() => router.back()}>
             Cancel

@@ -1,37 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useEffect } from 'react';
+import { ProductContext } from './ProductContext';
 
 export default function ProductDetails() {
-  const [formData, setFormData] = useState({
-    category: '',
-    name: '',
-    sku: '',
-    description: '',
-    tags: '',
-    brand: '',
-    country: '',
-    shipping: '',
-    videoUrl: '',
-    listAs: 'both',
-  });
+const {fetchCountry,formData,setFormData,countryData,fetchCategory,categoryData,brandData,fetchBrand} = useContext(ProductContext)
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  useEffect(()=>{
+    fetchCategory();
+    fetchBrand();
+    fetchCountry();
+  },[fetchCategory,fetchBrand,fetchCountry]);
+    
   return (
     <div className="mt-4 lg:p-6 p-3  rounded-2xl bg-white">
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4">
         <div>
-          <label className="block   text-[#232323] font-semibold">Product Category</label>
+          <label className="block text-[#232323] font-semibold">Product Category</label>
           <select
             name="category"
             className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
             onChange={handleChange}
           >
-            <option>Category</option>
+            {categoryData.map((item,index)=>{
+              return(
+                <>
+                <option key={index} value={item.id}>{item.name}</option>
+                
+                </>
+              )
+            })}
           </select>
         </div>
         <div>
@@ -79,42 +81,69 @@ export default function ProductDetails() {
         </div>
         <div>
           <label className="block   text-[#232323] font-semibold">Brand *</label>
-          <input
-            type="text"
+          <select
             name="brand"
             className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
             placeholder="Brand"
             onChange={handleChange}
-          />
+          >
+            {brandData.map((item,index)=>{
+              return(
+                <>
+                <option key={index} value={item.id}>{item.name}</option>
+                
+                </>
+              )
+            })}
+            </select>
         </div>
         <div>
-          <label className="block   text-[#232323] font-semibold">Country Of Origin *</label>
-          <input
-            type="text"
-            name="country"
+        <label className="block   text-[#232323] font-semibold">Country Of Origin *</label>
+
+        <select
+            name="origin_country"
             className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
-            placeholder="San Jose"
             onChange={handleChange}
-          />
+            value={formData.origin_country}
+          >
+            {countryData?.map((item,index)=>{
+              return(
+                <>
+                <option key={item.id} value={item.id}>{item.name}</option>
+                
+                </>
+              )
+            })}
+          </select>
+        
         </div>
       </div>
 
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4 mt-4">
         <div>
           <label className="block   text-[#232323] font-semibold">Shipping Country *</label>
-          <input
-            type="text"
-            name="shipping"
+         
+        <select
+            name="shipping_country"
             className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
-            placeholder="San Jose, California, USA"
             onChange={handleChange}
-          />
+            value={formData.shipping_country}
+          >
+            {countryData?.map((item,index)=>{
+              return(
+                <>
+                <option key={index} value={item.id}>{item.name}</option>
+                
+                </>
+              )
+            })}
+          </select>
         </div>
         <div>
           <label className="block   text-[#232323] font-semibold">Product Video URL (*Only Upload mp4,mov url only)</label>
           <input
             type="text"
-            name="videoUrl"
+            name="video_url"
             className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
             placeholder="USA"
             onChange={handleChange}
@@ -124,13 +153,13 @@ export default function ProductDetails() {
           <label className="block   text-[#232323] font-semibold">List As</label>
           <div className="flex flex-wrap gap-4 mt-2">
             <label className="flex items-center gap-2">
-              <input type="radio" name="listAs" value="warehouse" onChange={handleChange} /> Warehouse Model
+              <input type="radio" name="list_as" value="warehouse" onChange={handleChange} /> Warehouse Model
             </label>
             <label className="flex items-center gap-2">
-              <input type="radio" name="listAs" value="rto" onChange={handleChange} /> RTO Model
+              <input type="radio" name="list_as" value="rto" onChange={handleChange} /> RTO Model
             </label>
             <label className="flex items-center gap-2">
-              <input type="radio" name="listAs" value="both" defaultChecked onChange={handleChange} /> Both
+              <input type="radio" name="list_as" value="both" defaultChecked onChange={handleChange} /> Both
             </label>
           </div>
         </div>
