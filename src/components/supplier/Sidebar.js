@@ -29,18 +29,18 @@ export default function Sidebar() {
 
     const menuItems = [
         { name: "Dashboard", icon: Home, href: "/supplier" },
-        { name: "Product", icon: ShoppingCart, href: "/supplier/product" },
-        { name: "New Product Request", icon: Package, href: "/supplier/new-product-request" },
-        { name: "Orders", icon: ClipboardList, href: "/supplier/orders" },
+        { name: "Product (in development)", icon: ShoppingCart, href: "/supplier/product" },
+        { name: "New Product Request (In progress)", icon: Package, href: "/supplier/new-product-request" },
+        { name: "Orders (In progress)", icon: ClipboardList, href: "/supplier/orders" },
         { name: "Warehouse", icon: Warehouse, href: "/supplier/warehouse" },
         { name: "Category Management", icon: BiSolidCategory, href: "/supplier/category/list" },
         { name: "Brand Management", icon: TbBrandBinance, href: "/supplier/brand/list" },
-        { name: "RTO Orders", icon: Package, href: "/supplier/rto-orders" },
-        { name: "Profile", icon: User, href: "/supplier/profile" },
-        { name: "Settings", icon: Settings, href: "/supplier/settings" },
-        { name: "Billings", icon: FileText, href: "/supplier/billings" },
-        { name: "Payment", icon: CreditCard, href: "/supplier/payment" },
-        { name: "Terms & Condition", icon: BadgeDollarSign, href: "/supplier/terms" },
+        { name: "RTO Orders (In progress)", icon: Package, href: "/supplier/rto-orders" },
+        { name: "Profile (In progress)", icon: User, href: "/supplier/profile" },
+        { name: "Settings (In progress)", icon: Settings, href: "/supplier/settings" },
+        { name: "Billings (In progress)", icon: FileText, href: "/supplier/billings" },
+        { name: "Payment (In progress)", icon: CreditCard, href: "/supplier/payment" },
+        { name: "Terms & Condition (In progress)", icon: BadgeDollarSign, href: "/supplier/terms" },
     ];
 
 

@@ -1,16 +1,19 @@
-"use client"
+"use client";
+import { useRouter } from "next/navigation";
+
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
 import { MdModeEdit } from "react-icons/md";
 import Link from "next/link";
-import { FaCheck } from "react-icons/fa"; 
+import { FaCheck } from "react-icons/fa";
 import Image from "next/image";
-import productimage from '@/app/images/product1.png'
-import productimage2 from '@/app/images/product2.png'
-import productimage3 from '@/app/images/product3.png'
-import productimage4 from '@/app/images/product4.png'
-import productimage5 from '@/app/images/product5.png'
+import { useSupplier } from "../middleware/SupplierMiddleWareContext";
+import productimage from "@/app/images/product1.png";
+import productimage2 from "@/app/images/product2.png";
+import productimage3 from "@/app/images/product3.png";
+import productimage4 from "@/app/images/product4.png";
+import productimage5 from "@/app/images/product5.png";
 const ProductTable = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [showRtoLiveCount, setShowRtoLiveCount] = useState(false);
@@ -27,7 +30,7 @@ const ProductTable = () => {
             rtoStatus: "Free",
             adminStatus: "rejected",
             status: false,
-            model: 'Warehouse',
+            model: "Warehouse",
             productImage: productimage,
         },
         {
@@ -42,8 +45,8 @@ const ProductTable = () => {
             status: false,
             adminStatus: "rejected",
             rtoStatus: "Include RTO",
-            model: 'RTO',
-            productImage: productimage2
+            model: "RTO",
+            productImage: productimage2,
         },
         {
             id: 3,
@@ -57,7 +60,7 @@ const ProductTable = () => {
             status: true,
             adminStatus: "Pending",
             rtoStatus: "Free",
-            model: 'RTO',
+            model: "RTO",
             productImage: productimage3,
         },
         {
@@ -72,7 +75,7 @@ const ProductTable = () => {
             status: false,
             adminStatus: "Pending",
             rtoStatus: "Include RTO",
-            model: 'Warehouse',
+            model: "Warehouse",
             productImage: productimage4,
         },
         {
@@ -87,21 +90,384 @@ const ProductTable = () => {
             status: true,
             adminStatus: "Pending",
             rtoStatus: "Free",
-            model: 'Warehouse',
+            model: "Warehouse",
             productImage: productimage5,
         },
     ];
+    const [products, setProducts] = useState([]);
+    const { verifySupplierAuth } = useSupplier();
+    const [isTrashed, setIsTrashed] = useState(false);
+    const router = useRouter();
+    const [loading, setLoading] = useState(true);
+
+    const fetchProduct = useCallback(async () => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${suppliertoken}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Session Expired",
+                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+                });
+                throw new Error(errorMessage.message || errorMessage.error || "Session expired");
+            }
+
+            const result = await response.json();
+            if (result) {
+                setProducts(result?.product || []);
+            }
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, setProducts]);
+
+    const trashProducts = useCallback(async () => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${suppliertoken}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Session Expired",
+                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+                });
+                throw new Error(errorMessage.message || errorMessage.error || "Session expired");
+            }
+
+            const result = await response.json();
+            if (result) {
+                setProducts(result?.categories || []);
+            }
+        } catch (error) {
+            console.error("Error fetching trashed categories:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, setProducts]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsTrashed(false);
+            setLoading(true);
+            await verifySupplierAuth();
+            await fetchProduct();
+            setLoading(false);
+        };
+        fetchData();
+    }, [fetchProduct, verifySupplierAuth]);
+
+    useEffect(() => {
+        if (typeof window !== "undefined" && products.length > 0 && !loading) {
+            let table = null;
+
+            Promise.all([import("jquery"), import("datatables.net"), import("datatables.net-dt"), import("datatables.net-buttons"), import("datatables.net-buttons-dt")])
+                .then(([jQuery]) => {
+                    window.jQuery = window.$ = jQuery.default;
+
+                    // Destroy existing DataTable if it exists
+                    if ($.fn.DataTable.isDataTable("#productTable")) {
+                        $("#productTable").DataTable().destroy();
+                        $("#productTable").empty();
+                    }
+
+                    // Reinitialize DataTable with new data
+                    table = $("#productTable").DataTable();
+
+                    return () => {
+                        if (table) {
+                            table.destroy();
+                            $("#productTable").empty();
+                        }
+                    };
+                })
+                .catch((error) => {
+                    console.error("Failed to load DataTables dependencies:", error);
+                });
+        }
+    }, [products, loading]);
+
+
+
+    const handleDelete = async (item) => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        const confirmResult = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        try {
+            Swal.fire({
+                title: "Deleting...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            setLoading(true);
+
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${suppliertoken}`,
+                    },
+                }
+            );
+
+            Swal.close();
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
+                });
+                setLoading(false);
+                return;
+            }
+
+            const result = await response.json();
+
+            Swal.fire({
+                icon: "success",
+                title: "Trash!",
+                text: result.message || `${item.name} has been Trashed successfully.`,
+            });
+
+            await fetchProduct();
+        } catch (error) {
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handlePermanentDelete = async (item) => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        const confirmResult = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        try {
+            Swal.fire({
+                title: "Deleting...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            setLoading(true);
+
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/category/${item.id}/destroy`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${suppliertoken}`,
+                    },
+                }
+            );
+
+            Swal.close();
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
+                });
+                setLoading(false);
+                return;
+            }
+
+            const result = await response.json();
+
+            Swal.fire({
+                icon: "success",
+                title: "Deleted!",
+                text: result.message || `${item.name} has been deleted successfully.`,
+            });
+
+            await trashProducts();
+        } catch (error) {
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+     const handleRestore = useCallback(async (item) => {
+            const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+    
+            if (supplierData?.project?.active_panel !== "supplier") {
+                localStorage.removeItem("shippingData");
+                router.push("/supplier/auth/login");
+                return;
+            }
+    
+            const suppliertoken = supplierData?.security?.token;
+            if (!suppliertoken) {
+                router.push("/supplier/auth/login");
+                return;
+            }
+    
+            try {
+                setLoading(true);
+                const response = await fetch(
+                    `https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
+                    {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${suppliertoken}`,
+                        },
+                    }
+                );
+    
+                if (!response.ok) {
+                    const errorMessage = await response.json();
+                    Swal.fire({
+                        icon: "error",
+                        title: "Session Expired",
+                        text:
+                            errorMessage.error ||
+                            errorMessage.message ||
+                            "Your session has expired. Please log in again.",
+                    });
+                    throw new Error(
+                        errorMessage.message || errorMessage.error || "Session expired"
+                    );
+                }
+    
+                const result = await response.json();
+                if (result.status) {
+                    Swal.fire({
+                        icon: "success",
+                        title: `${item.name} Has Been Restored Successfully !`,
+                        text: result.message,
+                    });
+                    await trashProducts();
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            } finally {
+                setLoading(false);
+            }
+    }, [router, trashProducts]);
+    
     const [selected, setSelected] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(5);
     const [selectedMonth, setSelectedMonth] = useState(() => {
         const today = new Date();
-        return today.toISOString().slice(0, 7); 
+        return today.toISOString().slice(0, 7);
     });
     const handleCheckboxChange = (id) => {
-        setSelected((prev) =>
-            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-        );
+        setSelected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
     };
     const totalPages = Math.ceil(data.length / perPage);
     const indexOfLast = currentPage * perPage;
@@ -111,58 +477,40 @@ const ProductTable = () => {
     return (
         <div className="">
             <div className="flex flex-wrap md:justify-end justify-items-center gap-2 mb-4">
-                <button className="bg-[#EE5D50] text-white px-4 py-2 rounded-lg text-sm">
-                    Details for approval
-                </button>
-                <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">
-                    Import Inventory
-                </button>
-                <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">
-                    Export
-                </button>
-                <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">
-                    Import
-                </button>
-                <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" >
+                <button className="bg-[#EE5D50] text-white px-4 py-2 rounded-lg text-sm">Details for approval</button>
+                <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">Import Inventory</button>
+                <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
+                <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>
+                <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
                     <Link href="/supplier/add-product">Add New</Link>
                 </button>
-                <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">
-                    Filters
-                </button>
+                <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">Filters</button>
             </div>
 
             <div className="flex flex-wrap justify-between gap-4 items-end">
                 <div className="w-full md:w-4/12">
-                    <label className="block text-sm font-medium text-gray-700">
-                        RTO Address *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700">RTO Address *</label>
                     <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm">
                         <option></option>
                     </select>
                 </div>
 
                 <div className="w-full md:w-3/12">
-                    <label className="block text-sm font-medium text-gray-700">
-                        Pickup Address *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700">Pickup Address *</label>
                     <select className="w-full mt-1 px-3 border-[#DFEAF2] bg-white py-3 border rounded-lg text-sm">
                         <option></option>
                     </select>
                 </div>
 
                 <div className="w-full md:w-3/12">
-                    <label className="block text-sm font-medium text-gray-700">
-                        Select Model
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700">Select Model</label>
                     <select className="w-full mt-1 px-3 py-3 border border-[#DFEAF2] bg-white rounded-lg text-sm">
                         <option></option>
                     </select>
                 </div>
 
                 <div className="flex justify-end md:w-1/12 items-end">
-                    <button className="bg-[#F98F5C] text-white px-6 py-3 rounded-lg text-sm">
-                        Save
-                    </button>
+                    <button className="bg-[#F98F5C] text-white px-6 py-3 rounded-lg text-sm">Save</button>
                 </div>
             </div>
             <div className="bg-white rounded-2xl mt-5 p-4">
@@ -170,51 +518,27 @@ const ProductTable = () => {
                     <h2 className="text-2xl font-bold text-[#2B3674]">Product Details</h2>
                     <div className="flex gap-3  flex-wrap items-center">
                         <label className="flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="sr-only"
-                                checked={showRtoLiveCount}
-                                onChange={() => setShowRtoLiveCount(!showRtoLiveCount)}
-                            />
-                            <div
-                                className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${showRtoLiveCount ? "bg-orange-500" : ""
-                                    }`}
-                            >
-                                <div
-                                    className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${showRtoLiveCount ? "translate-x-5" : ""
-                                        }`}
-                                ></div>
+                            <input type="checkbox" className="sr-only" checked={showRtoLiveCount} onChange={() => setShowRtoLiveCount(!showRtoLiveCount)} />
+                            <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${showRtoLiveCount ? "bg-orange-500" : ""}`}>
+                                <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${showRtoLiveCount ? "translate-x-5" : ""}`}></div>
                             </div>
-                            <span className="ml-2 text-sm text-gray-600">
-                                Show RTO Live Count
-                            </span>
+                            <span className="ml-2 text-sm text-gray-600">Show RTO Live Count</span>
                         </label>
-                        {selected < 1 && (
-                            <span className="font-semibold text-[#2B3674]">Total: {data.length} Products</span>
-                        )}
+                        {selected < 1 && <span className="font-semibold text-[#2B3674]">Total: {data.length} Products</span>}
                         {selected.length > 0 && (
-
-                            <h5 className="font-semibold text-[#2B3674] bg-[#DFE9FF] p-3 flex rounded-md gap-7">{selected.length} Products Selected <span className="text-[#EE5D50] cursor-pointer " onClick={() => setSelected([])}>Clear</span></h5>
-                        )
-
-                        }
-
-
+                            <h5 className="font-semibold text-[#2B3674] bg-[#DFE9FF] p-3 flex rounded-md gap-7">
+                                {selected.length} Products Selected{" "}
+                                <span className="text-[#EE5D50] cursor-pointer " onClick={() => setSelected([])}>
+                                    Clear
+                                </span>
+                            </h5>
+                        )}
 
                         <button className="bg-[#F4F7FE] rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
-
                             {/* Month Input */}
-                            <input
-                                type="month"
-                                value={selectedMonth}
-                                onChange={(e) => setSelectedMonth(e.target.value)}
-                                className="outline-0"
-                            />
+                            <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="outline-0" />
                         </button>
-                        <button
-                            onClick={() => setIsPopupOpen((prev) => !prev)}
-                            className="bg-[#F4F7FE] p-2 rounded-lg relative"
-                        >
+                        <button onClick={() => setIsPopupOpen((prev) => !prev)} className="bg-[#F4F7FE] p-2 rounded-lg relative">
                             <MoreHorizontal className="text-[#F98F5C]" />
                             {isPopupOpen && (
                                 <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
@@ -234,132 +558,130 @@ const ProductTable = () => {
                     <table className="md:w-full w-auto">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">NAME<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">SKU<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-red-500">Suggested Price<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Shipwoll Cost Price<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Quantity<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                    NAME<i></i>
+                                </th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                    SKU<i></i>
+                                </th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-red-500">
+                                    Suggested Price<i></i>
+                                </th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                    Shipwoll Cost Price<i></i>
+                                </th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                    Quantity<i></i>
+                                </th>
                                 {showRtoLiveCount && (
-                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">Live RTO Stock<i></i></th>
+                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">
+                                        Live RTO Stock<i></i>
+                                    </th>
                                 )}
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Order Auto Accept<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Status<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Admin Status<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                    Order Auto Accept<i></i>
+                                </th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                    Status<i></i>
+                                </th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                    Admin Status<i></i>
+                                </th>
                                 {!showRtoLiveCount && (
-                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Model<i></i></th>
+                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                        Model<i></i>
+                                    </th>
                                 )}
                                 {showRtoLiveCount && (
-                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">RTO Status<i></i></th>
+                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                        RTO Status<i></i>
+                                    </th>
                                 )}
 
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Action<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                    Action<i></i>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {currentData.map((item) => (
                                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                    <td className="p-2 px-5 whitespace-nowrap"> <div className="flex items-center">
-                                        <label className="flex items-center cursor-pointer me-2">
-                                            <input
-                                                type="checkbox"
-                                                checked={selected.includes(item.id)}
-                                                onChange={() => handleCheckboxChange(item.id)}
-                                                className="peer hidden"
-                                            />
-                                            <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                      peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                                <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                            </div>
-                                        </label>
+                                    <td className="p-2 px-5 whitespace-nowrap">
+                                        {" "}
+                                        <div className="flex items-center">
+                                            <label className="flex items-center cursor-pointer me-2">
+                                                <input type="checkbox" checked={selected.includes(item.id)} onChange={() => handleCheckboxChange(item.id)} className="peer hidden" />
+                                                <div
+                                                    className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                                                      peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white"
+                                                >
+                                                    <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                                </div>
+                                            </label>
 
-                                        <Image src={item.productImage} alt={item.name} className="h-8 w-8 me-3" />
-                                        <span className="truncate"> {item.name}</span>
-                                    </div></td>
+                                            <Image src={item.productImage} alt={item.name} className="h-8 w-8 me-3" />
+                                            <span className="truncate"> {item.name}</span>
+                                        </div>
+                                    </td>
                                     <td className="p-2 px-5 whitespace-nowrap">{item.sku}</td>
                                     <td className="p-2 px-5 whitespace-nowrap text-red-500">{item.suggestedPrice}</td>
                                     <td className="p-2 px-5 whitespace-nowrap">{item.costPrice}</td>
                                     <td className="p-2 px-5 whitespace-nowrap">{item.quantity}</td>
-                                    {showRtoLiveCount && (
-                                        <td className="p-2 px-5 whitespace-nowrap text-blue-500">{item.liveRtoStock}</td>
-                                    )}
+                                    {showRtoLiveCount && <td className="p-2 px-5 whitespace-nowrap text-blue-500">{item.liveRtoStock}</td>}
                                     <td className="p-2 px-5 whitespace-nowrap">
                                         <div className="flex items-center mb-4">
                                             <label className="flex items-center cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    className="sr-only"
-                                                    checked={item.autoAccept}
-                                                    readOnly
-                                                />
-                                                <div
-                                                    className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.autoAccept ? "bg-orange-500" : ""
-                                                        }`}
-                                                >
-                                                    <div
-                                                        className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.autoAccept ? "translate-x-5" : ""
-                                                            }`}
-                                                    ></div>
+                                                <input type="checkbox" className="sr-only" checked={item.autoAccept} readOnly />
+                                                <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.autoAccept ? "bg-orange-500" : ""}`}>
+                                                    <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.autoAccept ? "translate-x-5" : ""}`}></div>
                                                 </div>
-
                                             </label>
                                         </div>
                                     </td>
                                     <td className="p-2 px-5 whitespace-nowrap">
                                         <div className="flex items-center mb-4">
                                             <label className="flex items-center cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    className="sr-only"
-                                                    checked={item.status}
-                                                    readOnly
-                                                />
-                                                <div
-                                                    className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.status ? "bg-orange-500" : ""
-                                                        }`}
-                                                >
-                                                    <div
-                                                        className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.status ? "translate-x-5" : ""
-                                                            }`}
-                                                    ></div>
+                                                <input type="checkbox" className="sr-only" checked={item.status} readOnly />
+                                                <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.status ? "bg-orange-500" : ""}`}>
+                                                    <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.status ? "translate-x-5" : ""}`}></div>
                                                 </div>
-
                                             </label>
                                         </div>
                                     </td>
                                     <td className="p-2 px-5 whitespace-nowrap">
                                         <button
                                             className={` py-2 text-white rounded-md text-sm p-3 uppercase  min-w-[95px]
-    ${item.adminStatus === "Done" ? "bg-green-500" :
-                                                    item.adminStatus === "Pending" ? "bg-[#FFB547]" :
-                                                        "bg-red-500"}`}
+    ${item.adminStatus === "Done" ? "bg-green-500" : item.adminStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
                                         >
                                             {item.adminStatus}
                                         </button>
-
                                     </td>
                                     {!showRtoLiveCount && (
                                         <td className="p-2 px-5 whitespace-nowrap">
                                             <button
                                                 className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px] 
-    ${item.model === "Warehouse" ? "bg-[#01B574]" :
-                                                        "bg-[#5CA4F9]"}`}
+    ${item.model === "Warehouse" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
                                             >
                                                 {item.model}
                                             </button>
-
                                         </td>
                                     )}
                                     {showRtoLiveCount && (
-                                        <td className="p-2 px-5 whitespace-nowrap"> <button
-                                            className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
-    ${item.rtoStatus === "Free" ? "bg-green-500" :
-                                                    item.rtoStatus === "Pending" ? "bg-[#FFB547]" :
-                                                        "bg-red-500"}`}
-                                        >
-                                            {item.rtoStatus}
-                                        </button></td>
+                                        <td className="p-2 px-5 whitespace-nowrap">
+                                            {" "}
+                                            <button
+                                                className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
+    ${item.rtoStatus === "Free" ? "bg-green-500" : item.rtoStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
+                                            >
+                                                {item.rtoStatus}
+                                            </button>
+                                        </td>
                                     )}
-                                    <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]"><div className="flex justify-center"><MdModeEdit className="text-center" /></div></td>
+                                    <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]">
+                                        <div className="flex justify-center">
+                                            <MdModeEdit className="text-center" />
+                                        </div>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -368,20 +690,11 @@ const ProductTable = () => {
 
                 <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
                     <div className="flex gap-1 items-center">
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
+                        <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50">
                             <MdKeyboardArrowLeft /> Previous
                         </button>
                         {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentPage(index + 1)}
-                                className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
-                                    }`}
-                            >
+                            <button key={index} onClick={() => setCurrentPage(index + 1)} className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""}`}>
                                 {index + 1}
                             </button>
                         ))}
@@ -395,11 +708,7 @@ const ProductTable = () => {
                     </div>
 
                     {/* Per Page Selection */}
-                    <select
-                        value={perPage}
-                        onChange={(e) => setPerPage(Number(e.target.value))}
-                        className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
-                    >
+                    <select value={perPage} onChange={(e) => setPerPage(Number(e.target.value))} className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold">
                         {[5, 10, 15].map((num) => (
                             <option key={num} value={num}>
                                 {num} /Per Page

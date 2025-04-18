@@ -60,64 +60,6 @@ const ProductProvider = ({ children }) => {
     pickup_address: '',
   });
 
-
-  const validateFormData = () => {
-    const requiredFields = {
-      category: 'Category',
-      name: 'Product Name',
-      main_sku: 'Main SKU',
-      description: 'Description',
-      brands: 'Brand',
-      origin_country: 'Origin Country',
-      shipping_country: 'Shipping Country',
-      list_as: 'List As',
-      Shipping_time: 'Shipping Time',
-      weight: 'Weight',
-      package_length: 'Package Length',
-      package_width: 'Package Width',
-      package_height: 'Package Height',
-      chargable_weight: 'Chargable Weight',
-      upc: 'UPC',
-      ean: 'EAN',
-      hsn_code: 'HSN Code',
-      tax_rate: 'Tax Rate',
-      rto_address: 'RTO Address',
-      pickup_address: 'Pickup Address',
-    };
-  
-    for (const [key, label] of Object.entries(requiredFields)) {
-      if (!formData[key] || formData[key].toString().trim() === '') {
-        return {
-          isValid: false,
-          message: `${label} is required.`,
-        };
-      }
-    }
-  
-    // Validate at least one variant exists and is complete
-    if (!Array.isArray(formData.variants) || formData.variants.length === 0) {
-      return {
-        isValid: false,
-        message: 'At least one product variant is required.',
-      };
-    }
-  
-    for (let i = 0; i < formData.variants.length; i++) {
-      const variant = formData.variants[i];
-      const requiredVariantFields = ['color', 'sku', 'qty', 'currency', 'article_id', 'suggested_price', 'shipowl_price', 'rto_suggested_price', 'rto_price'];
-      for (const field of requiredVariantFields) {
-        if (!variant[field] || variant[field].toString().trim() === '') {
-          return {
-            isValid: false,
-            message: `Variant ${i + 1}: ${field.replace(/_/g, ' ')} is required.`,
-          };
-        }
-      }
-    }
-  
-    return { isValid: true };
-  };
-  
   const fetchCategory = useCallback(async () => {
     const supplierData = JSON.parse(localStorage.getItem('shippingData'));
 

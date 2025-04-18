@@ -89,14 +89,14 @@ export default function Create() {
             const form = new FormData();
             form.append('name', formData.name);
             form.append('description', formData.description);
-            form.append('status', formData.status);
+            form.append('status', formData.status || true);
             if (files.length > 0) {
                 files.forEach((file, index) => {
                     form.append('image', file); // use 'images[]' if backend expects an array
                 });
             }
 
-            const url ="https://shipping-owl-vd4s.vercel.app/api/category";
+            const url ="https://sleeping-owl-we0m.onrender.com/api/category";
 
             const response = await fetch(url, {
                 method: "POST",

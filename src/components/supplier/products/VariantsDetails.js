@@ -192,7 +192,6 @@ export default function VariantDetails() {
             />
           </div>
 
-          {/* Article Id */}
           <div>
             <span className="text-orange-500 font-semibold whitespace-nowrap lg:hidden block">Article Id</span>
             <input

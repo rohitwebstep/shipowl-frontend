@@ -71,7 +71,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/warehouse/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/category/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -92,18 +92,12 @@ export default function Update() {
             }
 
             const result = await response.json();
-            const warehouse = result?.warehouse || {};
+            const warehouse = result?.categories || {};
 
             setFormData({
                 name: warehouse.name || '',
-                gst_number: warehouse.gst_number || '',
-                contact_name: warehouse.contact_name || '',
-                contact_number: warehouse.contact_number || '',
-                address_line_1: warehouse.address_line_1 || '',
-                address_line_2: warehouse.address_line_2 || '',
-                city: warehouse.city || '',
-                state: warehouse.state || '',
-                postal_code: warehouse.postal_code || ''
+                description: warehouse.description ||'',
+                status: warehouse.status || true,
             });
         } catch (error) {
             console.error("Error fetching warehouse:", error);
@@ -152,7 +146,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://shipping-owl-vd4s.vercel.app/api/warehouse${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/warehouse${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {
@@ -344,7 +338,7 @@ export default function Update() {
                                         type="checkbox"
                                         name='status'
                                         className="sr-only"
-                                        checked={formData.status}
+                                        checked={formData.status }
                                         onChange={handleChange}
                                     />
                                     <div

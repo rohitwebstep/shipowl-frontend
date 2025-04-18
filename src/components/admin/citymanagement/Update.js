@@ -5,14 +5,20 @@ import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import { HashLoader } from 'react-spinners'
 import { useAdmin } from '../middleware/AdminMiddleWareContext'
+import Select from 'react-select';
 
 export default function Update() {
+    const [countryData,setCountryData] = useState([])
+    const [stateData,setStateData] = useState([])
     const [formData, setFormData] = useState({
             name: "",
-            state_id: "",
-            country_id: "",
+            state: "",
+            country: "",
           });
-
+          const countryOptions = countryData?.map((item) => ({
+            value: item.id || item._id,
+            label: item.name,
+          }));
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
     const [validationErrors, setValidationErrors] = useState({});
@@ -29,8 +35,8 @@ export default function Update() {
     const validate = () => {
         const errors = {};
         if (!formData.name.trim()) errors.name = ' name is required.';
-        if (!formData.state_id.trim()) errors.gst_number = 'State Id is required.';
-        if (!formData.country_id.trim()) errors.contact_name = 'Country Id is required.';
+        if (!formData.state.trim()) errors.gst_number = 'State Id is required.';
+        if (!formData.country.trim()) errors.contact_name = 'Country Id is required.';
         return errors;
     };
 
@@ -42,17 +48,17 @@ export default function Update() {
         }));
     };
 
-    const fetchwarehouse = useCallback(async () => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+    const fetchCity = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
@@ -60,12 +66,12 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/warehouse/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`,
                 {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -81,36 +87,40 @@ export default function Update() {
             }
 
             const result = await response.json();
+            const countryData = result?.countries || {};
+            const stateData = result?.states || {};
             const cityData = result?.city || {};
 
             setFormData({
                 name:cityData?.name || "",
-                state_id:cityData?.state_id || "",
-                country_id:cityData?.country_id|| "",
+                state:cityData?.stateId || "",
+                country:cityData?.countryId|| "",
               });
+              setCountryData(countryData)
+              setStateData(stateData)
         } catch (error) {
-            console.error("Error fetching warehouse:", error);
+            console.error("Error fetching city:", error);
         } finally {
             setLoading(false);
         }
     }, [router, id]);
 
     useEffect(() => {
-        fetchwarehouse();
-    }, [fetchwarehouse]);
+        fetchCity();
+    }, [fetchCity]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        if (supplierData?.project?.active_panel !== "supplier") {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.clear("shippingData");
             router.push("/admin/auth/login");
             return;
         }
 
-        const token = supplierData?.security?.token;
+        const token = adminData?.security?.token;
         if (!token) {
             router.push("/admin/auth/login");
             return;
@@ -127,15 +137,15 @@ export default function Update() {
 
         try {
             Swal.fire({
-                title: 'Updating Warehouse...',
-                text: 'Please wait while we save your warehouse.',
+                title: 'Updating city...',
+                text: 'Please wait while we save your city.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
-            const url = `https://shipping-owl-vd4s.vercel.app/api/warehouse/${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {
@@ -165,17 +175,17 @@ export default function Update() {
             Swal.close();
             Swal.fire({
                 icon: "success",
-                title: "Warehouse Updated",
-                text: `The warehouse has been updated successfully!`,
+                title: "city Updated",
+                text: `The city has been updated successfully!`,
                 showConfirmButton: true,
             }).then((res) => {
                 if (res.isConfirmed) {
                     setFormData({
                         name: '',
-                        state_id: '',
-                        country_id: '',
+                        state: '',
+                        countryId: '',
                     });
-                    router.push("/supplier/warehouse");
+                    router.push("/admin/city/list");
                 }
             });
         } catch (error) {
@@ -201,30 +211,30 @@ export default function Update() {
     }
 
     return (
-        <section className="add-warehouse xl:w-8/12">
+        <section className="add-city xl:w-8/12">
               <form onSubmit={handleSubmit} className="p-4 rounded-md bg-white shadow">
               <div>
             <label className="font-bold block text-[#232323]">Country</label>
             <Select
-              name="countryId"
-              value={countryOptions.find((option) => option.value === formData.countryId)}
+              name="country"
+              value={countryOptions.find((option) => option.value === formData.country)}
               onChange={(selectedOption) =>
-                handleChange({ target: { name: 'countryId', value: selectedOption?.value } })
+                handleChange({ target: { name: 'country', value: selectedOption?.value } })
               }
               options={countryOptions}
               placeholder="Select a country"
               className="mt-1"
               classNamePrefix="react-select"
             />
-            {validationErrors.countryId && (
-              <p className="text-red-500 text-sm mt-1">{validationErrors.countryId}</p>
+            {validationErrors.country && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.country}</p>
             )}
           </div>
           <div className="pt-2">
               <label className="font-bold block text-[#232323]">State</label>
               <select
-                name="stateId"
-                value={formData.stateId}
+                name="state"
+                value={formData.state}
                 onChange={handleChange}
                 className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
               >
@@ -235,8 +245,8 @@ export default function Update() {
                   </option>
                 ))}
               </select>
-              {validationErrors.stateId && (
-                <p className="text-red-500 text-sm mt-1">{validationErrors.countryId}</p>
+              {validationErrors.state && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.country}</p>
               )}
             </div>
           <div className="pt-2">

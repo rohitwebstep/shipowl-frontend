@@ -31,7 +31,7 @@ export default function SupplierMiddleWareProvider({ children }) {
         };
 
         try {
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/supplier/auth/verify`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/verify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

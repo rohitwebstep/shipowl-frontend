@@ -22,27 +22,27 @@ import Logo from "@/app/assets/Shipowl-logo1.png";
 import { HiBars3CenterLeft } from "react-icons/hi2";
 
 const menuItems = [
-  { name: "Home", icon: Home, href: "/dropshipping", section: "MENU" },
+  { name: "Home (In progress) (In progress)", icon: Home, href: "/dropshipping", section: "MENU" },
   {
     name: "Manage Orders",
     icon: ShoppingCart,
     href: "#",
     section: "MENU",
     subMenu: [
-      { name: "All Orders", href: "/dropshipping/manage-orders" },
-      { name: "Pending Orders", href: "/dropshipping/pending-orders" }
+      { name: "All Orders (In progress)", href: "/dropshipping/manage-orders" },
+      { name: "Pending Orders (In progress)", href: "/dropshipping/pending-orders" }
     ]
   },
-  { name: "Manage Products", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },
-  { name: "Source a Product", icon: Gift, href: "/dropshipping/source-a-product", section: "MENU" },
-  { name: "Reports", icon: BarChart, href: "/dropshipping/report", section: "MENU" },
-  { name: "Payments", icon: CreditCard, href: "/dropshipping/payments", section: "MENU" },
-  { name: "Manage NDR", icon: FileText, href: "/dropshipping/manage-ndr", section: "MENU" },
-  { name: "High RTO Pincode", icon: MapPin, href: "/dropshipping/high-rto-pincode", section: "OTHERS" },
-  { name: "Boosters", icon: Volume2, href: "/dropshipping/boosters", section: "OTHERS" },
-  { name: "Integrations", icon: Link, href: "/dropshipping/Integration", section: "OTHERS" },
-  { name: "Settings", icon: Settings, href: "/dropshipping/settings", section: "OTHERS" },
-  { name: "Terms & Conditions", icon: FileText, href: "/dropshipping/term-and-condition", section: "OTHERS" }
+  { name: "Manage Products (In progress)", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },
+  { name: "Source a Product (In progress)", icon: Gift, href: "/dropshipping/source-a-product", section: "MENU" },
+  { name: "Reports (In progress)", icon: BarChart, href: "/dropshipping/report", section: "MENU" },
+  { name: "Payments (In progress)", icon: CreditCard, href: "/dropshipping/payments", section: "MENU" },
+  { name: "Manage NDR (In progress)", icon: FileText, href: "/dropshipping/manage-ndr", section: "MENU" },
+  { name: "High RTO Pincode (In progress)", icon: MapPin, href: "/dropshipping/high-rto-pincode", section: "OTHERS" },
+  { name: "Boosters (In progress)", icon: Volume2, href: "/dropshipping/boosters", section: "OTHERS" },
+  { name: "Integrations (In progress)", icon: Link, href: "/dropshipping/Integration", section: "OTHERS" },
+  { name: "Settings (In progress)", icon: Settings, href: "/dropshipping/settings", section: "OTHERS" },
+  { name: "Terms & Conditions (In progress)", icon: FileText, href: "/dropshipping/term-and-condition", section: "OTHERS" }
 ];
 
 const Sidebar = () => {

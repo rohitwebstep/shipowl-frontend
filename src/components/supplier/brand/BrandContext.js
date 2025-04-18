@@ -32,7 +32,7 @@ const BrandProvider = ({ children }) => {
 
         try {
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/brand`,
+                `https://sleeping-owl-we0m.onrender.com/api/brand`,
                 {
                     method: "GET",
                     headers: {

@@ -46,7 +46,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -93,7 +93,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city/trashed`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -175,7 +175,6 @@ export default function List() {
     }, [cityData, loading]);
 
     const handleEditItem = (item) => {
-        setIsEdit(true)
         router.push(`/admin/city/update?id=${item.id}`);
     };
 
@@ -219,7 +218,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -290,7 +289,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://shipping-owl-vd4s.vercel.app/api/location/city/${id}`, {
+                    fetch(`https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -335,7 +334,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -415,7 +414,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -546,13 +545,10 @@ export default function List() {
                                                 </div>
                                             </td>
                                            
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.description}</td>
+                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.id}</td>
                                             <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
-                                                {item.status ? (
-                                                    <span className="bg-green-100 text-green-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
-                                                ) : (
-                                                    <span className="bg-red-100 text-red-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
-                                                )}
+                                                {item.countryId}
+                                                
                                             </td>
                                             <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
                                                 <div className="flex justify-center gap-2">
