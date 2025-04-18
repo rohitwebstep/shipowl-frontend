@@ -1,10 +1,10 @@
-import Update from '@/components/admin/citymanagement/Update'
-import React from 'react'
+import React, { Suspense } from 'react';
+import Update from '@/components/admin/citymanagement/Update';
 
-export default function page() {
+export default function Page() {
   return (
-    <>
-    <Update/>
-    </>
-  )
+    <Suspense fallback={<div>Loading...</div>}>
+      <Update />
+    </Suspense>
+  );
 }
