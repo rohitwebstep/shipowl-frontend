@@ -3,5 +3,8 @@ import React from 'react'
 
 export default function page() {
   return (
-<Update/>  )
+    <>
+    <Update/>
+    </>
+  )
 }
