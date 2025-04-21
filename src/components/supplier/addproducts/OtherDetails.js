@@ -39,88 +39,112 @@ export default function OtherDetails() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    if (!validateForm()) {
-      setLoading(false);
-      return;
+  
+    const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+    if (!supplierData?.project?.active_panel === "supplier") {
+        localStorage.clear("shippingData");
+        router.push("/supplier/auth/login");
+        return;
     }
-
-    const supplierData = JSON.parse(localStorage.getItem('shippingData'));
-    if (supplierData?.project?.active_panel !== 'supplier') {
-      localStorage.clear('shippingData');
-      router.push('/supplier/auth/login');
-      return;
-    }
-
+  
     const token = supplierData?.security?.token;
     if (!token) {
-      router.push('/supplier/auth/login');
-      return;
+        router.push("/supplier/auth/login");
+        return;
     }
-
+  
     try {
-      Swal.fire({
-        title: 'Creating Product...',
-        text: 'Please wait while we save your Product.',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
-      const url = `https://shipping-owl-vd4s.vercel.app/api/product/${id}`;
-      const form = new FormData();
-      for (const key in formData) {
-        if (formData[key] !== undefined && formData[key] !== null) {
-          form.append(key, formData[key]);
-        }
-      }
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: form,
-      });
-
-      if (!response.ok) {
-        Swal.close();
-        const errorMessage = await response.json();
         Swal.fire({
-          icon: 'error',
-          title: 'Creation Failed',
-          text: errorMessage.message || errorMessage.error || 'An error occurred',
+            title: 'Creating Product...',
+            text: 'Please wait while we save your Product.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
-        throw new Error(errorMessage.message || errorMessage.error || 'Submission failed');
-      }
+  
+        const url = "https://sleeping-owl-we0m.onrender.com/api/product"; // Ensure the URL is correct
+        const form = new FormData();
 
-      const result = await response.json();
-      Swal.close();
-
-      if (result) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Product Created',
-          text: `The Product has been created successfully!`,
-          showConfirmButton: true,
-        }).then((res) => {
-          if (res.isConfirmed) {
-            setFormData({});
-            router.push('/supplier/product');
+        for (const key in formData) {
+          const value = formData[key];
+      
+          if (value === null || value === undefined || value === '') continue;
+      
+          // ✅ Send files
+          if (value instanceof File) {
+            form.append(key, value);
           }
+      
+          // ✅ Handle 'variants' as a single array stringified
+          else if (key === 'variants') {
+            form.append('variants', JSON.stringify(value));
+          }
+      
+          // ✅ Other arrays like 'tags'
+          else if (Array.isArray(value)) {
+            form.append(key, JSON.stringify(value));
+          }
+      
+          // ✅ Objects
+          else if (typeof value === 'object') {
+            form.append(key, JSON.stringify(value));
+          }
+      
+          // ✅ Everything else (strings, numbers)
+          else {
+            form.append(key, value);
+          }
+        }
+  
+        const response = await fetch(url, {
+            method: "POST", // Use POST for creating the resource
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: form,
         });
-      }
+  
+        if (!response.ok) {
+            Swal.close();
+            const errorMessage = await response.json();
+            Swal.fire({
+                icon: "error",
+                title: "Creation Failed",
+                text: errorMessage.message || errorMessage.error || "An error occurred",
+            });
+            throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+        }
+  
+        const result = await response.json();
+        Swal.close();
+  
+        if (result) {
+            Swal.fire({
+                icon: "success",
+                title: "Product Created",
+                text: `The Product has been created successfully!`,
+                showConfirmButton: true,
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    setFormData({});
+                    setFiles(null);
+                    router.push("/supplier/product");
+                }
+            });
+        }
+  
     } catch (error) {
-      console.error('Error:', error);
-      Swal.close();
-      Swal.fire({
-        icon: 'error',
-        title: 'Submission Error',
-        text: error.message || 'Something went wrong. Please try again.',
-      });
+        console.error("Error:", error);
+        Swal.close();
+        Swal.fire({
+            icon: "error",
+            title: "Submission Error",
+            text: error.message || "Something went wrong. Please try again.",
+        });
+        setError(error.message || "Submission failed.");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
@@ -198,6 +222,8 @@ export default function OtherDetails() {
               }`}
             >
               <option value="">Select RTO Address</option>
+              <option value="Address 1">Address 1</option>
+
             </select>
             {errors.rto_address && <p className="text-red-500 text-sm mt-1">{errors.rto_address}</p>}
           </div>
@@ -215,6 +241,7 @@ export default function OtherDetails() {
               }`}
             >
               <option value="">Select Pickup Address</option>
+              <option value="Address 1">Address 1</option>
             </select>
             {errors.pickup_address && <p className="text-red-500 text-sm mt-1">{errors.pickup_address}</p>}
           </div>

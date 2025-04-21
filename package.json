@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@pathofdev/react-tag-input": "^1.0.7",
     "datatables.net": "^2.2.2",
     "datatables.net-buttons": "^3.2.2",
     "datatables.net-buttons-dt": "^3.2.2",
@@ -24,6 +25,7 @@
     "react-icons": "^5.5.0",
     "react-select": "^5.10.1",
     "react-spinners": "^0.15.0",
+    "react-tag-input": "^6.10.6",
     "recharts": "^2.15.1",
     "sweetalert2": "^11.17.2",
     "swiper": "^11.2.6"

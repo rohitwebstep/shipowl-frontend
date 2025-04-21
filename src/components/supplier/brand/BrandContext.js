@@ -32,7 +32,7 @@ const BrandProvider = ({ children }) => {
 
         try {
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/brand`,
+                `https://sleeping-owl-we0m.onrender.com/api/brand`,
                 {
                     method: "GET",
                     headers: {
@@ -46,14 +46,14 @@ const BrandProvider = ({ children }) => {
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Session Expired",
+                    title: "Something Wrong!",
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
                         "Your session has expired. Please log in again.",
                 });
                 throw new Error(
-                    errorMessage.message || errorMessage.error || "Session expired"
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
                 );
             }
 

@@ -37,7 +37,7 @@ export default function DropshipperMiddleWareProvider({ children }) {
         }
 
         try {
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/dropshipper/auth/verify`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/auth/verify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -49,10 +49,10 @@ export default function DropshipperMiddleWareProvider({ children }) {
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Session Expired",
+                    title: "Something Wrong!",
                     text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
                 });
-                throw new Error(errorMessage.message || errorMessage.error || "Session expired");
+                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
             }
 
             const result = await response.json();

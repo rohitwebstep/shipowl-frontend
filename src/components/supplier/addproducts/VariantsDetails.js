@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { ProductContext } from './ProductContext';
 
 export default function VariantDetails() {
-  const { fetchCountry,formData,setFormData,countryData } = useContext(ProductContext);
+  const { fetchCountry,formData,setFormData,countryData,setActiveTab } = useContext(ProductContext);
 
   const handleChange = (index, field, value) => {
     const updatedVariants = [...formData.variants];
@@ -19,12 +19,13 @@ export default function VariantDetails() {
   },[fetchCountry])
 
   const handleFileChange = (event, index) => {
+    console.log('index',index)
     const file = event.target.files[0];
     if (file) {
       const imageKey = `variant_images_${index}`;
       setFormData((prev) => ({
         ...prev,
-        [imageKey]: URL.createObjectURL(file),
+        [imageKey]:file,
       }));
     }
   };
@@ -52,12 +53,15 @@ export default function VariantDetails() {
     const updatedVariants = formData.variants.filter((_, i) => i !== index);
     setFormData({ ...formData, variants: updatedVariants });
   };
+  const handleSubmit =()=>{
+    setActiveTab("shipping-details");
+  }
 
   return (
     <div className="mt-4 p-6 rounded-xl bg-white">
       <div className="md:flex mb-6 justify-between items-center">
         <h2 className="text-2xl font-semibold text-[#2B3674] mb-4">Variant Details</h2>
-        <button className="bg-[#4318FF] text-white px-4 py-2 rounded-md mt-4">Save Data</button>
+        <button className="bg-[#4318FF] text-white px-4 py-2 rounded-md mt-4 " onClick={handleSubmit}>Next</button>
       </div>
 
       <div className="lg:grid lg:grid-cols-9 hidden overflow-auto grid-cols-1 gap-6 items-center justify-between border-b border-[#E9EDF7] pb-2 mb-4 text-gray-600 text-sm font-semibold">
@@ -207,17 +211,9 @@ export default function VariantDetails() {
           <div className="md:flex justify-end">
   <span className="text-orange-500 font-semibold whitespace-nowrap lg:hidden block">Images</span>
   <div className="relative border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
-    {formData[`variant_images_${index}`] ? (
-      <Image
-        src={formData[`variant_images_${index}`]}
-        alt="Uploaded"
-        className="w-full h-full object-cover rounded-lg"
-        width={64}
-        height={64}
-      />
-    ) : (
+    
       <ImageIcon className="w-8 h-8 text-gray-400" />
-    )}
+  
     <input
       type="file"
       className="absolute opacity-0 w-full h-full cursor-pointer"

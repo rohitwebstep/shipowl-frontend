@@ -13,94 +13,125 @@ export default function OtherDetails() {
     [name]: value,
   }));
 };
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        if (!supplierData?.project?.active_panel === "supplier") {
-            localStorage.clear("shippingData");
-            router.push("/supplier/auth/login");
-            return;
-        }
+  const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+  if (!supplierData?.project?.active_panel === "supplier") {
+      localStorage.clear("shippingData");
+      router.push("/supplier/auth/login");
+      return;
+  }
 
-        const token = supplierData?.security?.token;
-        if (!token) {
-            router.push("/supplier/auth/login");
-            return;
-        }
+  const token = supplierData?.security?.token;
+  if (!token) {
+      router.push("/supplier/auth/login");
+      return;
+  }
 
-        try {
-            Swal.fire({
-                title: 'Creating Product...',
-                text: 'Please wait while we save your Product.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-        
-            const url = "https://shipping-owl-vd4s.vercel.app/api/product";
-        
-            const form = new FormData();
-            for (const key in formData) {
-                if (formData[key] !== undefined && formData[key] !== null) {
-                    form.append(key, formData[key]);
-                }
-            }
-        
-            const response = await fetch(url, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
-                body: form,
-            });
-        
-            if (!response.ok) {
-                Swal.close();
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Creation Failed",
-                    text: errorMessage.message || errorMessage.error || "An error occurred",
-                });
-                throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
-            }
-        
-            const result = await response.json();
-            Swal.close();
-        
-            if (result) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Product Created",
-                    text: `The Product has been created successfully!`,
-                    showConfirmButton: true,
-                }).then((res) => {
-                    if (res.isConfirmed) {
-                        setFormData({
-                        });
-                        setFiles(null);
-                        router.push("/supplier/product");
-                    }
-                });
-            }
-        
-        } catch (error) {
-            console.error("Error:", error);
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Submission Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-            setError(error.message || "Submission failed.");
-        } finally {
-            setLoading(false);
-        }
-        
-    };
+  try {
+      Swal.fire({
+          title: 'Creating Product...',
+          text: 'Please wait while we save your Product.',
+          allowOutsideClick: false,
+          didOpen: () => {
+              Swal.showLoading();
+          }
+      });
+
+      const url = "https://sleeping-owl-we0m.onrender.com/api/product"; // Ensure the URL is correct
+      const form = new FormData();
+
+      // Iterate over each field in formData
+      for (const key in formData) {
+          const value = formData[key];
+          form.append('variants', JSON.stringify(formData.variants));
+
+          // Skip empty/null/undefined values
+          if (value === null || value === undefined || value === '') continue;
+
+          // Handle objects inside arrays (like variants)
+          if (Array.isArray(value)) {
+              value.forEach((item, index) => {
+                  if (typeof item === 'object') {
+                      // If the item is an object, stringifying it
+                      form.append(`${key}[${index}]`, JSON.stringify(item));
+                  } else {
+                      // Otherwise, just append the value directly
+                      form.append(`${key}[${index}]`, item);
+                  }
+              });
+          }
+
+          // Handle non-array objects (like variant_images_0)
+          else if (typeof value === 'object') {
+              // If it's an object, stringifying it
+              form.append(key, JSON.stringify(value));
+          }
+
+          // Handle file fields (images/videos)
+          else if (value instanceof File) {
+              form.append(key, value);
+          }
+
+          // Handle regular fields (like strings or numbers)
+          else {
+              form.append(key, value);
+          }
+      }
+
+      const response = await fetch(url, {
+          method: "POST", // Use POST for creating the resource
+          headers: {
+              "Authorization": `Bearer ${token}`
+          },
+          body: form,
+      });
+
+      if (!response.ok) {
+          Swal.close();
+          const errorMessage = await response.json();
+          Swal.fire({
+              icon: "error",
+              title: "Creation Failed",
+              text: errorMessage.message || errorMessage.error || "An error occurred",
+          });
+          throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+      }
+
+      const result = await response.json();
+      Swal.close();
+
+      if (result) {
+          Swal.fire({
+              icon: "success",
+              title: "Product Created",
+              text: `The Product has been created successfully!`,
+              showConfirmButton: true,
+          }).then((res) => {
+              if (res.isConfirmed) {
+                  setFormData({});
+                  setFiles(null);
+                  router.push("/supplier/product");
+              }
+          });
+      }
+
+  } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+          icon: "error",
+          title: "Submission Error",
+          text: error.message || "Something went wrong. Please try again.",
+      });
+      setError(error.message || "Submission failed.");
+  } finally {
+      setLoading(false);
+  }
+};
+
 
   return (
     <form className='' onSubmit={handleSubmit}>

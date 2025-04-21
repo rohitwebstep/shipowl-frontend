@@ -65,7 +65,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}`,
+        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}`,
         {
           method: "GET",
           headers: {
@@ -79,7 +79,7 @@ export default function Update() {
         const errorMessage = await response.json();
         Swal.fire({
           icon: "error",
-          title: "Session Expired",
+          title: "Something Wrong!",
           text: errorMessage.message || "Your session has expired. Please log in again.",
         });
         throw new Error(errorMessage.message);
@@ -146,7 +146,7 @@ export default function Update() {
         }
       });
 
-      const url = `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}`;
+      const url = `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}`;
       const form = new FormData();
       for (const key in formData) {
         if (formData[key]) {

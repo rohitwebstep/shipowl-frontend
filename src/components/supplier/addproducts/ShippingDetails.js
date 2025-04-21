@@ -5,9 +5,8 @@ import { UploadCloud } from 'lucide-react';
 import { ProductContext } from './ProductContext';
 
 export default function ShippingDetails() {
-  const { formData, setFormData } = useContext(ProductContext);
-
-  const [errors, setErrors] = useState({}); // State to track validation errors
+  const { formData, setFormData,setActiveTab } = useContext(ProductContext);
+  const [errors, setErrors] = useState({});
 
   const fileFields = [
     { label: 'Package Weight Image', key: 'package_weight_image' },
@@ -18,12 +17,12 @@ export default function ShippingDetails() {
     { label: 'Upload Training Guidance Video', key: 'upload_training_guidance_video' },
   ];
 
-  const handleFileChange = (event, key) => {
-    const file = event.target.files[0];
-    if (file) {
+  const handleFileChange = (e, key) => {
+    const selectedFiles = Array.from(e.target.files);
+    if (selectedFiles.length > 0) {
       setFormData((prev) => ({
         ...prev,
-        [key]: file.name,
+        [key]: selectedFiles[0], // Store single file (you can adapt this if you want multiple)
       }));
     }
   };
@@ -36,10 +35,16 @@ export default function ShippingDetails() {
     }));
   };
 
-  // Validate function to check if required fields are filled
   const validateForm = () => {
     const newErrors = {};
-    const requiredFields = ['weight', 'package_length', 'package_width', 'package_height', 'chargable_weight'];
+    const requiredFields = [
+      'shipping_time',
+      'weight',
+      'package_length',
+      'package_width',
+      'package_height',
+      'chargable_weight',
+    ];
 
     requiredFields.forEach((field) => {
       if (!formData[field]) {
@@ -47,28 +52,21 @@ export default function ShippingDetails() {
       }
     });
 
-    // Validate file upload fields
     fileFields.forEach(({ key }) => {
       if (!formData[key]) {
-        newErrors[key] = `Please upload a file for ${key.replace('_', ' ')}`;
+        newErrors[key] = `Please upload a file for ${key.replace(/_/g, ' ')}`;
       }
     });
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Returns true if no errors
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    // If the form is invalid, prevent submission
-    if (!validateForm()) {
-      return;
-    }
-
-    // Proceed with the form submission if valid
-    // Handle the form submission here...
-  };
+    setActiveTab ('other-details') };
 
   return (
     <div className="xl:w-11/12 mt-4 xl:p-6 p-3 rounded-2xl bg-white">
@@ -81,7 +79,7 @@ export default function ShippingDetails() {
             <select
               name="shipping_time"
               className={`border ${errors.shipping_time ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
-              value={formData.shipping_time}
+              value={formData.shipping_time || ''}
               onChange={handleChange}
             >
               <option value="">Select</option>
@@ -94,76 +92,24 @@ export default function ShippingDetails() {
         </div>
 
         <div className="grid xl:grid-cols-5 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="text-[#232323] font-bold block">
-              Weight (in gm)* <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="GM"
-              className={`border placeholder-black placeholder:text-right ${errors.weight ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
-              name="weight"
-              value={formData.weight}
-              onChange={handleChange}
-            />
-            {errors.weight && <p className="text-red-500 text-sm">{errors.weight}</p>}
-          </div>
-          <div>
-            <label className="text-[#232323] font-bold block">
-              Package Length <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="CM"
-              className={`border placeholder-black placeholder:text-right ${errors.package_length ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
-              name="package_length"
-              value={formData.package_length}
-              onChange={handleChange}
-            />
-            {errors.package_length && <p className="text-red-500 text-sm">{errors.package_length}</p>}
-          </div>
-          <div>
-            <label className="text-[#232323] font-bold block">
-              Package Width <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="CM"
-              className={`border placeholder-black placeholder:text-right ${errors.package_width ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
-              name="package_width"
-              value={formData.package_width}
-              onChange={handleChange}
-            />
-            {errors.package_width && <p className="text-red-500 text-sm">{errors.package_width}</p>}
-          </div>
-          <div>
-            <label className="text-[#232323] font-bold block">
-              Package Height <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="CM"
-              className={`border placeholder-black placeholder:text-right ${errors.package_height ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
-              name="package_height"
-              value={formData.package_height}
-              onChange={handleChange}
-            />
-            {errors.package_height && <p className="text-red-500 text-sm">{errors.package_height}</p>}
-          </div>
-          <div>
-            <label className="text-[#232323] font-bold block">
-              Chargeable Weight <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="GM"
-              className={`border placeholder-black placeholder:text-right ${errors.chargable_weight ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
-              name="chargable_weight"
-              value={formData.chargable_weight}
-              onChange={handleChange}
-            />
-            {errors.chargable_weight && <p className="text-red-500 text-sm">{errors.chargable_weight}</p>}
-          </div>
+          {['weight', 'package_length', 'package_width', 'package_height', 'chargable_weight'].map((field) => (
+            <div key={field}>
+              <label className="text-[#232323] font-bold block">
+                {field.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())} <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder={field.includes('weight') ? 'GM' : 'CM'}
+                className={`border placeholder-black placeholder:text-right ${
+                  errors[field] ? 'border-red-500' : 'border-[#DFEAF2]'
+                } mt-2 w-full p-3 rounded-xl`}
+                name={field}
+                value={formData[field] || ''}
+                onChange={handleChange}
+              />
+              {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+            </div>
+          ))}
         </div>
 
         <div className="flex flex-wrap gap-8 my-8">
@@ -174,8 +120,8 @@ export default function ShippingDetails() {
               </label>
               <div className="border-1 relative border-dashed border-red-300 rounded-xl p-6 w-48 h-32 flex flex-col items-center justify-center">
                 <UploadCloud className="w-8 h-8 text-[#232323]" />
-                <span className="text-xs text-[#232323]">
-                  {formData[key] ? formData[key] : 'Upload'}
+                <span className="text-xs text-[#232323] text-center">
+                  {formData[key]?.name || 'Upload'}
                 </span>
                 <input
                   type="file"
@@ -190,7 +136,7 @@ export default function ShippingDetails() {
 
         <div className="flex flex-wrap gap-4">
           <button type="submit" className="bg-orange-500 text-white px-14 py-2 rounded-md">
-            Save
+            Next
           </button>
           <button type="button" className="bg-[#8F9BBA] text-white px-14 py-2 rounded-md">
             Cancel

@@ -1,6 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
-
+import { useRouter} from "next/navigation";
+import Swal from "sweetalert2";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import React, { useState, useCallback, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
@@ -117,7 +117,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/product`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -129,10 +129,10 @@ const ProductTable = () => {
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Session Expired",
+                    title: "Something Wrong!",
                     text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
                 });
-                throw new Error(errorMessage.message || errorMessage.error || "Session expired");
+                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
             }
 
             const result = await response.json();
@@ -163,7 +163,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/product/trashed`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -175,10 +175,10 @@ const ProductTable = () => {
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Session Expired",
+                    title: "Something Wrong!",
                     text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
                 });
-                throw new Error(errorMessage.message || errorMessage.error || "Session expired");
+                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
             }
 
             const result = await response.json();
@@ -274,7 +274,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -356,7 +356,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/category/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/category/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -418,7 +418,7 @@ const ProductTable = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://shipping-owl-vd4s.vercel.app/api/product/${item?.id}/restore`,
+                    `https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -432,14 +432,14 @@ const ProductTable = () => {
                     const errorMessage = await response.json();
                     Swal.fire({
                         icon: "error",
-                        title: "Session Expired",
+                        title: "Something Wrong!",
                         text:
                             errorMessage.error ||
                             errorMessage.message ||
                             "Your session has expired. Please log in again.",
                     });
                     throw new Error(
-                        errorMessage.message || errorMessage.error || "Session expired"
+                        errorMessage.message || errorMessage.error || "Something Wrong!"
                     );
                 }
     
@@ -473,6 +473,9 @@ const ProductTable = () => {
     const indexOfLast = currentPage * perPage;
     const indexOfFirst = indexOfLast - perPage;
     const currentData = data.slice(indexOfFirst, indexOfLast);
+    const handleEdit=(id)=>{
+        router.push(`/supplier/brand/update?id=${item.id}`);
+    }
 
     return (
         <div className="">
@@ -679,7 +682,7 @@ const ProductTable = () => {
                                     )}
                                     <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]">
                                         <div className="flex justify-center">
-                                            <MdModeEdit className="text-center" />
+                                            <MdModeEdit onClick={()=>handleEdit(item.id)} className="text-center" />
                                         </div>
                                     </td>
                                 </tr>

@@ -8,13 +8,12 @@ import OtherDetails from './OtherDetails'
 import { ProductContext } from "./ProductContext";
 import { useSearchParams } from 'next/navigation'
 
-const Tabs = () => {
-  const [activeTab, setActiveTab] = useState("product-details");
+ const Tabs = () => {
+ const [activeTab, setActiveTab] = useState("product-details");
  const {formData,setFormData} = useContext(ProductContext);
  const searchParams = useSearchParams();
 
-    const id = searchParams.get('id');
-
+     const id = searchParams.get('id');
      const fetchProducts = useCallback(async () => {
          const supplierData = JSON.parse(localStorage.getItem("shippingData"));
  
@@ -33,7 +32,7 @@ const Tabs = () => {
          try {
              setLoading(true);
              const response = await fetch(
-                 `https://shipping-owl-vd4s.vercel.app/api/product/${id}`,
+                 `https://sleeping-owl-we0m.onrender.com/api/product/${id}`,
                  {
                      method: "GET",
                      headers: {
@@ -47,7 +46,7 @@ const Tabs = () => {
                  const errorMessage = await response.json();
                  Swal.fire({
                      icon: "error",
-                     title: "Session Expired",
+                     title: "Something Wrong!",
                      text: errorMessage.message || "Your session has expired. Please log in again.",
                  });
                  throw new Error(errorMessage.message);
@@ -106,14 +105,12 @@ const Tabs = () => {
          }
      }, [router, id]);
 
-     
-
-  const tabs = [
-    { id: "product-details", label: "Product Details" },
-    { id: "variants-details", label: "Variants Details" },
-    { id: "shipping-details", label: "Shipping Details" },
-    { id: "other-details", label: "Other Details" },
-  ];
+      const tabs = [
+        { id: "product-details", label: "Product Details" },
+        { id: "variants-details", label: "Variants Details" },
+        { id: "shipping-details", label: "Shipping Details" },
+        { id: "other-details", label: "Other Details" },
+      ];
 
   return (
     <div className="w-full xl:p-6">

@@ -2,6 +2,8 @@
 
 import { useContext, useEffect, useState } from 'react';
 import { ProductContext } from './ProductContext';
+import "@pathofdev/react-tag-input/build/index.css"; // Required styles
+import ReactTagInput from "@pathofdev/react-tag-input";
 
 const fieldLabels = {
   category: 'Product Category',
@@ -26,6 +28,7 @@ export default function ProductDetails() {
     categoryData,
     brandData,
     fetchBrand,
+    setActiveTab
   } = useContext(ProductContext);
 
   const [errors, setErrors] = useState({});
@@ -38,9 +41,23 @@ export default function ProductDetails() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(' name, value', name, value)
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: '' });
   };
+  const handleChangeTags = (newTags) => {
+    console.log("Before update tags:", formData.tags);
+    console.log("New tags:", newTags);
+  
+    setFormData((prevData) => {
+      const updatedData = { ...prevData, tags: newTags };
+      console.log("Updated formData with new tags:", updatedData);
+      return updatedData;
+    });
+  };
+  
+  
+  
 
   const validateFields = () => {
     const requiredFields = [
@@ -49,6 +66,7 @@ export default function ProductDetails() {
       'main_sku',
       'description',
       'brand',
+      'tags',
       'origin_country',
       'shipping_country',
       'list_as',
@@ -67,8 +85,7 @@ export default function ProductDetails() {
 
   const handleSubmit = () => {
     if (validateFields()) {
-      // Submit logic here
-      console.log('Form is valid. Submitting...');
+      setActiveTab('variants-details')
     }
   };
 
@@ -139,17 +156,21 @@ export default function ProductDetails() {
       </div>
 
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4 mt-4">
-        <div>
-          <label className="block text-[#232323] font-semibold">Product Tags</label>
-          <input
-            type="text"
-            name="tags"
-            className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
-            placeholder="Tags"
-            onChange={handleChange}
-            value={formData.tags || ''}
-          />
-        </div>
+     
+      <div>
+  <label className="block text-[#232323] font-semibold">Product Tags<span className="text-red-500">*</span></label>
+  <ReactTagInput
+      name="tags"
+      className={`w-full border ${errors.description ? 'border-red-500' : 'border-[#DFEAF2]'} p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0 h-24`}
+
+      tags={formData.tags || []} // Ensure this is an array of strings
+      onChange={handleChangeTags} // Correctly passing the tag array to update formData
+      placeholder="Type and press enter"
+    />
+              {errors.tags && <p className="text-red-500 text-sm mt-1">{errors.tags}</p>}
+
+</div>
+
 
         <div>
           <label className="block text-[#232323] font-semibold">
@@ -248,7 +269,7 @@ export default function ProductDetails() {
           onClick={handleSubmit}
           className="bg-orange-500 text-white px-14 py-2 rounded-md"
         >
-          Save
+          Next
         </button>
         <button className="bg-[#8F9BBA] text-white px-14 py-2 rounded-md">Cancel</button>
       </div>

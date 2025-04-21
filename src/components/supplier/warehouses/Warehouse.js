@@ -44,7 +44,7 @@ export default function Warehouse() {
          try {
              setLoading(true);
              const response = await fetch(
-                 `https://shipping-owl-vd4s.vercel.app/api/warehouse`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse`,
                  {
                      method: "GET",
                      headers: {
@@ -65,7 +65,7 @@ export default function Warehouse() {
                          "Your session has expired. Please log in again.",
                  });
                  throw new Error(
-                     errorMessage.message || errorMessage.error || "Session expired"
+                     errorMessage.message || errorMessage.error || "Something Wrong!"
                  );
              }
  
@@ -98,7 +98,7 @@ export default function Warehouse() {
          try {
              setLoading(true);
              const response = await fetch(
-                 `https://shipping-owl-vd4s.vercel.app/api/warehouse/trashed`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse/trashed`,
                  {
                      method: "GET",
                      headers: {
@@ -112,14 +112,14 @@ export default function Warehouse() {
                  const errorMessage = await response.json();
                  Swal.fire({
                      icon: "error",
-                     title: "Session Expired",
+                     title: "Something Wrong!",
                      text:
                          errorMessage.error ||
                          errorMessage.message ||
                          "Your session has expired. Please log in again.",
                  });
                  throw new Error(
-                     errorMessage.message || errorMessage.error || "Session expired"
+                     errorMessage.message || errorMessage.error || "Something Wrong!"
                  );
              }
  
@@ -223,7 +223,7 @@ export default function Warehouse() {
              setLoading(true);
  
              const response = await fetch(
-                 `https://shipping-owl-vd4s.vercel.app/api/warehouse/${item.id}`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse/${item.id}`,
                  {
                      method: "DELETE",
                      headers: {
@@ -294,7 +294,7 @@ export default function Warehouse() {
  
              const results = await Promise.all(
                  selected.map(id =>
-                     fetch(`https://shipping-owl-vd4s.vercel.app/api/warehouse/${id}`, {
+                     fetch(`https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`, {
                          method: "DELETE",
                          headers: {
                              "Content-Type": "application/json",
@@ -339,7 +339,7 @@ export default function Warehouse() {
          try {
              setLoading(true);
              const response = await fetch(
-                 `https://shipping-owl-vd4s.vercel.app/api/warehouse/${item?.id}/restore`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse/${item?.id}/restore`,
                  {
                      method: "PATCH",
                      headers: {
@@ -353,14 +353,14 @@ export default function Warehouse() {
                  const errorMessage = await response.json();
                  Swal.fire({
                      icon: "error",
-                     title: "Session Expired",
+                     title: "Something Wrong!",
                      text:
                          errorMessage.error ||
                          errorMessage.message ||
                          "Your session has expired. Please log in again.",
                  });
                  throw new Error(
-                     errorMessage.message || errorMessage.error || "Session expired"
+                     errorMessage.message || errorMessage.error || "Something Wrong!"
                  );
              }
  
@@ -420,7 +420,7 @@ export default function Warehouse() {
              setLoading(true);
  
              const response = await fetch(
-                 `https://shipping-owl-vd4s.vercel.app/api/warehouse/${item.id}/destroy`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse/${item.id}/destroy`,
                  {
                      method: "DELETE",
                      headers: {

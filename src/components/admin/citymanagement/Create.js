@@ -89,7 +89,7 @@ export default function Create() {
         formdata.append("country", formData.countryId);
         formdata.append("state", formData.stateId);
   
-        const url = "https://shipping-owl-vd4s.vercel.app/api/location/city";
+        const url = "https://sleeping-owl-we0m.onrender.com/api/location/city";
   
         const response = await fetch(url, {
           method: "POST",
@@ -158,7 +158,7 @@ export default function Create() {
     try {
         setLoading(true);
         const response = await fetch(
-            `https://shipping-owl-vd4s.vercel.app/api/location/country`,
+            `https://sleeping-owl-we0m.onrender.com/api/location/country`,
             {
                 method: "GET",
                 headers: {
@@ -172,14 +172,14 @@ export default function Create() {
             const errorMessage = await response.json();
             Swal.fire({
                 icon: "error",
-                title: "Session Expired",
+                title: "Something Wrong!",
                 text:
                     errorMessage.error ||
                     errorMessage.message ||
                     "Your session has expired. Please log in again.",
             });
             throw new Error(
-                errorMessage.message || errorMessage.error || "Session expired"
+                errorMessage.message || errorMessage.error || "Something Wrong!"
             );
         }
 
@@ -214,7 +214,7 @@ const fetchStateList = useCallback(async (id) => {
   try {
       setLoading(true);
       const response = await fetch(
-          `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}/states`,
+          `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
           {
               method: "GET",
               headers: {
@@ -228,14 +228,14 @@ const fetchStateList = useCallback(async (id) => {
           const errorMessage = await response.json();
           Swal.fire({
               icon: "error",
-              title: "Session Expired",
+              title: "Something Wrong!",
               text:
                   errorMessage.error ||
                   errorMessage.message ||
                   "Your session has expired. Please log in again.",
           });
           throw new Error(
-              errorMessage.message || errorMessage.error || "Session expired"
+              errorMessage.message || errorMessage.error || "Something Wrong!"
           );
       }
 

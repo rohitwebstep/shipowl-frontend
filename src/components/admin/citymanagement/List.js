@@ -46,7 +46,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -61,10 +61,10 @@ export default function List() {
             if (!response.ok) {
                 Swal.fire({
                     icon: "error",
-                    title: "Session Expired",
+                    title: "Something Wrong!",
                     text: result.message || result.error || "Your session has expired. Please log in again.",
                 });
-                throw new Error(result.message || result.error || "Session expired");
+                throw new Error(result.message || result.error || "Something Wrong!");
             }
     
             setCityData(result?.cities || []);
@@ -93,7 +93,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city/trashed`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -107,14 +107,14 @@ export default function List() {
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Session Expired",
+                    title: "Something Wrong!",
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
                         "Your session has expired. Please log in again.",
                 });
                 throw new Error(
-                    errorMessage.message || errorMessage.error || "Session expired"
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
                 );
             }
 
@@ -218,7 +218,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -289,7 +289,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://shipping-owl-vd4s.vercel.app/api/location/city/${id}`, {
+                    fetch(`https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -334,7 +334,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -348,14 +348,14 @@ export default function List() {
                 const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Session Expired",
+                    title: "Something Wrong!",
                     text:
                         errorMessage.error ||
                         errorMessage.message ||
                         "Your session has expired. Please log in again.",
                 });
                 throw new Error(
-                    errorMessage.message || errorMessage.error || "Session expired"
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
                 );
             }
 
@@ -414,7 +414,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/location/city/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

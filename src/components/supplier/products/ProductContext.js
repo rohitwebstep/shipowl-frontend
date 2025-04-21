@@ -76,7 +76,7 @@ const ProductProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://shipping-owl-vd4s.vercel.app/api/category', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/category', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -88,13 +88,13 @@ const ProductProvider = ({ children }) => {
         const errorMessage = await response.json();
         Swal.fire({
           icon: 'error',
-          title: 'Session Expired',
+          title: 'Something Wrong!',
           text:
             errorMessage.error ||
             errorMessage.message ||
             'Your session has expired. Please log in again.',
         });
-        throw new Error(errorMessage.message || errorMessage.error || 'Session expired');
+        throw new Error(errorMessage.message || errorMessage.error || 'Something Wrong!');
       }
 
       const result = await response.json();
@@ -122,7 +122,7 @@ const ProductProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://shipping-owl-vd4s.vercel.app/api/brand', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/brand', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -134,13 +134,13 @@ const ProductProvider = ({ children }) => {
         const errorMessage = await response.json();
         Swal.fire({
           icon: 'error',
-          title: 'Session Expired',
+          title: 'Something Wrong!',
           text:
             errorMessage.error ||
             errorMessage.message ||
             'Your session has expired. Please log in again.',
         });
-        throw new Error(errorMessage.message || errorMessage.error || 'Session expired');
+        throw new Error(errorMessage.message || errorMessage.error || 'Something Wrong!');
       }
 
       const result = await response.json();
@@ -165,7 +165,7 @@ const ProductProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch('https://shipping-owl-vd4s.vercel.app/api/location/country', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/location/country', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -177,13 +177,13 @@ const ProductProvider = ({ children }) => {
         const errorMessage = await response.json();
         Swal.fire({
           icon: 'error',
-          title: 'Session Expired',
+          title: 'Something Wrong!',
           text:
             errorMessage.error ||
             errorMessage.message ||
             'Your session has expired. Please log in again.',
         });
-        throw new Error(errorMessage.message || errorMessage.error || 'Session expired');
+        throw new Error(errorMessage.message || errorMessage.error || 'Something Wrong!');
       }
 
       const result = await response.json();
@@ -197,7 +197,8 @@ const ProductProvider = ({ children }) => {
     }
   }, [router]);
 
-  console.log('formData',formData)
+  console.log('formData---',formData)
+  console.log('type',typeof formData.variants)
 
   return (
     <ProductContext.Provider
