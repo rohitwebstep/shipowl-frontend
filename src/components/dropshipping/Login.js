@@ -42,7 +42,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/auth/login`, {
+            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/dropshipper/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),

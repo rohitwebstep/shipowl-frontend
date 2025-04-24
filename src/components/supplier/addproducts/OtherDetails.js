@@ -63,7 +63,7 @@ export default function OtherDetails() {
             }
         });
   
-        const url = "https://sleeping-owl-we0m.onrender.com/api/product"; // Ensure the URL is correct
+        const url = "https://shipping-owl-vd4s.vercel.app/api/product"; // Ensure the URL is correct
         const form = new FormData();
 
         for (const key in formData) {
@@ -196,7 +196,7 @@ export default function OtherDetails() {
               Tax Rate (GST) <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
+              type="number"
               name="tax_rate"
               value={formData.tax_rate || ''}
               onChange={handleChange}

@@ -10,7 +10,12 @@ export default function VariantDetails() {
 
   const handleChange = (index, field, value) => {
     const updatedVariants = [...formData.variants];
-    updatedVariants[index][field] = value;
+    const numericFields = ['qty', 'suggested_price', 'shipowl_price', 'rto_suggested_price', 'rto_price'];
+  
+    updatedVariants[index][field] = numericFields.includes(field)
+      ? value === '' ? '' : Number(value)
+      : value;
+  
     setFormData({ ...formData, variants: updatedVariants });
   };
 

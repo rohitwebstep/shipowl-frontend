@@ -32,7 +32,7 @@ import { useSearchParams } from 'next/navigation'
          try {
              setLoading(true);
              const response = await fetch(
-                 `https://sleeping-owl-we0m.onrender.com/api/product/${id}`,
+                 `https://shipping-owl-vd4s.vercel.app/api/product/${id}`,
                  {
                      method: "GET",
                      headers: {

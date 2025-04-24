@@ -96,7 +96,7 @@ export default function Create() {
                 });
             }
 
-            const url ="https://sleeping-owl-we0m.onrender.com/api/brand";
+            const url ="https://shipping-owl-vd4s.vercel.app/api/brand";
 
             const response = await fetch(url, {
                 method: "POST",

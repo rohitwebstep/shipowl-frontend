@@ -14,7 +14,7 @@ export default function ShippingDetails() {
     { label: 'Package Width Image', key: 'package_width_image' },
     { label: 'Package Height Image', key: 'package_height_image' },
     { label: 'Upload Product Details Video', key: 'product_detail_video' },
-    { label: 'Upload Training Guidance Video', key: 'upload_training_guidance_video' },
+    { label: 'Upload Training Guidance Video', key: 'training_guidance_video' },
   ];
 
   const handleFileChange = (e, key) => {
@@ -48,7 +48,7 @@ export default function ShippingDetails() {
 
     requiredFields.forEach((field) => {
       if (!formData[field]) {
-        newErrors[field] = `${field.replace('_', ' ').toUpperCase()} is required`;
+        newErrors[field] = `${field.replace('_', ' ')} is required`;
       }
     });
 
@@ -64,7 +64,7 @@ export default function ShippingDetails() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (validateForm()) return;
 
     setActiveTab ('other-details') };
 
@@ -77,9 +77,9 @@ export default function ShippingDetails() {
               Shipping Time (in Days) <span className="text-red-500">*</span>
             </label>
             <select
-              name="shipping_time"
-              className={`border ${errors.shipping_time ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
-              value={formData.shipping_time || ''}
+              name="Shipping_time"
+              className={`border ${errors.Shipping_time ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
+              value={formData.Shipping_time || ''}
               onChange={handleChange}
             >
               <option value="">Select</option>
@@ -87,7 +87,7 @@ export default function ShippingDetails() {
               <option value="3">3 Days</option>
               <option value="5">5 Days</option>
             </select>
-            {errors.shipping_time && <p className="text-red-500 text-sm">{errors.shipping_time}</p>}
+            {errors.Shipping_time && <p className="text-red-500 text-sm">{errors.Shipping_time}</p>}
           </div>
         </div>
 
@@ -98,7 +98,7 @@ export default function ShippingDetails() {
                 {field.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())} <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
+                type="number"
                 placeholder={field.includes('weight') ? 'GM' : 'CM'}
                 className={`border placeholder-black placeholder:text-right ${
                   errors[field] ? 'border-red-500' : 'border-[#DFEAF2]'

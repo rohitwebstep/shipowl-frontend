@@ -75,7 +75,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category/${id}`,
+                `https://shipping-owl-vd4s.vercel.app/api/category/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -150,7 +150,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/warehouse${id}`;
+            const url = `https://shipping-owl-vd4s.vercel.app/api/warehouse${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {

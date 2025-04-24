@@ -14,7 +14,7 @@ const fieldLabels = {
   brand: 'Brand',
   origin_country: 'Country of Origin',
   shipping_country: 'Shipping Country',
-  video_url: 'Product Video URL',
+  video: 'Product Video URL',
   list_as: 'List As',
 };
 
@@ -28,7 +28,7 @@ export default function ProductDetails() {
     categoryData,
     brandData,
     fetchBrand,
-    setActiveTab
+    setActiveTab,
   } = useContext(ProductContext);
 
   const [errors, setErrors] = useState({});
@@ -234,11 +234,11 @@ export default function ProductDetails() {
           </label>
           <input
             type="text"
-            name="video_url"
+            name="video"
             className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
             placeholder="Video URL"
             onChange={handleChange}
-            value={formData.video_url || ''}
+            value={formData.video || ''}
           />
         </div>
 

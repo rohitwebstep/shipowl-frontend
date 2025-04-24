@@ -40,7 +40,7 @@ const handleSubmit = async (e) => {
           }
       });
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/product"; // Ensure the URL is correct
+      const url = "https://shipping-owl-vd4s.vercel.app/api/product"; // Ensure the URL is correct
       const form = new FormData();
 
       // Iterate over each field in formData

@@ -45,7 +45,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/auth/login`, {
+            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/admin/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),

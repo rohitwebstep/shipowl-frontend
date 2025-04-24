@@ -17,7 +17,7 @@ import productimage5 from "@/app/images/product5.png";
 const ProductTable = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [showRtoLiveCount, setShowRtoLiveCount] = useState(false);
-    const data = [
+    const product = [
         {
             id: 1,
             name: "Product Name",
@@ -94,6 +94,7 @@ const ProductTable = () => {
             productImage: productimage5,
         },
     ];
+
     const [products, setProducts] = useState([]);
     const { verifySupplierAuth } = useSupplier();
     const [isTrashed, setIsTrashed] = useState(false);
@@ -117,7 +118,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product`, {
+            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/product`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -163,7 +164,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
+            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/product/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -217,7 +218,7 @@ const ProductTable = () => {
                         $("#productTable").empty();
                     }
 
-                    // Reinitialize DataTable with new data
+                    // Reinitialize DataTable with new product
                     table = $("#productTable").DataTable();
 
                     return () => {
@@ -274,7 +275,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
+                `https://shipping-owl-vd4s.vercel.app/api/product/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -356,7 +357,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category/${item.id}/destroy`,
+                `https://shipping-owl-vd4s.vercel.app/api/category/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -418,7 +419,7 @@ const ProductTable = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
+                    `https://shipping-owl-vd4s.vercel.app/api/product/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -469,10 +470,7 @@ const ProductTable = () => {
     const handleCheckboxChange = (id) => {
         setSelected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
     };
-    const totalPages = Math.ceil(data.length / perPage);
-    const indexOfLast = currentPage * perPage;
-    const indexOfFirst = indexOfLast - perPage;
-    const currentData = data.slice(indexOfFirst, indexOfLast);
+   
     const handleEdit=(id)=>{
         router.push(`/supplier/brand/update?id=${item.id}`);
     }
@@ -527,7 +525,7 @@ const ProductTable = () => {
                             </div>
                             <span className="ml-2 text-sm text-gray-600">Show RTO Live Count</span>
                         </label>
-                        {selected < 1 && <span className="font-semibold text-[#2B3674]">Total: {data.length} Products</span>}
+                        {selected < 1 && <span className="font-semibold text-[#2B3674]">Total: {product.length} Products</span>}
                         {selected.length > 0 && (
                             <h5 className="font-semibold text-[#2B3674] bg-[#DFE9FF] p-3 flex rounded-md gap-7">
                                 {selected.length} Products Selected{" "}
@@ -558,7 +556,7 @@ const ProductTable = () => {
 
                 {/* Table */}
                 <div className="overflow-x-auto relative w-full">
-                    <table className="md:w-full w-auto">
+                    <table className="md:w-full w-auto" id="productTable">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
@@ -607,7 +605,7 @@ const ProductTable = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {currentData.map((item) => (
+                            {products.map((item) => (
                                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
                                     <td className="p-2 px-5 whitespace-nowrap">
                                         {" "}
@@ -691,34 +689,7 @@ const ProductTable = () => {
                     </table>
                 </div>
 
-                <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
-                    <div className="flex gap-1 items-center">
-                        <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50">
-                            <MdKeyboardArrowLeft /> Previous
-                        </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button key={index} onClick={() => setCurrentPage(index + 1)} className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""}`}>
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            Next <MdKeyboardArrowRight />
-                        </button>
-                    </div>
-
-                    {/* Per Page Selection */}
-                    <select value={perPage} onChange={(e) => setPerPage(Number(e.target.value))} className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold">
-                        {[5, 10, 15].map((num) => (
-                            <option key={num} value={num}>
-                                {num} /Per Page
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                
             </div>
         </div>
     );
