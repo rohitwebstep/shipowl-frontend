@@ -532,47 +532,47 @@ const ProductTable = () => {
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    NAME<i></i>
+                                    NAME
                                 </th>
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    SKU<i></i>
+                                    SKU
                                 </th>
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-red-500">
-                                    Suggested Price<i></i>
+                                    Suggested Price
                                 </th>
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Shipwoll Cost Price<i></i>
+                                    Shipwoll Cost Price
                                 </th>
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Quantity<i></i>
+                                    Quantity
                                 </th>
                                 {showRtoLiveCount && (
                                     <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">
-                                        Live RTO Stock<i></i>
+                                        Live RTO Stock
                                     </th>
                                 )}
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Order Auto Accept<i></i>
+                                    Order Auto Accept
                                 </th>
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Status<i></i>
+                                    Status
                                 </th>
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Admin Status<i></i>
+                                    Admin Status
                                 </th>
                                 {!showRtoLiveCount && (
                                     <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                        Model<i></i>
+                                        Model
                                     </th>
                                 )}
                                 {showRtoLiveCount && (
                                     <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                        RTO Status<i></i>
+                                        RTO Status
                                     </th>
                                 )}
 
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Action<i></i>
+                                    Action
                                 </th>
                             </tr>
                         </thead>
