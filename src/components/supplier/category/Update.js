@@ -183,7 +183,7 @@ export default function Update() {
         status: '',
         image:'',
                     });
-                    router.push("/supplier/category");
+                    router.push("/supplier/category/list");
                 }
             });
         } catch (error) {
