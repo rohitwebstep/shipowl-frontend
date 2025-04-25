@@ -2,10 +2,10 @@
 
 import { useState, useContext } from 'react';
 import { UploadCloud } from 'lucide-react';
-import { ProductContext } from './ProductContext';
+import { ProductContextEdit } from './ProductContextEdit';
 
 export default function ShippingDetails() {
-  const { formData, setFormData,setActiveTab } = useContext(ProductContext);
+  const { formData, setFormData, setActiveTab } = useContext(ProductContextEdit);
   const [errors, setErrors] = useState({});
 
   const fileFields = [
@@ -22,7 +22,7 @@ export default function ShippingDetails() {
     if (selectedFiles.length > 0) {
       setFormData((prev) => ({
         ...prev,
-        [key]: selectedFiles[0], // Store single file (you can adapt this if you want multiple)
+        [key]: selectedFiles[0], // Only store the first file
       }));
     }
   };
@@ -48,7 +48,7 @@ export default function ShippingDetails() {
 
     requiredFields.forEach((field) => {
       if (!formData[field]) {
-        newErrors[field] = `${field.replace('_', ' ')} is required`;
+        newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
       }
     });
 
@@ -64,9 +64,10 @@ export default function ShippingDetails() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
-
-    setActiveTab ('other-details') };
+    if (validateForm()) {
+      setActiveTab('other-details');
+    }
+  };
 
   return (
     <div className="xl:w-11/12 mt-4 xl:p-6 p-3 rounded-2xl bg-white">
@@ -77,9 +78,9 @@ export default function ShippingDetails() {
               Shipping Time (in Days) <span className="text-red-500">*</span>
             </label>
             <select
-              name="Shipping_time"
-              className={`border ${errors.Shipping_time ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
-              value={formData.Shipping_time || ''}
+              name="shipping_time"
+              className={`border ${errors.shipping_time ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
+              value={formData.shipping_time || ''}
               onChange={handleChange}
             >
               <option value="">Select</option>
@@ -87,7 +88,7 @@ export default function ShippingDetails() {
               <option value="3">3 Days</option>
               <option value="5">5 Days</option>
             </select>
-            {errors.Shipping_time && <p className="text-red-500 text-sm">{errors.Shipping_time}</p>}
+            {errors.shipping_time && <p className="text-red-500 text-sm">{errors.shipping_time}</p>}
           </div>
         </div>
 
@@ -95,7 +96,7 @@ export default function ShippingDetails() {
           {['weight', 'package_length', 'package_width', 'package_height', 'chargable_weight'].map((field) => (
             <div key={field}>
               <label className="text-[#232323] font-bold block">
-                {field.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())} <span className="text-red-500">*</span>
+                {field.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())} <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -127,6 +128,7 @@ export default function ShippingDetails() {
                   type="file"
                   className="absolute opacity-0 w-full h-full cursor-pointer"
                   onChange={(e) => handleFileChange(e, key)}
+                  // NOTE: Do not use `value` here for file inputs
                 />
               </div>
               {errors[key] && <p className="text-red-500 text-sm">{errors[key]}</p>}

@@ -4,27 +4,27 @@ import { useState, createContext, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 
-export const ProductContext = createContext();
+export const ProductContextEdit = createContext();
 
-const ProductProvider = ({ children }) => {
+const ProductProviderEdit = ({ children }) => {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("product-details");
 
   const [categoryData, setCategoryData] = useState([]);
   const [brandData, setBrandData] = useState([]);
   const [countryData, setCountryData] = useState([]);
   const [isEdit, setIsEdit] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({
     category: '',
     name: '',
     main_sku: '',
     description: '',
-    tags: [{}],
-    brands: '',
+    tags: [],
+    brand: '',
     origin_country: '',
     shipping_country: '',
-    video_url: '',
+    video: '',
     list_as: '',
     variant_images_0: '',
     variants: [
@@ -46,12 +46,12 @@ const ProductProvider = ({ children }) => {
     package_width: '',
     package_height: '',
     chargable_weight: '',
-    package_weight_image: '',
-    package_length_image: '',
-    package_width_image: '',
-    package_height_image: '',
-    product_detail_video: '',
-    upload_training_guidance_video: '',
+    package_weight_image:0,
+    package_length_image:0,
+    package_width_image:0,
+    package_height_image:0,
+    product_detail_video:0,
+    training_guidance_video:0,
     upc: '',
     ean: '',
     hsn_code: '',
@@ -76,7 +76,7 @@ const ProductProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://shipping-owl-vd4s.vercel.app/api/category', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/category', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ const ProductProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://shipping-owl-vd4s.vercel.app/api/brand', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/brand', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -154,9 +154,6 @@ const ProductProvider = ({ children }) => {
 
   const fetchCountry = useCallback(async () => {
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
-
-   
-
     const admintoken = adminData?.security?.token;
     if (!admintoken) {
       router.push('/admin/auth/login');
@@ -165,7 +162,7 @@ const ProductProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch('https://shipping-owl-vd4s.vercel.app/api/location/country', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/location/country', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -197,31 +194,33 @@ const ProductProvider = ({ children }) => {
     }
   }, [router]);
 
-  console.log('formData---',formData)
-  console.log('type',typeof formData.variants)
+  console.log('formData',formData)
 
   return (
-    <ProductContext.Provider
-      value={{
-        formData,
-        setFormData,
-        categoryData,
-        setCategoryData,
-        brandData,
-        setBrandData,
-        countryData,
-        setCountryData,
-        isEdit,
-        setIsEdit,
-        fetchCategory,
-        fetchBrand,
-        fetchCountry,
-        loading,
-      }}
-    >
-      {children}
-    </ProductContext.Provider>
+    <ProductContextEdit.Provider
+    value={{
+      formData,
+      setFormData,
+      categoryData,
+      setCategoryData,
+      brandData,
+      setBrandData,
+      countryData,
+      setCountryData,
+      isEdit,
+      setIsEdit,
+      fetchCategory,
+      fetchBrand,
+      fetchCountry,
+      loading,
+      activeTab,       // ✅ Added
+      setActiveTab,    // ✅ Added
+    }}
+  >
+    {children}
+  </ProductContextEdit.Provider>
+  
   );
 };
 
-export { ProductProvider };
+export { ProductProviderEdit };

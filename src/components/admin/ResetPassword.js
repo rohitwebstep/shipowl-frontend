@@ -32,7 +32,7 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch('https://shipping-owl-vd4s.vercel.app/api/admin/auth/password/reset', {
+      const res = await fetch('https://sleeping-owl-we0m.onrender.com/api/admin/auth/password/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password }),

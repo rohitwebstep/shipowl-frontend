@@ -24,7 +24,7 @@ const ProductProvider = ({ children }) => {
     brand: '',
     origin_country: '',
     shipping_country: '',
-    video: '',
+    video_url: '',
     list_as: '',
     variant_images_0: '',
     variants: [
@@ -40,12 +40,12 @@ const ProductProvider = ({ children }) => {
         rto_price:""
       },
     ],
-    Shipping_time: '',
+    shipping_time: '',
     weight: '',
     package_length: '',
     package_width: '',
     package_height: '',
-    chargable_weight: '',
+    chargeable_weight: '',
     package_weight_image:0,
     package_length_image:0,
     package_width_image:0,
@@ -76,7 +76,7 @@ const ProductProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://shipping-owl-vd4s.vercel.app/api/category', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/category', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ const ProductProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://shipping-owl-vd4s.vercel.app/api/brand', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/brand', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -165,7 +165,7 @@ const ProductProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch('https://shipping-owl-vd4s.vercel.app/api/location/country', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/location/country', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

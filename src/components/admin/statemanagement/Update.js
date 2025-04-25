@@ -61,7 +61,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/location/state/${id}`,
+        `https://sleeping-owl-we0m.onrender.com/api/location/state/${id}`,
         {
           method: "GET",
           headers: {
@@ -118,7 +118,7 @@ export default function Update() {
 
     try {
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/location/country`,
+        `https://sleeping-owl-we0m.onrender.com/api/location/country`,
         {
           method: "GET",
           headers: {
@@ -188,7 +188,7 @@ export default function Update() {
       }
 
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/location/state/${id}`,
+        `https://sleeping-owl-we0m.onrender.com/api/location/state/${id}`,
         {
           method: "PUT",
           headers: {

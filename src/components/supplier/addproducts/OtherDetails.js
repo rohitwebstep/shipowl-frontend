@@ -63,7 +63,7 @@ export default function OtherDetails() {
             }
         });
   
-        const url = "https://shipping-owl-vd4s.vercel.app/api/product"; // Ensure the URL is correct
+        const url = "https://sleeping-owl-we0m.onrender.com/api/product"; // Ensure the URL is correct
         const form = new FormData();
 
         for (const key in formData) {
@@ -133,7 +133,8 @@ export default function OtherDetails() {
                 }
             });
         }
-  
+        router.push("/supplier/product");
+
     } catch (error) {
         console.error("Error:", error);
         Swal.close();

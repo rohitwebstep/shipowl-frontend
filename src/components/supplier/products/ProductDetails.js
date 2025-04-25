@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext, useEffect, useState } from 'react';
-import { ProductContext } from './ProductContext';
+import { ProductContextEdit } from './ProductContextEdit';
 import "@pathofdev/react-tag-input/build/index.css"; // Required styles
 import ReactTagInput from "@pathofdev/react-tag-input";
 
@@ -29,7 +29,7 @@ export default function ProductDetails() {
     brandData,
     fetchBrand,
     setActiveTab,
-  } = useContext(ProductContext);
+  } = useContext(ProductContextEdit);
 
   const [errors, setErrors] = useState({});
 

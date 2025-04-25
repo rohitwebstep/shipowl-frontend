@@ -20,23 +20,25 @@ export default function Login() {
     const handleEmailChange = (e) => setEmail(e.target.value);
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
     const [formErrors, setFormErrors] = useState({});
-
-
     useEffect(() => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        const token = supplierData?.security?.token;
-
-        if (supplierData?.project?.active_panel !== "supplier") {
+        const checkAuth = async () => {
+          const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+          const token = supplierData?.security?.token;
+      
+          if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/supplier/auth/login");
             return;
-        }
-
-        if (token && verifySupplierAuth()) {
+          }
+      
+          if (token && await verifySupplierAuth()) {
             router.push("/supplier");
-        }
-
-    }, [router, verifySupplierAuth]); // empty array = run only once
+          }
+        };
+      
+        checkAuth();
+      }, []);
+      
     const validateForm = () => {
         const errors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,7 +78,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/supplier/auth/login`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),

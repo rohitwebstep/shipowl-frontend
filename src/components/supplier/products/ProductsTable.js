@@ -1,106 +1,35 @@
 "use client";
+import 'datatables.net-dt/css/dataTables.dataTables.css';
+
 import { useRouter} from "next/navigation";
 import Swal from "sweetalert2";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import HashLoader from "react-spinners/HashLoader";
 import React, { useState, useCallback, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
-import { MdModeEdit } from "react-icons/md";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
-import Image from "next/image";
 import { useSupplier } from "../middleware/SupplierMiddleWareContext";
-import productimage from "@/app/images/product1.png";
-import productimage2 from "@/app/images/product2.png";
-import productimage3 from "@/app/images/product3.png";
-import productimage4 from "@/app/images/product4.png";
-import productimage5 from "@/app/images/product5.png";
+import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
+import { AiOutlineDelete } from "react-icons/ai";
 const ProductTable = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [showRtoLiveCount, setShowRtoLiveCount] = useState(false);
-    const product = [
-        {
-            id: 1,
-            name: "Product Name",
-            sku: "#SKU58208",
-            suggestedPrice: 5,
-            costPrice: 5,
-            quantity: 5,
-            liveRtoStock: 5,
-            autoAccept: true,
-            rtoStatus: "Free",
-            adminStatus: "rejected",
-            status: false,
-            model: "Warehouse",
-            productImage: productimage,
-        },
-        {
-            id: 2,
-            name: "Product Name",
-            sku: "#SKU5858",
-            suggestedPrice: 4,
-            costPrice: 4,
-            quantity: 4,
-            liveRtoStock: 4,
-            autoAccept: false,
-            status: false,
-            adminStatus: "rejected",
-            rtoStatus: "Include RTO",
-            model: "RTO",
-            productImage: productimage2,
-        },
-        {
-            id: 3,
-            name: "Product Name",
-            sku: "#SKU78208",
-            suggestedPrice: 6,
-            costPrice: 6,
-            quantity: 6,
-            liveRtoStock: 6,
-            autoAccept: false,
-            status: true,
-            adminStatus: "Pending",
-            rtoStatus: "Free",
-            model: "RTO",
-            productImage: productimage3,
-        },
-        {
-            id: 4,
-            name: "Product Name",
-            sku: "#SKU98208",
-            suggestedPrice: 8,
-            costPrice: 8,
-            quantity: 8,
-            liveRtoStock: 8,
-            autoAccept: false,
-            status: false,
-            adminStatus: "Pending",
-            rtoStatus: "Include RTO",
-            model: "Warehouse",
-            productImage: productimage4,
-        },
-        {
-            id: 5,
-            name: "Product Name",
-            sku: "#SKU56208",
-            suggestedPrice: 10,
-            costPrice: 10,
-            quantity: 10,
-            liveRtoStock: 10,
-            autoAccept: false,
-            status: true,
-            adminStatus: "Pending",
-            rtoStatus: "Free",
-            model: "Warehouse",
-            productImage: productimage5,
-        },
-    ];
-
+    const [selectedRtoAddress, setSelectedRtoAddress] = useState('');
+    const [selectedPickupAddress, setSelectedPickupAddress] = useState('');
+    const [selectedModel, setSelectedModel] = useState('');
     const [products, setProducts] = useState([]);
     const { verifySupplierAuth } = useSupplier();
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-
+    const filteredProducts = products.filter((item) => {
+        const matchesRto = selectedRtoAddress ? item.rtoAddress === selectedRtoAddress : true;
+        const matchesPickup = selectedPickupAddress ? item.pickupAddress === selectedPickupAddress : true;
+        const matchesModel = selectedModel ? item.list_as === selectedModel : true;
+      
+        return matchesRto && matchesPickup && matchesModel;
+      });
+      
     const fetchProduct = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -118,7 +47,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/product`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -138,7 +67,7 @@ const ProductTable = () => {
 
             const result = await response.json();
             if (result) {
-                setProducts(result?.product || []);
+                setProducts(result?.products || []);
             }
         } catch (error) {
             console.error("Error fetching categories:", error);
@@ -164,7 +93,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/product/trashed`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -184,7 +113,7 @@ const ProductTable = () => {
 
             const result = await response.json();
             if (result) {
-                setProducts(result?.categories || []);
+                setProducts(result?.products || []);
             }
         } catch (error) {
             console.error("Error fetching trashed categories:", error);
@@ -275,7 +204,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -357,7 +286,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/category/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -419,7 +348,7 @@ const ProductTable = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://shipping-owl-vd4s.vercel.app/api/product/${item?.id}/restore`,
+                    `https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -461,8 +390,6 @@ const ProductTable = () => {
     }, [router, trashProducts]);
     
     const [selected, setSelected] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [perPage, setPerPage] = useState(5);
     const [selectedMonth, setSelectedMonth] = useState(() => {
         const today = new Date();
         return today.toISOString().slice(0, 7);
@@ -472,7 +399,7 @@ const ProductTable = () => {
     };
    
     const handleEdit=(id)=>{
-        router.push(`/supplier/brand/update?id=${item.id}`);
+        router.push(`/supplier/product/update?id=${id}`);
     }
 
     return (
@@ -491,22 +418,45 @@ const ProductTable = () => {
             <div className="flex flex-wrap justify-between gap-4 items-end">
                 <div className="w-full md:w-4/12">
                     <label className="block text-sm font-medium text-gray-700">RTO Address *</label>
-                    <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm">
-                        <option></option>
-                    </select>
+                    <select
+  value={selectedRtoAddress}
+  onChange={(e) => setSelectedRtoAddress(e.target.value)}
+  className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
+>
+  <option value="">All</option>
+  {[...new Set(products.map(item => item.rtoAddress))].map((addr, index) => (
+    <option key={index} value={addr}>{addr}</option>
+  ))}
+</select>
+
                 </div>
 
                 <div className="w-full md:w-3/12">
                     <label className="block text-sm font-medium text-gray-700">Pickup Address *</label>
-                    <select className="w-full mt-1 px-3 border-[#DFEAF2] bg-white py-3 border rounded-lg text-sm">
-                        <option></option>
-                    </select>
+                    <select
+  value={selectedPickupAddress}
+  onChange={(e) => setSelectedPickupAddress(e.target.value)}
+  className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
+>
+  <option value="">All</option>
+  {[...new Set(products.map(item => item.pickupAddress))].map((addr, index) => (
+    <option key={index} value={addr}>{addr}</option>
+  ))}
+</select>
+
                 </div>
 
                 <div className="w-full md:w-3/12">
                     <label className="block text-sm font-medium text-gray-700">Select Model</label>
-                    <select className="w-full mt-1 px-3 py-3 border border-[#DFEAF2] bg-white rounded-lg text-sm">
-                        <option></option>
+                    <select
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value)}
+                    className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
+                    >
+                    <option value="">All</option>
+                    {[...new Set(products.map(item => item.list_as))].map((model, index) => (
+                        <option key={index} value={model}>{model}</option>
+                    ))}
                     </select>
                 </div>
 
@@ -514,6 +464,11 @@ const ProductTable = () => {
                     <button className="bg-[#F98F5C] text-white px-6 py-3 rounded-lg text-sm">Save</button>
                 </div>
             </div>
+            {loading ? (
+                <div className="flex justify-center items-center h-96">
+                    <HashLoader color="orange" />
+                </div>
+            ) : (
             <div className="bg-white rounded-2xl mt-5 p-4">
                 <div className="flex flex-wrap justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-[#2B3674]">Product Details</h2>
@@ -525,7 +480,7 @@ const ProductTable = () => {
                             </div>
                             <span className="ml-2 text-sm text-gray-600">Show RTO Live Count</span>
                         </label>
-                        {selected < 1 && <span className="font-semibold text-[#2B3674]">Total: {product.length} Products</span>}
+                        {selected < 1 && <span className="font-semibold text-[#2B3674]">Total: {filteredProducts.length} Products</span>}
                         {selected.length > 0 && (
                             <h5 className="font-semibold text-[#2B3674] bg-[#DFE9FF] p-3 flex rounded-md gap-7">
                                 {selected.length} Products Selected{" "}
@@ -551,12 +506,29 @@ const ProductTable = () => {
                                 </div>
                             )}
                         </button>
+                         <div className="flex justify-end gap-2">
+                                                        <button
+                                                            className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                                            onClick={async () => {
+                                                                if (isTrashed) {
+                                                                    setIsTrashed(false);
+                                                                    await fetchProduct();
+                                                                } else {
+                                                                    setIsTrashed(true);
+                                                                    await trashProducts();
+                                                                }
+                                                            }}
+                                                        >
+                                                            {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
+                                                        </button>
+                                                       
+                                                    </div>
                     </div>
                 </div>
 
                 {/* Table */}
-                <div className="overflow-x-auto relative w-full">
-                    <table className="md:w-full w-auto" id="productTable">
+                <div className="overflow-x-auto relative main-outer-wrapper w-full">
+                    <table className="md:w-full w-auto display main-tables" id="productTable">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
@@ -605,10 +577,9 @@ const ProductTable = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {products.map((item) => (
+                            {filteredProducts.map((item) => (
                                 <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
                                     <td className="p-2 px-5 whitespace-nowrap">
-                                        {" "}
                                         <div className="flex items-center">
                                             <label className="flex items-center cursor-pointer me-2">
                                                 <input type="checkbox" checked={selected.includes(item.id)} onChange={() => handleCheckboxChange(item.id)} className="peer hidden" />
@@ -619,15 +590,23 @@ const ProductTable = () => {
                                                     <FaCheck className=" peer-checked:block text-white w-3 h-3" />
                                                 </div>
                                             </label>
-
-                                            <Image src={item.productImage} alt={item.name} className="h-8 w-8 me-3" />
-                                            <span className="truncate"> {item.name}</span>
+                         
+                                            <span className="truncate"> {item.name|| 'NIL'}</span>
                                         </div>
                                     </td>
-                                    <td className="p-2 px-5 whitespace-nowrap">{item.sku}</td>
-                                    <td className="p-2 px-5 whitespace-nowrap text-red-500">{item.suggestedPrice}</td>
-                                    <td className="p-2 px-5 whitespace-nowrap">{item.costPrice}</td>
-                                    <td className="p-2 px-5 whitespace-nowrap">{item.quantity}</td>
+                                    <td className="p-2 px-5 whitespace-nowrap">{item.main_sku|| 'NIL'}</td>
+                                    {(() => {
+                                    const variant = item.variants[0] || {};
+                                    return (
+                                        <>
+                                        <td className="p-2 px-5 whitespace-nowrap text-red-500">{variant.suggested_price || 'NIL'}</td>
+                                        <td className="p-2 px-5 whitespace-nowrap">{variant.shipowl_price || 'NIL'}</td>
+                                        <td className="p-2 px-5 whitespace-nowrap">{variant.qty || 'NIL'}</td>
+                                        </>
+                                    );
+                                    })()}
+
+
                                     {showRtoLiveCount && <td className="p-2 px-5 whitespace-nowrap text-blue-500">{item.liveRtoStock}</td>}
                                     <td className="p-2 px-5 whitespace-nowrap">
                                         <div className="flex items-center mb-4">
@@ -654,7 +633,7 @@ const ProductTable = () => {
                                             className={` py-2 text-white rounded-md text-sm p-3 uppercase  min-w-[95px]
     ${item.adminStatus === "Done" ? "bg-green-500" : item.adminStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
                                         >
-                                            {item.adminStatus}
+                                            {item.adminStatus || 'NIL'}
                                         </button>
                                     </td>
                                     {!showRtoLiveCount && (
@@ -663,7 +642,7 @@ const ProductTable = () => {
                                                 className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px] 
     ${item.model === "Warehouse" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
                                             >
-                                                {item.model}
+                                                {item.list_as || 'NIL'}
                                             </button>
                                         </td>
                                     )}
@@ -674,14 +653,24 @@ const ProductTable = () => {
                                                 className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
     ${item.rtoStatus === "Free" ? "bg-green-500" : item.rtoStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
                                             >
-                                                {item.rtoStatus}
+                                                {item.rtoStatus || 'NIL'}
                                             </button>
                                         </td>
                                     )}
                                     <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]">
-                                        <div className="flex justify-center">
-                                            <MdModeEdit onClick={()=>handleEdit(item.id)} className="text-center" />
-                                        </div>
+                                        <div className="flex justify-center gap-2">
+                                    {isTrashed ? (
+                                        <>
+                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <MdModeEdit onClick={() => handleEdit(item.id)} className="cursor-pointer text-2xl" />
+                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                                        </>
+                                    )}
+                                </div>
                                     </td>
                                 </tr>
                             ))}
@@ -691,6 +680,7 @@ const ProductTable = () => {
 
                 
             </div>
+            )}
         </div>
     );
 };

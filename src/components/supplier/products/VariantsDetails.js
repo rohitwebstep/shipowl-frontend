@@ -2,11 +2,10 @@
 
 import { useContext, useEffect } from 'react';
 import { Plus, Minus, ImageIcon } from 'lucide-react';
-import Image from 'next/image';
-import { ProductContext } from './ProductContext';
+import { ProductContextEdit } from './ProductContextEdit';
 
 export default function VariantDetails() {
-  const { fetchCountry,formData,setFormData,countryData,setActiveTab } = useContext(ProductContext);
+  const { fetchCountry,formData,setFormData,countryData,setActiveTab } = useContext(ProductContextEdit);
 
   const handleChange = (index, field, value) => {
     const updatedVariants = [...formData.variants];

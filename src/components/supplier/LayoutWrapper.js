@@ -9,6 +9,7 @@ import { CategoryProvider } from "./category/CategoryContext";
 import { ApiProvider } from "../ApiContext";
 import { BrandProvider } from "./brand/BrandContext";
 import { ProductProvider } from "./addproducts/ProductContext";
+import { ProductProviderEdit } from "./products/ProductContextEdit";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
@@ -28,6 +29,7 @@ export default function LayoutWrapper({ children }) {
             <div className=" xl:p-3 md:pt-4 md:px-0">
               <SupplierMiddleWareProvider>
                 <ProductProvider>
+                <ProductProviderEdit>
                 <ApiProvider>
                   <CategoryProvider>
                     <BrandProvider>
@@ -35,6 +37,7 @@ export default function LayoutWrapper({ children }) {
                     </BrandProvider>
                   </CategoryProvider>
                 </ApiProvider>
+                </ProductProviderEdit>
                 </ProductProvider>
               </SupplierMiddleWareProvider>
 

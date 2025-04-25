@@ -2,7 +2,6 @@
 
 import { useContext, useEffect } from 'react';
 import { Plus, Minus, ImageIcon } from 'lucide-react';
-import Image from 'next/image';
 import { ProductContext } from './ProductContext';
 
 export default function VariantDetails() {
@@ -46,7 +45,7 @@ export default function VariantDetails() {
           sku: '',
           qty: 1,
           currency: 'INR',
-          productLink: '',
+          product_link: '',
           articleId: '',
           image: null,
         },
@@ -147,7 +146,7 @@ export default function VariantDetails() {
           <div>
             <label className='text-[#A3AED0] text-sm'>Suggested Price</label>
             <input
-              type="text"
+              type="number"
               placeholder="Suggested Price"
               className="border p-2 rounded-xl text-[#718EBF] font-bold border-[#DFEAF2] w-full"
               value={variant.suggested_price || ''}
@@ -157,7 +156,7 @@ export default function VariantDetails() {
           <div>
             <label className='text-[#A3AED0] text-sm'>ShipOwl Cost Price (ex. GST)</label>
             <input
-              type="text"
+              type="number"
               placeholder="B2B Price"
               className="border p-2 rounded-xl text-[#718EBF] font-bold border-[#DFEAF2] w-full"
               value={variant.shipowl_price || ''}
@@ -171,7 +170,7 @@ export default function VariantDetails() {
           <div>
             <label className='text-[#A3AED0] text-sm'>Suggested Price</label>
             <input
-              type="text"
+              type="number"
               placeholder="Product MRP"
               className="border p-2 rounded-xl text-[#718EBF] font-bold border-[#DFEAF2] w-full"
               value={variant.rto_suggested_price || ''}
@@ -181,7 +180,7 @@ export default function VariantDetails() {
           <div>
             <label className='text-[#A3AED0] text-sm'>ShipOwl Cost Price (ex. GST)</label>
             <input
-              type="text"
+              type="number"
               placeholder="B2B Price"
               className="border p-2 rounded-xl text-[#718EBF] font-bold border-[#DFEAF2] w-full"
               value={variant.rto_price || ''}
@@ -201,7 +200,6 @@ export default function VariantDetails() {
             />
           </div>
 
-          {/* Article Id */}
           <div>
             <span className="text-orange-500 font-semibold whitespace-nowrap lg:hidden block">Article Id</span>
             <input
@@ -214,21 +212,18 @@ export default function VariantDetails() {
           </div>
 
           <div className="md:flex justify-end">
-  <span className="text-orange-500 font-semibold whitespace-nowrap lg:hidden block">Images</span>
-  <div className="relative border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
-    
-      <ImageIcon className="w-8 h-8 text-gray-400" />
-  
-    <input
-      type="file"
-      className="absolute opacity-0 w-full h-full cursor-pointer"
-      onChange={(e) => handleFileChange(e, index)}
-    />
-  </div>
-</div>
-
-
-          {/* Remove Variant */}
+          <span className="text-orange-500 font-semibold whitespace-nowrap lg:hidden block">Images</span>
+          <div className="relative border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
+            
+              <ImageIcon className="w-8 h-8 text-gray-400" />
+          
+            <input
+              type="file"
+              className="absolute opacity-0 w-full h-full cursor-pointer"
+              onChange={(e) => handleFileChange(e, index)}
+            />
+          </div>
+        </div>
           <div className="flex items-start justify-end gap-2">
             <button className="bg-red-500 text-white p-2 rounded" onClick={() => removeVariant(index)}>
               <Minus className="w-4 h-4" />
