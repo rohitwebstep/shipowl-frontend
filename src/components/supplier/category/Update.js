@@ -179,14 +179,9 @@ export default function Update() {
                 if (res.isConfirmed) {
                     setFormData({
                         name: '',
-                        gst_number: '',
-                        contact_name: '',
-                        contact_number: '',
-                        address_line_1: '',
-                        address_line_2: '',
-                        city: '',
-                        state: '',
-                        postal_code: ''
+        description: '',
+        status: '',
+        image:'',
                     });
                     router.push("/supplier/category");
                 }
