@@ -87,16 +87,16 @@ export default function Update() {
             }
 
             const result = await response.json();
-            const warehouse = result?.category || {};
+            const category = result?.category || {};
 
             setFormData({
-                name: warehouse.name || '',
-                description: warehouse.description ||'',
-                status: warehouse.status || true,
-                image: warehouse.image || '',
+                name: category.name || '',
+                description: category.description ||'',
+                status: category.status || true,
+                image: category.image || '',
             });
         } catch (error) {
-            console.error("Error fetching warehouse:", error);
+            console.error("Error fetching category:", error);
         } finally {
             setLoading(false);
         }
@@ -134,15 +134,15 @@ export default function Update() {
 
         try {
             Swal.fire({
-                title: 'Updating Warehouse...',
-                text: 'Please wait while we save your warehouse.',
+                title: 'Updating category...',
+                text: 'Please wait while we save your category.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/warehouse${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {
@@ -172,8 +172,8 @@ export default function Update() {
             Swal.close();
             Swal.fire({
                 icon: "success",
-                title: "Warehouse Updated",
-                text: `The warehouse has been updated successfully!`,
+                title: "category Updated",
+                text: `The category has been updated successfully!`,
                 showConfirmButton: true,
             }).then((res) => {
                 if (res.isConfirmed) {
@@ -188,7 +188,7 @@ export default function Update() {
                         state: '',
                         postal_code: ''
                     });
-                    router.push("/supplier/warehouse");
+                    router.push("/supplier/category");
                 }
             });
         } catch (error) {
@@ -226,7 +226,7 @@ export default function Update() {
                     <HashLoader color="orange" />
                 </div>
             ) : (
-                <section className="add-warehouse xl:w-8/12">
+                <section className="add-category xl:w-8/12">
                     <div className="bg-white rounded-2xl p-5">
                         <form onSubmit={handleSubmit}>
                             <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
