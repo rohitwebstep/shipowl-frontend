@@ -21,6 +21,7 @@ export default function Update() {
         postal_code: ''
     });
     const [countryData, setCountryData] = useState([]);
+    const [allData, setAllData] = useState([]);
 
     const [stateData, setStateData] = useState([]);
     const [cityData, setCityData] = useState([]);
@@ -188,9 +189,7 @@ export default function Update() {
             }
         }, [router, setCountryData,]);
     
-     useEffect(()=>{
-        fetchcountry();
-    },[fetchcountry]);
+     
 
     const validate = () => {
         const errors = {};
@@ -202,7 +201,7 @@ export default function Update() {
         if (!formData.city.trim()) errors.city = 'City is required.';
         if (!formData.state.trim()) errors.state = 'State is required.';
         if (!formData.postal_code.trim()) errors.postal_code = 'Postal code is required.';
-        if (!formData.country.trim()) errors.country = 'Postal code is required.';
+        if (!formData.country.trim()) errors.country = 'Country code is required.';
         return errors;
     };
 
@@ -271,8 +270,11 @@ export default function Update() {
                 address_line_2: warehouse.address_line_2 || '',
                 city: warehouse.cityId || '',
                 state: warehouse.stateId || '',
+                country: warehouse.countryId || '',
                 postal_code: warehouse.postal_code || ''
             });
+            fetchState(warehouse?.countryId);
+            fetchCity(warehouse?.stateId);
         } catch (error) {
             console.error("Error fetching warehouse:", error);
         } finally {
@@ -280,9 +282,7 @@ export default function Update() {
         }
     }, [router, id]);
 
-    useEffect(() => {
-        fetchwarehouse();
-    }, [fetchwarehouse]);
+  
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -383,15 +383,23 @@ export default function Update() {
         }
     };
 
+    useEffect(() => {
+      const fetchData = async () => {
+        await fetchwarehouse();
+        await fetchcountry();
+      };
+      fetchData();
+    }, []);
+    
     if (loading) {
-        return (
-            <div className="flex items-center justify-center h-[80vh]">
-                <HashLoader size={60} color="#F97316" loading={true} />
-            </div>
-        );
+      return (
+        <div className="flex items-center justify-center h-[80vh]">
+          <HashLoader size={60} color="#F97316" loading={true} />
+        </div>
+      );
     }
-
-    return (
+    
+      return (
         <section className="add-warehouse xl:w-8/12">
            <form onSubmit={handleSubmit}>
   <div className="bg-white rounded-2xl p-5">

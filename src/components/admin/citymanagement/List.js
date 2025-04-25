@@ -18,6 +18,8 @@ export default function List() {
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState([]);
     const [cityData, setCityData] = useState([]);
+    const [stateData, setStateData] = useState([]);
+    const [countryData, setCountryData] = useState([]);
     const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
 
@@ -68,6 +70,8 @@ export default function List() {
             }
     
             setCityData(result?.cities || []);
+            setCountryData(result?.countries || []);
+            setStateData(result?.states || []);
         } catch (error) {
             console.error("Error fetching cities:", error);
         } finally {
@@ -520,8 +524,8 @@ export default function List() {
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                         <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">City Name</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">city Code</th>
-                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country Code</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">State</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
                                         <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
                                     </tr>
                                 </thead>
@@ -545,11 +549,38 @@ export default function List() {
                                                 </div>
                                             </td>
                                            
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.id}</td>
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
-                                                {item.countryId}
-                                                
-                                            </td>
+                                            <td className="px-6 py-4">
+                                            {
+                                                (() => {
+                                                const filtered = stateData.filter((c) => {
+                                                    const match = c.id === item.stateId;
+                                                    return match;
+                                                });
+
+
+                                                const names = filtered.map((c) => {
+                                                    return c.name;
+                                                });
+                                                return names.join(', ');
+                                                })()
+                                            }
+                                            </td>  
+                                            <td className="px-6 py-4">
+                                            {
+                                                (() => {
+                                                const filtered = countryData.filter((c) => {
+                                                    const match = c.id === item.countryId;
+                                                    return match;
+                                                });
+
+
+                                                const names = filtered.map((c) => {
+                                                    return c.name;
+                                                });
+                                                return names.join(', ');
+                                                })()
+                                            }
+                                            </td>  
                                             <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
                                                 <div className="flex justify-center gap-2">
                                                     {isTrashed ? (

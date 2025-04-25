@@ -13,6 +13,8 @@ const BrandProvider = ({ children }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
+        status:'',
+        image:""
     });
 
     const fetchBrand = useCallback(async () => {

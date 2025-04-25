@@ -23,7 +23,6 @@ export default function VariantDetails() {
   },[fetchCountry])
 
   const handleFileChange = (event, index) => {
-    console.log('index',index)
     const file = event.target.files[0];
     if (file) {
       const imageKey = `variant_images_${index}`;

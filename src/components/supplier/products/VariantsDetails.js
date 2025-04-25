@@ -25,7 +25,6 @@ export default function VariantDetails() {
   },[fetchCountry])
 
   const handleFileChange = (event, index) => {
-    console.log('index',index)
     const file = event.target.files[0];
     if (file) {
       const imageKey = `variant_images_${index}`;
@@ -43,13 +42,16 @@ export default function VariantDetails() {
       variants: [
         ...formData.variants,
         {
+          image: null,
           color: '',
           sku: '',
           qty: 1,
-          currency: 'INR',
-          productLink: '',
-          articleId: '',
-          image: null,
+          currency: '',
+          article_id: '',
+          suggested_price:"",
+          shipowl_price:"",
+          rto_suggested_price:"",
+          rto_price:""
         },
       ],
     });
@@ -209,8 +211,8 @@ export default function VariantDetails() {
               type="text"
               placeholder="Article Id"
               className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]"
-              value={variant.articleId}
-              onChange={(e) => handleChange(index, 'articleId', e.target.value)}
+              value={variant.article_id}
+              onChange={(e) => handleChange(index, 'article_id', e.target.value)}
             />
           </div>
 

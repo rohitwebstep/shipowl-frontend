@@ -66,13 +66,11 @@ export default function Login() {
         setError(null);
 
         const validationError = validateForm(); // returns an object
-        console.log('validationError', validationError)
 
         if (Object.keys(validationError).length > 0) {
             setFormErrors(validationError);
             return; // ✅ Stop here if validation fails
         }
-        console.log('formerror', formErrors);
 
         setFormErrors({})
         setLoading(true);

@@ -19,7 +19,6 @@ const router =useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Submitting Courier Company:", formData);
     // TODO: Submit data to backend
   };
 

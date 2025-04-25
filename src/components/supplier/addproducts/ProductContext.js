@@ -197,8 +197,6 @@ const ProductProvider = ({ children }) => {
     }
   }, [router]);
 
-  console.log('formData',formData)
-
   return (
     <ProductContext.Provider
     value={{

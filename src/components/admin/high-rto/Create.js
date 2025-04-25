@@ -23,15 +23,11 @@ export default function Create() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Submitting Courier Company:", formData);
-    // TODO: Submit single form data
   };
 
   const handleBulkSubmit = (e) => {
     e.preventDefault();
     if (bulkFile) {
-      console.log("Uploading Bulk File:", bulkFile.name);
-      // TODO: Upload the bulkFile to the server
     }
   };
 

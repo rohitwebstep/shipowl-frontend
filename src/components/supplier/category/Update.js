@@ -13,16 +13,11 @@ import 'swiper/css/navigation';
 export default function Update() {
     const [formData, setFormData] = useState({
         name: '',
-        gst_number: '',
-        contact_name: '',
-        contact_number: '',
-        address_line_1: '',
-        address_line_2: '',
-        city: '',
-        state: '',
-        postal_code: ''
+        description: '',
+        status: '',
+        image:'',
     });
-
+    const [files, setFiles] = useState([]);
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
     const [validationErrors, setValidationErrors] = useState({});
@@ -38,16 +33,12 @@ export default function Update() {
 
     const validate = () => {
         const errors = {};
-        if (!formData.name.trim()) errors.name = 'Warehouse name is required.';
-        if (!formData.gst_number.trim()) errors.gst_number = 'GST number is required.';
-        if (!formData.contact_name.trim()) errors.contact_name = 'Contact name is required.';
-        if (!formData.contact_number.trim()) errors.contact_number = 'Contact number is required.';
-        if (!formData.address_line_1.trim()) errors.address_line_1 = 'Address Line 1 is required.';
-        if (!formData.city.trim()) errors.city = 'City is required.';
-        if (!formData.state.trim()) errors.state = 'State is required.';
-        if (!formData.postal_code.trim()) errors.postal_code = 'Postal code is required.';
+        if (!formData.name.trim()) errors.name = 'Category name is required.';
+        if (!formData.description.trim()) errors.description = 'Category description is required.';
+        if (!formData.image && files.length === 0) errors.image = 'Category image is required.';
         return errors;
     };
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -57,7 +48,7 @@ export default function Update() {
         }));
     };
 
-    const fetchwarehouse = useCallback(async () => {
+    const fetchCategory = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
         if (supplierData?.project?.active_panel !== "supplier") {
@@ -96,12 +87,13 @@ export default function Update() {
             }
 
             const result = await response.json();
-            const warehouse = result?.categories || {};
+            const warehouse = result?.category || {};
 
             setFormData({
                 name: warehouse.name || '',
                 description: warehouse.description ||'',
                 status: warehouse.status || true,
+                image: warehouse.image || '',
             });
         } catch (error) {
             console.error("Error fetching warehouse:", error);
@@ -111,8 +103,8 @@ export default function Update() {
     }, [router, id]);
 
     useEffect(() => {
-        fetchwarehouse();
-    }, [fetchwarehouse]);
+        fetchCategory();
+    }, [fetchCategory]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -220,6 +212,11 @@ export default function Update() {
             </div>
         );
     }
+
+    const handleFileChange = (e) => {
+        const selectedFiles = Array.from(e.target.files);
+        setFiles(selectedFiles);
+    };
 
 
     return (

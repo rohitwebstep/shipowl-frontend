@@ -41,26 +41,26 @@ export default function Update() {
         const errors = {};
 
         if (!formData.name || formData.name.trim() === '') {
-            errors.name = 'Category name is required.';
+            errors.name = 'brand name is required.';
         }
         if (!formData.description || formData.description.trim() === '') {
-            errors.description = 'Category description is required.';
+            errors.description = 'brand description is required.';
         }
         if ((!files || files.length === 0) && (!formData.image || formData.image.trim() === '')) {
-            errors.image = 'At least one category image is required.';
+            errors.image = 'At least one brand image is required.';
         }
 
         return errors;
     };
 
-    const fetchCategory = useCallback(async () => {
+    const fetchbrand = useCallback(async () => {
         if (!id) {
             Swal.fire({
                 icon: "error",
-                title: "Invalid Category",
-                text: "No category ID provided.",
+                title: "Invalid brand",
+                text: "No brand ID provided.",
             });
-            router.push("/supplier/category/list");
+            router.push("/supplier/brand/list");
             return;
         }
 
@@ -81,7 +81,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -107,9 +107,8 @@ export default function Update() {
             }
 
             const result = await response.json();
-            if (result && result.category) {
-                const currentCat = result.category;
-                console.log('currentCat', currentCat);
+            if (result && result.brand) {
+                const currentCat = result.brand;
                 setFormData({
                     name: currentCat.name || '',
                     description: currentCat.description || '',
@@ -118,15 +117,15 @@ export default function Update() {
                 });
             }
         } catch (error) {
-            console.error("Error fetching category:", error);
+            console.error("Error fetching brand:", error);
         } finally {
             setLoading(false);
         }
     }, [router, id, setFormData]);
 
     useEffect(() => {
-        fetchCategory();
-    }, [fetchCategory]);
+        fetchbrand();
+    }, [fetchbrand]);
 
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
@@ -161,8 +160,8 @@ export default function Update() {
 
         try {
             Swal.fire({
-                title: 'Updating Category...',
-                text: 'Please wait while we save your category.',
+                title: 'Updating brand...',
+                text: 'Please wait while we save your brand.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -179,7 +178,7 @@ export default function Update() {
                 });
             }
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`;
 
             const response = await fetch(url, {
                 method: "PUT",
@@ -206,14 +205,14 @@ export default function Update() {
             if (result) {
                 Swal.fire({
                     icon: "success",
-                    title: "Category Updated",
-                    text: `The category has been updated successfully!`,
+                    title: "brand Updated",
+                    text: `The brand has been updated successfully!`,
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
                         setFormData({ name: '', description: '', image: '', status: false });
                         setFiles([]);
-                        router.push("/supplier/category/list");
+                        router.push("/supplier/brand/list");
                     }
                 });
             }
@@ -257,7 +256,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}/image/${index}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}/image/${index}`;
 
             const response = await fetch(url, {
                 method: "DELETE",
@@ -288,7 +287,7 @@ export default function Update() {
                     showConfirmButton: true,
                 }).then((res) => {
                     if (res.isConfirmed) {
-                        fetchCategory(); // Refresh formData with updated images
+                        fetchbrand(); // Refresh formData with updated images
                     }
                 });
             }
@@ -306,6 +305,8 @@ export default function Update() {
         }
     };
 
+
+    console.log('formData',formData)
     return (
         <>
             {loading ? (
@@ -319,7 +320,7 @@ export default function Update() {
                             <div className="grid md:grid-cols-2 grid-cols-1 gap-3">
                                 <div>
                                     <label htmlFor="name" className="font-bold block text-[#232323]">
-                                        Category Name <span className="text-red-500 text-lg">*</span>
+                                        Brand Name <span className="text-red-500 text-lg">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -337,7 +338,7 @@ export default function Update() {
 
                                 <div>
                                     <label htmlFor="description" className="font-bold block text-[#232323]">
-                                        Category Description <span className="text-red-500 text-lg">*</span>
+                                        Brand Description <span className="text-red-500 text-lg">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -356,7 +357,7 @@ export default function Update() {
 
                             <div className="mt-2">
                                 <label htmlFor="image" className="font-bold block text-[#232323]">
-                                    Upload Category Images <span className="text-red-500 text-lg">*</span>
+                                    Upload Brand Images <span className="text-red-500 text-lg">*</span>
                                 </label>
                                 <input
                                     type="file"
@@ -367,33 +368,59 @@ export default function Update() {
                                     className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold ${validationErrors.image ? "border-red-500" : "border-[#E0E5F2]"
                                         }`}
                                 />
-                                {validationErrors.image && (
-                                    <p className="text-red-500 text-sm mt-1">{validationErrors.image}</p>
-                                )}
-
-                                {formData.image && Array.isArray(formData.image) && formData.image.length > 0 && (
-                                    <div className="grid grid-cols-3 gap-4 mt-4">
-                                        {formData.image.map((img, index) => (
-                                            <div key={index} className="relative">
-                                                <Image
-                                                    src={img}
-                                                    alt={`Category Image ${index + 1}`}
-                                                    width={100}
-                                                    height={100}
-                                                    className="rounded-md object-cover"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleImageDelete(index)}
-                                                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                                                    title="Delete Image"
-                                                >
-                                                    ×
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                           {formData?.image && (
+                                                              <div className="mt-2">
+                                                                  <Swiper
+                                                                      key={formData.id}
+                                                                      modules={[Navigation]}
+                                                                      slidesPerView={2}
+                                                                      loop={formData.image?.split(',').length > 1}
+                                                                      navigation={true}
+                                                                      className="mySwiper w-full ms-2"
+                                                                  >
+                                                                      {formData.image?.split(',').map((img, index) => (
+                                                                          <SwiperSlide key={index} className="relative gap-3">
+                                                                              {/* Delete Button */}
+                                                                              <button
+                                                                                  type="button"
+                                                                                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                                                                                  onClick={() => {
+                                                                                      Swal.fire({
+                                                                                          title: 'Are you sure?',
+                                                                                          text: `Do you want to delete this image?`,
+                                                                                          icon: 'warning',
+                                                                                          showCancelButton: true,
+                                                                                          confirmButtonColor: '#d33',
+                                                                                          cancelButtonColor: '#3085d6',
+                                                                                          confirmButtonText: 'Yes, delete it!'
+                                                                                      }).then((result) => {
+                                                                                          if (result.isConfirmed) {
+                          
+                                                                                              handleImageDelete(index); // Call your delete function
+                                                                                          }
+                                                                                      });
+                                                                                  }}
+                                                                              >
+                                                                                  ✕
+                                                                              </button>
+                          
+                                                                              {/* Image */}
+                                                                              <Image
+                                                                                  src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                                                                                  alt={`Image ${index + 1}`}
+                                                                                  width={500}
+                                                                                  height={500}
+                                                                                  className="me-3 p-2 object-cover rounded"
+                                                                              />
+                                                                          </SwiperSlide>
+                                                                      ))}
+                                                                  </Swiper>
+                                                              </div>
+                          
+                                                          )}
+                                                          {validationErrors.image && (
+                                                              <p className="text-red-500 text-sm mt-1">{validationErrors.image}</p>
+                                                          )}
 
                             </div>
                             <div>

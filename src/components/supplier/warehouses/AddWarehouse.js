@@ -200,7 +200,7 @@ export default function AddWarehouse() {
         if (!formData.city.trim()) errors.city = 'City is required.';
         if (!formData.state.trim()) errors.state = 'State is required.';
         if (!formData.postal_code.trim()) errors.postal_code = 'Postal code is required.';
-        if (!formData.country.trim()) errors.country = 'Postal code is required.';
+        if (!formData.country.trim()) errors.country = 'Country code is required.';
         return errors;
     };
 

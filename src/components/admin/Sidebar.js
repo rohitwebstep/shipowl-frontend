@@ -79,9 +79,10 @@ export default function Sidebar() {
         },
       ],
     },
+
+    { title: "Country Management", icon: SiGoogletagmanager, href: "/admin/country/list" },
     { title: "State Management", icon: ShieldCheck, href: "/admin/state/list" },
     { title: "City Management", icon: ShieldCheck, href: "/admin/city/list" },
-    { title: "Country Management", icon: SiGoogletagmanager, href: "/admin/country/list" },
     { title: "Settings(In progress)", icon: Settings, href: "/admin/setting" },
     { title: "Profile(In progress)", icon: User, href: "/admin/profile" },
     { title: "Terms & Condition(In progress)", icon: ShieldCheck, href: "/admin/terms" },

@@ -41,17 +41,14 @@ export default function ProductDetails() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(' name, value', name, value)
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: '' });
   };
   const handleChangeTags = (newTags) => {
-    console.log("Before update tags:", formData.tags);
-    console.log("New tags:", newTags);
+ 
   
     setFormData((prevData) => {
       const updatedData = { ...prevData, tags: newTags };
-      console.log("Updated formData with new tags:", updatedData);
       return updatedData;
     });
   };

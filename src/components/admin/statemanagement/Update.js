@@ -216,7 +216,7 @@ export default function Update() {
         text: "The state has been updated successfully!",
       }).then((res) => {
         if (res.isConfirmed) {
-          router.push("/admin/state");
+          router.push("/admin/state/list");
         }
       });
     } catch (error) {

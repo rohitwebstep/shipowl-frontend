@@ -41,17 +41,14 @@ export default function ProductDetails() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(' name, value', name, value)
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: '' });
   };
   const handleChangeTags = (newTags) => {
-    console.log("Before update tags:", formData.tags);
-    console.log("New tags:", newTags);
+    
   
     setFormData((prevData) => {
       const updatedData = { ...prevData, tags: newTags };
-      console.log("Updated formData with new tags:", updatedData);
       return updatedData;
     });
   };
@@ -234,11 +231,11 @@ export default function ProductDetails() {
           </label>
           <input
             type="text"
-            name="video"
+            name="video_url"
             className="w-full border border-[#DFEAF2] p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0"
             placeholder="Video URL"
             onChange={handleChange}
-            value={formData.video || ''}
+            value={formData.video_url || ''}
           />
         </div>
 

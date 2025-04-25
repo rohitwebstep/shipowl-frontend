@@ -21,7 +21,6 @@ export default function Create() {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle form submission (API call or local storage)
-        console.log("Payment Submitted:", formData);
         router.push("/admin/payments"); // Redirect after submit
     };
 

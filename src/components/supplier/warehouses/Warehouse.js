@@ -558,41 +558,42 @@ export default function Warehouse() {
                                       </td>
                                       <td className="p-2 whitespace-nowrap px-5">{item.contact_name}<br />
                                         {item.contact_number}</td>
-                                      <td className="p-2 whitespace-nowrap px-5">
-                                        {(() => {
-                                          const parts = item.address_line_1.split(",");
+                                        <td className="p-2 whitespace-nowrap px-5">
+  {(() => {
+    if (!item?.address_line_1) return "-";
 
-                                          if (parts.length > 2) {
-                                            const firstPart = parts.slice(0, 2).join(",") + ","; // First 2 segments
-                                            const remaining = parts.slice(2).join(","); // Remaining part after 2nd comma
+    const parts = item.address_line_1.split(",");
 
-                                            // Now split the remaining part again
-                                            const remainingParts = remaining.split(",");
+    if (parts.length > 2) {
+      const firstPart = parts.slice(0, 2).join(",") + ",";
+      const remaining = parts.slice(2).join(",");
+      const remainingParts = remaining.split(",");
 
-                                            if (remainingParts.length > 2) {
-                                              return (
-                                                <>
-                                                  {firstPart}
-                                                  <br />
-                                                  {remainingParts.slice(0, 2).join(",")},{" "}
-                                                  <br />
-                                                  {remainingParts.slice(2).join(",")}
-                                                </>
-                                              );
-                                            }
+      if (remainingParts.length > 2) {
+        return (
+          <>
+            {firstPart}
+            <br />
+            {remainingParts.slice(0, 2).join(",")},{" "}
+            <br />
+            {remainingParts.slice(2).join(",")}
+          </>
+        );
+      }
 
-                                            return (
-                                              <>
-                                                {firstPart}
-                                                <br />
-                                                {remaining}
-                                              </>
-                                            );
-                                          }
+      return (
+        <>
+          {firstPart}
+          <br />
+          {remaining}
+        </>
+      );
+    }
 
-                                          return item.address; // If not enough commas, return full address
-                                        })()}
-                                      </td>
+    // Fallback for addresses with less than 3 parts
+    return item.address_line_1;
+  })()}
+</td>
 
 
                                       <td className="p-2 px-5">

@@ -194,7 +194,6 @@ const ProductProviderEdit = ({ children }) => {
     }
   }, [router]);
 
-  console.log('formData',formData)
 
   return (
     <ProductContextEdit.Provider

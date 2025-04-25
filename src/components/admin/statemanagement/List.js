@@ -544,22 +544,15 @@ export default function List() {
             <td className="px-6 py-4">
   {
     (() => {
-      console.log('item:', item);
       const filtered = country.filter((c) => {
         const match = c.id === item.countryId;
-        console.log(`Checking if country ID ${c.id} === item.countryId ${item.countryId}:`, match);
         return match;
       });
 
-      console.log('Filtered result:', filtered);
 
       const names = filtered.map((c) => {
-        console.log('Mapping country to name:', c.name);
         return c.name;
       });
-
-      console.log('Final names array:', names);
-
       return names.join(', ');
     })()
   }
