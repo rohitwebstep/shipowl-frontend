@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useContext } from "react";
 import ProfileEdit from './ProfileEdit'
 import BusinessInfo from './BusinessInfo';
 import AccountInfo from './AccountInfo';
-
+import { ProfileContext } from "./ProfileContext";
 export default function Profile() {
 
-  const [activeTab, setActiveTab] = useState("profile-edit");
+  const {activeTab, setActiveTab} = useContext(ProfileContext);
 
   const tabs = [
     { id: "profile-edit", label: "Personal Information" },

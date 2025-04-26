@@ -1,270 +1,256 @@
 'use client';
 
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { ProfileContext } from './ProfileContext';
+
 const BusinessInfo = () => {
-  const { formData, handleChange } = useContext(ProfileContext);
+  const { formData, setFormData,setActiveTab } = useContext(ProfileContext);
+  const [errors, setErrors] = useState({});
+
+  
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+  
+    // Update form data properly
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files?.length ? files[0] : value,
+    }));
+  
+    // Clear error for the current field
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',
+    }));
+  };
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const requiredFields = {
+      companyName: 'Registered Company Name is required',
+      brandName: 'Brand Name is required',
+      billingAddress: 'Billing Address is required',
+      billingPincode: 'Pincode is required',
+      billingState: 'State is required',
+      billingCity: 'City is required',
+      businessType: 'Business Type is required',
+      clientEntryType: 'Client Entry Type is required',
+      gstNumber: 'GST Number is required',
+      companyPanNumber: 'PAN Number is required',
+      aadharNumber: 'Aadhar Number is required',
+      panCardHolderName: 'PAN Card Holder Name is required',
+      aadharCardHolderName: 'Aadhar Card Holder Name is required',
+    };
+
+    const newErrors = {};
+    for (let key in requiredFields) {
+      if (!formData[key] || formData[key].toString().trim() === '') {
+        newErrors[key] = requiredFields[key];
+      }
+    }
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      setActiveTab('account-info');
+    }
+  };
+
+  const renderLabel = (label, field) => (
+    <label className="block text-[#232323] font-bold mb-1">
+      {label}
+      {errors[field] && <span className="text-red-500 ml-1">*</span>}
+    </label>
+  );
+
+  const renderInputClasses = (field) =>
+    `w-full p-3 border rounded-lg font-bold ${
+      errors[field] ? 'border-red-500' : 'border-[#DFEAF2]'
+    } text-[#718EBF]`;
+
+  const renderError = (field) =>
+    errors[field] && <p className="text-red-500 text-sm mt-1">{errors[field]}</p>;
 
   return (
-    <div className='bg-white lg:p-10 p-3 rounded-tl-none rounded-tr-none  rounded-2xl'>
-
+    <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 rounded-2xl">
       <div className="grid lg:grid-cols-3 py-5 gap-4">
         <div>
-          <label className="block text-[#232323] font-bold mb-1">Registered Company Name</label>
+          {renderLabel('Registered Company Name', 'companyName')}
           <input
             type="text"
-            name="name"
-            value={formData.name}
+            name="companyName"
+            value={formData.companyName}
             onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
+            className={renderInputClasses('companyName')}
           />
+          {renderError('companyName')}
         </div>
 
         <div>
-          <label className="block text-[#232323] font-bold mb-1">Brand Name</label>
+          {renderLabel('Brand Name', 'brandName')}
           <input
             type="text"
             name="brandName"
             value={formData.brandName}
             onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
+            className={renderInputClasses('brandName')}
           />
+          {renderError('brandName')}
         </div>
 
         <div>
-          <label className="block text-[#232323] font-bold mb-1">Short Brand Name</label>
+          {renderLabel('Short Brand Name')}
           <input
             type="text"
-            name="shortBrandName"
-            value={formData.shortBrandName}
+            name="brandShortName"
+            value={formData.brandShortName}
             onChange={handleChange}
             className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
           />
         </div>
       </div>
+
       <div>
-
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">Company Billing Address</label>
-          <input
-            type="text"
-            name="companyBillingAddress"
-            value={formData.companyBillingAddress}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
+        {renderLabel('Company Billing Address', 'billingAddress')}
+        <input
+          type="text"
+          name="billingAddress"
+          value={formData.billingAddress}
+          onChange={handleChange}
+          className={renderInputClasses('billingAddress')}
+        />
+        {renderError('billingAddress')}
       </div>
+
       <div className="grid lg:grid-cols-3 py-5 gap-4">
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">Pincode</label>
-          <input
-            type="text"
-            name="postalCode"
-            value={formData.postalCode}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
-
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">State</label>
-          <input
-            type="text"
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
-
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">City</label>
-          <input
-            type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
+        {['billingPincode', 'billingState', 'billingCity'].map((field) => (
+          <div key={field}>
+            {renderLabel(field === 'billingPincode' ? 'Pincode' : field === 'billingState' ? 'State' : 'City', field)}
+            <input
+              type="text"
+              name={field}
+              value={formData[field]}
+              onChange={handleChange}
+              className={renderInputClasses(field)}
+            />
+            {renderError(field)}
+          </div>
+        ))}
       </div>
-      <div className="grid lg:grid-cols-3  gap-4">
+
+      <div className="grid lg:grid-cols-3 gap-4">
         <div>
-          <label className="block text-[#232323] font-bold mb-1">Business Type</label>
+          {renderLabel('Business Type', 'businessType')}
           <select
             name="businessType"
             value={formData.businessType}
             onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
+            className={renderInputClasses('businessType')}
           >
+            <option value="">Select</option>
             <option value="Business">Business</option>
             <option value="Freelancer">Freelancer</option>
             <option value="Startup">Startup</option>
           </select>
+          {renderError('businessType')}
         </div>
 
         <div>
-          <label className="block text-[#232323] font-bold mb-1">Form of Client’s Entity</label>
+          {renderLabel('Form of Client’s Entity', 'clientEntryType')}
           <select
-            name="clientEntity"
-            value={formData.clientEntity}
+            name="clientEntryType"
+            value={formData.clientEntryType}
             onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
+            className={renderInputClasses('clientEntryType')}
           >
+            <option value="">Select</option>
             <option value="Entrepreneurship">Entrepreneurship</option>
             <option value="Partnership">Partnership</option>
             <option value="Corporation">Corporation</option>
           </select>
+          {renderError('clientEntryType')}
         </div>
       </div>
 
       <div className="mt-6">
-        <h3 className="font-semibold text-[#FF702C] py-5 underline text-sm">KYC Details – Provide minimum of 2 documents</h3>
-        <div className="grid lg:grid-cols-3 gap-4 mt-2">
-          <div>
-            <label className="block text-[#232323] font-bold mb-1">GST Number</label>
-            <input
-              type="text"
-              name="gstNumber"
-              value={formData.gstNumber}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-            />
-          </div>
+        <h3 className="font-semibold text-[#FF702C] py-5 underline text-sm">
+          KYC Details – Provide minimum of 2 documents
+        </h3>
 
-          <div>
-            <label className="block text-[#232323] font-bold mb-1">Company PAN Card ID</label>
-            <input
-              type="text"
-              name="panCardID"
-              value={formData.panCardID}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-            />
-          </div>
-          <div>
-            <label className="block text-[#232323] font-bold mb-1">Adhar Card ID</label>
-            <input
-              type="text"
-              name="aadharCardId"
-              value={formData.aadharCardId}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-            />
-          </div>
-          <div>
-            <label className="block text-[#232323] font-bold mb-1">Upload GST Document</label>
+        <div className="grid lg:grid-cols-3 gap-4 mt-2">
+          {[
+            { label: 'GST Number', name: 'gstNumber' },
+            { label: 'Company PAN Card ID', name: 'companyPanNumber' },
+            { label: 'Adhar Card ID', name: 'aadharNumber' },
+            { label: 'Upload GST Document', name: 'gstDocument', type: 'file' },
+            { label: 'Name on PAN Card', name: 'panCardHolderName' },
+            { label: 'Name Adhar Card ID', name: 'aadharCardHolderName' },
+          ].map(({ label, name, type = 'text' }) => (
+            <div key={name}>
+              {renderLabel(label, name)}
+              <input
+                type={type}
+                name={name}
+                value={type === 'file' ? undefined : formData[name]}
+                onChange={handleChange}
+                className={renderInputClasses(name)}
+              />
+              {renderError(name)}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 py-5 gap-3">
+        {['panCardImage', 'aadharCardImage'].map((name) => (
+          <div key={name}>
+            {renderLabel(
+              name === 'panCardImage' ? 'Upload PAN card image' : 'Upload Adhar card image',
+              name
+            )}
             <input
               type="file"
-              name="gstDocument"
+              name={name}
               onChange={handleChange}
-              placeholder='Upload'
-              className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
+              className={renderInputClasses(name)}
             />
           </div>
-
-          <div>
-            <label className="block text-[#232323] font-bold mb-1">Name on PAN Card</label>
-            <input
-              type="text"
-              name="panCardName"
-              value={formData.panCardName}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-            />
-          </div>
-
-          <div>
-            <label className="block text-[#232323] font-bold mb-1">Name Adhar Card ID</label>
-            <input
-              type="text"
-              name="aadharCardName"
-              value={formData.aadharCardName}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-            />
-          </div>
-
-
-        </div>
-      </div>
-      <div className='grid md:grid-cols-2 py-5 gap-3'>
-
-
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">Upload PAN card image</label>
-          <input
-            type="file"
-            name="aadhar_card_images"
-            onChange={handleChange}
-            placeholder='Upload'
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">Upload Adhar card image</label>
-          <input
-            type="file"
-            name="pan_card_images"
-            onChange={handleChange}
-            placeholder='Upload'
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
+        ))}
       </div>
 
-      <h3 className="font-semibold text-[#FF702C] underline text-sm pt-5">Additional Supporting Document</h3>
+      <h3 className="font-semibold text-[#FF702C] underline text-sm pt-5">
+        Additional Supporting Document
+      </h3>
 
       <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 pt-3">
-
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">Document to upload</label>
-          <input
-            type="text"
-            name="panCardName"
-            value={formData.panCardName}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">Document ID</label>
-          <input
-            type="text"
-            name="panCardName"
-            value={formData.panCardName}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">Name of document</label>
-          <input
-            type="text"
-            name="panCardName"
-            value={formData.panCardName}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
-        <div>
-          <label className="block text-[#232323] font-bold mb-1">Document Image</label>
-          <input
-            type="file"
-            name="aadhar_card_images"
-            onChange={handleChange}
-            placeholder='Upload'
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
+        {[
+          { label: 'Document to upload', name: 'additionalDocumentUpload', type: 'file' },
+          { label: 'Document ID', name: 'documentId' },
+          { label: 'Name of document', name: 'documentName' },
+          { label: 'Document Image', name: 'documentImage', type: 'file' },
+        ].map(({ label, name, type = 'text' }) => (
+          <div key={name}>
+            {renderLabel(label, name)}
+            <input
+              type={type}
+              name={name}
+              value={type === 'file' ? undefined : formData[name]}
+              onChange={handleChange}
+              className={renderInputClasses(name)}
+            />
+          </div>
+        ))}
       </div>
 
       <div className="flex space-x-4 mt-6">
-        <button className="px-4 py-2 bg-orange-500 text-white rounded-lg">Save</button>
-        <button className="px-4 py-2 bg-gray-400 text-white rounded-lg">Cancel</button>
+        <button type="submit" onClick={handleSubmit} className="px-4 py-2 bg-orange-500 text-white rounded-lg">
+          Next
+        </button>
+        <button type="button" className="px-4 py-2 bg-gray-400 text-white rounded-lg">
+          Cancel
+        </button>
       </div>
-    </div>
+    </form>
   );
 };
 

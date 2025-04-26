@@ -37,7 +37,8 @@ export default function OtherDetails() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if(validateForm()){
+      e.preventDefault();
     setLoading(true);
   
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -143,9 +144,10 @@ export default function OtherDetails() {
             title: "Submission Error",
             text: error.message || "Something went wrong. Please try again.",
         });
-        setError(error.message || "Submission failed.");
+        setErrors(error.message || "Submission failed.");
     } finally {
         setLoading(false);
+    }
     }
   };
 

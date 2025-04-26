@@ -464,6 +464,8 @@ const ProductTable = () => {
                     <button className="bg-[#F98F5C] text-white px-6 py-3 rounded-lg text-sm">Save</button>
                 </div>
             </div>
+        
+
             {loading ? (
                 <div className="flex justify-center items-center h-96">
                     <HashLoader color="orange" />
@@ -526,157 +528,161 @@ const ProductTable = () => {
                     </div>
                 </div>
 
-                {/* Table */}
-                <div className="overflow-x-auto relative main-outer-wrapper w-full">
-                    <table className="md:w-full w-auto display main-tables" id="productTable">
-                        <thead>
-                            <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    NAME
-                                </th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    SKU
-                                </th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-red-500">
-                                    Suggested Price
-                                </th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Shipwoll Cost Price
-                                </th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Quantity
-                                </th>
-                                {showRtoLiveCount && (
-                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">
-                                        Live RTO Stock
-                                    </th>
-                                )}
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Order Auto Accept
-                                </th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Status
-                                </th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Admin Status
-                                </th>
-                                {!showRtoLiveCount && (
-                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                        Model
-                                    </th>
-                                )}
-                                {showRtoLiveCount && (
-                                    <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                        RTO Status
-                                    </th>
-                                )}
+                {products.length > 0 ? (
+            <div className="overflow-x-auto relative main-outer-wrapper w-full">
+            <table className="md:w-full w-auto display main-tables" id="productTable">
+                <thead>
+                    <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                            NAME
+                        </th>
+                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                            SKU
+                        </th>
+                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-red-500">
+                            Suggested Price
+                        </th>
+                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                            Shipwoll Cost Price
+                        </th>
+                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                            Quantity
+                        </th>
+                        {showRtoLiveCount && (
+                            <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">
+                                Live RTO Stock
+                            </th>
+                        )}
+                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                            Order Auto Accept
+                        </th>
+                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                            Status
+                        </th>
+                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                            Admin Status
+                        </th>
+                        {!showRtoLiveCount && (
+                            <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                Model
+                            </th>
+                        )}
+                        {showRtoLiveCount && (
+                            <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                RTO Status
+                            </th>
+                        )}
 
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredProducts.map((item) => (
-                                <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                    <td className="p-2 px-5 whitespace-nowrap">
-                                        <div className="flex items-center">
-                                            <label className="flex items-center cursor-pointer me-2">
-                                                <input type="checkbox" checked={selected.includes(item.id)} onChange={() => handleCheckboxChange(item.id)} className="peer hidden" />
-                                                <div
-                                                    className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                      peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white"
-                                                >
-                                                    <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                                </div>
-                                            </label>
-                         
-                                            <span className="truncate"> {item.name|| 'NIL'}</span>
-                                        </div>
-                                    </td>
-                                    <td className="p-2 px-5 whitespace-nowrap">{item.main_sku|| 'NIL'}</td>
-                                    {(() => {
-                                    const variant = item.variants[0] || {};
-                                    return (
-                                        <>
-                                        <td className="p-2 px-5 whitespace-nowrap text-red-500">{variant.suggested_price || 'NIL'}</td>
-                                        <td className="p-2 px-5 whitespace-nowrap">{variant.shipowl_price || 'NIL'}</td>
-                                        <td className="p-2 px-5 whitespace-nowrap">{variant.qty || 'NIL'}</td>
-                                        </>
-                                    );
-                                    })()}
-
-
-                                    {showRtoLiveCount && <td className="p-2 px-5 whitespace-nowrap text-blue-500">{item.liveRtoStock}</td>}
-                                    <td className="p-2 px-5 whitespace-nowrap">
-                                        <div className="flex items-center mb-4">
-                                            <label className="flex items-center cursor-pointer">
-                                                <input type="checkbox" className="sr-only" checked={item.autoAccept} readOnly />
-                                                <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.autoAccept ? "bg-orange-500" : ""}`}>
-                                                    <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.autoAccept ? "translate-x-5" : ""}`}></div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td className="p-2 px-5 whitespace-nowrap">
-                                        <div className="flex items-center mb-4">
-                                            <label className="flex items-center cursor-pointer">
-                                                <input type="checkbox" className="sr-only" checked={item.status} readOnly />
-                                                <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.status ? "bg-orange-500" : ""}`}>
-                                                    <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.status ? "translate-x-5" : ""}`}></div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td className="p-2 px-5 whitespace-nowrap">
-                                        <button
-                                            className={` py-2 text-white rounded-md text-sm p-3 uppercase  min-w-[95px]
-    ${item.adminStatus === "Done" ? "bg-green-500" : item.adminStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
+                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {filteredProducts.map((item) => (
+                        <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                            <td className="p-2 px-5 whitespace-nowrap">
+                                <div className="flex items-center">
+                                    <label className="flex items-center cursor-pointer me-2">
+                                        <input type="checkbox" checked={selected.includes(item.id)} onChange={() => handleCheckboxChange(item.id)} className="peer hidden" />
+                                        <div
+                                            className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                                                peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white"
                                         >
-                                            {item.adminStatus || 'NIL'}
-                                        </button>
-                                    </td>
-                                    {!showRtoLiveCount && (
-                                        <td className="p-2 px-5 whitespace-nowrap">
-                                            <button
-                                                className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px] 
-    ${item.model === "Warehouse" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
-                                            >
-                                                {item.list_as || 'NIL'}
-                                            </button>
-                                        </td>
-                                    )}
-                                    {showRtoLiveCount && (
-                                        <td className="p-2 px-5 whitespace-nowrap">
-                                            {" "}
-                                            <button
-                                                className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
-    ${item.rtoStatus === "Free" ? "bg-green-500" : item.rtoStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
-                                            >
-                                                {item.rtoStatus || 'NIL'}
-                                            </button>
-                                        </td>
-                                    )}
-                                    <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]">
-                                        <div className="flex justify-center gap-2">
-                                    {isTrashed ? (
-                                        <>
-                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <MdModeEdit onClick={() => handleEdit(item.id)} className="cursor-pointer text-2xl" />
-                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
-                                        </>
-                                    )}
+                                            <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                        </div>
+                                    </label>
+                
+                                    <span className="truncate"> {item.name|| 'NIL'}</span>
                                 </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </td>
+                            <td className="p-2 px-5 whitespace-nowrap">{item.main_sku|| 'NIL'}</td>
+                            {(() => {
+                            const variant = item.variants[0] || {};
+                            return (
+                                <>
+                                <td className="p-2 px-5 whitespace-nowrap text-red-500">{variant.suggested_price || 'NIL'}</td>
+                                <td className="p-2 px-5 whitespace-nowrap">{variant.shipowl_price || 'NIL'}</td>
+                                <td className="p-2 px-5 whitespace-nowrap">{variant.qty || 'NIL'}</td>
+                                </>
+                            );
+                            })()}
+
+
+                            {showRtoLiveCount && <td className="p-2 px-5 whitespace-nowrap text-blue-500">{item.liveRtoStock}</td>}
+                            <td className="p-2 px-5 whitespace-nowrap">
+                                <div className="flex items-center mb-4">
+                                    <label className="flex items-center cursor-pointer">
+                                        <input type="checkbox" className="sr-only" checked={item.autoAccept} readOnly />
+                                        <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.autoAccept ? "bg-orange-500" : ""}`}>
+                                            <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.autoAccept ? "translate-x-5" : ""}`}></div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                            <td className="p-2 px-5 whitespace-nowrap">
+                                <div className="flex items-center mb-4">
+                                    <label className="flex items-center cursor-pointer">
+                                        <input type="checkbox" className="sr-only" checked={item.status} readOnly />
+                                        <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.status ? "bg-orange-500" : ""}`}>
+                                            <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.status ? "translate-x-5" : ""}`}></div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </td>
+                            <td className="p-2 px-5 whitespace-nowrap">
+                                <button
+                                    className={` py-2 text-white rounded-md text-sm p-3 uppercase  min-w-[95px]
+            ${item.adminStatus === "Done" ? "bg-green-500" : item.adminStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
+                                >
+                                    {item.adminStatus || 'NIL'}
+                                </button>
+                            </td>
+                            {!showRtoLiveCount && (
+                                <td className="p-2 px-5 whitespace-nowrap">
+                                    <button
+                                        className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px] 
+            ${item.model === "Warehouse" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
+                                    >
+                                        {item.list_as || 'NIL'}
+                                    </button>
+                                </td>
+                            )}
+                            {showRtoLiveCount && (
+                                <td className="p-2 px-5 whitespace-nowrap">
+                                    {" "}
+                                    <button
+                                        className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
+            ${item.rtoStatus === "Free" ? "bg-green-500" : item.rtoStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
+                                    >
+                                        {item.rtoStatus || 'NIL'}
+                                    </button>
+                                </td>
+                            )}
+                            <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]">
+                                <div className="flex justify-center gap-2">
+                            {isTrashed ? (
+                                <>
+                                    <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                                </>
+                            ) : (
+                                <>
+                                    <MdModeEdit onClick={() => handleEdit(item.id)} className="cursor-pointer text-2xl" />
+                                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                                </>
+                            )}
+                        </div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            </div>
+                ) : (
+                // Render when no suppliers
+                <div className='text-center'>No Products available</div>
+                )}                
 
                 
             </div>
