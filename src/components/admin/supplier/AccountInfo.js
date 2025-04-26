@@ -94,39 +94,48 @@ const AccountInfo = () => {
   
         const url = "https://sleeping-owl-we0m.onrender.com/api/supplier"; // Ensure the URL is correct
         const form = new FormData();
-
         for (const key in formData) {
           const value = formData[key];
-      
+        
           if (value === null || value === undefined || value === '') continue;
-      
-          // ✅ Send files
-          if (value instanceof File) {
+        
+          // ✅ Special handling for date fields
+          if (key === 'dateOfBirth' && value) {
+            const dateObj = new Date(value);
+            const day = String(dateObj.getDate()).padStart(2, '0'); // e.g., "26"
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // e.g., "04"
+            const year = dateObj.getFullYear(); // e.g., "2025"
+            const formattedDate = `${day}-${month}-${year}`; // 👉 "26-04-2025"
+            form.append(key, formattedDate);
+          }
+        
+          // ✅ Files
+          else if (value instanceof File) {
             form.append(key, value);
           }
-      
-          // ✅ Handle 'variants' as a single array stringified
+        
+          // ✅ bankAccounts array
           else if (key === 'bankAccounts') {
             form.append('bankAccounts', JSON.stringify(value));
           }
-      
-          // ✅ Other arrays like 'tags'
+        
+          // ✅ Other arrays
           else if (Array.isArray(value)) {
             form.append(key, JSON.stringify(value));
           }
-      
+        
           // ✅ Objects
           else if (typeof value === 'object') {
             form.append(key, JSON.stringify(value));
           }
-      
-          // ✅ Everything else (strings, numbers)
+        
+          // ✅ Strings, numbers
           else {
             form.append(key, value);
           }
         }
-  
-        const response = await fetch(url, {
+        
+                const response = await fetch(url, {
             method: "POST", // Use POST for creating the resource
             headers: {
                 "Authorization": `Bearer ${token}`
@@ -188,7 +197,7 @@ const AccountInfo = () => {
       }));
     }
   };
-
+ 
   return (
     <div className="bg-white lg:p-10 p-3 rounded-tr-none rounded-tl-none rounded-2xl">
       {formData.bankAccounts.map((account, index) => (

@@ -1,27 +1,130 @@
 'use client';
-
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState ,useCallback} from 'react';
 import { ProfileContext } from './ProfileContext';
 import profileImg from '@/app/images/editprofile.png';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 
 const ProfileEdit = () => {
-    const { formData, setFormData, setActiveTab } = useContext(ProfileContext);
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const { formData, setFormData,fetchCountry, setActiveTab,countryData} = useContext(ProfileContext);
     const [errors, setErrors] = useState({});
+    const [cityData, setCityData] = useState([]);
+    const [stateData, setStateData] = useState([]);
 
-    const handleChange = (e) => {
+    const fetchCity = useCallback(async (id) => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${admintoken}`,
+                },
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                });
+                throw new Error(result.message || result.error || "Something Wrong!");
+            }
+
+            setCityData(result?.cities || []);
+            setStateData(result?.states || []);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
+    const fetchState = useCallback(async (id) => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        
+        if (adminData?.project?.active_panel !== "admin") {
+          localStorage.removeItem("shippingData");
+          router.push("/admin/auth/login");
+          return;
+        }
+      
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+          router.push("/admin/auth/login");
+          return;
+        }
+      
+        try {
+          setLoading(true);
+          const response = await fetch(
+            `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${admintoken}`,
+              },
+            }
+          );
+      
+          const result = await response.json();
+      
+          if (!response.ok) {
+            Swal.fire({
+              icon: "error",
+              title: "Something went wrong!",
+              text: result.message || result.error || "Your session has expired. Please log in again.",
+            });
+            throw new Error(result.message || result.error || "Something Wrong!");
+          }
+      
+          setStateData(result?.states || []);
+        } catch (error) {
+          console.error("Error fetching states:", error); // <- corrected message: "states" instead of "cities"
+        } finally {
+          setLoading(false);
+        }
+      }, [router]);
+      
+
+      const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-
-        // Clear error when typing
+    
+        if (name === "permanentCountry" && value) {
+            fetchState(value);
+        }
+    
+        if (name === "permanentState" && value) {
+            fetchCity(value);
+        }
+    
         if (errors[name]) {
             setErrors({ ...errors, [name]: '' });
         }
     };
-
+    
     const validate = () => {
         const newErrors = {};
-        if (!formData.fullName) newErrors.fullName = 'Full Name is required';
+        if (!formData.name) newErrors.name = 'Full Name is required';
         if (!formData.username) newErrors.username = 'Username is required';
         if (!formData.email) newErrors.email = 'Email is required';
         if (!formData.password) newErrors.password = 'Password is required';
@@ -31,6 +134,7 @@ const ProfileEdit = () => {
         if (!formData.permanentCity) newErrors.permanentCity = 'City is required';
         if (!formData.permanentPostalCode) newErrors.permanentPostalCode = 'Postal Code is required';
         if (!formData.permanentCountry) newErrors.permanentCountry = 'Country is required';
+        if (!formData.permanentState) newErrors.permanentState = 'State is required';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -42,6 +146,10 @@ const ProfileEdit = () => {
         }
     };
 
+    useEffect(() => {
+        fetchCountry();
+    }, [fetchCountry]);
+
     const inputClasses = (field) =>
         `w-full p-3 border rounded-lg font-bold ${
             errors[field] ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
@@ -51,9 +159,7 @@ const ProfileEdit = () => {
         `block font-bold mb-1 ${errors[field] ? 'text-red-500' : 'text-[#232323]'}`;
 
     const handleCancel = () => {
-        setErrors({}); // Clears errors
-        // Optionally, reset the form data here if needed
-        // setFormData(initialState);
+        setErrors({});
     };
 
     return (
@@ -63,51 +169,126 @@ const ProfileEdit = () => {
                     <Image src={profileImg} alt="Profile image" />
                 </div>
             </div>
-            <div className='md:w-10/12'>
-                <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
-                    {[
-                        { label: 'Your Name', name: 'name', type: 'text' },
-                        { label: 'User Name', name: 'username', type: 'text' },
-                        { label: 'Email', name: 'email', type: 'email' },
-                        { label: 'Password', name: 'password', type: 'password' },
-                        { label: 'Date of Birth', name: 'dateOfBirth', type: 'date' },
-                        { label: 'Present Address', name: 'currentAddress', type: 'text' },
-                        { label: 'Permanent Address', name: 'permanentAddress', type: 'text' },
-                        { label: 'City', name: 'permanentCity', type: 'text' },
-                        { label: 'Postal Code', name: 'permanentPostalCode', type: 'text' },
-                        { label: 'Country', name: 'permanentCountry', type: 'text' },
-                    ].map(({ label, name, type }) => (
-                        <div key={name}>
-                            <label className={labelClasses(name)}>{label}</label>
-                            <input
-                                type={type}
-                                name={name}
-                                value={formData[name]}
-                                onChange={handleChange}
-                                className={inputClasses(name)}
-                            />
-                            {errors[name] && (
-                                <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
-                            )}
-                        </div>
-                    ))}
-                </div>
 
-                <div className="flex space-x-4 mt-6">
-                    <button
-                        onClick={handleSubmit}
-                        className="px-4 py-2 bg-orange-500 text-white rounded-lg"
-                    >
-                        Next
-                    </button>
-                    <button
-                        className="px-4 py-2 bg-gray-400 text-white rounded-lg"
-                        onClick={handleCancel}
-                    >
-                        Cancel
-                    </button>
-                </div>
-            </div>
+            <div className="md:w-10/12">
+  <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
+    {/* Basic Inputs */}
+    {[
+      { label: 'Your Name', name: 'name', type: 'text' },
+      { label: 'User Name', name: 'username', type: 'text' },
+      { label: 'Email', name: 'email', type: 'email' },
+      { label: 'Password', name: 'password', type: 'password' },
+      { label: 'Date of Birth', name: 'dateOfBirth', type: 'date' },
+      { label: 'Present Address', name: 'currentAddress', type: 'text' },
+      { label: 'Permanent Address', name: 'permanentAddress', type: 'text' },
+      { label: 'Postal Code', name: 'permanentPostalCode', type: 'text' },
+    ].map(({ label, name, type }) => (
+      <div key={name}>
+        <label className={labelClasses(name)}>
+          {label} <span className="text-red-500">*</span>
+        </label>
+        <input
+          type={type}
+          name={name}
+          value={formData[name] || ''}
+          onChange={handleChange}
+          className={inputClasses(name)}
+        />
+        {errors[name] && (
+          <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
+        )}
+      </div>
+    ))}
+
+    {/* Country Select */}
+    <div>
+      <label className={labelClasses('permanentCountry')}>
+        Country <span className="text-red-500">*</span>
+      </label>
+      <select
+        name="permanentCountry"
+        value={formData.permanentCountry || ''}
+        onChange={handleChange}
+        className={inputClasses('permanentCountry')}
+      >
+        <option value="">Select Country</option>
+        {countryData.map((country) => (
+          <option key={country.id} value={country.id}>
+            {country.name}
+          </option>
+        ))}
+      </select>
+      {errors.permanentCountry && (
+        <p className="text-red-500 text-sm mt-1">{errors.permanentCountry}</p>
+      )}
+    </div>
+
+    {/* State Select */}
+    <div>
+      <label className={labelClasses('permanentState')}>
+        State <span className="text-red-500">*</span>
+      </label>
+      <select
+        name="permanentState"
+        value={formData.permanentState || ''}
+        onChange={handleChange}
+        className={inputClasses('permanentState')}
+      >
+        <option value="">Select State</option>
+        {stateData.map((state) => (
+          <option key={state.id} value={state.id}>
+            {state.name}
+          </option>
+        ))}
+      </select>
+      {errors.permanentState && (
+        <p className="text-red-500 text-sm mt-1">{errors.permanentState}</p>
+      )}
+    </div>
+
+    {/* City Select */}
+    <div>
+      <label className={labelClasses('permanentCity')}>
+        City <span className="text-red-500">*</span>
+      </label>
+      <select
+        name="permanentCity"
+        value={formData.permanentCity || ''}
+        onChange={handleChange}
+        className={inputClasses('permanentCity')}
+      >
+        <option value="">Select City</option>
+        {cityData.map((city) => (
+          <option key={city.id} value={city.id}>
+            {city.name}
+          </option>
+        ))}
+      </select>
+      {errors.permanentCity && (
+        <p className="text-red-500 text-sm mt-1">{errors.permanentCity}</p>
+      )}
+    </div>
+  </div>
+
+  {/* Buttons */}
+  <div className="flex space-x-4 mt-6">
+    <button
+      type="button"
+      onClick={handleSubmit}
+      className="px-4 py-2 bg-orange-500 text-white rounded-lg"
+    >
+      Next
+    </button>
+    <button
+      type="button"
+      onClick={handleCancel}
+      className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+    >
+      Cancel
+    </button>
+  </div>
+</div>
+
         </div>
     );
 };

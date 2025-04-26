@@ -1,47 +1,149 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState,useCallback } from 'react';
 import { ProfileContext } from './ProfileContext';
-
+import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 const BusinessInfo = () => {
-  const { formData, setFormData,setActiveTab } = useContext(ProfileContext);
+      const [cityData, setCityData] = useState([]);
+      const [stateData, setStateData] = useState([]);
+  const { formData, setFormData, setActiveTab,countryData, fetchCountry } = useContext(ProfileContext);
   const [errors, setErrors] = useState({});
+  const router = useRouter();
+    const [loading, setLoading] = useState(false);
+  const requiredFields = {
+    companyName: 'Registered Company Name is required',
+    brandName: 'Brand Name is required',
+    billingAddress: 'Billing Address is required',
+    billingPincode: 'Pincode is required',
+    billingCountry: 'Country is required',
+    billingState: 'State is required',
+    billingCity: 'City is required',
+    businessType: 'Business Type is required',
+    clientEntryType: 'Client Entry Type is required',
+    gstNumber: 'GST Number is required',
+    companyPanNumber: 'PAN Number is required',
+    aadharNumber: 'Aadhar Number is required',
+    panCardHolderName: 'PAN Card Holder Name is required',
+    aadharCardHolderName: 'Aadhar Card Holder Name is required',
+  };
 
-  
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-  
-    // Update form data properly
     setFormData((prev) => ({
       ...prev,
       [name]: files?.length ? files[0] : value,
     }));
-  
-    // Clear error for the current field
+    if (name === "billingCountry" && value) {
+      fetchState(value);
+  }
+
+  if (name === "billingState" && value) {
+      fetchCity(value);
+  }
     setErrors((prevErrors) => ({
       ...prevErrors,
       [name]: '',
     }));
   };
+
+  useEffect(() => {
+    fetchCountry();
+  }, [fetchCountry]);
+
+  const fetchState = useCallback(async (id) => {
+    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    
+    if (adminData?.project?.active_panel !== "admin") {
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
+      return;
+    }
   
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+      router.push("/admin/auth/login");
+      return;
+    }
+  
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${admintoken}`,
+          },
+        }
+      );
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong!",
+          text: result.message || result.error || "Your session has expired. Please log in again.",
+        });
+        throw new Error(result.message || result.error || "Something Wrong!");
+      }
+  
+      setStateData(result?.states || []);
+    } catch (error) {
+      console.error("Error fetching states:", error); // <- corrected message: "states" instead of "cities"
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+      const fetchCity = useCallback(async (id) => {
+          const adminData = JSON.parse(localStorage.getItem("shippingData"));
+          if (adminData?.project?.active_panel !== "admin") {
+              localStorage.removeItem("shippingData");
+              router.push("/admin/auth/login");
+              return;
+          }
+  
+          const admintoken = adminData?.security?.token;
+          if (!admintoken) {
+              router.push("/admin/auth/login");
+              return;
+          }
+  
+          try {
+              setLoading(true);
+              const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+                  method: "GET",
+                  headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${admintoken}`,
+                  },
+              });
+  
+              const result = await response.json();
+  
+              if (!response.ok) {
+                  Swal.fire({
+                      icon: "error",
+                      title: "Something Wrong!",
+                      text: result.message || result.error || "Your session has expired. Please log in again.",
+                  });
+                  throw new Error(result.message || result.error || "Something Wrong!");
+              }
+  
+              setCityData(result?.cities || []);
+              setStateData(result?.states || []);
+          } catch (error) {
+              console.error("Error fetching cities:", error);
+          } finally {
+              setLoading(false);
+          }
+      }, [router]);
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const requiredFields = {
-      companyName: 'Registered Company Name is required',
-      brandName: 'Brand Name is required',
-      billingAddress: 'Billing Address is required',
-      billingPincode: 'Pincode is required',
-      billingState: 'State is required',
-      billingCity: 'City is required',
-      businessType: 'Business Type is required',
-      clientEntryType: 'Client Entry Type is required',
-      gstNumber: 'GST Number is required',
-      companyPanNumber: 'PAN Number is required',
-      aadharNumber: 'Aadhar Number is required',
-      panCardHolderName: 'PAN Card Holder Name is required',
-      aadharCardHolderName: 'Aadhar Card Holder Name is required',
-    };
 
     const newErrors = {};
     for (let key in requiredFields) {
@@ -56,17 +158,20 @@ const BusinessInfo = () => {
     }
   };
 
-  const renderLabel = (label, field) => (
-    <label className="block text-[#232323] font-bold mb-1">
-      {label}
-      {errors[field] && <span className="text-red-500 ml-1">*</span>}
-    </label>
-  );
-
-  const renderInputClasses = (field) =>
+  // ✅ fixed: Label with * for required
+  const labelClasses = (field) => "block text-[#232323] font-bold mb-1";
+  
+  const inputClasses = (field) =>
     `w-full p-3 border rounded-lg font-bold ${
       errors[field] ? 'border-red-500' : 'border-[#DFEAF2]'
     } text-[#718EBF]`;
+
+  const renderLabel = (label, field) => (
+    <label className={labelClasses(field)}>
+      {label}
+      {requiredFields[field] && <span className="text-red-500 ml-1">*</span>}
+    </label>
+  );
 
   const renderError = (field) =>
     errors[field] && <p className="text-red-500 text-sm mt-1">{errors[field]}</p>;
@@ -81,7 +186,7 @@ const BusinessInfo = () => {
             name="companyName"
             value={formData.companyName}
             onChange={handleChange}
-            className={renderInputClasses('companyName')}
+            className={inputClasses('companyName')}
           />
           {renderError('companyName')}
         </div>
@@ -93,7 +198,7 @@ const BusinessInfo = () => {
             name="brandName"
             value={formData.brandName}
             onChange={handleChange}
-            className={renderInputClasses('brandName')}
+            className={inputClasses('brandName')}
           />
           {renderError('brandName')}
         </div>
@@ -110,6 +215,7 @@ const BusinessInfo = () => {
         </div>
       </div>
 
+      {/* Billing Address */}
       <div>
         {renderLabel('Company Billing Address', 'billingAddress')}
         <input
@@ -117,27 +223,80 @@ const BusinessInfo = () => {
           name="billingAddress"
           value={formData.billingAddress}
           onChange={handleChange}
-          className={renderInputClasses('billingAddress')}
+          className={inputClasses('billingAddress')}
         />
         {renderError('billingAddress')}
       </div>
 
+      {/* Pincode, State, City */}
       <div className="grid lg:grid-cols-3 py-5 gap-4">
-        {['billingPincode', 'billingState', 'billingCity'].map((field) => (
-          <div key={field}>
-            {renderLabel(field === 'billingPincode' ? 'Pincode' : field === 'billingState' ? 'State' : 'City', field)}
-            <input
-              type="text"
-              name={field}
-              value={formData[field]}
-              onChange={handleChange}
-              className={renderInputClasses(field)}
-            />
-            {renderError(field)}
-          </div>
-        ))}
+        <div>
+          {renderLabel('Pincode', 'billingPincode')}
+          <input
+            type="text"
+            name="billingPincode"
+            value={formData.billingPincode}
+            onChange={handleChange}
+            className={inputClasses('billingPincode')}
+          />
+          {renderError('billingPincode')}
+        </div>
+
+        <div>
+          {renderLabel('country', 'billingCountry')}
+          <select
+            name="billingCountry"
+            value={formData.billingCountry}
+            onChange={handleChange}
+            className={inputClasses('billingCountry')}
+          >
+            <option value="">Select Country</option>
+            {countryData.map((country) => (
+              <option key={country.id} value={country.id}>
+                {country.name}
+              </option>
+            ))}
+          </select>
+          {renderError('billingCountry')}
+        </div>
+        <div>
+          {renderLabel('State', 'billingState')}
+          <select
+            name="billingState"
+            value={formData.billingState}
+            onChange={handleChange}
+            className={inputClasses('billingState')}
+          >
+            <option value="">Select State</option>
+            {stateData?.map((state) => (
+              <option key={state.id} value={state.id}>
+                {state.name}
+              </option>
+            ))}
+          </select>
+          {renderError('billingState')}
+        </div>
+
+        <div>
+          {renderLabel('City', 'billingCity')}
+          <select
+            name="billingCity"
+            value={formData.billingCity}
+            onChange={handleChange}
+            className={inputClasses('billingCity')}
+          >
+            <option value="">Select City</option>
+            {cityData?.map((city) => (
+              <option key={city.id} value={city.id}>
+                {city.name}
+              </option>
+            ))}
+          </select>
+          {renderError('billingCity')}
+        </div>
       </div>
 
+      {/* Business Type, Client Entry Type */}
       <div className="grid lg:grid-cols-3 gap-4">
         <div>
           {renderLabel('Business Type', 'businessType')}
@@ -145,7 +304,7 @@ const BusinessInfo = () => {
             name="businessType"
             value={formData.businessType}
             onChange={handleChange}
-            className={renderInputClasses('businessType')}
+            className={inputClasses('businessType')}
           >
             <option value="">Select</option>
             <option value="Business">Business</option>
@@ -161,7 +320,7 @@ const BusinessInfo = () => {
             name="clientEntryType"
             value={formData.clientEntryType}
             onChange={handleChange}
-            className={renderInputClasses('clientEntryType')}
+            className={inputClasses('clientEntryType')}
           >
             <option value="">Select</option>
             <option value="Entrepreneurship">Entrepreneurship</option>
@@ -172,11 +331,11 @@ const BusinessInfo = () => {
         </div>
       </div>
 
+      {/* KYC Documents */}
       <div className="mt-6">
         <h3 className="font-semibold text-[#FF702C] py-5 underline text-sm">
           KYC Details – Provide minimum of 2 documents
         </h3>
-
         <div className="grid lg:grid-cols-3 gap-4 mt-2">
           {[
             { label: 'GST Number', name: 'gstNumber' },
@@ -193,7 +352,7 @@ const BusinessInfo = () => {
                 name={name}
                 value={type === 'file' ? undefined : formData[name]}
                 onChange={handleChange}
-                className={renderInputClasses(name)}
+                className={inputClasses(name)}
               />
               {renderError(name)}
             </div>
@@ -201,23 +360,25 @@ const BusinessInfo = () => {
         </div>
       </div>
 
+      {/* PAN and Aadhar Upload */}
       <div className="grid md:grid-cols-2 py-5 gap-3">
         {['panCardImage', 'aadharCardImage'].map((name) => (
           <div key={name}>
             {renderLabel(
-              name === 'panCardImage' ? 'Upload PAN card image' : 'Upload Adhar card image',
+              name === 'panCardImage' ? 'Upload PAN card image' : 'Upload Aadhar card image',
               name
             )}
             <input
               type="file"
               name={name}
               onChange={handleChange}
-              className={renderInputClasses(name)}
+              className={inputClasses(name)}
             />
           </div>
         ))}
       </div>
 
+      {/* Additional Documents */}
       <h3 className="font-semibold text-[#FF702C] underline text-sm pt-5">
         Additional Supporting Document
       </h3>
@@ -236,14 +397,15 @@ const BusinessInfo = () => {
               name={name}
               value={type === 'file' ? undefined : formData[name]}
               onChange={handleChange}
-              className={renderInputClasses(name)}
+              className={inputClasses(name)}
             />
           </div>
         ))}
       </div>
 
+      {/* Buttons */}
       <div className="flex space-x-4 mt-6">
-        <button type="submit" onClick={handleSubmit} className="px-4 py-2 bg-orange-500 text-white rounded-lg">
+        <button type="submit" className="px-4 py-2 bg-orange-500 text-white rounded-lg">
           Next
         </button>
         <button type="button" className="px-4 py-2 bg-gray-400 text-white rounded-lg">
