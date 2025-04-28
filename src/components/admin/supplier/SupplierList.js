@@ -10,7 +10,7 @@ import { FaCheck } from "react-icons/fa";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
-const supplierList = () => {
+const SupplierList = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
     const { verifyAdminAuth } = useAdmin();
@@ -520,4 +520,4 @@ const supplierList = () => {
     );
 };
 
-export default supplierList;
+export default SupplierList;

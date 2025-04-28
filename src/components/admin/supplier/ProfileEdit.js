@@ -5,6 +5,7 @@ import profileImg from '@/app/images/editprofile.png';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
+import { Pencil } from 'lucide-react';
 
 const ProfileEdit = () => {
     const router = useRouter();
@@ -165,9 +166,34 @@ const ProfileEdit = () => {
     return (
         <div className='md:flex gap-4 xl:w-10/12 py-10 bg-white rounded-tl-none rounded-tr-none p-3 xl:p-10 rounded-2xl'>
             <div className='md:w-2/12'>
-                <div className="edit-img p-5">
-                    <Image src={profileImg} alt="Profile image" />
-                </div>
+            <div className="relative edit-img p-5 w-48 h-48">
+  <Image
+    src={formData.profilePicture || profileImg}
+    alt="Profile image"
+    width={192}
+    height={192}
+    className="w-full h-full object-cover rounded-full"
+  />
+
+  {/* Hidden input */}
+  <input
+    type="file"
+    id="upload"
+    name="profilePicture"
+    accept="image/*"
+    onChange={handleChange}
+    className="hidden"
+  />
+
+  {/* Edit Icon */}
+  <label
+    htmlFor="upload"
+    className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow cursor-pointer"
+  >
+    <Pencil size={18} className="text-gray-600" />
+  </label>
+</div>
+
             </div>
 
             <div className="md:w-10/12">

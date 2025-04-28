@@ -55,7 +55,8 @@ const ProfileProvider = ({ children }) => {
     ifscCode: "",
     }
    
-  ]
+  ],
+  profilePicture:'',
 });
 
  const fetchCountry = useCallback(async () => {
