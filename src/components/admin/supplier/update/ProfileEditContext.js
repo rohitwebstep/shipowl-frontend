@@ -3,63 +3,62 @@
 import { useState, createContext ,useCallback} from 'react';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
-const ProfileContext = createContext();
+const ProfileEditContext = createContext();
 
-const ProfileProvider = ({ children }) => {
+const ProfileEditProvider = ({ children }) => {
 
     const [loading, setLoading] = useState(false);
     const [countryData, setCountryData] = useState([]);
     const [activeTab, setActiveTab] = useState("profile-edit");
     const router = useRouter();
+    const [formData, setFormData] = useState({
+      name: "",
+      username: "",
+      email: "",
+      password: "",
+      dateOfBirth: "",
+      currentAddress: "",
+      permanentAddress: "",
+      permanentCity: "",
+      permanentPostalCode: "",
+      permanentCountry: "",
+      companyName: "",
+      brandName: "",
+      brandShortName: "",
+      billingAddress: "",
+      billingPincode: "",
+      profilePicture:'',
+      billingState: "",
+      billingCity: "",
+      businessType: "",
+      clientEntryType: "",
+      gstNumber: "",
+      companyPanNumber: "",
+      aadharNumber: "",
+      gstDocument: "",         
+      panCardHolderName: "",
+      aadharCardHolderName: "",
+      panCardImage: "",        
+      aadharCardImage: "",   
+      additionalDocumentUpload: "", 
+      documentId: "",
+      documentName: "",
+      documentImage: "",  
+      cancelledChequeImage_0:"",      
+      bankAccounts: [
+        {
+        accountHolderName: "",
+        accountNumber: "",
+        bankName: "",
+        bankBranch: "",
+        accountType: "",
+        ifscCode: "",
+        }
+      
+      ],
+  });
 
-  const [formData, setFormData] = useState({
-  name: "",
-  username: "",
-  email: "",
-  password: "",
-  dateOfBirth: "",
-  currentAddress: "",
-  permanentAddress: "",
-  permanentCity: "",
-  permanentPostalCode: "",
-  permanentCountry: "",
-  companyName: "",
-  brandName: "",
-  brandShortName: "",
-  billingAddress: "",
-  billingPincode: "",
-  profilePicture:'',
-  billingState: "",
-  billingCity: "",
-  businessType: "",
-  clientEntryType: "",
-  gstNumber: "",
-  companyPanNumber: "",
-  aadharNumber: "",
-  gstDocument: "",         
-  panCardHolderName: "",
-  aadharCardHolderName: "",
-  panCardImage: "",        
-  aadharCardImage: "",   
-  additionalDocumentUpload: "", 
-  documentId: "",
-  documentName: "",
-  documentImage: "",  
-  cancelledChequeImage_0:"",      
-  bankAccounts: [
-    {
-    accountHolderName: "",
-    accountNumber: "",
-    bankName: "",
-    bankBranch: "",
-    accountType: "",
-    ifscCode: "",
-    }
-   
-  ],
-});
-
- const fetchCountry = useCallback(async () => {
+    const fetchCountry = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
         if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
@@ -103,10 +102,10 @@ const ProfileProvider = ({ children }) => {
     }, [router]);
 
   return (
-    <ProfileContext.Provider value={{fetchCountry, formData,activeTab,countryData,setActiveTab, setFormData }}>
+    <ProfileEditContext.Provider value={{fetchCountry, formData,activeTab,countryData,setActiveTab, setFormData }}>
       {children}
-    </ProfileContext.Provider>
+    </ProfileEditContext.Provider>
   );
 };
 
-export { ProfileProvider, ProfileContext };
+export { ProfileEditProvider, ProfileEditContext };

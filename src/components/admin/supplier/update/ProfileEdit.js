@@ -1,6 +1,6 @@
 'use client';
 import { useContext, useEffect, useState ,useCallback} from 'react';
-import { ProfileContext } from './ProfileContext';
+import { ProfileEditContext } from './ProfileEditContext';
 import profileImg from '@/app/images/editprofile.png';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,7 @@ import { Pencil } from 'lucide-react';
 const ProfileEdit = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const { formData, setFormData,fetchCountry, setActiveTab,countryData} = useContext(ProfileContext);
+    const { formData, setFormData,fetchCountry, setActiveTab,countryData} = useContext(ProfileEditContext);
     const [errors, setErrors] = useState({});
     const [cityData, setCityData] = useState([]);
     const [stateData, setStateData] = useState([]);

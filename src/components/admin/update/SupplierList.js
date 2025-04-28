@@ -9,7 +9,7 @@ import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
-import { useAdmin } from '../middleware/AdminMiddleWareContext';
+import { useAdmin } from '../../middleware/AdminMiddleWareContext';
 const SupplierList = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
@@ -379,7 +379,10 @@ const SupplierList = () => {
     }, [router, trashSupplier]);
     
     const [selected, setSelected] = useState([]);
-   
+    const [selectedMonth, setSelectedMonth] = useState(() => {
+        const today = new Date();
+        return today.toISOString().slice(0, 7);
+    });
     const handleCheckboxChange = (id) => {
         setSelected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
     };
@@ -387,147 +390,148 @@ const SupplierList = () => {
     const handleEdit=(id)=>{
         router.push(`/admin/supplier/update?id=${id}`);
     }
-    return (
-        loading ? (
-            <div className="flex justify-center items-center h-96">
-                <HashLoader color="orange" />
-            </div>
-        ) : (
-            <div className="bg-white rounded-3xl p-5">
-                <div className="flex flex-wrap justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-[#2B3674]">Suppliers List</h2>
-                    <div className="flex gap-3 flex-wrap items-center">
-                        <button
-                            onClick={() => setIsPopupOpen((prev) => !prev)}
-                            className="bg-[#F4F7FE] p-2 rounded-lg relative"
-                        >
-                            <MoreHorizontal className="text-[#F98F5C]" />
-                            {isPopupOpen && (
-                                <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
-                                    <ul className="py-2 text-sm text-[#2B3674]">
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                                    </ul>
-                                </div>
-                            )}
+console.log('suppliers',suppliers)
+return (
+    loading ? (
+        <div className="flex justify-center items-center h-96">
+            <HashLoader color="orange" />
+        </div>
+    ) : (
+        <div className="bg-white rounded-3xl p-5">
+            <div className="flex flex-wrap justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#2B3674]">Suppliers List</h2>
+                <div className="flex gap-3 flex-wrap items-center">
+                    <button
+                        onClick={() => setIsPopupOpen((prev) => !prev)}
+                        className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                    >
+                        <MoreHorizontal className="text-[#F98F5C]" />
+                        {isPopupOpen && (
+                            <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                                <ul className="py-2 text-sm text-[#2B3674]">
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                </ul>
+                            </div>
+                        )}
+                    </button>
+                    <div className="flex justify-end gap-2">
+                        <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
+                            <Link href="/admin/supplier/create">Add New</Link>
                         </button>
-                        <div className="flex justify-end gap-2">
-                            <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
-                                <Link href="/admin/supplier/create">Add New</Link>
-                            </button>
-                            <button
-                                className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-                                onClick={async () => {
-                                    if (isTrashed) {
-                                        setIsTrashed(false);
-                                        await fetchSupplier();
-                                    } else {
-                                        setIsTrashed(true);
-                                        await trashSupplier();
-                                    }
-                                }}
-                            >
-                                {isTrashed ? "Supplier Listing (Simple)" : "Trashed Supplier"}
-                            </button>
-                        </div>
+                        <button
+                            className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                            onClick={async () => {
+                                if (isTrashed) {
+                                    setIsTrashed(false);
+                                    await fetchSupplier();
+                                } else {
+                                    setIsTrashed(true);
+                                    await trashSupplier();
+                                }
+                            }}
+                        >
+                            {isTrashed ? "Supplier Listing (Simple)" : "Trashed Supplier"}
+                        </button>
                     </div>
                 </div>
-                {suppliers.length > 0 ? (
-                    <div className="overflow-x-auto w-full relative">
-                        <table className="w-full" id="supplierTable">
-                            <thead>
-                                <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Sr.</th>
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Name</th>
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Email</th>
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Date Of Birth</th>
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Present Address</th>
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Permanent Address</th>
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">State</th>
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">City</th>
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Postal Code</th>
-                                    <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {suppliers.map((item, index) => {
-                                    return (
-                                        <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                            {/* Checkbox Column */}
-                                            <td className="p-2 px-4 whitespace-nowrap text-left">
-                                                <div className="flex items-center">
-                                                    <label className="flex items-center cursor-pointer me-2">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selected.includes(item.id)}
-                                                            onChange={() => handleCheckboxChange(item.id)}
-                                                            className="peer hidden"
-                                                        />
-                                                        <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                                            <FaCheck className="peer-checked:block text-white w-3 h-3" />
-                                                        </div>
-                                                    </label>
-                                                    {index + 1}
-                                                </div>
-                                            </td>    
-
-                                            {/* Supplier Information Columns */}
-                                            <td className="p-2 px-4 whitespace-nowrap text-left">{item.name}</td>
-                                            <td className="p-2 px-4 whitespace-nowrap text-left">{item.email}</td>
-
-                                            {/* Handle empty dateOfBirth and other date fields */}
-                                            <td className="p-2 px-4 whitespace-nowrap text-left">
-                                                {item.dateOfBirth && Object.keys(item.dateOfBirth).length ? item.dateOfBirth : 'N/A'}
-                                            </td>
-
-                                            <td className="p-2 px-4 whitespace-nowrap text-left">{item.currentAddress || 'N/A'}</td>
-                                            <td className="p-2 px-4 whitespace-nowrap text-left">{item.permanentAddress || 'N/A'}</td>
-                                            <td className="p-2 px-4 whitespace-nowrap text-left">{item.state || 'N/A'}</td>
-                                            <td className="p-2 px-4 whitespace-nowrap text-left">{item.city || 'N/A'}</td>
-                                            <td className="p-2 px-4 whitespace-nowrap text-left">{item.permanentPostalCode || 'N/A'}</td>
-
-                                            {/* Action Column (Edit/Delete/Restore) */}
-                                            <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]">
-                                                <div className="flex justify-center gap-2">
-                                                    {isTrashed ? (
-                                                        <>
-                                                            <MdRestoreFromTrash
-                                                                onClick={() => handleRestore(item)} 
-                                                                className="cursor-pointer text-3xl text-green-500"
-                                                            />
-                                                            <AiOutlineDelete
-                                                                onClick={() => handlePermanentDelete(item)} 
-                                                                className="cursor-pointer text-2xl"
-                                                            />
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <MdModeEdit
-                                                                onClick={() => handleEdit(item.id)} 
-                                                                className="cursor-pointer text-2xl"
-                                                            />
-                                                            <AiOutlineDelete
-                                                                onClick={() => handleDelete(item)} 
-                                                                className="cursor-pointer text-2xl"
-                                                            />
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    // Render when no suppliers
-                    <div className='text-center'>No suppliers available</div>
-                )}
             </div>
-        )
-    );
+            {suppliers.length > 0 ? (
+                <div className="overflow-x-auto w-full relative">
+                    <table className="w-full" id="supplierTable">
+                        <thead>
+                            <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Sr.</th>
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Name</th>
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Email</th>
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Date Of Birth</th>
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Present Address</th>
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Permanent Address</th>
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">State</th>
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">City</th>
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Postal Code</th>
+                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {suppliers.map((item, index) => {
+                                return (
+                                    <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                        {/* Checkbox Column */}
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">
+                                            <div className="flex items-center">
+                                                <label className="flex items-center cursor-pointer me-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selected.includes(item.id)}
+                                                        onChange={() => handleCheckboxChange(item.id)}
+                                                        className="peer hidden"
+                                                    />
+                                                    <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                        <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                                                    </div>
+                                                </label>
+                                                {index + 1}
+                                            </div>
+                                        </td>    
+
+                                        {/* Supplier Information Columns */}
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.name}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.email}</td>
+
+                                        {/* Handle empty dateOfBirth and other date fields */}
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">
+                                            {item.dateOfBirth && Object.keys(item.dateOfBirth).length ? item.dateOfBirth : 'N/A'}
+                                        </td>
+
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.currentAddress || 'N/A'}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.permanentAddress || 'N/A'}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.state || 'N/A'}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.city || 'N/A'}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.permanentPostalCode || 'N/A'}</td>
+
+                                        {/* Action Column (Edit/Delete/Restore) */}
+                                        <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]">
+                                            <div className="flex justify-center gap-2">
+                                                {isTrashed ? (
+                                                    <>
+                                                        <MdRestoreFromTrash
+                                                            onClick={() => handleRestore(item)} 
+                                                            className="cursor-pointer text-3xl text-green-500"
+                                                        />
+                                                        <AiOutlineDelete
+                                                            onClick={() => handlePermanentDelete(item)} 
+                                                            className="cursor-pointer text-2xl"
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <MdModeEdit
+                                                            onClick={() => handleEdit(item.id)} 
+                                                            className="cursor-pointer text-2xl"
+                                                        />
+                                                        <AiOutlineDelete
+                                                            onClick={() => handleDelete(item)} 
+                                                            className="cursor-pointer text-2xl"
+                                                        />
+                                                    </>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                // Render when no suppliers
+                <div className='text-center'>No suppliers available</div>
+            )}
+        </div>
+    )
+);
 
 };
 

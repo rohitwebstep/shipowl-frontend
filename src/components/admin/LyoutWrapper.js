@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import '@/app/globals.css'
 import { ProfileProvider } from "./supplier/ProfileContext";
+import { ProfileEditProvider } from "./supplier/update/ProfileEditContext";
 import AdminMiddleWareProvider from "./middleware/AdminMiddleWareContext";
 import { DropshipperProfileProvider } from "./dropshipper/DropshipperProfileContext";
 export default function LayoutWrapper({ children }) {
@@ -25,9 +26,11 @@ export default function LayoutWrapper({ children }) {
                         <div className=" xl:p-3 md:pt-4 md:px-0">
                             <AdminMiddleWareProvider>
                                 <ProfileProvider>
+                                <ProfileEditProvider>
                                     <DropshipperProfileProvider>
                                         {children}
                                     </DropshipperProfileProvider>
+                                </ProfileEditProvider>
                                 </ProfileProvider>
                             </AdminMiddleWareProvider>
                         </div>

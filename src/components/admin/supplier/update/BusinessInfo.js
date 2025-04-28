@@ -1,14 +1,14 @@
 'use client';
 
 import { useContext, useEffect, useState, useCallback } from 'react';
-import { ProfileContext } from './ProfileContext';
+import { ProfileEditContext } from './ProfileEditContext';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 
 const BusinessInfo = () => {
   const [cityData, setCityData] = useState([]);
   const [stateData, setStateData] = useState([]);
-  const { formData, setFormData, setActiveTab, countryData, fetchCountry } = useContext(ProfileContext);
+  const { formData, setFormData, setActiveTab, countryData, fetchCountry } = useContext(ProfileEditContext);
   const [errors, setErrors] = useState({});
   const router = useRouter();
   const [loading, setLoading] = useState(false);

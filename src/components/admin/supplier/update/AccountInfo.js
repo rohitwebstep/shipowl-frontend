@@ -1,12 +1,12 @@
 'use client';
 
 import { useContext, useState } from 'react';
-import { ProfileContext } from './ProfileContext';
+import { ProfileEditContext } from './ProfileEditContext';
 import BankAccountList from './BankAccountList';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 const AccountInfo = () => {
-  const { formData, setFormData } = useContext(ProfileContext);
+  const { formData, setFormData } = useContext(ProfileEditContext);
   const [errors, setErrors] = useState([{}]);
   const [loading,setLoading] = useState(false)
     const router = useRouter();
