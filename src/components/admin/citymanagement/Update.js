@@ -66,7 +66,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`,
+                `http://localhost:3001/api/location/city/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -145,7 +145,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`;
+            const url = `http://localhost:3001/api/location/city/${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {

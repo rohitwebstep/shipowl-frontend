@@ -73,7 +73,7 @@ export default function Sidebar() {
           icon: LuLayoutDashboard,
           subMenu: [
             { icon: ClipboardList, name: "Courier Company", href: "/admin/courier/list" },
-            { icon: ClipboardList, name: "Api Credentials", href: "/adminhttps://sleeping-owl-we0m.onrender.com/api/list" },
+            { icon: ClipboardList, name: "Api Credentials", href: "/adminhttp://localhost:3001/api/list" },
             { name: "High RTO(In progress)", icon: Package, href: "/admin/high-rto/list" },
           ],
         },

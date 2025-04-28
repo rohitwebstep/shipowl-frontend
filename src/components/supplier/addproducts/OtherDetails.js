@@ -64,7 +64,7 @@ export default function OtherDetails() {
             }
         });
   
-        const url = "https://sleeping-owl-we0m.onrender.com/api/product"; // Ensure the URL is correct
+        const url = "http://localhost:3001/api/product"; // Ensure the URL is correct
         const form = new FormData();
 
         for (const key in formData) {

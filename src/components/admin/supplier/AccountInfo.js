@@ -92,7 +92,7 @@ const AccountInfo = () => {
             }
         });
   
-        const url = "https://sleeping-owl-we0m.onrender.com/api/supplier"; // Ensure the URL is correct
+        const url = "http://localhost:3001/api/supplier"; // Ensure the URL is correct
         const form = new FormData();
         for (const key in formData) {
           const value = formData[key];

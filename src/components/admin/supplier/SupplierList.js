@@ -36,7 +36,7 @@ const supplierList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier`, {
+            const response = await fetch(`http://localhost:3001/api/supplier`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const supplierList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/trashed`, {
+            const response = await fetch(`http://localhost:3001/api/supplier/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -193,7 +193,7 @@ const supplierList = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item.id}`,
+                `http://localhost:3001/api/supplier/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -275,7 +275,7 @@ const supplierList = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item.id}/destroy`,
+                `http://localhost:3001/api/supplier/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -337,7 +337,7 @@ const supplierList = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/supplier/${item?.id}/restore`,
+                    `http://localhost:3001/api/supplier/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
