@@ -4,11 +4,13 @@ import { useContext, useEffect, useState, useCallback } from 'react';
 import { ProfileEditContext } from './ProfileEditContext';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
-
+import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 const BusinessInfo = () => {
-  const [cityData, setCityData] = useState([]);
-  const [stateData, setStateData] = useState([]);
-  const { formData, setFormData, setActiveTab, countryData, fetchCountry } = useContext(ProfileEditContext);
+  const { formData, setFormData,stateData,cityData, setCityData, setStateData, setActiveTab, countryData, fetchCountry } = useContext(ProfileEditContext);
   const [errors, setErrors] = useState({});
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -143,6 +145,79 @@ const BusinessInfo = () => {
       setLoading(false);
     }
   }, [router]);
+    const handleImageDelete = async (index) => {
+            setLoading(true);
+    
+            const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+            if (dropshipperData?.project?.active_panel !== "supplier") {
+                localStorage.removeItem("shippingData");
+                router.push("/supplier/auth/login");
+                return;
+            }
+    
+            const token = dropshipperData?.security?.token;
+            if (!token) {
+                router.push("/supplier/auth/login");
+                return;
+            }
+    
+            try {
+                Swal.fire({
+                    title: 'Deleting Image...',
+                    text: 'Please wait while we remove the image.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+    
+                const url = `http://localhost:3001/api/supplier/${id}/company/${companyId}/image/${index}?type=${type}`;
+                const response = await fetch(url, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+    
+                if (!response.ok) {
+                    Swal.close();
+                    const errorMessage = await response.json();
+                    Swal.fire({
+                        icon: "error",
+                        title: "Delete Failed",
+                        text: errorMessage.message || errorMessage.error || "An error occurred",
+                    });
+                    throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+                }
+    
+                const result = await response.json();
+                Swal.close();
+    
+                if (result) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Image Deleted",
+                        text: `The image has been deleted successfully!`,
+                        showConfirmButton: true,
+                    }).then((res) => {
+                        if (res.isConfirmed) {
+                            fetchbrand(); // Refresh formData with updated images
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Submission Error",
+                    text: error.message || "Something went wrong. Please try again.",
+                });
+                setError(error.message || "Submission failed.");
+            } finally {
+                setLoading(false);
+            }
+        };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -175,7 +250,7 @@ const BusinessInfo = () => {
     errors[field] && <p className="text-red-500 text-sm mt-1">{errors[field]}</p>;
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 rounded-2xl">
+<form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 rounded-2xl">
   <div className="grid lg:grid-cols-3 py-5 gap-4">
     {/* Company Name, Brand Name, Short Brand Name */}
     <div>
@@ -277,7 +352,12 @@ const BusinessInfo = () => {
       {renderError('billingState')}
     </div>
 
-    <div>
+ 
+  </div>
+
+  {/* Business Type, Client Entry Type */}
+  <div className="grid lg:grid-cols-3 gap-4">
+  <div>
       {renderLabel('City', 'billingCity')}
       <select
         name="billingCity"
@@ -294,10 +374,6 @@ const BusinessInfo = () => {
       </select>
       {renderError('billingCity')}
     </div>
-  </div>
-
-  {/* Business Type, Client Entry Type */}
-  <div className="grid lg:grid-cols-3 gap-4">
     <div>
       {renderLabel('Business Type', 'businessType')}
       <select
@@ -337,46 +413,211 @@ const BusinessInfo = () => {
       KYC Details – Provide minimum of 2 documents
     </h3>
     <div className="grid lg:grid-cols-3 gap-4 mt-2">
-      {[
-        { label: 'GST Number', name: 'gstNumber' },
-        { label: 'Company PAN Card ID', name: 'companyPanNumber' },
-        { label: 'Aadhar Card ID', name: 'aadharNumber' },
-        { label: 'Upload GST Document', name: 'gstDocument', type: 'file' },
-        { label: 'Name on PAN Card', name: 'panCardHolderName' },
-        { label: 'Name Aadhar Card ID', name: 'aadharCardHolderName' },
-      ].map(({ label, name, type = 'text' }) => (
-        <div key={name}>
-          {renderLabel(label, name)}
-          <input
-            type={type}
-            name={name}
-            {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name], onChange: handleChange })}
-            className={inputClasses(name)}
-          />
-          {renderError(name)}
-        </div>
-      ))}
+  {[
+    { label: 'GST Number', name: 'gstNumber' },
+    { label: 'Company PAN Card ID', name: 'companyPanNumber' },
+    { label: 'Aadhar Card ID', name: 'aadharNumber' },
+    { label: 'Name on PAN Card', name: 'panCardHolderName' },
+    { label: 'Name Aadhar Card ID', name: 'aadharCardHolderName' }
+  ].map(({ label, name, type = 'text' }) => (
+    <div key={name}>
+      {renderLabel(label, name)}
+      <input
+        type={type}
+        name={name}
+        {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name], onChange: handleChange })}
+        className={inputClasses(name)}
+      />
+      {renderError(name)}
     </div>
+  ))}
+</div>
+
+{/* Separate file input for "Upload GST Document" */}
+<div className="mt-6">
+  <div className="mb-4">
+    {renderLabel('Upload GST Document', 'gstDocument')}
+    <input
+      type="file"
+      name="gstDocument"
+      multiple
+      onChange={handleChange}
+      className={inputClasses('gstDocument')}
+    />
+    {renderError('gstDocument')}
+  </div>
+
+  {/* File preview for GST Document */}
+  {formData.gstDocument?.length > 0 && (
+      <Swiper
+      key={formData.id}
+      modules={[Navigation]}
+      slidesPerView={2}
+      loop={formData.gstDocument?.split(',').length > 1}
+      navigation={true}
+      className="mySwiper w-full ms-2"
+    >
+      {formData.gstDocument?.split(',').map((img, index) => (
+        <SwiperSlide key={index} className="relative gap-3">
+          {/* Delete Button */}
+          <button
+            type="button"
+            className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+            onClick={() => {
+              Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to delete this image?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  handleImageDelete(index); // Call your delete function
+                }
+              });
+            }}
+          >
+            ✕
+          </button>
+          {/* Image */}
+          <Image
+            src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+            alt={`Image ${index + 1}`}
+            width={500}
+            height={500}
+            className="me-3 p-2 object-cover rounded"
+          />
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  )}
+</div>
+
   </div>
 
   {/* PAN and Aadhar Upload */}
   <div className="grid md:grid-cols-2 py-5 gap-3">
-    {['panCardImage', 'aadharCardImage'].map((name) => (
-      <div key={name}>
-        {renderLabel(
-          name === 'panCardImage' ? 'Upload PAN card image' : 'Upload Aadhar card image',
-          name
-        )}
-        <input
-          type="file"
-          name={name}
-          multiple
-          onChange={handleChange}
-          className={inputClasses(name)}
-        />
+  {/* PAN Card Image Upload */}
+  <div>
+    {renderLabel('Upload PAN card image', 'panCardImage')}
+    <input
+      type="file"
+      name="panCardImage"
+      multiple
+      onChange={handleChange}
+      className={inputClasses('panCardImage')}
+    />
+    <div className="py-6">
+      <div className="mt-2">
+        <Swiper
+          key={formData.id}
+          modules={[Navigation]}
+          slidesPerView={2}
+          loop={formData.panCardImage?.split(',').length > 1}
+          navigation={true}
+          className="mySwiper w-full ms-2"
+        >
+          {formData.panCardImage?.split(',').map((img, index) => (
+            <SwiperSlide key={index} className="relative gap-3">
+              {/* Delete Button */}
+              <button
+                type="button"
+                className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                onClick={() => {
+                  Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete this image?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      handleImageDelete(index); // Call your delete function
+                    }
+                  });
+                }}
+              >
+                ✕
+              </button>
+              {/* Image */}
+              <Image
+                src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                alt={`Image ${index + 1}`}
+                width={500}
+                height={500}
+                className="me-3 p-2 object-cover rounded"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
-    ))}
+    </div>
   </div>
+
+  {/* Aadhar Card Image Upload */}
+  <div>
+    {renderLabel('Upload Aadhar card image', 'aadharCardImage')}
+    <input
+      type="file"
+      name="aadharCardImage"
+      multiple
+      onChange={handleChange}
+      className={inputClasses('aadharCardImage')}
+    />
+    <div className="py-6">
+      <div className="mt-2">
+        <Swiper
+          key={formData.id}
+          modules={[Navigation]}
+          slidesPerView={2}
+          loop={formData.aadharCardImage?.split(',').length > 1}
+          navigation={true}
+          className="mySwiper w-full ms-2"
+        >
+          {formData.aadharCardImage?.split(',').map((img, index) => (
+            <SwiperSlide key={index} className="relative gap-3">
+              {/* Delete Button */}
+              <button
+                type="button"
+                className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                onClick={() => {
+                  Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete this image?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      handleImageDelete(index); // Call your delete function
+                    }
+                  });
+                }}
+              >
+                ✕
+              </button>
+              {/* Image */}
+              <Image
+                src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                alt={`Image ${index + 1}`}
+                width={500}
+                height={500}
+                className="me-3 p-2 object-cover rounded"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   {/* Additional Documents */}
   <h3 className="font-semibold text-[#FF702C] underline text-sm pt-5">
@@ -384,23 +625,143 @@ const BusinessInfo = () => {
   </h3>
 
   <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 pt-3">
-    {[
-      { label: 'Document to upload', name: 'additionalDocumentUpload', type: 'file' },
-      { label: 'Document ID', name: 'documentId' },
-      { label: 'Name of document', name: 'documentName' },
-      { label: 'Document Image', name: 'documentImage', type: 'file' },
-    ].map(({ label, name, type = 'text' }) => (
-      <div key={name}>
-        {renderLabel(label, name)}
-        <input
-          type={type}
-          name={name}
-          {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name], onChange: handleChange })}
-          className={inputClasses(name)}
-        />
+  {/* Other fields */}
+  {[
+    { label: 'Document ID', name: 'documentId' },
+    { label: 'Name of document', name: 'documentName' }
+  ].map(({ label, name, type = 'text' }) => (
+    <div key={name}>
+      {renderLabel(label, name)}
+      <input
+        type={type}
+        name={name}
+        {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name], onChange: handleChange })}
+        className={inputClasses(name)}
+      />
+    </div>
+  ))}
+
+  {/* Document to upload with Swiper preview */}
+  <div>
+    {renderLabel('Document to upload', 'additionalDocumentUpload')}
+    <input
+      type="file"
+      name="additionalDocumentUpload"
+      multiple
+      onChange={handleChange}
+      className={inputClasses('additionalDocumentUpload')}
+    />
+
+    <div className="py-6">
+      <div className="mt-2">
+      <Swiper
+          key={formData.id}
+          modules={[Navigation]}
+          slidesPerView={2}
+          loop={formData.additionalDocumentUpload?.split(',').length > 1}
+          navigation={true}
+          className="mySwiper w-full ms-2"
+        >
+          {formData.additionalDocumentUpload?.split(',').map((img, index) => (
+            <SwiperSlide key={index} className="relative gap-3">
+              {/* Delete Button */}
+              <button
+                type="button"
+                className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                onClick={() => {
+                  Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete this image?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      handleImageDelete(index); // Call your delete function
+                    }
+                  });
+                }}
+              >
+                ✕
+              </button>
+              {/* Image */}
+              <Image
+                src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                alt={`Image ${index + 1}`}
+                width={500}
+                height={500}
+                className="me-3 p-2 object-cover rounded"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
-    ))}
+    </div>
   </div>
+
+  {/* Document Image */}
+  <div>
+    {renderLabel('Document Image', 'documentImage')}
+    <input
+      type="file"
+      name="documentImage"
+      multiple
+      onChange={handleChange}
+      className={inputClasses('documentImage')}
+    />
+
+    <div className="py-6">
+      <div className="mt-2">
+      <Swiper
+          key={formData.id}
+          modules={[Navigation]}
+          slidesPerView={2}
+          loop={formData.documentImage?.split(',').length > 1}
+          navigation={true}
+          className="mySwiper w-full ms-2"
+        >
+          {formData.documentImage?.split(',').map((img, index) => (
+            <SwiperSlide key={index} className="relative gap-3">
+              {/* Delete Button */}
+              <button
+                type="button"
+                className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                onClick={() => {
+                  Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete this image?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      handleImageDelete(index); // Call your delete function
+                    }
+                  });
+                }}
+              >
+                ✕
+              </button>
+              {/* Image */}
+              <Image
+                src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                alt={`Image ${index + 1}`}
+                width={500}
+                height={500}
+                className="me-3 p-2 object-cover rounded"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   <div className="py-5">
     <button type="submit" className="px-5 p-2 bg-[#FF702C] text-white py-3 rounded-xl">
@@ -408,6 +769,7 @@ const BusinessInfo = () => {
     </button>
   </div>
 </form>
+
 
   );
 };

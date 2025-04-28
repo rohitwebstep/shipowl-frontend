@@ -9,10 +9,8 @@ import { Pencil } from 'lucide-react';
 const ProfileEdit = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const { formData, setFormData,fetchCountry, setActiveTab,countryData} = useContext(ProfileEditContext);
+    const { formData, setFormData,fetchCountry, stateData,cityData, setCityData, setStateData,setActiveTab,countryData} = useContext(ProfileEditContext);
     const [errors, setErrors] = useState({});
-    const [cityData, setCityData] = useState([]);
-    const [stateData, setStateData] = useState([]);
     const [previewUrl, setPreviewUrl] = useState(null);
     const fetchCity = useCallback(async (id) => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -30,7 +28,7 @@ const ProfileEdit = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
+            const response = await fetch(`http://localhost:3001/api/location/state/${formData?.permanentState||id}/cities`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -58,6 +56,7 @@ const ProfileEdit = () => {
         }
     }, [router]);
     const fetchState = useCallback(async (id) => {
+      console.log('id',id)
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
         
         if (adminData?.project?.active_panel !== "admin") {
@@ -75,7 +74,7 @@ const ProfileEdit = () => {
         try {
           setLoading(true);
           const response = await fetch(
-            `http://localhost:3001/api/location/country/${id}/states`,
+            `http://localhost:3001/api/location/country/${ formData?.permanentCountry|| id}/states`,
             {
               method: "GET",
               headers: {

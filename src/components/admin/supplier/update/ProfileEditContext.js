@@ -6,7 +6,8 @@ import Swal from 'sweetalert2';
 const ProfileEditContext = createContext();
 
 const ProfileEditProvider = ({ children }) => {
-
+    const [cityData,setCityData] = useState([]);
+    const [stateData,setStateData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [countryData, setCountryData] = useState([]);
     const [activeTab, setActiveTab] = useState("profile-edit");
@@ -57,6 +58,8 @@ const ProfileEditProvider = ({ children }) => {
       
       ],
   });
+  const [cancelledChequeImages,setCancelledChequeImages] = useState([]);
+
 
     const fetchCountry = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -102,7 +105,7 @@ const ProfileEditProvider = ({ children }) => {
     }, [router]);
 
   return (
-    <ProfileEditContext.Provider value={{fetchCountry, formData,activeTab,countryData,setActiveTab, setFormData }}>
+    <ProfileEditContext.Provider value={{fetchCountry,cancelledChequeImages,setCancelledChequeImages,cityData,setCityData,stateData,setStateData, formData,activeTab,countryData,setActiveTab, setFormData }}>
       {children}
     </ProfileEditContext.Provider>
   );

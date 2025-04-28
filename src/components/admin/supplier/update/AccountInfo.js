@@ -5,11 +5,18 @@ import { ProfileEditContext } from './ProfileEditContext';
 import BankAccountList from './BankAccountList';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 const AccountInfo = () => {
-  const { formData, setFormData } = useContext(ProfileEditContext);
+  const { formData, setFormData,cancelledChequeImages,setCancelledChequeImages } = useContext(ProfileEditContext);
   const [errors, setErrors] = useState([{}]);
-  const [loading,setLoading] = useState(false)
+  const [loading,setLoading] = useState(false);
+
     const router = useRouter();
+    console.log('cancelledChequeImages',cancelledChequeImages)
 
   const handleChange = (index, e) => {
     const { name, value, files } = e.target;
@@ -189,6 +196,82 @@ const AccountInfo = () => {
     }    }
   };
 
+
+
+     const handleImageDelete = async (index) => {
+          setLoading(true);
+  
+          const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+          if (dropshipperData?.project?.active_panel !== "supplier") {
+              localStorage.removeItem("shippingData");
+              router.push("/supplier/auth/login");
+              return;
+          }
+  
+          const token = dropshipperData?.security?.token;
+          if (!token) {
+              router.push("/supplier/auth/login");
+              return;
+          }
+  
+          try {
+              Swal.fire({
+                  title: 'Deleting Image...',
+                  text: 'Please wait while we remove the image.',
+                  allowOutsideClick: false,
+                  didOpen: () => {
+                      Swal.showLoading();
+                  }
+              });
+  
+              const url = `http://localhost:3001/api/brand/${id}/image/${index}`;
+  
+              const response = await fetch(url, {
+                  method: "DELETE",
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                  },
+              });
+  
+              if (!response.ok) {
+                  Swal.close();
+                  const errorMessage = await response.json();
+                  Swal.fire({
+                      icon: "error",
+                      title: "Delete Failed",
+                      text: errorMessage.message || errorMessage.error || "An error occurred",
+                  });
+                  throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+              }
+  
+              const result = await response.json();
+              Swal.close();
+  
+              if (result) {
+                  Swal.fire({
+                      icon: "success",
+                      title: "Image Deleted",
+                      text: `The image has been deleted successfully!`,
+                      showConfirmButton: true,
+                  }).then((res) => {
+                      if (res.isConfirmed) {
+                          fetchbrand(); // Refresh formData with updated images
+                      }
+                  });
+              }
+          } catch (error) {
+              console.error("Error:", error);
+              Swal.close();
+              Swal.fire({
+                  icon: "error",
+                  title: "Submission Error",
+                  text: error.message || "Something went wrong. Please try again.",
+              });
+              setError(error.message || "Submission failed.");
+          } finally {
+              setLoading(false);
+          }
+      };
   const handleFileChange = (event, index) => {
     const file = event.target.files[0];
     if (file) {
@@ -262,13 +345,64 @@ const AccountInfo = () => {
             </label>
             <input
               type="file"
+              multiple
               onChange={(e) => handleFileChange(e,index)}
               className={`w-full p-3 border rounded-lg font-bold ${
-                errors[index]?.cancelledChequeImage
+                errors[index]?.cancelledChequeImage_0
                   ? 'border-red-500 text-red-500'
                   : 'border-[#DFEAF2] text-[#718EBF]'
               }`}
             />
+              {formData?.cancelledChequeImage_0 && (
+                  <div className="mt-2">
+                      <Swiper
+                          key={formData.id}
+                          modules={[Navigation]}
+                          slidesPerView={2}
+                          loop={formData.image?.split(',').length > 1}
+                          navigation={true}
+                          className="mySwiper w-full ms-2"
+                      >
+                          {formData.image?.split(',').map((img, index) => (
+                              <SwiperSlide key={index} className="relative gap-3">
+                                  {/* Delete Button */}
+                                  <button
+                                      type="button"
+                                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                                      onClick={() => {
+                                          Swal.fire({
+                                              title: 'Are you sure?',
+                                              text: `Do you want to delete this image?`,
+                                              icon: 'warning',
+                                              showCancelButton: true,
+                                              confirmButtonColor: '#d33',
+                                              cancelButtonColor: '#3085d6',
+                                              confirmButtonText: 'Yes, delete it!'
+                                          }).then((result) => {
+                                              if (result.isConfirmed) {
+
+                                                  handleImageDelete(index); // Call your delete function
+                                              }
+                                          });
+                                      }}
+                                  >
+                                      ✕
+                                  </button>
+
+                                  {/* Image */}
+                                  <Image
+                                      src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                                      alt={`Image ${index + 1}`}
+                                      width={500}
+                                      height={500}
+                                      className="me-3 p-2 object-cover rounded"
+                                  />
+                              </SwiperSlide>
+                          ))}
+                      </Swiper>
+                  </div>
+
+              )}
             {errors[index]?.cancelledChequeImage && (
               <p className="text-red-500 text-sm mt-1">{errors[index].cancelledChequeImage}</p>
             )}
