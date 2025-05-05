@@ -562,7 +562,8 @@ export default function List() {
                                                 </div>
                                             </td>
                                             <td className="p-2 w-auto relative bg-transparent whitespace-nowrap px-5 border-0">
-                                                <Swiper
+                                               {
+                                                item.image ? ( <Swiper
                                                     key={item.id}
                                                     modules={[Navigation]}
                                                     slidesPerView={1}
@@ -581,7 +582,9 @@ export default function List() {
                                                             />
                                                         </SwiperSlide>
                                                     ))}
-                                                </Swiper>
+                                                </Swiper>) : (<p>No Image Found</p>)
+                                               }
+                                               
                                             </td>
                                             <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.description}</td>
                                             <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">

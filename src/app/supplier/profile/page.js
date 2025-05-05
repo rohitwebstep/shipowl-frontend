@@ -1,10 +1,10 @@
-import Profile from '@/components/supplier/userprofile/Profile'
+import ProfileList from '@/components/supplier/userprofile/ProfileList'
 import React from 'react'
 
 export default function page() {
   return (
     <>
-    <Profile/>
+    <ProfileList/>
     </>
   )
 }

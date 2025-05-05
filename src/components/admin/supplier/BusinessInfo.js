@@ -8,49 +8,42 @@ import Swal from 'sweetalert2';
 const BusinessInfo = () => {
   const [cityData, setCityData] = useState([]);
   const [stateData, setStateData] = useState([]);
-  const { formData, setFormData, setActiveTab, countryData, fetchCountry } = useContext(ProfileContext);
-  const [errors, setErrors] = useState({});
+  const { formData, setFormData,businessErrors, setBusinessErrors, setActiveTab,validateBusiness,requiredFields, countryData, fetchCountry } = useContext(ProfileContext);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const requiredFields = {
-    companyName: 'Registered Company Name is required',
-    brandName: 'Brand Name is required',
-    billingAddress: 'Billing Address is required',
-    billingPincode: 'Pincode is required',
-    billingCountry: 'Country is required',
-    billingState: 'State is required',
-    billingCity: 'City is required',
-    businessType: 'Business Type is required',
-    clientEntryType: 'Client Entry Type is required',
-    gstNumber: 'GST Number is required',
-    companyPanNumber: 'PAN Number is required',
-    aadharNumber: 'Aadhar Number is required',
-    panCardHolderName: 'PAN Card Holder Name is required',
-    aadharCardHolderName: 'Aadhar Card Holder Name is required',
-  };
-
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: files?.length ? files : value, // Store multiple files if selected
-    }));
-
+  
+    if (files) {
+      // Handle file input (multiple files)
+      setFormData((prev) => ({
+        ...prev,
+        [name]: Array.from(files), // Store files as an array (e.g., for 'panCardImage')
+      }));
+    } else {
+      // Handle text input
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value, // Store value for text-based inputs
+      }));
+    }
+  
+    // Optional: Fetch states and cities based on country and state selections
     if (name === "billingCountry" && value) {
       fetchState(value);
     }
-
+  
     if (name === "billingState" && value) {
       fetchCity(value);
     }
-
-    setErrors((prevErrors) => ({
+  
+    // Clear the field-specific error message
+    setBusinessErrors((prevErrors) => ({
       ...prevErrors,
       [name]: '',
     }));
   };
-
   useEffect(() => {
     fetchCountry();
   }, [fetchCountry]);
@@ -144,25 +137,22 @@ const BusinessInfo = () => {
     }
   }, [router]);
 
+
+ 
+  
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const newErrors = {};
-    for (let key in requiredFields) {
-      if (!formData[key] || formData[key].toString().trim() === '') {
-        newErrors[key] = requiredFields[key];
-      }
-    }
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
+    if (validateBusiness()) {
       setActiveTab('account-info');
     }
+    setBusinessErrors()
   };
+  
 
   const labelClasses = (field) => "block text-[#232323] font-bold mb-1";
   const inputClasses = (field) =>
-    `w-full p-3 border rounded-lg font-bold ${errors[field] ? 'border-red-500' : 'border-[#DFEAF2]'} text-[#718EBF]`;
+    `w-full p-3 border rounded-lg font-bold ${businessErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'} text-[#718EBF]`;
 
   const renderLabel = (label, field) => (
     <label className={labelClasses(field)}>
@@ -172,7 +162,7 @@ const BusinessInfo = () => {
   );
 
   const renderError = (field) =>
-    errors[field] && <p className="text-red-500 text-sm mt-1">{errors[field]}</p>;
+    businessErrors[field] && <p className="text-red-500 text-sm mt-1">{businessErrors[field]}</p>;
 
   return (
     <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 rounded-2xl">
@@ -183,7 +173,7 @@ const BusinessInfo = () => {
       <input
         type="text"
         name="companyName"
-        value={formData.companyName}
+        value={formData.companyName || ''}
         onChange={handleChange}
         className={inputClasses('companyName')}
       />
@@ -195,7 +185,7 @@ const BusinessInfo = () => {
       <input
         type="text"
         name="brandName"
-        value={formData.brandName}
+        value={formData.brandName || ''}
         onChange={handleChange}
         className={inputClasses('brandName')}
       />
@@ -207,7 +197,7 @@ const BusinessInfo = () => {
       <input
         type="text"
         name="brandShortName"
-        value={formData.brandShortName}
+        value={formData.brandShortName|| ''}
         onChange={handleChange}
         className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
       />
@@ -220,7 +210,7 @@ const BusinessInfo = () => {
     <input
       type="text"
       name="billingAddress"
-      value={formData.billingAddress}
+      value={formData.billingAddress || ''}
       onChange={handleChange}
       className={inputClasses('billingAddress')}
     />
@@ -234,7 +224,7 @@ const BusinessInfo = () => {
       <input
         type="text"
         name="billingPincode"
-        value={formData.billingPincode}
+        value={formData.billingPincode || ''}
         onChange={handleChange}
         className={inputClasses('billingPincode')}
       />
@@ -245,7 +235,7 @@ const BusinessInfo = () => {
       {renderLabel('Country', 'billingCountry')}
       <select
         name="billingCountry"
-        value={formData.billingCountry}
+        value={formData.billingCountry || ''}
         onChange={handleChange}
         className={inputClasses('billingCountry')}
       >
@@ -263,7 +253,7 @@ const BusinessInfo = () => {
       {renderLabel('State', 'billingState')}
       <select
         name="billingState"
-        value={formData.billingState}
+        value={formData.billingState || ''}
         onChange={handleChange}
         className={inputClasses('billingState')}
       >
@@ -281,7 +271,7 @@ const BusinessInfo = () => {
       {renderLabel('City', 'billingCity')}
       <select
         name="billingCity"
-        value={formData.billingCity}
+        value={formData.billingCity || ''}
         onChange={handleChange}
         className={inputClasses('billingCity')}
       >
@@ -302,7 +292,7 @@ const BusinessInfo = () => {
       {renderLabel('Business Type', 'businessType')}
       <select
         name="businessType"
-        value={formData.businessType}
+        value={formData.businessType || ''}
         onChange={handleChange}
         className={inputClasses('businessType')}
       >
@@ -318,7 +308,7 @@ const BusinessInfo = () => {
       {renderLabel('Form of Client’s Entity', 'clientEntryType')}
       <select
         name="clientEntryType"
-        value={formData.clientEntryType}
+        value={formData.clientEntryType || ''}
         onChange={handleChange}
         className={inputClasses('clientEntryType')}
       >

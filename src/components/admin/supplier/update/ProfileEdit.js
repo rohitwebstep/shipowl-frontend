@@ -9,8 +9,7 @@ import { Pencil } from 'lucide-react';
 const ProfileEdit = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const { formData, setFormData,fetchCountry, stateData,cityData, setCityData, setStateData,setActiveTab,countryData} = useContext(ProfileEditContext);
-    const [errors, setErrors] = useState({});
+    const { formData,validate ,errors,setErrors ,setFormData,fetchCountry, stateData,cityData, setCityData, setStateData,setActiveTab,countryData} = useContext(ProfileEditContext);
     const [previewUrl, setPreviewUrl] = useState(null);
     const fetchCity = useCallback(async (id) => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -48,15 +47,15 @@ const ProfileEdit = () => {
             }
 
             setCityData(result?.cities || []);
-            setStateData(result?.states || []);
         } catch (error) {
             console.error("Error fetching cities:", error);
         } finally {
             setLoading(false);
         }
     }, [router]);
+
     const fetchState = useCallback(async (id) => {
-      console.log('id',id)
+      console.log('errors',errors)
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
         
         if (adminData?.project?.active_panel !== "admin") {
@@ -112,49 +111,26 @@ const ProfileEdit = () => {
             const file = files[0];
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
-    
-            updatedFormData[name] = file; // Set the file in formData
+            updatedFormData[name] = file;
         } else {
             updatedFormData[name] = value;
-            if (name === "profilePicture") {
-                setPreviewUrl(null); // Remove preview if profilePicture is not selected
+    
+            // Fetch states/cities AFTER updating the form data
+            if (name === "permanentCountry") {
+                fetchState(value); // <-- Use `value` directly
+            }
+            if (name === "permanentState") {
+                fetchCity(value);  // <-- Use `value` directly
             }
         }
     
-        setFormData(updatedFormData); // Update the form data with the new file or value
-    
-        if (name === "permanentCountry" && value) {
-            fetchState(value);
-        }
-        if (name === "permanentState" && value) {
-            fetchCity(value);
-        }
+        setFormData(updatedFormData);
     
         if (errors[name]) {
             setErrors({ ...errors, [name]: '' });
         }
     };
     
-    
-    
-    const validate = () => {
-        const newErrors = {};
-        if (!formData.name) newErrors.name = 'Full Name is required';
-        if (!formData.username) newErrors.username = 'Username is required';
-        if (!formData.email) newErrors.email = 'Email is required';
-        if (!formData.password) newErrors.password = 'Password is required';
-        if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of Birth is required';
-        if (!formData.currentAddress) newErrors.currentAddress = 'Present Address is required';
-        if (!formData.permanentAddress) newErrors.permanentAddress = 'Permanent Address is required';
-        if (!formData.permanentCity) newErrors.permanentCity = 'City is required';
-        if (!formData.permanentPostalCode) newErrors.permanentPostalCode = 'Postal Code is required';
-        if (!formData.permanentCountry) newErrors.permanentCountry = 'Country is required';
-        if (!formData.permanentState) newErrors.permanentState = 'State is required';
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
     const handleSubmit = () => {
         if (validate()) {
             setActiveTab('business-info');
@@ -218,7 +194,6 @@ const ProfileEdit = () => {
       { label: 'Your Name', name: 'name', type: 'text' },
       { label: 'User Name', name: 'username', type: 'text' },
       { label: 'Email', name: 'email', type: 'email' },
-      { label: 'Password', name: 'password', type: 'password' },
       { label: 'Date of Birth', name: 'dateOfBirth', type: 'date' },
       { label: 'Present Address', name: 'currentAddress', type: 'text' },
       { label: 'Permanent Address', name: 'permanentAddress', type: 'text' },

@@ -13,7 +13,7 @@ const BrandProvider = ({ children }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        status:'',
+        status:false,
         image:""
     });
 

@@ -53,29 +53,29 @@ export default function Create() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
+    
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (!dropshipperData?.project?.active_panel === "supplier") {
+        if (dropshipperData?.project?.active_panel !== "supplier") {
             localStorage.clear("shippingData");
             router.push("/supplier/auth/login");
             return;
         }
-
+    
         const token = dropshipperData?.security?.token;
         if (!token) {
             router.push("/supplier/auth/login");
             return;
         }
-
+    
         const errors = validate();
         if (Object.keys(errors).length > 0) {
             setValidationErrors(errors);
             setLoading(false);
             return;
         }
-
+    
         setValidationErrors({});
-
+    
         try {
             Swal.fire({
                 title: isEdit ? 'Updating Brand...' : 'Creating Brand...',
@@ -85,19 +85,20 @@ export default function Create() {
                     Swal.showLoading();
                 }
             });
-
+    
             const form = new FormData();
             form.append('name', formData.name);
             form.append('description', formData.description);
             form.append('status', formData.status);
+    
             if (files.length > 0) {
-                files.forEach((file, index) => {
+                files.forEach((file) => {
                     form.append('image', file); // use 'images[]' if backend expects an array
                 });
             }
-
-            const url ="http://localhost:3001/api/brand";
-
+    
+            const url = "http://localhost:3001/api/brand";
+    
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -105,22 +106,39 @@ export default function Create() {
                 },
                 body: form,
             });
-
+    
+            const result = await response.json(); // Parse the result here
+    
             if (!response.ok) {
                 Swal.close();
-                const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
                     title: "Creation Failed",
-                    text: errorMessage.message || errorMessage.error || "An error occurred",
+                    text: result.message || result.error || "An error occurred",
                 });
-                throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
-            }
-
-            const result = await response.json();
-            Swal.close();
-
-            if (result) {
+    
+                if (result.error && typeof result.error === 'object') {
+                    const entries = Object.entries(result.error);
+                    let focused = false;
+    
+                    entries.forEach(([key, message]) => {
+                        setValidationErrors((prev) => ({
+                            ...prev,
+                            [key]: message,
+                        }));
+    
+                        if (!focused) {
+                            setTimeout(() => {
+                                const input = document.querySelector(`[name="${key}"]`);
+                                if (input) input.focus();
+                            }, 300);
+    
+                            focused = true;
+                        }
+                    });
+                }
+            } else {
+                Swal.close();
                 Swal.fire({
                     icon: "success",
                     title: "Brand Created",
@@ -129,12 +147,12 @@ export default function Create() {
                 }).then((res) => {
                     if (res.isConfirmed) {
                         setFormData({ name: '', description: '', image: '' });
-                        setFiles(null);
+                        setFiles([]); // Reset file input state
                         router.push("/supplier/brand/list");
                     }
                 });
             }
-
+    
         } catch (error) {
             console.error("Error:", error);
             Swal.close();
@@ -148,6 +166,7 @@ export default function Create() {
             setLoading(false);
         }
     };
+    
 
     return (
         <section className="add-warehouse xl:w-8/12">
@@ -161,7 +180,7 @@ export default function Create() {
                             <input
                                 type="text"
                                 name="name"
-                                value={formData?.name}
+                                value={formData?.name || ''}
                                 id="name"
                                 onChange={handleChange}
                                 className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.name ? "border-red-500" : "border-[#E0E5F2]"
@@ -178,7 +197,7 @@ export default function Create() {
                             <input
                                 type="text"
                                 name="description"
-                                value={formData.description}
+                                value={formData.description || ''}
                                 id="description"
                                 onChange={handleChange}
                                 className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.description ? "border-red-500" : "border-[#E0E5F2]"
@@ -214,7 +233,7 @@ export default function Create() {
                                 type="checkbox"
                                 name='status'
                                 className="sr-only"
-                                checked={formData.status}
+                                checked={formData.status || ''}
                                 onChange={handleChange}
                             />
                             <div
@@ -230,6 +249,9 @@ export default function Create() {
                                 Status
                             </span>
                         </label>
+                        {validationErrors.status && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.status}</p>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap gap-3 mt-5">

@@ -1,23 +1,10 @@
 'use client';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { ProductContext } from './ProductContext';
 import "@pathofdev/react-tag-input/build/index.css"; // Required styles
 import ReactTagInput from "@pathofdev/react-tag-input";
-
-const fieldLabels = {
-  category: 'Product Category',
-  name: 'Product Name',
-  main_sku: 'Product Main SKU',
-  description: 'Description',
-  tags: 'Product Tags',
-  brand: 'Brand',
-  origin_country: 'Country of Origin',
-  shipping_country: 'Shipping Country',
-  video: 'Product Video URL',
-  list_as: 'List As',
-};
-
+import { HashLoader } from 'react-spinners';
 export default function ProductDetails() {
   const {
     fetchCountry,
@@ -29,9 +16,10 @@ export default function ProductDetails() {
     brandData,
     fetchBrand,
     setActiveTab,
+    validateFields,
+    errors, setErrors,loading
   } = useContext(ProductContext);
 
-  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchCategory();
@@ -53,38 +41,19 @@ export default function ProductDetails() {
     });
   };
   
-  
-  
-
-  const validateFields = () => {
-    const requiredFields = [
-      'category',
-      'name',
-      'main_sku',
-      'description',
-      'brand',
-      'tags',
-      'origin_country',
-      'shipping_country',
-      'list_as',
-    ];
-
-    const newErrors = {};
-    requiredFields.forEach((field) => {
-      if (!formData[field] || formData[field].toString().trim() === '') {
-        newErrors[field] = `${fieldLabels[field]} is required.`;
-      }
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleSubmit = () => {
     if (validateFields()) {
       setActiveTab('variants-details')
     }
   };
+  if (loading) {
+    return (
+        <div className="flex items-center justify-center h-[80vh]">
+            <HashLoader size={60} color="#F97316" loading={true} />
+        </div>
+    );
+}
 
   return (
     <div className="mt-4 lg:p-6 p-3 rounded-2xl bg-white">

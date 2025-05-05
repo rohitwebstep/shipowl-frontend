@@ -72,7 +72,7 @@ export default function List() {
                             )}
                         </button>
                         <div className="flex justify-start gap-5 items-end">
-                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/adminhttp://localhost:3001/api/create">Add New</Link></button>
+                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/api/create">Add New</Link></button>
                         </div>
                     </div>
                 </div>

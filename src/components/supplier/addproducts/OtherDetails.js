@@ -6,13 +6,12 @@ import Swal from 'sweetalert2';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function OtherDetails() {
-  const { formData, setFormData } = useContext(ProductContext);
+  const { formData, setFormData,setActiveTab,setErrors } = useContext(ProductContext);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [error, setError] = useState({});
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const id = searchParams.get('id');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,135 +20,180 @@ export default function OtherDetails() {
       [name]: value,
     }));
   };
+  const requiredFields = ['tax_rate', 'rto_address', 'pickup_address'];
 
   const validateForm = () => {
-    const newErrors = {};
-    const requiredFields = ['tax_rate', 'rto_address', 'pickup_address'];
+    const newError = {};
     
     requiredFields.forEach((field) => {
       if (!formData[field] || formData[field].toString().trim() === '') {
-        newErrors[field] = `${field.replace('_', ' ')} is required.`;
+        newError[field] = `${field.replace('_', ' ')} is required.`;
       }
     });
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setError(newError);
+    return Object.keys(newError).length === 0;
+  };
+
+  const getTabByFieldName = (fieldName) => {
+    const ProductDetails = [
+      'category',
+    'name',
+    'main_sku',
+    'description',
+    'brand',
+    'tags',
+    'origin_country',
+    'shipping_country',
+    'list_as',
+    ];
+  
+    const businessFields = Object.keys(requiredFields);
+  
+    const shippingDetails = [
+     'shipping_time',
+      'weight',
+      'package_length',
+      'package_width',
+      'package_height',
+      'chargable_weight',
+    ];
+  
+     
+    if (ProductDetails.includes(fieldName)) return 'product-details';
+    if (shippingDetails.includes(fieldName)) return 'shipping-details';
+    if (businessFields.includes(fieldName)) return 'other-details';
+  
+    return null;
   };
 
   const handleSubmit = async (e) => {
-    if(validateForm()){
-      e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
+  
+    if (!validateForm()) return;
+  
     setLoading(true);
   
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
     if (!supplierData?.project?.active_panel === "supplier") {
-        localStorage.clear("shippingData");
-        router.push("/supplier/auth/login");
-        return;
+      localStorage.clear("shippingData");
+      router.push("/supplier/auth/login");
+      return;
     }
   
     const token = supplierData?.security?.token;
     if (!token) {
-        router.push("/supplier/auth/login");
-        return;
+      router.push("/supplier/auth/login");
+      return;
     }
   
     try {
+      Swal.fire({
+        title: 'Creating Product...',
+        text: 'Please wait while we save your Product.',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+  
+      const url = "http://localhost:3001/api/product";
+      const form = new FormData();
+  
+      for (const key in formData) {
+        const value = formData[key];
+  
+        if (value === null || value === undefined || value === '') continue;
+  
+        // ✅ Handle arrays of File objects (multiple image upload)
+        if (Array.isArray(value) && value[0] instanceof File) {
+          value.forEach((file) => form.append(key, file));
+        }
+  
+        // ✅ Handle single File
+        else if (value instanceof File) {
+          form.append(key, value);
+        }
+  
+        // ✅ Handle variants, tags, and other arrays or objects
+        else if (Array.isArray(value) || typeof value === 'object') {
+          form.append(key, JSON.stringify(value));
+        }
+  
+        // ✅ Handle primitive values (strings, numbers)
+        else {
+          form.append(key, value);
+        }
+      }
+  
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        body: form,
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        Swal.close();
+  
         Swal.fire({
-            title: 'Creating Product...',
-            text: 'Please wait while we save your Product.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
+          icon: "error",
+          title: "Creation Failed",
+          text: result.message || result.error || "An error occurred",
+        });
+  
+        if (result.error && typeof result.error === 'object') {
+          const entries = Object.entries(result.error);
+          let focused = false;
+  
+          entries.forEach(([key, message]) => {
+            setErrors((prev) => ({
+              ...prev,
+              [key]: message,
+            }));
+  
+            if (!focused) {
+              const tab = getTabByFieldName(key);
+              if (tab) setActiveTab(tab);
+  
+              setTimeout(() => {
+                const input = document.querySelector(`[name="${key}"]`);
+                if (input) input.focus();
+              }, 300);
+  
+              focused = true;
             }
-        });
-  
-        const url = "http://localhost:3001/api/product"; // Ensure the URL is correct
-        const form = new FormData();
-
-        for (const key in formData) {
-          const value = formData[key];
-      
-          if (value === null || value === undefined || value === '') continue;
-      
-          // ✅ Send files
-          if (value instanceof File) {
-            form.append(key, value);
-          }
-      
-          // ✅ Handle 'variants' as a single array stringified
-          else if (key === 'variants') {
-            form.append('variants', JSON.stringify(value));
-          }
-      
-          // ✅ Other arrays like 'tags'
-          else if (Array.isArray(value)) {
-            form.append(key, JSON.stringify(value));
-          }
-      
-          // ✅ Objects
-          else if (typeof value === 'object') {
-            form.append(key, JSON.stringify(value));
-          }
-      
-          // ✅ Everything else (strings, numbers)
-          else {
-            form.append(key, value);
-          }
+          });
         }
-  
-        const response = await fetch(url, {
-            method: "POST", // Use POST for creating the resource
-            headers: {
-                "Authorization": `Bearer ${token}`
-            },
-            body: form,
-        });
-  
-        if (!response.ok) {
-            Swal.close();
-            const errorMessage = await response.json();
-            Swal.fire({
-                icon: "error",
-                title: "Creation Failed",
-                text: errorMessage.message || errorMessage.error || "An error occurred",
-            });
-            throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
-        }
-  
-        const result = await response.json();
-        Swal.close();
-  
-        if (result) {
-            Swal.fire({
-                icon: "success",
-                title: "Product Created",
-                text: `The Product has been created successfully!`,
-                showConfirmButton: true,
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    setFormData({});
-                    setFiles(null);
-                    router.push("/supplier/product");
-                }
-            });
-        }
-        router.push("/supplier/product");
-
-    } catch (error) {
-        console.error("Error:", error);
-        Swal.close();
+      } else {
         Swal.fire({
-            icon: "error",
-            title: "Submission Error",
-            text: error.message || "Something went wrong. Please try again.",
+          icon: "success",
+          title: "Product Created",
+          text: "The Product has been created successfully!",
+          showConfirmButton: true,
+        }).then((res) => {
+          if (res.isConfirmed) {
+            setFormData({});
+            router.push("/supplier/product");
+          }
         });
-        setErrors(error.message || "Submission failed.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Submission Error",
+        text: error.message || "Something went wrong. Please try again.",
+      });
+      setError(error.message || "Submission failed.");
     } finally {
-        setLoading(false);
-    }
+      setLoading(false);
     }
   };
+  
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -204,10 +248,10 @@ export default function OtherDetails() {
               value={formData.tax_rate || ''}
               onChange={handleChange}
               className={`border p-3 mt-2 rounded-md w-full ${
-                errors.tax_rate ? 'border-red-500' : 'border-[#DFEAF2]'
+                error.tax_rate ? 'border-red-500' : 'border-[#DFEAF2]'
               }`}
             />
-            {errors.tax_rate && <p className="text-red-500 text-sm mt-1">{errors.tax_rate}</p>}
+            {error.tax_rate && <p className="text-red-500 text-sm mt-1">{error.tax_rate}</p>}
           </div>
         </div>
 
@@ -221,14 +265,14 @@ export default function OtherDetails() {
               value={formData.rto_address || ''}
               onChange={handleChange}
               className={`border p-3 mt-2 rounded-md w-full ${
-                errors.rto_address ? 'border-red-500' : 'border-[#DFEAF2]'
+                error.rto_address ? 'border-red-500' : 'border-[#DFEAF2]'
               }`}
             >
               <option value="">Select RTO Address</option>
               <option value="Address 1">Address 1</option>
 
             </select>
-            {errors.rto_address && <p className="text-red-500 text-sm mt-1">{errors.rto_address}</p>}
+            {error.rto_address && <p className="text-red-500 text-sm mt-1">{error.rto_address}</p>}
           </div>
 
           <div>
@@ -240,13 +284,13 @@ export default function OtherDetails() {
               value={formData.pickup_address || ''}
               onChange={handleChange}
               className={`border p-3 mt-2 rounded-md w-full ${
-                errors.pickup_address ? 'border-red-500' : 'border-[#DFEAF2]'
+                error.pickup_address ? 'border-red-500' : 'border-[#DFEAF2]'
               }`}
             >
               <option value="">Select Pickup Address</option>
               <option value="Address 1">Address 1</option>
             </select>
-            {errors.pickup_address && <p className="text-red-500 text-sm mt-1">{errors.pickup_address}</p>}
+            {error.pickup_address && <p className="text-red-500 text-sm mt-1">{error.pickup_address}</p>}
           </div>
         </div>
 

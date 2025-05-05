@@ -246,3 +246,6 @@ table tr th:last-child {
 .swiper-button-prev:after, .swiper-button-next:after {
   font-size: 17px !important;
 }
+td:hover,th:hover{
+  outline: none !important;
+}

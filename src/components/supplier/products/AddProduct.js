@@ -8,16 +8,28 @@ import ShippingDetails from './ShippingDetails';
 import OtherDetails from './OtherDetails';
 import { ProductContextEdit } from "./ProductContextEdit";
 import Swal from 'sweetalert2';
-
+import { HashLoader } from "react-spinners";
 const AddProduct = () => {
   
   const [loading, setLoading] = useState(false);
-  const {activeTab, setActiveTab,setFormData } = useContext(ProductContextEdit);
+  const {activeTab, setActiveTab,setFormData,validateFields,validateForm2 } = useContext(ProductContextEdit);
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const id = searchParams.get("id");
+  const handleTabClick = async (tabId) => {
+    if (activeTab === 'product-details') {
+      const isValid = await validateFields();
+      if (!isValid) return;
+    }
 
+    if (activeTab === 'shipping-details') {
+      const isValid = await validateForm2();
+      if (!isValid) return;
+    }
+
+    setActiveTab(tabId);
+  };
   const fetchProducts = useCallback(async () => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -81,6 +93,7 @@ const AddProduct = () => {
           color: variant.color || '',
           sku: variant.sku || '',
           qty: variant.qty || 1,
+          variant_images: variant.image || '',
           currency: variant.currency || '',
           article_id: variant.article_id || '',
           product_link: variant.product_link || '',
@@ -95,12 +108,12 @@ const AddProduct = () => {
         package_width: products.package_width || '',
         package_height: products.package_height || '',
         chargable_weight: products.chargeable_weight || '',
-        package_weight_image: '',
-        package_length_image:  '',
-        package_width_image:  '',
-        package_height_image:'',
-        product_detail_video:  '',
-        upload_training_guidance_video: '',
+        package_weight_image:products.package_weight_image ||  '',
+        package_length_image: products.package_length_image ||  '',
+        package_width_image:  products.package_width_image ||'',
+        package_height_image:products.package_height_image ||'',
+        product_detail_video: products.product_detail_video|| '',
+        upload_training_guidance_video:products.upload_training_guidance_video || '',
         upc: products.upc || '',
         ean: products.ean || '',
         hsn_code: products.hsnCode || '',
@@ -126,21 +139,28 @@ const AddProduct = () => {
     { id: "shipping-details", label: "Shipping Details" },
     { id: "other-details", label: "Other Details" },
   ];
-
+  if (loading) {
+    return (
+        <div className="flex items-center justify-center h-[80vh]">
+            <HashLoader size={60} color="#F97316" loading={true} />
+        </div>
+    );
+}
   return (
     <div className="w-full xl:p-6">
       <div className="bg-white rounded-3xl p-5">
         <div className="flex border-b overflow-auto border-[#F4F5F7]">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`px-4 py-2 text-lg whitespace-nowrap ${
-                activeTab === tab.id
-                  ? "border-b-4 border-orange-500 font-bold text-orange-500"
-                  : "text-[#718EBF] font-medium"
-              }`}
-              onClick={() => setActiveTab(tab.id)}
-            >
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => handleTabClick(tab.id)}
+            className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${
+              activeTab === tab.id
+                ? 'border-b-3 border-orange-500 text-orange-500'
+                : 'text-[#718EBF]'
+            }`}
+          >
               {tab.label}
             </button>
           ))}

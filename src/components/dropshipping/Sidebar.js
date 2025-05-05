@@ -34,7 +34,8 @@ const menuItems = [
     ]
   },
   { name: "Manage Products (In progress)", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },
-  { name: "Source a Product (In progress)", icon: Gift, href: "/dropshipping/source-a-product", section: "MENU" },
+  { name: "Profile", icon: Package, href: "/dropshipping/profile", section: "MENU" },
+  { name: "Source a Product (In progress)", icon: Gift, href: "/dropshipping/product/source/create", section: "MENU" },
   { name: "Reports (In progress)", icon: BarChart, href: "/dropshipping/report", section: "MENU" },
   { name: "Payments (In progress)", icon: CreditCard, href: "/dropshipping/payments", section: "MENU" },
   { name: "Manage NDR (In progress)", icon: FileText, href: "/dropshipping/manage-ndr", section: "MENU" },

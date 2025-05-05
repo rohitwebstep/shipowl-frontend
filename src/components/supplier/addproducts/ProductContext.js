@@ -9,7 +9,8 @@ export const ProductContext = createContext();
 const ProductProvider = ({ children }) => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("product-details");
-
+  const [errors, setErrors] = useState({});
+  const [shippingErrors, setShippingErrors] = useState({});
   const [categoryData, setCategoryData] = useState([]);
   const [brandData, setBrandData] = useState([]);
   const [countryData, setCountryData] = useState([]);
@@ -151,7 +152,15 @@ const ProductProvider = ({ children }) => {
       console.error('Error fetching brands:', error);
     }
   }, [router]);
-
+  
+  const fileFields = [
+    { label: 'Package Weight Image', key: 'package_weight_image' },
+    { label: 'Package Length Image', key: 'package_length_image' },
+    { label: 'Package Width Image', key: 'package_width_image' },
+    { label: 'Package Height Image', key: 'package_height_image' },
+    { label: 'Upload Product Details Video', key: 'product_detail_video' },
+    { label: 'Upload Training Guidance Video', key: 'training_guidance_video' },
+  ];
   const fetchCountry = useCallback(async () => {
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
 
@@ -197,11 +206,75 @@ const ProductProvider = ({ children }) => {
     }
   }, [router]);
 
+  const fieldLabels = {
+    category: 'Product Category',
+    name: 'Product Name',
+    main_sku: 'Product Main SKU',
+    description: 'Description',
+    tags: 'Product Tags',
+    brand: 'Brand',
+    origin_country: 'Country of Origin',
+    shipping_country: 'Shipping Country',
+    video: 'Product Video URL',
+    list_as: 'List As',
+  };
+  const validateForm2 = () => {
+    const newErrors = {};
+    const requiredFields = [
+      'shipping_time',
+      'weight',
+      'package_length',
+      'package_width',
+      'package_height',
+      'chargable_weight',
+    ];
+
+    requiredFields.forEach((field) => {
+      if (!formData[field]) {
+        newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
+      }
+    });
+
+    fileFields.forEach(({ key }) => {
+      if (!formData[key]) {
+        newErrors[key] = `Please upload a file for ${key.replace(/_/g, ' ')}`;
+      }
+    });
+
+    setShippingErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateFields = () => {
+    const requiredFields = [
+      'category',
+      'name',
+      'main_sku',
+      'description',
+      'brand',
+      'tags',
+      'origin_country',
+      'shipping_country',
+      'list_as',
+    ];
+
+    const newErrors = {};
+    requiredFields.forEach((field) => {
+      if (!formData[field] || formData[field].toString().trim() === '') {
+        newErrors[field] = `${fieldLabels[field]} is required.`;
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   return (
     <ProductContext.Provider
     value={{
       formData,
       setFormData,
+      fileFields,
       categoryData,
       setCategoryData,
       brandData,
@@ -209,12 +282,14 @@ const ProductProvider = ({ children }) => {
       countryData,
       setCountryData,
       isEdit,
+      validateForm2,
       setIsEdit,
       fetchCategory,
       fetchBrand,
       fetchCountry,
       loading,
-      activeTab,       // ✅ Added
+      activeTab,  errors, setErrors,shippingErrors, setShippingErrors,
+      validateFields,     // ✅ Added
       setActiveTab,    // ✅ Added
     }}
   >

@@ -474,7 +474,6 @@ export default function Warehouse() {
                   <>
                      <div className="flex justify-end gap-5 items-end mb-5">
 
-<button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/supplier/add-warehouse">Add New</Link></button>
 
 </div>
 <div className="bg-white rounded-3xl p-5">
@@ -512,152 +511,125 @@ export default function Warehouse() {
                                         {isTrashed ? "Warehouse Listing (Simple)" : "Trashed Warehouse"}
                                     </button>
                                     <button
-                                        onClick={() => {
-                                            setFormData({});
-                                            setIsEdit(false);
-                                        }}
+                                      
                                         className="bg-[#4285F4] text-white rounded-md p-2 px-4"
                                     >
-                                        <Link href="/supplier/add-warehouse">Add Warehouse</Link>
+                                        <Link href="/supplier/warehouse/create">Add Warehouse</Link>
                                     </button>
                                 </div>
                               </div>
                             </div>
-                            <div className="overflow-x-auto w-full relative">
-                              <table className="w-full" id='warehouseTable'>
-                                <thead>
-                                  <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Warehouse Name</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Name</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Address</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pickup Address</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">RTO Address</th>
-                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Action</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {WarehouseData.map((item) => (
-                                    <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                      <td className="p-2 whitespace-nowrap px-5">
-                                        <div className="flex items-center">
-                                          <label className="flex items-center cursor-pointer me-2">
-                                            <input
-                                              type="checkbox"
-                                              checked={selected.includes(item.id)}
-                                              onChange={() => handleCheckboxChange(item.id)}
-                                              className="peer hidden"
-                                            />
-                                            <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                                                              peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                              <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                            </div>
-                                          </label>
-                                          {item.name}
-                                        </div>
+                            {WarehouseData.length > 0 ? (
+  <div className="overflow-x-auto w-full relative">
+    <table className="w-full" id="warehouseTable">
+      <thead>
+        <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Warehouse Name</th>
+          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Name</th>
+          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Address</th>
+          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pickup Address</th>
+          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">RTO Address</th>
+          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {WarehouseData.map((item) => (
+          <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+            <td className="p-2 whitespace-nowrap px-5">
+              <div className="flex items-center">
+                <label className="flex items-center cursor-pointer me-2">
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(item.id)}
+                    onChange={() => handleCheckboxChange(item.id)}
+                    className="peer hidden"
+                  />
+                  <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                      peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                    <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                  </div>
+                </label>
+                {item.name}
+              </div>
+            </td>
+            <td className="p-2 whitespace-nowrap px-5">
+              {item.contact_name}<br />
+              {item.contact_number}
+            </td>
+            <td className="p-2 whitespace-nowrap px-5">
+              {(() => {
+                if (!item?.address_line_1) return "-";
+                const parts = item.address_line_1.split(",");
+                if (parts.length > 2) {
+                  const firstPart = parts.slice(0, 2).join(",") + ",";
+                  const remaining = parts.slice(2).join(",");
+                  const remainingParts = remaining.split(",");
+                  if (remainingParts.length > 2) {
+                    return (
+                      <>
+                        {firstPart}
+                        <br />
+                        {remainingParts.slice(0, 2).join(",")},{" "}
+                        <br />
+                        {remainingParts.slice(2).join(",")}
+                      </>
+                    );
+                  }
+                  return (
+                    <>
+                      {firstPart}
+                      <br />
+                      {remaining}
+                    </>
+                  );
+                }
+                return item.address_line_1;
+              })()}
+            </td>
+            <td className="p-2 px-5">
+              <div className="flex items-center mb-4">
+                <label className="flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only" checked={item.pickup_address} readOnly />
+                  <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.pickup_address ? "bg-orange-500" : ""}`}>
+                    <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.pickup_address ? "translate-x-5" : ""}`} />
+                  </div>
+                </label>
+              </div>
+            </td>
+            <td className="p-2 px-5">
+              <div className="flex items-center mb-4">
+                <label className="flex items-center cursor-pointer">
+                  <input type="checkbox" className="sr-only" checked={item.rto_address} readOnly />
+                  <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.rto_address ? "bg-orange-500" : ""}`}>
+                    <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.rto_address ? "translate-x-5" : ""}`} />
+                  </div>
+                </label>
+              </div>
+            </td>
+            <td className="p-2 px-5 text-[#8F9BBA]">
+              <div className="flex justify-center gap-2">
+                {isTrashed ? (
+                  <>
+                    <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                  </>
+                ) : (
+                  <>
+                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
+                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                  </>
+                )}
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+) : (
+  <p className="text-center text-gray-500 py-6">No Warehouses Available</p>
+)}
 
-                                      </td>
-                                      <td className="p-2 whitespace-nowrap px-5">{item.contact_name}<br />
-                                        {item.contact_number}</td>
-                                        <td className="p-2 whitespace-nowrap px-5">
-  {(() => {
-    if (!item?.address_line_1) return "-";
-
-    const parts = item.address_line_1.split(",");
-
-    if (parts.length > 2) {
-      const firstPart = parts.slice(0, 2).join(",") + ",";
-      const remaining = parts.slice(2).join(",");
-      const remainingParts = remaining.split(",");
-
-      if (remainingParts.length > 2) {
-        return (
-          <>
-            {firstPart}
-            <br />
-            {remainingParts.slice(0, 2).join(",")},{" "}
-            <br />
-            {remainingParts.slice(2).join(",")}
-          </>
-        );
-      }
-
-      return (
-        <>
-          {firstPart}
-          <br />
-          {remaining}
-        </>
-      );
-    }
-
-    // Fallback for addresses with less than 3 parts
-    return item.address_line_1;
-  })()}
-</td>
-
-
-                                      <td className="p-2 px-5">
-                                        <div className="flex items-center mb-4">
-                                          <label className="flex items-center cursor-pointer">
-                                            <input
-                                              type="checkbox"
-                                              className="sr-only"
-                                              checked={item.pickup_address}
-                                              readOnly
-                                            />
-                                            <div
-                                              className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.pickup_address ? "bg-orange-500" : ""
-                                                }`}
-                                            >
-                                              <div
-                                                className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.pickup_address ? "translate-x-5" : ""
-                                                  }`}
-                                              ></div>
-                                            </div>
-
-                                          </label>
-                                        </div>
-                                      </td>
-                                      <td className="p-2 px-5">
-                                        <div className="flex items-center mb-4">
-                                          <label className="flex items-center cursor-pointer">
-                                            <input
-                                              type="checkbox"
-                                              className="sr-only"
-                                              checked={item.rto_address}
-                                              readOnly
-                                            />
-                                            <div
-                                              className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.rto_address ? "bg-orange-500" : ""
-                                                }`}
-                                            >
-                                              <div
-                                                className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.rto_address ? "translate-x-5" : ""
-                                                  }`}
-                                              ></div>
-                                            </div>
-
-                                          </label>
-                                        </div>
-                                      </td>
-                                      <td className="p-2 px-5 text-[#8F9BBA]">  <div className="flex justify-center gap-2">
-                                                                                          {isTrashed ? (
-                                                                                              <>
-                                                                                                  <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                                                                                  <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
-                                                                                              </>
-                                                                                          ) : (
-                                                                                              <>
-                                                                                                  <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
-                                                                                                  <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
-                                                                                              </>
-                                                                                          )}
-                                                                                      </div></td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
                             </div>
                   </>
             )}

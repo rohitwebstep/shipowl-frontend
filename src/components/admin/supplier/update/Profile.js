@@ -6,14 +6,26 @@ import BusinessInfo from './BusinessInfo';
 import AccountInfo from './AccountInfo';
 import { ProfileEditContext } from "./ProfileEditContext";
 import { useRouter, useSearchParams } from 'next/navigation';
-
+import { HashLoader } from 'react-spinners';
 export default function Profile() {
 
-  const {activeTab,formData, setActiveTab ,cancelledChequeImages,setCancelledChequeImages,setFormData,setCityData,setStateData} = useContext(ProfileEditContext);
+  const {activeTab,validateBusiness,validate,formData, setActiveTab,setFormData,setCityData,setStateData} = useContext(ProfileEditContext);
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading,setLoading] = useState(false);
+  const handleTabClick = async (tabId) => {
+    if (activeTab === 'profile-edit') {
+      const isValid = await validate();
+      if (!isValid) return;
+    }
 
+    if (activeTab === 'business-info') {
+      const isValid = await validateBusiness();
+      if (!isValid) return;
+    }
+
+    setActiveTab(tabId);
+  };
 
   const id = searchParams.get("id");
 
@@ -58,35 +70,16 @@ export default function Profile() {
 
       const companyDetail = suppliers?.companyDetail || {};
       const bankAccounts = suppliers?.bankAccounts || [];
-      if(result){
-        fetchCity(suppliers.permanentStateId);
+      if(suppliers.permanentCountryId){
         fetchState(suppliers.permanentCountryId);
       }
-
-      console.log(`bankAccounts - `, bankAccounts);
-      // --------- Prepare cancelledChequeImage array using while loop ----------
-      const cancelledChequeImages = [];
-      let missingCount = 0;
-      let i = 0;
-
-      while (missingCount < 10) {
-        const field = `cancelledChequeImage${i}`;
-        
-        if (bankAccounts[field]) {
-          cancelledChequeImages.push(bankAccounts[field]);
-          missingCount = 0; // reset if found
-        } else {
-          missingCount++; // if not found
-        }
-
-        i++;
+      if(suppliers.permanentStateId){
+        fetchCity(suppliers.permanentStateId);
       }
-
-      console.log(`cancelledChequeImages - `, cancelledChequeImages);
-      setCancelledChequeImages(cancelledChequeImages)
 
       setFormData({
         name: suppliers.name || "",
+        id: suppliers.id || "",
         username: suppliers.username || "",
         email: suppliers.email || "",
         password: "", // keep password empty for security
@@ -105,6 +98,7 @@ export default function Profile() {
         billingAddress: companyDetail.billingAddress || "",
         billingPincode: companyDetail.billingPincode || "",
         billingState: companyDetail.billingState || "",
+        billingCountry: companyDetail.billingCountry || "",
         billingCity: companyDetail.billingCity || "",
         businessType: companyDetail.businessType || "",
         clientEntryType: companyDetail.clientEntryType || "",
@@ -120,18 +114,18 @@ export default function Profile() {
         documentId: companyDetail.documentId || "",
         documentName: companyDetail.documentName || "",
         documentImage: companyDetail.documentImage || "",
-      
-        // For bank accounts (only the first one, or you can map multiple later)
-        cancelledChequeImage_0: bankAccounts[0]?.cancelledChequeImage || "",
+        companyid: companyDetail.id || "",
       
         bankAccounts: bankAccounts.length > 0 
           ? bankAccounts.map((account) => ({
               accountHolderName: account.accountHolderName || "",
+              id: account.id || "",
               accountNumber: account.accountNumber || "",
               bankName: account.bankName || "",
               bankBranch: account.bankBranch || "",
               accountType: account.accountType || "",
               ifscCode: account.ifscCode || "",
+              cancelledChequeImage: account.cancelledChequeImage || "",
             }))
           : [
               {
@@ -141,6 +135,7 @@ export default function Profile() {
                 bankBranch: "",
                 accountType: "",
                 ifscCode: "",
+                cancelledChequeImage: ""
               },
             ],
       });
@@ -246,6 +241,13 @@ export default function Profile() {
   useEffect(() => {
     if (id) fetchSupplier();
   }, [fetchSupplier, id]);
+    if (loading) {
+      return (
+          <div className="flex items-center justify-center h-[80vh]">
+              <HashLoader size={60} color="#F97316" loading={true} />
+          </div>
+      );
+  }
   const tabs = [
     { id: "profile-edit", label: "Personal Information" },
     { id: "business-info", label: "Business Information" },
@@ -257,14 +259,16 @@ export default function Profile() {
   return (
     <div className="">
       <div className={`flex border-b bg-white pt-5 xl:gap-8 overflow-auto px-4 rounded-tl-2xl rounded-tr-2xl  border-[#F4F5F7] ${activeTab == "profile-edit" ? "xl:w-10/12" : "w-full"}`}>
-        {tabs.map((tab) => (
+      {tabs.map((tab) => (
           <button
             key={tab.id}
-            className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${activeTab === tab.id
-              ? "border-b-3 border-orange-500 text-orange-500"
-              : "text-[#718EBF]"
-              }`}
-            onClick={() => setActiveTab(tab.id)}
+            type="button"
+            onClick={() => handleTabClick(tab.id)}
+            className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${
+              activeTab === tab.id
+                ? 'border-b-3 border-orange-500 text-orange-500'
+                : 'text-[#718EBF]'
+            }`}
           >
             {tab.label}
           </button>

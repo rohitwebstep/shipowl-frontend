@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Swal from 'sweetalert2';
 
 export default function OtherDetails() {
-  const { formData, setFormData } = useContext(ProductContextEdit);
+  const { formData, setFormData ,files} = useContext(ProductContextEdit);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({});
@@ -25,67 +25,52 @@ export default function OtherDetails() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     const supplierData = JSON.parse(localStorage.getItem('shippingData'));
     if (supplierData?.project?.active_panel !== 'supplier') {
       localStorage.clear();
       router.push('/supplier/auth/login');
       return;
     }
-
+  
     const token = supplierData?.security?.token;
     if (!token) {
       router.push('/supplier/auth/login');
       return;
     }
-
+  
     try {
       Swal.fire({
-        title: 'Creating Product...',
-        text: 'Please wait while we save your Product.',
+        title: 'Updating Product...',
+        text: 'Please wait while we update your product.',
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
         },
       });
-
+  
       const url = `http://localhost:3001/api/product/${id}`;
       const form = new FormData();
-
-      // Append variants only once
-
-      for (const key in formData) {
-        const value = formData[key];
-    
+  
+      // Combine formData and files for unified processing
+      const combinedData = { ...formData, ...files };
+  
+      for (const key in combinedData) {
+        const value = combinedData[key];
+  
         if (value === null || value === undefined || value === '') continue;
-    
-        // ✅ Send files
-        if (value instanceof File) {
+  
+        if (Array.isArray(value) && value[0] instanceof File) {
+          value.forEach((file) => form.append(key, file));
+        } else if (value instanceof File) {
           form.append(key, value);
-        }
-    
-        // ✅ Handle 'variants' as a single array stringified
-       
-        else if (key === 'tags') {
-          form.append('tags', JSON.stringify(value));
-        }
-    
-        // ✅ Other arrays like 'tags'
-        else if (Array.isArray(value)) {
+        } else if (Array.isArray(value) || typeof value === 'object') {
           form.append(key, JSON.stringify(value));
-        }
-    
-        // ✅ Objects
-        else if (typeof value === 'object') {
-          form.append(key, JSON.stringify(value));
-        }
-    
-        // ✅ Everything else (strings, numbers)
-        else {
+        } else {
           form.append(key, value);
         }
       }
-
+  
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -93,36 +78,32 @@ export default function OtherDetails() {
         },
         body: form,
       });
-
+  
+      const result = await response.json();
+      Swal.close();
+  
       if (!response.ok) {
-        Swal.close();
-        const errorMessage = await response.json();
         Swal.fire({
           icon: 'error',
           title: 'Update Failed',
-          text: errorMessage.message || errorMessage.error || 'An error occurred',
+          text: result.message || result.error || 'An error occurred',
         });
-        throw new Error(errorMessage.message || errorMessage.error || 'Submission failed');
+        throw new Error(result.message || result.error || 'Update failed');
       }
-
-      const result = await response.json();
-      Swal.close();
-
-      if (result) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Product Updated',
-          text: 'The Product has been updated successfully!',
-          showConfirmButton: true,
-        }).then((res) => {
-          if (res.isConfirmed) {
-            setFormData({});
-            router.push('/supplier/product');
-          }
-        });
-      }
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Product Updated',
+        text: 'The product has been updated successfully!',
+        showConfirmButton: true,
+      }).then((res) => {
+        if (res.isConfirmed) {
+          setFormData({});
+          router.push('/supplier/product');
+        }
+      });
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Submission Error:', err);
       Swal.close();
       Swal.fire({
         icon: 'error',
@@ -134,6 +115,7 @@ export default function OtherDetails() {
       setLoading(false);
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit}>

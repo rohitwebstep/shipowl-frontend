@@ -11,7 +11,7 @@ const CategoryProvider = ({ children }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        status: '',
+        status: false,
     });
 
 

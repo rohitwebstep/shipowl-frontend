@@ -144,10 +144,15 @@ export default function Update() {
 
             const url = `http://localhost:3001/api/category/${id}`;
             const form = new FormData();
-            for (const key in formData) {
-                if (formData[key]) {
-                    form.append(key, formData[key]);
-                }
+            form.append('name', formData.name);
+            form.append('description', formData.description);
+            form.append('status', formData.status);
+    
+            // Add images if available
+            if (files.length > 0) {
+                files.forEach((file) => {
+                    form.append('image', file); // use 'images[]' if backend expects an array
+                });
             }
 
             const response = await fetch(url, {
@@ -200,18 +205,86 @@ export default function Update() {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-[80vh]">
-                <HashLoader size={60} color="#F97316" loading={true} />
-            </div>
-        );
-    }
-
+  c
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
         setFiles(selectedFiles);
     };
+
+          const handleImageDelete = async (index) => {
+            setLoading(true);
+    
+            const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+            if (dropshipperData?.project?.active_panel !== "supplier") {
+                localStorage.removeItem("shippingData");
+                router.push("/supplier/auth/login");
+                return;
+            }
+    
+            const token = dropshipperData?.security?.token;
+            if (!token) {
+                router.push("/supplier/auth/login");
+                return;
+            }
+    
+            try {
+                Swal.fire({
+                    title: 'Deleting Image...',
+                    text: 'Please wait while we remove the image.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+    
+                const url = `http://localhost:3001/api/category/${id}/image/${index}`;
+    
+                const response = await fetch(url, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+    
+                if (!response.ok) {
+                    Swal.close();
+                    const errorMessage = await response.json();
+                    Swal.fire({
+                        icon: "error",
+                        title: "Delete Failed",
+                        text: errorMessage.message || errorMessage.error || "An error occurred",
+                    });
+                    throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+                }
+    
+                const result = await response.json();
+                Swal.close();
+    
+                if (result) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Image Deleted",
+                        text: `The image has been deleted successfully!`,
+                        showConfirmButton: true,
+                    }).then((res) => {
+                        if (res.isConfirmed) {
+                            fetchCategory(); // Refresh formData with updated images
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Submission Error",
+                    text: error.message || "Something went wrong. Please try again.",
+                });
+                setError(error.message || "Submission failed.");
+            } finally {
+                setLoading(false);
+            }
+        };
 
 
     return (

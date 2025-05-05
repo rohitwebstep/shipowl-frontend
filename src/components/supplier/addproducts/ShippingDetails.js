@@ -5,27 +5,22 @@ import { UploadCloud } from 'lucide-react';
 import { ProductContext } from './ProductContext';
 
 export default function ShippingDetails() {
-  const { formData, setFormData, setActiveTab } = useContext(ProductContext);
-  const [errors, setErrors] = useState({});
+  const { formData,validateForm2, setFormData, shippingErrors, fileFields,setActiveTab } = useContext(ProductContext);
 
-  const fileFields = [
-    { label: 'Package Weight Image', key: 'package_weight_image' },
-    { label: 'Package Length Image', key: 'package_length_image' },
-    { label: 'Package Width Image', key: 'package_width_image' },
-    { label: 'Package Height Image', key: 'package_height_image' },
-    { label: 'Upload Product Details Video', key: 'product_detail_video' },
-    { label: 'Upload Training Guidance Video', key: 'training_guidance_video' },
-  ];
 
-  const handleFileChange = (e, key) => {
-    const selectedFiles = Array.from(e.target.files);
-    if (selectedFiles.length > 0) {
-      setFormData((prev) => ({
-        ...prev,
-        [key]: selectedFiles[0], // Only store the first file
-      }));
-    }
+
+  const handleFileChange = (event, key) => {
+    const selectedFiles = Array.from(event.target.files);
+  
+    // Update formData state with the actual File objects
+    setFormData((prev) => ({
+      ...prev,
+      [key]: selectedFiles,
+    }));
   };
+  
+  
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,36 +30,11 @@ export default function ShippingDetails() {
     }));
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    const requiredFields = [
-      'shipping_time',
-      'weight',
-      'package_length',
-      'package_width',
-      'package_height',
-      'chargable_weight',
-    ];
-
-    requiredFields.forEach((field) => {
-      if (!formData[field]) {
-        newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
-      }
-    });
-
-    fileFields.forEach(({ key }) => {
-      if (!formData[key]) {
-        newErrors[key] = `Please upload a file for ${key.replace(/_/g, ' ')}`;
-      }
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (validateForm()) {
+    if (validateForm2()) {
       setActiveTab('other-details');
     }
   };
@@ -79,7 +49,7 @@ export default function ShippingDetails() {
             </label>
             <select
               name="shipping_time"
-              className={`border ${errors.shipping_time ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
+              className={`border ${shippingErrors.shipping_time ? 'border-red-500' : 'border-[#DFEAF2]'} mt-2 w-full p-3 rounded-xl`}
               value={formData.shipping_time || ''}
               onChange={handleChange}
             >
@@ -88,7 +58,7 @@ export default function ShippingDetails() {
               <option value="3">3 Days</option>
               <option value="5">5 Days</option>
             </select>
-            {errors.shipping_time && <p className="text-red-500 text-sm">{errors.shipping_time}</p>}
+            {shippingErrors.shipping_time && <p className="text-red-500 text-sm">{shippingErrors.shipping_time}</p>}
           </div>
         </div>
 
@@ -102,13 +72,13 @@ export default function ShippingDetails() {
                 type="number"
                 placeholder={field.includes('weight') ? 'GM' : 'CM'}
                 className={`border placeholder-black placeholder:text-right ${
-                  errors[field] ? 'border-red-500' : 'border-[#DFEAF2]'
+                  shippingErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'
                 } mt-2 w-full p-3 rounded-xl`}
                 name={field}
                 value={formData[field] || ''}
                 onChange={handleChange}
               />
-              {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+              {shippingErrors[field] && <p className="text-red-500 text-sm">{shippingErrors[field]}</p>}
             </div>
           ))}
         </div>
@@ -120,18 +90,23 @@ export default function ShippingDetails() {
                 {label} <span className="text-red-500">*</span>
               </label>
               <div className="border-1 relative border-dashed border-red-300 rounded-xl p-6 w-48 h-32 flex flex-col items-center justify-center">
-                <UploadCloud className="w-8 h-8 text-[#232323]" />
-                <span className="text-xs text-[#232323] text-center">
-                  {formData[key]?.name || 'Upload'}
-                </span>
-                <input
-                  type="file"
-                  className="absolute opacity-0 w-full h-full cursor-pointer"
-                  onChange={(e) => handleFileChange(e, key)}
-                  // NOTE: Do not use `value` here for file inputs
-                />
-              </div>
-              {errors[key] && <p className="text-red-500 text-sm">{errors[key]}</p>}
+  <UploadCloud className="w-8 h-8 text-[#232323]" />
+  <span className="text-xs text-[#232323] text-center">
+    {formData[key]?.length > 0 ? (
+      formData[key].join(', ') // Display the file names as a comma-separated list
+    ) : (
+      'Upload'
+    )}
+  </span>
+  <input
+    type="file"
+    multiple
+    className="absolute opacity-0 w-full h-full cursor-pointer"
+    onChange={(e) => handleFileChange(e, key)}
+  />
+</div>
+
+              {shippingErrors[key] && <p className="text-red-500 text-sm">{shippingErrors[key]}</p>}
             </div>
           ))}
         </div>

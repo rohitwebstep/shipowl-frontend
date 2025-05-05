@@ -4,7 +4,7 @@ import {useEffect, useState,useCallback } from 'react'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import { useSupplier } from '../middleware/SupplierMiddleWareContext'
-
+import { HashLoader } from 'react-spinners'
 export default function AddWarehouse() {
     const [formData, setFormData] = useState({
         name: '',
@@ -327,6 +327,14 @@ export default function AddWarehouse() {
         }
         
     };
+      if (loading) {
+            return (
+                <div className="flex items-center justify-center h-[80vh]">
+                    <HashLoader size={60} color="#F97316" loading={true} />
+                </div>
+            );
+        }
+    
 
     return (
         <section className="add-warehouse xl:w-8/12">

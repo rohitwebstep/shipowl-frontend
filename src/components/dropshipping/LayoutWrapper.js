@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import DropshipperMiddleWareProvider from "./middleware/DropshipperMiddleWareContext";
+import { DropshipperProfileProvider } from "./dropshipper/update/DropshipperProfileContext";
+import { ProfileProvider } from "../admin/supplier/ProfileContext";
 
 export default function LayoutWrapper({ children }) {
     const pathname = usePathname();
@@ -21,7 +23,11 @@ export default function LayoutWrapper({ children }) {
                     <div className={`px-3 mt-20 lg:mt-0 main-outlet lg-px-0 ${isAuthPage ? "w-full" : "xl:w-[81.5%] lg:w-[77%]"}`}>
                         {!isAuthPage && <Header />}
                         <div className="md:p-7 xl:p-3 md:pt-0">
+                            <ProfileProvider>
+                                <DropshipperProfileProvider>
                             <DropshipperMiddleWareProvider>{children}</DropshipperMiddleWareProvider>
+                            </DropshipperProfileProvider>
+                            </ProfileProvider>
                         </div>
                     </div>
                 </div>
