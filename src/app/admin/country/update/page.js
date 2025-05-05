@@ -1,10 +1,9 @@
-import Update from '@/components/admin/countrymanagement/Update'
-import React, { Suspense } from 'react';
+import React from 'react';
+import Update from '@/components/admin/countrymanagement/Update';
 
-export default function page() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-         <Update />
-       </Suspense>
-  )
+// ✅ Disable static rendering for this page, ensuring dynamic rendering
+export const dynamic = 'force-dynamic';
+
+export default function Page() {
+  return <Update />;
 }
