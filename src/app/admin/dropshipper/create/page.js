@@ -1,11 +1,8 @@
-import Profile from '@/components/admin/dropshipper/Profile'
-import React from 'react'
+import React from 'react';
+import Profile from '@/components/admin/dropshipper/Profile';
 
-export default function page() {
-  return (
-    <>
-    <Profile/>
-    
-    </>
-  )
+export const dynamic = 'force-dynamic';
+
+export default function Page() {
+  return <Profile />;
 }
