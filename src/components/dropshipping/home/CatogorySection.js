@@ -1,34 +1,90 @@
-import product from '@/app/assets/cat1.png';
-import product1 from '@/app/assets/cat2.png';
-import product3 from '@/app/assets/cat4.png';
-import product4 from '@/app/assets/cat5.png';
-import product5 from '@/app/assets/cat6.png';
-import product6 from '@/app/assets/cat7.png';
+import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-const categories = [
-  { name: "Category Name", image: product },
-  { name: "Skincare", image: product1 },
-  { name: "Handmade", image: product6 },
-  { name: "Health", image: product3 },
-  { name: "Shoes", image: product4 },
-  { name: "Beverages", image: product5 },
-  { name: "Gadgets", image: product6 }
-];
+import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
+import { HashLoader } from 'react-spinners';
+import product3 from '@/app/assets/cat4.png';
 
 const CategorySection = () => {
+  const [categoryData, setCategoryData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const fetchCategory = useCallback(async () => {
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+
+    if (dropshipperData?.project?.active_panel !== "dropshipper") {
+      localStorage.removeItem("shippingData");
+      router.push("/dropshipping/auth/login");
+      return;
+    }
+
+    const dropshippertoken = dropshipperData?.security?.token;
+    if (!dropshippertoken) {
+      router.push("/dropshipping/auth/login");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:3001/api/category", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${dropshippertoken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Something Wrong!",
+          text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+        });
+        throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
+      }
+
+      const result = await response.json();
+      if (result) {
+        setCategoryData(result?.categories || []);
+      }
+    } catch (error) {
+      console.error("Error fetching category data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    fetchCategory();
+  }, [fetchCategory]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <HashLoader size={60} color="#F97316" loading={true} />
+      </div>
+    );
+  }
   return (
     <section className="xl:p-6 pt-5">
       <div className="container">
-        <h2 className="md:text-[24px] text-lg  text-[#F98F5C] font-lato font-bold">Top Categories</h2>
-        <div className="md:w-[281px]  border-b-3 border-[#F98F5C] mt-1 mb-4"></div>
-        <div className="xl:grid grid-cols-7   flex overflow-auto gap-4 py-4 justify-between">
-          {categories.map((category, index) => (
-            <div key={index} className="flex w-full md:justify-items-start justify-center  p-3  items-center">
+        <h2 className="md:text-[24px] text-lg text-[#F98F5C] font-lato font-bold">Top Categories</h2>
+        <div className="md:w-[281px] border-b-3 border-[#F98F5C] mt-1 mb-4"></div>
+        <div className="xl:grid grid-cols-7 flex overflow-auto gap-4 py-4 justify-between">
+          {categoryData.map((category, index) => (
+            <div key={index} className="flex w-full md:justify-items-start justify-center p-3 items-center">
               <div>
-                <div className="md:w-[134px] md:h-[132px]  w-[100px] h-[100px] rounded-full overflow-hidden border-4 border-white">
-                  <Image src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                <div className="md:w-[134px] md:h-[132px] w-[100px] h-[100px] rounded-full overflow-hidden border-4 border-white relative">
+                  <Image
+                    src={product3}
+                    alt={category.name}
+                    layout="fill"
+                    objectFit="cover"
+                  />
                 </div>
-                <p className="mt-2  text-[#222222] text-center font-lato font-medium text-[16px] whitespace-nowrap">{category.name}</p>
+                <p className="mt-2 text-[#222222] text-center font-lato font-medium text-[16px] capitalize whitespace-nowrap">{category.name}</p>
               </div>
             </div>
           ))}
