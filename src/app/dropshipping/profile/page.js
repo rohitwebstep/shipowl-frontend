@@ -1,10 +1,9 @@
-import ProfileList from '@/components/dropshipping/dropshipper/ProfileList'
-import React from 'react'
+import React from 'react';
+import ProfileList from '@/components/dropshipping/dropshipper/ProfileList';
 
-export default function page() {
-  return (
-    <>
-    <ProfileList/>
-    </>
-  )
+// ✅ Key line to fix the prerendering issue
+export const dynamic = 'force-dynamic';
+
+export default function Page() {
+  return <ProfileList />;
 }
