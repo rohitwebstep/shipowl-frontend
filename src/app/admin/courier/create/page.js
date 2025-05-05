@@ -1,10 +1,9 @@
-import Create from '@/components/admin/courier/Create'
-import React from 'react'
+import React from 'react';
+import Create from '@/components/admin/courier/Create';
 
-export default function page() {
-  return (
-   <>
-   <Create/>
-   </>
-  )
+// ✅ Prevents prerender crash by disabling static generation
+export const dynamic = 'force-dynamic';
+
+export default function Page() {
+  return <Create />;
 }
