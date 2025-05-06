@@ -76,7 +76,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const response = await fetch(`http://localhost:3001/api/supplier/auth/login`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),

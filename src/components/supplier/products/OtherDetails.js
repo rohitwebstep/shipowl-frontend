@@ -49,7 +49,7 @@ export default function OtherDetails() {
         },
       });
   
-      const url = `http://localhost:3001/api/product/${id}`;
+      const url = `https://sleeping-owl-we0m.onrender.com/api/product/${id}`;
       const form = new FormData();
   
       // Combine formData and files for unified processing

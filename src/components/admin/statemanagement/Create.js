@@ -62,7 +62,7 @@ export default function Create() {
           try {
               setLoading(true);
               const response = await fetch(
-                  `http://localhost:3001/api/location/country`,
+                  `https://sleeping-owl-we0m.onrender.com/api/location/country`,
                   {
                       method: "GET",
                       headers: {
@@ -143,7 +143,7 @@ export default function Create() {
         form.append("image", file);
       });
 
-      const response = await fetch("http://localhost:3001/api/location/state", {
+      const response = await fetch("https://sleeping-owl-we0m.onrender.com/api/location/state", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

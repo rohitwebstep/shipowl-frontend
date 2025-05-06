@@ -34,7 +34,7 @@ export default function NewProducts() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `http://localhost:3001/api/product/request`,
+                      `https://sleeping-owl-we0m.onrender.com/api/product/request`,
                       {
                           method: "GET",
                           headers: {
@@ -95,7 +95,7 @@ export default function NewProducts() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `http://localhost:3001/api/product/request/trashed`,
+                      `https://sleeping-owl-we0m.onrender.com/api/product/request/trashed`,
                       {
                           method: "GET",
                           headers: {
@@ -170,7 +170,7 @@ export default function NewProducts() {
               setLoading(true);
   
               const response = await fetch(
-                  `http://localhost:3001/api/product/request/${item.id}`,
+                  `https://sleeping-owl-we0m.onrender.com/api/product/request/${item.id}`,
                   {
                       method: "DELETE",
                       headers: {
@@ -238,7 +238,7 @@ export default function NewProducts() {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `http://localhost:3001/api/product/request/${item?.id}/restore`,
+                    `https://sleeping-owl-we0m.onrender.com/api/product/request/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -317,7 +317,7 @@ export default function NewProducts() {
                 setLoading(true);
     
                 const response = await fetch(
-                    `http://localhost:3001/api/product/request/${item.id}/destroy`,
+                    `https://sleeping-owl-we0m.onrender.com/api/product/request/${item.id}/destroy`,
                     {
                         method: "DELETE",
                         headers: {
