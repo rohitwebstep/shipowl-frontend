@@ -26,10 +26,11 @@ function LayoutWrapperInner({ children }) {
               <Sidebar />
             </div>
           )}
+        <AdminMiddleWareProvider>
+
           <div className={`px-3 mt-20 lg:mt-0 main-outlet lg-px-0 ${isAuthPage ? "w-full" : "xl:w-[81.5%] lg:w-[73%]"}`}>
             {!isAuthPage && <Header />}
             <div className="xl:p-3 md:pt-4 md:px-0">
-              <AdminMiddleWareProvider>
                 <ProfileProvider>
                   <ProfileEditProvider>
                     <DropshipperProfileProvider>
@@ -37,9 +38,10 @@ function LayoutWrapperInner({ children }) {
                     </DropshipperProfileProvider>
                   </ProfileEditProvider>
                 </ProfileProvider>
-              </AdminMiddleWareProvider>
             </div>
           </div>
+          </AdminMiddleWareProvider>
+
         </div>
       </div>
     </div>

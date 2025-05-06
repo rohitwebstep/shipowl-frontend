@@ -31,10 +31,11 @@ function LayoutWrapperInner({ children }) {
               <Sidebar />
             </div>
           )}
+                        <SupplierMiddleWareProvider>
+
           <div className={`px-3 mt-20 lg:mt-0 main-outlet lg-px-0 ${isAuthPage ? "w-full" : "xl:w-[81.5%] lg:w-[77%]"}`}>
             {!isAuthPage && <Header />}
             <div className="xl:p-3 md:pt-4 md:px-0">
-              <SupplierMiddleWareProvider>
                 <ProductProvider>
                   <ProductProviderEdit>
                     <ApiProvider>
@@ -46,9 +47,10 @@ function LayoutWrapperInner({ children }) {
                     </ApiProvider>
                   </ProductProviderEdit>
                 </ProductProvider>
-              </SupplierMiddleWareProvider>
             </div>
           </div>
+          </SupplierMiddleWareProvider>
+
         </div>
       </div>
     </div>
