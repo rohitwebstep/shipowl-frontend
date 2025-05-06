@@ -1,13 +1,11 @@
 import Profile from '@/components/admin/supplier/Profile'
-import { ProfileProvider } from '@/components/admin/supplier/ProfileContext'
-import React from 'react'
+import React,{Suspense} from 'react'
 
 export default function page() {
     return (
-        <ProfileProvider>
-
-            <Profile />
-        </ProfileProvider>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Profile/>
+          </Suspense>
 
     )
 }
