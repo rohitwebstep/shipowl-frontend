@@ -3,8 +3,9 @@ import React, { Suspense } from 'react'
 
 export default function Page() {
   return (
-    <Suspense><ResetPassword/></Suspense>
-  )
+  <Suspense fallback={<div>Loading...</div>}>
+         <ResetPassword />
+   </Suspense>  )
 }
 
 
