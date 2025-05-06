@@ -1,4 +1,3 @@
-'use client'
 
 import Update from '@/components/dropshipping/product/Update';
 import React, { Suspense } from 'react';
