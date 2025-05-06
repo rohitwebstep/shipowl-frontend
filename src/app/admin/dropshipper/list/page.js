@@ -1,3 +1,6 @@
+
+
+'use client'
 import dynamic from 'next/dynamic'
 
 const Dropshippers = dynamic(() => import('@/components/admin/dropshipper/Dropshipper'), {
