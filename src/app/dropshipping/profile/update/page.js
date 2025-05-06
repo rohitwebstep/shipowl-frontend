@@ -1,4 +1,6 @@
-'use client'
+'use client';
+
+export const dynamic = 'force-dynamic';
 
 import Profile from '@/components/dropshipping/dropshipper/update/Profile';
 import React, { Suspense } from 'react';
@@ -6,7 +8,7 @@ import React, { Suspense } from 'react';
 function Page() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <Profile/>
+      <Profile />
     </Suspense>
   );
 }
