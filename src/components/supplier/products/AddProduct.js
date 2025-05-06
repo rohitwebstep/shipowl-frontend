@@ -113,7 +113,7 @@ const AddProduct = () => {
         package_width_image:  products.package_width_image ||'',
         package_height_image:products.package_height_image ||'',
         product_detail_video: products.product_detail_video|| '',
-        upload_training_guidance_video:products.upload_training_guidance_video || '',
+        training_guidance_video:products.training_guidance_video || '',
         upc: products.upc || '',
         ean: products.ean || '',
         hsn_code: products.hsnCode || '',

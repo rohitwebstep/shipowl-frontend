@@ -8,10 +8,17 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import Image from "next/image";
 import 'swiper/css/navigation';
+import Swal from "sweetalert2";
+import { useRouter, useSearchParams } from 'next/navigation';
+
 export default function ShippingDetails() {
   const { formData,files, setFiles,validateForm2, setFormData, shippingErrors, fileFields,setActiveTab } = useContext(ProductContextEdit);
+  const [loading,setLoading] = useState(null);
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
+  const id = searchParams.get("id");
 
   const handleFileChange = (e, key) => {
     const selectedFiles = Array.from(e.target.files);
@@ -24,7 +31,7 @@ export default function ShippingDetails() {
   
 
 
-  const handleImageDelete = async (index) => {
+  const handleImageDelete = async (index,type) => {
       setLoading(true);
 
       const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
@@ -50,7 +57,7 @@ export default function ShippingDetails() {
               }
           });
 
-          const url = `http://localhost:3001/api/product/${id}/image/${index}`;
+          const url = `http://localhost:3001/api/product/${id}/image/${index}?type=${type}`;
 
           const response = await fetch(url, {
               method: "DELETE",
@@ -81,7 +88,6 @@ export default function ShippingDetails() {
                   showConfirmButton: true,
               }).then((res) => {
                   if (res.isConfirmed) {
-                      fetchCategory(); // Refresh formData with updated images
                   }
               });
           }

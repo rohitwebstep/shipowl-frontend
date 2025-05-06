@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Plus, Minus, ImageIcon } from 'lucide-react';
 import { ProductContextEdit } from './ProductContextEdit';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -8,6 +8,7 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Image from 'next/image';
+import Swal from "sweetalert2";
 export default function VariantDetails() {
   const { fetchCountry, formData, setFormData, countryData, setActiveTab } = useContext(ProductContextEdit);
 
@@ -35,7 +36,7 @@ const handleFileChange = (event, index) => {
     }));
   }
 };
-
+const [loading,setLoading] = useState(null);
 
   const addVariant = () => {
     setFormData({
@@ -68,6 +69,79 @@ const handleFileChange = (event, index) => {
     setActiveTab('shipping-details');
   };
 
+    const handleImageDelete = async (index,type,variantId) => {
+          setLoading(true);
+  
+          const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+          if (dropshipperData?.project?.active_panel !== "supplier") {
+              localStorage.removeItem("shippingData");
+              router.push("/supplier/auth/login");
+              return;
+          }
+  
+          const token = dropshipperData?.security?.token;
+          if (!token) {
+              router.push("/supplier/auth/login");
+              return;
+          }
+  
+          try {
+              Swal.fire({
+                  title: 'Deleting Image...',
+                  text: 'Please wait while we remove the image.',
+                  allowOutsideClick: false,
+                  didOpen: () => {
+                      Swal.showLoading();
+                  }
+              });
+  
+              const url = `http://localhost:3001/api/product/${variantId}/image/${index}?type=${type}`;
+  
+              const response = await fetch(url, {
+                  method: "DELETE",
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                  },
+              });
+  
+              if (!response.ok) {
+                  Swal.close();
+                  const errorMessage = await response.json();
+                  Swal.fire({
+                      icon: "error",
+                      title: "Delete Failed",
+                      text: errorMessage.message || errorMessage.error || "An error occurred",
+                  });
+                  throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+              }
+  
+              const result = await response.json();
+              Swal.close();
+  
+              if (result) {
+                  Swal.fire({
+                      icon: "success",
+                      title: "Image Deleted",
+                      text: `The image has been deleted successfully!`,
+                      showConfirmButton: true,
+                  }).then((res) => {
+                      if (res.isConfirmed) {
+                      }
+                  });
+              }
+          } catch (error) {
+              console.error("Error:", error);
+              Swal.close();
+              Swal.fire({
+                  icon: "error",
+                  title: "Submission Error",
+                  text: error.message || "Something went wrong. Please try again.",
+              });
+              setError(error.message || "Submission failed.");
+          } finally {
+              setLoading(false);
+          }
+      };
   return (
     <div className="mt-4 p-6 rounded-xl bg-white">
       <div className="md:flex mb-6 justify-between items-center">
@@ -271,7 +345,7 @@ const handleFileChange = (event, index) => {
                             confirmButtonText: 'Yes, delete it!',
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              handleImageDelete(index, key);
+                              handleImageDelete(index, 'variant_image',variant.id);
                             }
                           });
                         }}
