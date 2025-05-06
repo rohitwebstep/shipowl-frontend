@@ -1,12 +1,10 @@
-import Login from '@/components/admin/Login'
-import React from 'react'
+import dynamic from 'next/dynamic'
 
-function Page() {
-    return (
-        <>
-            <Login />
-        </>
-    )
+// Dynamically import the Login component and disable SSR
+const Login = dynamic(() => import('@/components/admin/Login'), {
+  ssr: false, // Disable server-side rendering
+})
+
+export default function Page() {
+  return <Login />
 }
-
-export default Page
