@@ -265,61 +265,6 @@ export default function List() {
             setLoading(false);
         }
     };
-
-    const handleBulkDelete = async () => {
-        if (selected.length === 0) {
-            Swal.fire("No items selected", "", "info");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: `You will delete ${selected.length} city!`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete them!",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        const admintoken = adminData?.security?.token;
-
-        try {
-            Swal.fire({ title: "Deleting...", didOpen: () => Swal.showLoading() });
-            setLoading(true);
-
-            const results = await Promise.all(
-                selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`, {
-                        method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${admintoken}`,
-                        },
-                    })
-                )
-            );
-
-            Swal.close();
-            await fetchCity();
-            setSelected([]);
-            Swal.fire("Deleted!", `${results.length} city were deleted.`, "success");
-        } catch (error) {
-            Swal.close();
-            Swal.fire("Error", error.message || "Failed to delete", "error");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const exportCsv = () => {
-        const table = $('#citytable').DataTable();
-        table.button('.buttons-csv').trigger();
-    };
-
     const handleRestore = useCallback(async (item) => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -461,6 +406,62 @@ export default function List() {
             setLoading(false);
         }
     };
+
+    const handleBulkDelete = async () => {
+        if (selected.length === 0) {
+            Swal.fire("No items selected", "", "info");
+            return;
+        }
+
+        const confirmResult = await Swal.fire({
+            title: "Are you sure?",
+            text: `You will delete ${selected.length} city!`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete them!",
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        const admintoken = adminData?.security?.token;
+
+        try {
+            Swal.fire({ title: "Deleting...", didOpen: () => Swal.showLoading() });
+            setLoading(true);
+
+            const results = await Promise.all(
+                selected.map(id =>
+                    fetch(`https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${admintoken}`,
+                        },
+                    })
+                )
+            );
+
+            Swal.close();
+            await fetchCity();
+            setSelected([]);
+            Swal.fire("Deleted!", `${results.length} city were deleted.`, "success");
+        } catch (error) {
+            Swal.close();
+            Swal.fire("Error", error.message || "Failed to delete", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const exportCsv = () => {
+        const table = $('#citytable').DataTable();
+        table.button('.buttons-csv').trigger();
+    };
+
+   
 
     return (
         <div className="">
