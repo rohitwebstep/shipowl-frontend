@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { ProfileProvider } from "./userprofile/ProfileContext";
@@ -11,9 +12,15 @@ import { BrandProvider } from "./brand/BrandContext";
 import { ProductProvider } from "./addproducts/ProductContext";
 import { ProductProviderEdit } from "./products/ProductContextEdit";
 
-export default function LayoutWrapper({ children }) {
+function LayoutWrapperInner({ children }) {
   const pathname = usePathname();
-  const isAuthPage = pathname.includes('/admin') || pathname.includes('/dropshipping') || pathname.includes('/supplier/auth/login') ||pathname.includes('/supplier/auth/password/forget/') ||pathname.includes('/supplier/auth/password/reset/') || pathname == "/";
+  const isAuthPage =
+    pathname.includes('/admin') ||
+    pathname.includes('/dropshipping') ||
+    pathname.includes('/supplier/auth/login') ||
+    pathname.includes('/supplier/auth/password/forget/') ||
+    pathname.includes('/supplier/auth/password/reset/') ||
+    pathname === "/";
 
   return (
     <div className="main">
@@ -26,25 +33,32 @@ export default function LayoutWrapper({ children }) {
           )}
           <div className={`px-3 mt-20 lg:mt-0 main-outlet lg-px-0 ${isAuthPage ? "w-full" : "xl:w-[81.5%] lg:w-[77%]"}`}>
             {!isAuthPage && <Header />}
-            <div className=" xl:p-3 md:pt-4 md:px-0">
+            <div className="xl:p-3 md:pt-4 md:px-0">
               <SupplierMiddleWareProvider>
                 <ProductProvider>
-                <ProductProviderEdit>
-                <ApiProvider>
-                  <CategoryProvider>
-                    <BrandProvider>
-                      <ProfileProvider>{children}</ProfileProvider>
-                    </BrandProvider>
-                  </CategoryProvider>
-                </ApiProvider>
-                </ProductProviderEdit>
+                  <ProductProviderEdit>
+                    <ApiProvider>
+                      <CategoryProvider>
+                        <BrandProvider>
+                          <ProfileProvider>{children}</ProfileProvider>
+                        </BrandProvider>
+                      </CategoryProvider>
+                    </ApiProvider>
+                  </ProductProviderEdit>
                 </ProductProvider>
               </SupplierMiddleWareProvider>
-
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LayoutWrapper({ children }) {
+  return (
+    <Suspense fallback={<div>Loading layout...</div>}>
+      <LayoutWrapperInner>{children}</LayoutWrapperInner>
+    </Suspense>
   );
 }

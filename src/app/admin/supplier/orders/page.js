@@ -1,12 +1,14 @@
+'use client';
+
 import React, { Suspense } from 'react';
+import Orders from '@/components/admin/orders/Order';
 
-// Dynamically import the Orders component
-const Orders = React.lazy(() => import('@/components/admin/orders/Order'));
-
-export default function Page() {
+function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Loading orders...</div>}>
       <Orders />
     </Suspense>
   );
 }
+
+export default Page;

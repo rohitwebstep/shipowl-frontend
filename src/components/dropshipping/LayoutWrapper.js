@@ -1,15 +1,18 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import DropshipperMiddleWareProvider from "./middleware/DropshipperMiddleWareContext";
 import { DropshipperProfileProvider } from "./dropshipper/update/DropshipperProfileContext";
 import { ProfileProvider } from "../admin/supplier/ProfileContext";
 
-export default function LayoutWrapper({ children }) {
+function LayoutWrapperInner({ children }) {
     const pathname = usePathname();
-    const isAuthPage = pathname === '/dropshipping/auth/login/' || pathname === '/dropshipping/auth/password/forget/' || pathname === '/dropshipping/auth/password/reset/';
+    const isAuthPage = pathname === '/dropshipping/auth/login/' ||
+                       pathname === '/dropshipping/auth/password/forget/' ||
+                       pathname === '/dropshipping/auth/password/reset/';
 
     return (
         <div className="main">
@@ -25,13 +28,23 @@ export default function LayoutWrapper({ children }) {
                         <div className="md:p-7 xl:p-3 md:pt-0">
                             <ProfileProvider>
                                 <DropshipperProfileProvider>
-                            <DropshipperMiddleWareProvider>{children}</DropshipperMiddleWareProvider>
-                            </DropshipperProfileProvider>
+                                    <DropshipperMiddleWareProvider>
+                                        {children}
+                                    </DropshipperMiddleWareProvider>
+                                </DropshipperProfileProvider>
                             </ProfileProvider>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function LayoutWrapper({ children }) {
+    return (
+        <Suspense fallback={<div>Loading layout...</div>}>
+            <LayoutWrapperInner>{children}</LayoutWrapperInner>
+        </Suspense>
     );
 }

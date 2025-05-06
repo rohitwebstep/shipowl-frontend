@@ -15,46 +15,7 @@ import { FiDownloadCloud } from "react-icons/fi";
 import { MoreHorizontal } from "lucide-react";
 import { FaCheck } from 'react-icons/fa';
 const orders = [
-    {
-        id: '#ID285800',
-        date: '15 Aug 24, 01:43 AM',
-        product: 'Product Name',
-        sku: '2584026',
-        qty: 1,
-        seller_tags: null,
-        cod: '₹580',
-        orderValue: '₹580',
-        status: 'Unpaid',
-        tags: ['Repeat Customer', 'Label Generated', 'Warehouse Model'],
-        shipment: {
-            id: '#ODR85178048081',
-            status: 'Order Placed',
-            provider: 'Shiprocket / Right Traders',
-            date: 'Aug 18, 2024 01:54 PM',
-        },
-        sla: '27h 54m 57s',
-        sla_date: 'Aug 18, 2024 05:11:54 pm',
-    },
-    {
-        id: '#ID285801',
-        date: '15 Aug 24, 01:43 AM',
-        product: 'Product Name',
-        sku: '2584026',
-        qty: 1,
-        seller_tags: null,
-        cod: '₹580',
-        orderValue: '₹580',
-        status: 'Unpaid',
-        tags: ['Repeat Customer', 'Label Generated', 'Warehouse Model'],
-        shipment: {
-            id: '#ODR85178048081',
-            status: 'Order Placed',
-            provider: 'Shiprocket / Right Traders',
-            date: 'Aug 18, 2024 01:54 PM',
-        },
-        sla: '27h 54m 57s',
-        sla_date: 'Aug 18, 2024 05:11:54 pm',
-    },
+   
 ];
 
 export default function Orders() {
