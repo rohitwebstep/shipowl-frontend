@@ -1,10 +1,7 @@
-import dynamic from 'next/dynamic'
+'use client';  // Mark this file as a client component
 
-// Dynamically import the Login component and disable SSR
-const Login = dynamic(() => import('@/components/admin/Login'), {
-  ssr: false, // Disable server-side rendering
-})
+import Login from '@/components/admin/Login';
 
 export default function Page() {
-  return <Login />
+  return <Login />;
 }
