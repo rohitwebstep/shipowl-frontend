@@ -1,7 +1,7 @@
 import ProductList from '@/components/dropshipping/home/ProductList'
 import React from 'react'
 
-const page = () => {
+const Page = () => {
   return (
     <ProductList/>
   )

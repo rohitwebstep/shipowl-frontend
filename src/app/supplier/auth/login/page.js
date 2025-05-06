@@ -1,5 +1,5 @@
 import Login from '@/components/supplier/Login'
-const page = () => {
+const Page = () => {
   return (
    <>
    
