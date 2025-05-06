@@ -1,12 +1,10 @@
-import ProductList from '@/components/dropshipping/product/ProductList'
-import React, { Suspense } from 'react';
+"use client"
+import dynamic from 'next/dynamic'
 
-function Page() {
-  return (
-   <Suspense fallback={<div>Loading...</div>}>
-    <ProductList/>
-   </Suspense>
-  )
+const ProductList = dynamic(() => import('@/components/dropshipping/product/ProductList'), { 
+  ssr: false 
+})
+
+export default function Page() {
+  return <ProductList />
 }
-
-export default Page
