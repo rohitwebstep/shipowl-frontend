@@ -1,12 +1,10 @@
 import ReportsPage from '@/components/dropshipping/reports/ReportsPage'
 import React from 'react'
 
-const page = () => {
-  return (
-   <>
-   <ReportsPage/>
-   </>
-  )
-}
+export const dynamic = 'force-dynamic';
 
-export default page
+const Page = () => {
+  return <ReportsPage />;
+};
+
+export default Page;
