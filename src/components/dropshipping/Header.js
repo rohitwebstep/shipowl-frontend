@@ -6,7 +6,13 @@ import user from '@/app/assets/user.png';
 import Image from 'next/image';
 import { IoIosArrowDown } from "react-icons/io";
 import { FaSignOutAlt } from 'react-icons/fa';
+import { useDropshipper } from './middleware/DropshipperMiddleWareContext';
 const Header = () => {
+  const {verifyDropShipperAuth} = useDropshipper();
+  const logout=()=>{
+    localStorage.removeItem('shippingData');
+    verifyDropShipperAuth();
+  }
   return (
     <nav className="fixed rounded-xl lg:relative lg:mt-3 top-0 left-0 w-full bg-white   p-4 flex items-center justify-between lg:shadow-none">
       <button className="p-2 bg-black text-white rounded-full ">
@@ -27,7 +33,7 @@ const Header = () => {
             <Image src={user} alt="User" className="w-8 h-8 rounded-full" />
             <IoIosArrowDown className="text-gray-600" />
             <button
-              onClick={() => localStorage.removeItem('shippingData')}
+              onClick={logout}
               className="bg-orange-500 p-1 rounded-full h-10 w-10 flex items-center justify-center"
             >
               <FaSignOutAlt className="text-white" />

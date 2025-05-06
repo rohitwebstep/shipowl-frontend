@@ -4,9 +4,11 @@ import { FaSearch, FaBell, FaChevronDown } from "react-icons/fa";
 import Image from "next/image";
 import userImage from "@/app/images/userimage.png";
 import { FaSignOutAlt } from "react-icons/fa";
+import { useSupplier } from "./middleware/SupplierMiddleWareContext";
 
 export default function Header() {
   const pathname = usePathname(); 
+  const {verifySupplierAuth} = useSupplier();
 
   const pageTitles = {
     "/supplier": "Dashboard",
@@ -31,7 +33,10 @@ export default function Header() {
   };
 
   const currentPage = pageTitles[pathname] || "Dashboard";
-
+const logout=()=>{
+  localStorage.removeItem('shippingData');
+  verifySupplierAuth();
+}
   return (
     <header className="md:flex items-center md:mt-16 mt-10 lg:mt-0 justify-between lg:py-7 px-3 p-2 pt-6">
       <div className="md:w-4/12">
@@ -67,7 +72,7 @@ export default function Header() {
           />
         </div>
         <button
-          onClick={() => localStorage.removeItem('shippingData')}
+          onClick={logout}
           className="bg-orange-500 p-1 rounded-full h-10 w-10 flex items-center justify-center"
         >
           <FaSignOutAlt className="text-white" />
