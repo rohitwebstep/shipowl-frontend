@@ -1,10 +1,10 @@
-import React, { Suspense } from 'react'
-import Create from '@/components/admin/api-credentials/Create'
+"use client"
+import dynamic from 'next/dynamic';
+
+const Create = dynamic(() => import('@/components/admin/api-credentials/Create'), { 
+  ssr: false // Disable SSR for this component
+});
 
 export default function Page() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Create />
-    </Suspense>
-  )
+  return <Create />;
 }
