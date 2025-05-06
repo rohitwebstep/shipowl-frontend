@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
 import dynamic from 'next/dynamic';
 
-// Dynamically import ProductDetails with ssr: false to disable SSR for this component
+// Dynamically import ProductDetails with ssr: false
 const ProductDetails = dynamic(() => import('@/components/dropshipping/home/ProductDetails'), { 
-  ssr: false // This disables SSR and renders it only on the client
+  ssr: false 
 });
 
 export default function Page() {
