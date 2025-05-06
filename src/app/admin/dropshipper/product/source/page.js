@@ -1,7 +1,7 @@
 import ProductList from '@/components/admin/sourceproduct/ProductList'
 import React from 'react'
 
-function page() {
+function Page() {
   return (
     <><ProductList/></>
   )

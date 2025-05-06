@@ -1,10 +1,10 @@
+import React, { Suspense } from 'react'
 import Create from '@/components/admin/api-credentials/Create'
-import React from 'react'
 
-export default function page() {
+export default function Page() {
   return (
-   <>
-   <Create/>
-   </>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Create />
+    </Suspense>
   )
 }

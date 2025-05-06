@@ -1,7 +1,7 @@
 import Term from '@/components/admin/terms/Term'
 import React from 'react'
 
-export default function page() {
+export default function Page() {
   return (
    <Term/>
   )

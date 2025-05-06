@@ -1,6 +1,6 @@
 import Setting from "@/components/supplier/setting/Setting";
 
-export default function page() {
+export default function Page() {
     return (
         <div>
             <Setting />

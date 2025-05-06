@@ -1,7 +1,7 @@
 import NewProducts from '@/components/supplier/newproducts/NewProducts'
 import React from 'react'
 
-function page() {
+function Page() {
   return (
    <NewProducts/>
   )

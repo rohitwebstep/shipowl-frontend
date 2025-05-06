@@ -1,7 +1,7 @@
 import Login from '@/components/dropshipping/Login'
 import React from 'react'
 
-function page() {
+function Page() {
     return (
         <>
             <Login />
