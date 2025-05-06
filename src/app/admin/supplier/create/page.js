@@ -1,10 +1,11 @@
-import Profile from '@/components/admin/supplier/Profile'
-import React,{Suspense} from 'react'
+import dynamic from 'next/dynamic'
+
+const Profile = dynamic(() => import('@/components/admin/supplier/Profile'), {
+  ssr: false // Disable server-side rendering
+})
 
 export default function Page() {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-          <Profile/>
-        </Suspense>
-    )
+  return (
+    <Profile />
+  )
 }
