@@ -1,10 +1,10 @@
 import Products from '@/components/admin/products/Products'
-import React,{Suspense} from 'react'
+import React from 'react'
 
-export default function Page() {
+export default function page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-         <Products />
-       </Suspense>
+   <>
+   <Products/>
+   </>
   )
 }
