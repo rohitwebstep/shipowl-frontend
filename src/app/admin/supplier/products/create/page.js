@@ -1,9 +1,9 @@
-import React from 'react'
+import React ,{Suspense} from 'react'
 import AddProduct from '@/components/admin/addproducts/AddProduct'
 export default function page() {
   return (
-    <div>
-   <AddProduct/>
-    </div>
+     <Suspense fallback={<div>Loading...</div>}>
+          <AddProduct />
+        </Suspense>
   )
 }
