@@ -1,7 +1,12 @@
 
-import React from 'react';
+import React,{Suspense} from 'react';
 import Create from '@/components/admin/countrymanagement/Create';
 export const dynamic = 'force-dynamic';
 export default function Page() {
-  return <Create />;
+  return(
+    <Suspense fallback={<div>Loading...</div>}>
+
+   <Create />
+   </Suspense>
+  )
 }

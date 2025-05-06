@@ -1,11 +1,11 @@
 import Create from '@/components/admin/citymanagement/Create'
-import React from 'react'
+import React,{Suspense} from 'react'
 
 export default function page() {
   return (
-    <>
-    <Create/>
-    
-    </>
+    <Suspense fallback={<div>Loading...</div>}>
+   
+      <Create />
+      </Suspense>
   )
 }

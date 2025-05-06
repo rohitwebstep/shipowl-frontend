@@ -1,16 +1,12 @@
-import React, { Suspense } from 'react'
-import dynamic from 'next/dynamic'
+import Create from '@/components/admin/statemanagement/Create'
+import React,{Suspense} from 'react'
 
-// Dynamically import Create to ensure it's client-side only (if needed)
-const Create = dynamic(() => import('@/components/admin/statemanagement/Create'), {
-  ssr: false, // disables server-side rendering
-  suspense: true,
-})
-
-export default function Page() {
+export default function page() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <Create />
+
+    <Create/>
+    
     </Suspense>
   )
 }
