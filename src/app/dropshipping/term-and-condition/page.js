@@ -1,10 +1,8 @@
-import Terms from '@/components/dropshipping/terms/Terms'
-import React from 'react'
+import Terms from '@/components/dropshipping/terms/Terms';
+import React from 'react';
 
-export default function page() {
-  return (
-    <>
-    <Terms/>
-    </>
-  )
+export const dynamic = 'force-dynamic';
+
+export default function Page() {
+  return <Terms />;
 }
