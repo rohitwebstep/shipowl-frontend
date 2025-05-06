@@ -1,10 +1,8 @@
-import Warehouse from '@/components/admin/warehouse/Warehouse'
-import React from 'react'
+import Warehouse from '@/components/admin/warehouse/Warehouse';
+import React from 'react';
 
-export default function page() {
-  return (
-   <>
-   <Warehouse/>
-   </>
-  )
+export const dynamic = 'force-dynamic';
+
+export default function Page() {
+  return (<Warehouse />);
 }
