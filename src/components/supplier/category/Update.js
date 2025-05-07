@@ -205,7 +205,6 @@ export default function Update() {
         }
     };
 
-  c
     const handleFileChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
         setFiles(selectedFiles);
