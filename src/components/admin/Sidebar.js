@@ -74,7 +74,7 @@ export default function Sidebar() {
           subMenu: [
             { icon: ClipboardList, name: "Courier Company", href: "/admin/courier/list" },
             { icon: ClipboardList, name: "Api Credentials", href: "/admin/api/list" },
-            { name: "High RTO(In progress)", icon: Package, href: "/admin/high-rto/list" },
+            { name: "High RTO", icon: Package, href: "/admin/high-rto/list" },
           ],
         },
       ],
