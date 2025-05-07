@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter ,useSearchParams} from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import Select from 'react-select';
 import Swal from "sweetalert2";
@@ -12,6 +12,7 @@ export default function Create() {
   const [countryData, setCountryData] = useState([]);
   const [stateData, setStateData] = useState([]);
   const [cityData, setCityData] = useState([]);
+  const [pinCode, setPinCode] = useState([]);
 
   const [formData, setFormData] = useState({
     state: "",
@@ -19,7 +20,8 @@ export default function Create() {
     city: "",
     pincode: "",
   });
-
+ const searchParams = useSearchParams();
+  const id = searchParams.get('id');
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -40,6 +42,66 @@ export default function Create() {
       }));
     }
   };
+  const fetchPincodes = useCallback(async () => {
+    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+
+    if (adminData?.project?.active_panel !== "admin") {
+        localStorage.removeItem("shippingData");
+        router.push("/admin/auth/login");
+        return;
+    }
+
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+        router.push("/admin/auth/login");
+        return;
+    }
+
+    try {
+        setLoading(true);
+        const response = await fetch(
+            `https://sleeping-owl-we0m.onrender.com/api/high-rto/${id}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${admintoken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            const errorMessage = await response.json();
+            Swal.fire({
+                icon: "error",
+                title: "Something Wrong!",
+                text: errorMessage.message || "Your session has expired. Please log in again.",
+            });
+            throw new Error(errorMessage.message);
+        }
+
+        const result = await response.json();
+        const pinCode = result?.highRto || {};
+        if(pinCode?.countryId){
+            fetchStateList(pinCode?.countryId);
+        }
+        if(pinCode?.stateId){
+            fetchCity(pinCode?.stateId);
+        }
+
+        setFormData({
+          state: pinCode?.stateId || "",
+          country:pinCode?.countryId|| "",
+          city:pinCode?.cityId ||  "",
+          pincode: pinCode?.pincode|| "",
+          });
+          setPinCode(pinCode)
+    } catch (error) {
+        console.error("Error fetching Company:", error);
+    } finally {
+        setLoading(false);
+    }
+}, [router, id]);
 
   const fetchCity = useCallback(async (id) => {
     const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -121,20 +183,20 @@ export default function Create() {
       });
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.message ||result.error || "Failed to fetch country list");
+      if (!res.ok) throw new Error(result.message || "Failed to fetch country list");
 
       setCountryData(result?.countries || []);
-      setStateData(result?.states || []);
     } catch (err) {
-      Swal.fire("Error", err.message , "error");
+      Swal.fire("Error", err.message, "error");
     } finally {
       setLoading(false);
     }
   }, [router]);
 
   useEffect(() => {
+    fetchPincodes();
     fetchCountryAndState();
-  }, [fetchCountryAndState]);
+  }, [fetchCountryAndState,fetchPincodes]);
 
   const validate = () => {
     const newErrors = {};
@@ -173,8 +235,8 @@ export default function Create() {
       formdata.append("state", formData.state);
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/high-rto", {
-        method: "POST",
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/high-rto/${id}`, {
+        method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
       });
@@ -183,7 +245,7 @@ export default function Create() {
 
       if (!res.ok) throw new Error(result.message || "Creation failed");
 
-      Swal.fire("High RTO Created", " Hihg RTO has been created successfully!", "success").then(() => {
+      Swal.fire("Updating...", "Rto has been Updated successfully!", "success").then(() => {
         setFormData({state: "", country: "", city: "", pincode: "" });
         router.push("/admin/high-rto/list");
       });
@@ -206,6 +268,10 @@ export default function Create() {
       Swal.fire("Please select a file before uploading", "", "warning");
     }
   };
+
+  
+     
+  
 
   return (
     <div className="md:w-10/12 p-6 bg-white shadow-md rounded-lg mt-6">
@@ -253,7 +319,7 @@ export default function Create() {
             <input
               type="text"
               name="pincode"
-              value={formData.pincode}
+              value={formData.pincode || ''}
               onChange={handleChange}
               className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3"
             />

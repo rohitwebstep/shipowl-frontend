@@ -63,7 +63,7 @@ export default function CourierDetails() {
           <table className="w-full border-collapse">
             <thead className="">
               <tr className="text-[#A3AED0] border-b  ">
-                <th className="p-2 ps-0 px-5 whitespace-nowrap text-left uppercase">NAME <i></i></th>
+                <th className="p-2 ps-0 px-5 whitespace-nowrap text-left uppercase">NAME </th>
                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Total <i></i></th>
                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Booked <i></i></th>
                 <th className="p-2 px-5 whitespace-nowrap text-left uppercase">PP <i></i></th>

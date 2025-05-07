@@ -79,19 +79,19 @@ export default function SkuOrders() {
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="text-[#A3AED0] border-b border-[#E9EDF7]">
-              <th className="px-5 ps-0 py-3 whitespace-nowrap text-left uppercase">NAME<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Manifested<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase text-red-500">Cancelled<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase text-yellow-500">Pickup Pending<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">In Transit<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Out For Delivery<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">NDR<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Delivered<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">RTO In Transit<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">RTO In Delivered<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Lost/Damaged<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Delivered (%)<i></i></th>
-              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">RTO (%)<i></i></th>
+              <th className="px-5 ps-0 py-3 whitespace-nowrap text-left uppercase">NAME</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Manifested</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase text-red-500">Cancelled</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase text-yellow-500">Pickup Pending</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">In Transit</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Out For Delivery</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">NDR</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Delivered</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">RTO In Transit</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">RTO In Delivered</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Lost/Damaged</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">Delivered (%)</th>
+              <th className="px-5 py-3 whitespace-nowrap text-left uppercase">RTO (%)</th>
             </tr>
           </thead>
           <tbody>

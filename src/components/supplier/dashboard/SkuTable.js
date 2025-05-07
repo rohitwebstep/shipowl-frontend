@@ -66,16 +66,16 @@ export default function SkuTable() {
                     <thead>
                         <tr className="text-[#A3AED0]">
                             <th className="p-2 px-5 ps-0 whitespace-nowrap text-left uppercase">
-                                NAME <i></i>
+                                NAME 
                             </th>
                             <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                SKU <i></i>
+                                SKU 
                             </th>
                             <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                QUANTITY <i></i>
+                                QUANTITY 
                             </th>
                             <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                BOOKED <i></i>
+                                BOOKED 
                             </th>
                         </tr>
                     </thead>

@@ -73,11 +73,11 @@ export default function RecentOrders() {
         <table className="w-full border-collapse">
           <thead className="">
             <tr className="text-[#A3AED0] border-b  border-[#E9EDF7]">
-              <th className="p-3 px-4 whitespace-nowrap text-left">NAME <i></i></th>
-              <th className="p-3 px-4 whitespace-nowrap text-left">SKU<i></i></th>
-              <th className="p-3 px-4 whitespace-nowrap text-left">QUANTITY<i></i></th>
-              <th className="p-3 px-4 whitespace-nowrap text-left">STATUS<i></i></th>
-              <th className="p-3 px-4 whitespace-nowrap text-left">DATE<i></i></th>
+              <th className="p-3 px-4 whitespace-nowrap text-left">NAME </th>
+              <th className="p-3 px-4 whitespace-nowrap text-left">SKU</th>
+              <th className="p-3 px-4 whitespace-nowrap text-left">QUANTITY</th>
+              <th className="p-3 px-4 whitespace-nowrap text-left">STATUS</th>
+              <th className="p-3 px-4 whitespace-nowrap text-left">DATE</th>
             </tr>
           </thead>
           <tbody>

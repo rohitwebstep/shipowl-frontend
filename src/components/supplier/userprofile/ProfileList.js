@@ -60,106 +60,106 @@ const ProfileList = () => {
             setLoading(false);
         }
     }, [router, setSuppliers]);
-     const fetchCity = useCallback(async () => {
-                const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-            
-                if (supplierData?.project?.active_panel !== "supplier") {
-                    localStorage.removeItem("shippingData");
-                    router.push("/supplier/auth/login");
-                    return;
-                }
-            
-                const suppliertoken = supplierData?.security?.token;
-                if (!suppliertoken) {
-                    router.push("/supplier/auth/login");
-                    return;
-                }
-            
-                try {
-                    setLoading(true);
-                    const response = await fetch(
-                        `https://sleeping-owl-we0m.onrender.com/api/location/city`,
-                        {
-                            method: "GET",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Bearer ${suppliertoken}`,
-                            },
-                        }
-                    );
-            
-                    const result = await response.json();
-            
-                    if (!response.ok) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Something Wrong!",
-                            text: result.message || result.error || "Your session has expired. Please log in again.",
-                        });
-                        throw new Error(result.message || result.error || "Something Wrong!");
-                    }
-            
-                    setCityData(result?.cities || []);
-                } catch (error) {
-                    console.error("Error fetching cities:", error);
-                } finally {
-                    setLoading(false);
-                }
-            }, [router]);
+    const fetchCity = useCallback(async () => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
     
-              const fetchState = useCallback(async () => {
-                    const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-            
-                    if (supplierData?.project?.active_panel !== "supplier") {
-                        localStorage.removeItem("shippingData");
-                        router.push("/supplier/auth/login");
-                        return;
-                    }
-            
-                    const suppliertoken = supplierData?.security?.token;
-                    if (!suppliertoken) {
-                        router.push("/supplier/auth/login");
-                        return;
-                    }
-            
-                    try {
-                        setLoading(true);
-                        const response = await fetch(
-                            `https://sleeping-owl-we0m.onrender.com/api/location/state`,
-                            {
-                                method: "GET",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    Authorization: `Bearer ${suppliertoken}`,
-                                },
-                            }
-                        );
-            
-                        if (!response.ok) {
-                            const errorMessage = await response.json();
-                            Swal.fire({
-                                icon: "error",
-                                title: "Something Wrong!",
-                                text:
-                                    errorMessage.error ||
-                                    errorMessage.message ||
-                                    "Your session has expired. Please log in again.",
-                            });
-                            throw new Error(
-                                errorMessage.message || errorMessage.error || "Something Wrong!"
-                            );
-                        }
-            
-                        const result = await response.json();
-                        if (result) {
-                            setStateData(result?.states || []);
-                        }
-                    } catch (error) {
-                        console.error("Error fetching state:", error);
-                    } finally {
-                        setLoading(false);
-                    }
-                }, [router, setStateData]);
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/supplier/auth/login");
+            return;
+        }
+    
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/supplier/auth/login");
+            return;
+        }
+    
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${suppliertoken}`,
+                    },
+                }
+            );
+    
+            const result = await response.json();
+    
+            if (!response.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                });
+                throw new Error(result.message || result.error || "Something Wrong!");
+            }
+    
+            setCityData(result?.cities || []);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
+    
+    const fetchState = useCallback(async () => {
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (supplierData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${suppliertoken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text:
+                        errorMessage.error ||
+                        errorMessage.message ||
+                        "Your session has expired. Please log in again.",
+                });
+                throw new Error(
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
+                );
+            }
+
+            const result = await response.json();
+            if (result) {
+                setStateData(result?.states || []);
+            }
+        } catch (error) {
+            console.error("Error fetching state:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, setStateData]);
             
 
     useEffect(() => {

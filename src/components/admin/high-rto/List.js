@@ -1,61 +1,572 @@
-
-"use client"
-import { useState } from 'react'
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+"use client";
+import {useEffect, useCallback, useState } from "react";
+import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
-import Link from 'next/link';
-import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
+import Link from "next/link";
+import { AiOutlineDelete } from "react-icons/ai";
+import HashLoader from "react-spinners/HashLoader";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import 'datatables.net-dt/css/dataTables.dataTables.css';
+import { useAdmin } from "../middleware/AdminMiddleWareContext";
+
 export default function List() {
+    const [isTrashed, setIsTrashed] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState([]);
+    const [stateData, setStateData] = useState([]);
+    const [cityData, setCityData] = useState([]);
+    const [countryData, setCountryData] = useState([]);
+    const { verifyAdminAuth } = useAdmin();
+    const router = useRouter();
+    const fetchRto = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+    
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+    
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/high-rto`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
+    
+            const result = await response.json();
+    
+            if (!response.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                });
+                throw new Error(result.message || result.error || "Something Wrong!");
+            }
+    
+            setData(result?.highRtos || []);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
+    
+    const trashedRto = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [perPage, setPerPage] = useState(5);
-    const Couriers = [
-        {
-            id: 1,
-            pincode: "DTDC",
-            dist: "DTDC",
-            state: "demo4.in",
-        },
-        {
-            id: 2,
-            pincode: "Blue Dart",
-            dist: "BLUEDART",
-            state: "demo.com",
-        },
-        {
-            id: 3,
-            pincode: "Delhivery",
-            dist: "DELHIVERY",
-            state: "demo1.com",
-        },
-        {
-            id: 4,
-            pincode: "Ecom Express",
-            dist: "ECOMEXP",
-            state: "demo3.in",
-        },
-    ];
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
 
-    const [selected, setSelected] = useState([]);
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
 
-    const handleCheckboxChange = (id) => {
-        setSelected((prev) =>
-            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-        );
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/high-rto/trashed`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text:
+                        errorMessage.error ||
+                        errorMessage.message ||
+                        "Your session has expired. Please log in again.",
+                });
+                throw new Error(
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
+                );
+            }
+
+            const result = await response.json();
+            if (result) {
+                setData(result?.highRtos || []);
+            }
+        } catch (error) {
+            console.error("Error fetching trashed High Rto:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, setData]);
+    const fetchCity = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+    
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+    
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
+    
+            const result = await response.json();
+    
+            if (!response.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                });
+                throw new Error(result.message || result.error || "Something Wrong!");
+            }
+    
+            setCityData(result?.cities || []);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
+    
+    const fetchState = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text:
+                        errorMessage.error ||
+                        errorMessage.message ||
+                        "Your session has expired. Please log in again.",
+                });
+                throw new Error(
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
+                );
+            }
+
+            const result = await response.json();
+            if (result) {
+                setStateData(result?.states || []);
+            }
+        } catch (error) {
+            console.error("Error fetching state:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, setStateData]);
+     const fetchcountry = useCallback(async () => {
+            const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    
+            if (adminData?.project?.active_panel !== "admin") {
+                localStorage.removeItem("shippingData");
+                router.push("/admin/auth/login");
+                return;
+            }
+    
+            const admintoken = adminData?.security?.token;
+            if (!admintoken) {
+                router.push("/admin/auth/login");
+                return;
+            }
+    
+            try {
+                setLoading(true);
+                const response = await fetch(
+                    `https://sleeping-owl-we0m.onrender.com/api/location/country`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${admintoken}`,
+                        },
+                    }
+                );
+    
+                if (!response.ok) {
+                    const errorMessage = await response.json();
+                    Swal.fire({
+                        icon: "error",
+                        title: "Something Wrong!",
+                        text:
+                            errorMessage.error ||
+                            errorMessage.message ||
+                            "Your session has expired. Please log in again.",
+                    });
+                    throw new Error(
+                        errorMessage.message || errorMessage.error || "Something Wrong!"
+                    );
+                }
+    
+                const result = await response.json();
+                if (result) {
+                    setCountryData(result?.countries || []);
+                }
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            } finally {
+                setLoading(false);
+            }
+        }, [router, setCountryData]);
+    
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsTrashed(false);
+            setLoading(true);
+            await verifyAdminAuth();
+            await fetchRto();
+            await fetchState();
+            await fetchCity();
+            await fetchcountry();
+            setLoading(false);
+        };
+        fetchData();
+    }, [fetchRto, verifyAdminAuth]);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && data.length > 0 && !loading) {
+            let table = null;
+
+            Promise.all([
+                import('jquery'),
+                import('datatables.net'),
+                import('datatables.net-dt'),
+                import('datatables.net-buttons'),
+                import('datatables.net-buttons-dt')
+            ]).then(([jQuery]) => {
+                window.jQuery = window.$ = jQuery.default;
+
+                // Destroy existing DataTable if it exists
+                if ($.fn.DataTable.isDataTable('#rto-table')) {
+                    $('#rto-table').DataTable().destroy();
+                    $('#rto-table').empty();
+                }
+
+                // Reinitialize DataTable with new data
+                table = $('#rto-table').DataTable();
+
+                return () => {
+                    if (table) {
+                        table.destroy();
+                        $('#rto-table').empty();
+                    }
+                };
+            }).catch((error) => {
+                console.error('Failed to load DataTables dependencies:', error);
+            });
+        }
+    }, [data, loading]);
+
+    const handleEditItem = (item) => {
+        router.push(`/admin/high-rto/update?id=${item.id}`);
     };
 
-    const totalPages = Math.ceil(Couriers.length / perPage);
-    const indexOfLast = currentPage * perPage;
-    const indexOfFirst = indexOfLast - perPage;
-    const currentData = Couriers.slice(indexOfFirst, indexOfLast);
 
+    const handleDelete = async (item) => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const confirmResult = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        try {
+            Swal.fire({
+                title: "Deleting...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            setLoading(true);
+
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item.id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
+
+            Swal.close();
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
+                });
+                setLoading(false);
+                return;
+            }
+
+            const result = await response.json();
+
+            Swal.fire({
+                icon: "success",
+                title: "Trash!",
+                text: result.message || `${item.name} has been Trashed successfully.`,
+            });
+
+            await fetchRto();
+        } catch (error) {
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handleRestore = useCallback(async (item) => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item?.id}/restore`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text:
+                        errorMessage.error ||
+                        errorMessage.message ||
+                        "Your session has expired. Please log in again.",
+                });
+                throw new Error(
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
+                );
+            }
+
+            const result = await response.json();
+            if (result.status) {
+                Swal.fire({
+                    icon: "success",
+                    title: `Rto Has Been Restored Successfully !`,
+                    text: result.message,
+                });
+                await trashedRto();
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, trashedRto]);
+
+    const handlePermanentDelete = async (item) => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const confirmResult = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        try {
+            Swal.fire({
+                title: "Deleting...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            setLoading(true);
+
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item.id}/destroy`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
+
+            Swal.close();
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
+                });
+                setLoading(false);
+                return;
+            }
+
+            const result = await response.json();
+
+            Swal.fire({
+                icon: "success",
+                title: "Deleted!",
+                text: result.message || `${item.name} has been deleted successfully.`,
+            });
+
+            await trashedRto();
+        } catch (error) {
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+  if (loading) {
+          return (
+              <div className="flex items-center justify-center h-[80vh]">
+                  <HashLoader size={60} color="#F97316" loading={true} />
+              </div>
+          );
+      }
+
+         
+                  
     return (
         <>
 
-            <div className="bg-white lg:w-8/12 rounded-3xl p-5">
+            <div className="bg-white rounded-3xl p-5">
                 <div className="flex flex-wrap justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-[#2B3674]">High RTO List</h2>
+                    <h2 className="text-2xl font-bold text-[#2B3674]">High Rto List</h2>
                     <div className="flex gap-3  flex-wrap items-center">
                         <button
                             onClick={() => setIsPopupOpen((prev) => !prev)}
@@ -73,100 +584,114 @@ export default function List() {
                             )}
                         </button>
                         <div className="flex justify-start gap-5 items-end">
+                        <button
+                                    className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                    onClick={async () => {
+                                        if (isTrashed) {
+                                            setIsTrashed(false);
+                                            await fetchRto();
+                                        } else {
+                                            setIsTrashed(true);
+                                            await trashedRto();
+                                        }
+                                    }}
+                                >
+                                    {isTrashed ? "High Rto Listing (Simple)" : "Trashed High Rto"}
+                                </button>
                             <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/high-rto/create">Add New</Link></button>
                         </div>
                     </div>
                 </div>
-                <div className="overflow-x-auto w-full relative">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pincode<i></i></th>
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">District<i></i></th>
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">state<i></i></th>
-                                <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action<i></i></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentData.map((item) => (
-                                <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                    <td className="p-2 whitespace-nowrap px-5">
-                                        <div className="flex items-center">
-                                            <label className="flex items-center cursor-pointer me-2">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selected.includes(item.id)}
-                                                    onChange={() => handleCheckboxChange(item.id)}
-                                                    className="peer hidden"
-                                                />
-                                                <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                                           peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                                    <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                                </div>
-                                            </label>
-                                            {item.pincode}
-                                        </div>
+              {data.length > 0 ?(
+                  <div className="overflow-x-auto w-full relative">
+                  <table className="w-full" id="rto-table">
+                      <thead>
+                          <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">State</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">City</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pincode</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {data.map((item) => (
+                              <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                              <td className="px-6 py-4">
+                                            {
+                                                (() => {
+                                                const filtered = countryData.filter((c) => {
+                                                    const match = c.id === item.countryId;
+                                                    return match;
+                                                });
 
-                                    </td>
-                                    <td className="p-2 whitespace-nowrap px-5">{item.dist}<br /></td>
-                                    <td className="p-2 whitespace-nowrap px-5">{item.state}<br /></td>
-                                    <td className="p-2 px-5 text-[#8F9BBA] text-center">
 
-                                        <button className='p-2 px-3 rounded-md bg-orange-500 text-white'>
-                                            Edit
-                                        </button>
-                                        <button className='p-2 px-3 ms-2  rounded-md bg-red-500 text-white'>
-                                            Delete
-                                        </button>
+                                                const names = filtered.map((c) => {
+                                                    return c.name;
+                                                });
+                                                return names.join(', ');
+                                                })()
+                                            }
+                                            </td> 
+                                              <td className="px-6 py-4">
+                                            {
+                                                (() => {
+                                                const filtered = stateData.filter((c) => {
+                                                    const match = c.id === item.stateId;
+                                                    return match;
+                                                });
 
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
 
-                <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
-                    <div className="flex gap-1 items-center">
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1  items-center  text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            <MdKeyboardArrowLeft /> Previous
-                        </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentPage(index + 1)}
-                                className={`px-3 hidden md:block py-1 border-[#2B3674] text-[#2B3674] rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""
-                                    }`}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
-                        <button
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                            disabled={currentPage === totalPages}
-                            className="px-3 py-1 border-[#2B3674] flex gap-1 items-center text-[#2B3674] rounded mx-1 disabled:opacity-50"
-                        >
-                            Next <MdKeyboardArrowRight />
-                        </button>
-                    </div>
+                                                const names = filtered.map((c) => {
+                                                    return c.name;
+                                                });
+                                                return names.join(', ');
+                                                })()
+                                            }
+                                            </td> 
+                                            <td className="px-6 py-4">
+                                            {
+                                                (() => {
+                                                const filtered = cityData.filter((c) => {
+                                                    const match = c.id === item.cityId;
+                                                    return match;
+                                                });
 
-                    {/* Per Page Selection */}
-                    <select
-                        value={perPage}
-                        onChange={(e) => setPerPage(Number(e.target.value))}
-                        className="border-[#2B3674] bg-[#F8FBFF] text-[#2B3674] rounded px-3 py-2 font-semibold"
-                    >
-                        {[5, 10, 15].map((num) => (
-                            <option key={num} value={num}>
-                                {num} /Per Page
-                            </option>
-                        ))}
-                    </select>
-                </div>
+
+                                                const names = filtered.map((c) => {
+                                                    return c.name;
+                                                });
+                                                return names.join(', ');
+                                                })()
+                                            }
+                                            </td>  
+                                           
+                                  <td className="p-2 whitespace-nowrap px-5">{item.pincode}</td>
+                                  <td className="p-2 px-5 text-[#8F9BBA] text-center">
+
+                                    <div className="flex justify-end gap-2">{isTrashed ? (
+                                        <>
+                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
+                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                                        </>
+                                    )}</div>
+
+                                  </td>
+                              </tr>
+                          ))}
+                      </tbody>
+                  </table>
+              </div>
+              ):(
+                <p className="text-center">No Rto Found</p>
+              )}
+
+               
             </div>
 
 

@@ -249,3 +249,6 @@ table tr th:last-child {
 td:hover,th:hover{
   outline: none !important;
 }
+.css-hlgwow {
+  padding: 8px !important;
+}
