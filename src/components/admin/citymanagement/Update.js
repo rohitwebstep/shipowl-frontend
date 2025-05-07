@@ -19,11 +19,15 @@ export default function Update() {
             value: item.id || item._id,
             label: item.name,
           }));
-    const searchParams = useSearchParams();
-    const id = searchParams.get('id');
-    const [validationErrors, setValidationErrors] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+          const stateOptions = stateData?.map((item) => ({
+            value: item.id || item._id,
+            label: item.name,
+          }));
+        const searchParams = useSearchParams();
+        const id = searchParams.get('id');
+        const [validationErrors, setValidationErrors] = useState({});
+        const [loading, setLoading] = useState(false);
+        const [error, setError] = useState(null);
 
     const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
@@ -232,19 +236,17 @@ export default function Update() {
           </div>
           <div className="pt-2">
               <label className="font-bold block text-[#232323]">State</label>
-              <select
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-                className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-              >
-                <option value="">Select a state</option>
-                {stateData.map((item) => (
-                  <option key={item.id || item._id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
+                <Select
+                           name="stateId"
+                           value={stateOptions.find((option) => option.value === formData.stateId)}
+                           onChange={(selectedOption) =>
+                             handleChange({ target: { name: 'stateId', value: selectedOption?.value } })
+                           }
+                           options={stateOptions}
+                           placeholder="Select a State"
+                           className="mt-1"
+                           classNamePrefix="react-select"
+                         />
               {validationErrors.state && (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.country}</p>
               )}

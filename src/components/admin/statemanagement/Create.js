@@ -4,6 +4,7 @@ import { useEffect, useState,useCallback } from "react";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
+import Select from 'react-select';
 
 export default function Create() {
   const router = useRouter();
@@ -99,7 +100,11 @@ export default function Create() {
       }, [router, setCountryData]);
   useEffect(()=>{
     fetchcountry();
-  },[fetchcountry])
+  },[fetchcountry]);
+  const countryOptions = countryData.map((country) => ({
+    value: country.id,
+    label: country.name,
+  }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -216,7 +221,7 @@ export default function Create() {
                   value={formData[name]}
                   id={name}
                   onChange={handleChange}
-                  className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold ${
+                  className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 font-bold ${
                     validationErrors.type? "border-red-500" : "border-[#E0E5F2]"
                   }`}
                 />
@@ -228,22 +233,14 @@ export default function Create() {
 
             <div>
               <label className="block font-medium">Country</label>
-              <select
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-              >
-                {
-                  countryData.map((item)=>{
-                    return (
-
-                      <option key={item.id} value={item.id}>{item.name}</option>
-                    )
-
-                  })
-                }
-              </select>
+               <Select
+                   name="country"
+                   value={countryOptions.find(opt => opt.value === formData.country) || null}
+                   onChange={(selected) => handleChange({ target: { name: "country", value: selected?.value } })}
+                   options={countryOptions}
+                   placeholder="Select Country"
+                  
+                 />
             </div>
            
         </div>

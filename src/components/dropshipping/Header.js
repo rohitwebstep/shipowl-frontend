@@ -1,7 +1,7 @@
 'use client';
 import { Bell } from 'lucide-react';
 import { HiBars3CenterLeft } from "react-icons/hi2";
-
+import React ,{useState,useEffect} from 'react';
 import user from '@/app/assets/user.png';
 import Image from 'next/image';
 import { IoIosArrowDown } from "react-icons/io";
@@ -9,6 +9,16 @@ import { FaSignOutAlt } from 'react-icons/fa';
 import { useDropshipper } from './middleware/DropshipperMiddleWareContext';
 const Header = () => {
   const {verifyDropShipperAuth} = useDropshipper();
+    const [userName, setUserName] = useState('');
+    const [activePanel, setActivePanel] = useState('');
+  
+    useEffect(() => {
+      const data = JSON.parse(localStorage.getItem("shippingData"));
+      if (data) {
+        setUserName(data?.admin?.name || 'User');
+        setActivePanel(data?.project?.active_panel || 'Panel');
+      }
+    }, []);
   const logout=()=>{
     localStorage.removeItem('shippingData');
     verifyDropShipperAuth();
@@ -26,8 +36,8 @@ const Header = () => {
 
         <div className="flex items-center gap-2">
           <div className="hidden sm:block text-right">
-            <p className="text-sm font-medium">John Doe</p>
-            <p className="text-xs text-gray-500">Admin</p>
+            <p className="text-sm font-medium">{userName}</p>
+            <p className="text-xs text-gray-500">{activePanel}</p>
           </div>
           <div className="flex gap-2 items-center">
             <Image src={user} alt="User" className="w-8 h-8 rounded-full" />

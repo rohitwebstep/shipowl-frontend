@@ -9,6 +9,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import Select from 'react-select';
+
 const BusinessInfo = () => {
   const { formData, requiredFields,businessErrors,validateBusiness, setBusinessErrors,setFiles,setFormData,stateData,cityData, setCityData, setStateData, setActiveTab, countryData, fetchCountry } = useContext(ProfileContext);
   const router = useRouter();
@@ -232,7 +234,20 @@ const BusinessInfo = () => {
 
   const renderError = (field) =>
     businessErrors[field] && <p className="text-red-500 text-sm mt-1">{businessErrors[field]}</p>;
-
+  const countryOptions = countryData.map((country) => ({
+    value: country.id,
+    label: country.name,
+  }));
+  
+  const stateOptions = stateData?.map((state) => ({
+    value: state.id,
+    label: state.name,
+  }));
+  
+  const cityOptions = cityData?.map((city) => ({
+    value: city.id,
+    label: city.name,
+  }));
   return (
 <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 rounded-2xl">
   <div className="grid lg:grid-cols-3 py-5 gap-4">
@@ -301,63 +316,49 @@ const BusinessInfo = () => {
     </div>
 
     <div>
-      {renderLabel('Country', 'billingCountry')}
-      <select
-        name="billingCountry"
-        value={formData.billingCountry}
-        onChange={handleChange}
-        className={inputClasses('billingCountry')}
-      >
-        <option value="">Select Country</option>
-        {countryData.map((country) => (
-          <option key={country.id} value={country.id}>
-            {country.name}
-          </option>
-        ))}
-      </select>
-      {renderError('billingCountry')}
-    </div>
+         {renderLabel('Country', 'billingCountry')}
+         
+          <Select
+           name="billingCountry"
+           value={countryOptions.find(opt => opt.value === formData.billingCountry) || null}
+           onChange={(selected) => handleChange({ target: { name: "billingCountry", value: selected?.value } })}
+           options={countryOptions}
+           placeholder="Select Country"
+         />
+         {renderError('billingCountry')}
+       </div>
+   
+       <div>
+         {renderLabel('State', 'billingState')}
+         <Select
+           name="billingState"
+           value={stateOptions.find(opt => opt.value === formData.billingState) || null}
+           onChange={(selected) => handleChange({ target: { name: "billingState", value: selected?.value } })}
+           options={stateOptions}
+          
+           placeholder="Select State"
+         />
+         {renderError('billingState')}
+       </div>
 
-    <div>
-      {renderLabel('State', 'billingState')}
-      <select
-        name="billingState"
-        value={formData.billingState}
-        onChange={handleChange}
-        className={inputClasses('billingState')}
-      >
-        <option value="">Select State</option>
-        {stateData?.map((state) => (
-          <option key={state.id} value={state.id}>
-            {state.name}
-          </option>
-        ))}
-      </select>
-      {renderError('billingState')}
-    </div>
-
- 
+  
   </div>
 
   {/* Business Type, Client Entry Type */}
   <div className="grid lg:grid-cols-3 gap-4">
   <div>
-      {renderLabel('City', 'billingCity')}
-      <select
-        name="billingCity"
-        value={formData.billingCity}
-        onChange={handleChange}
-        className={inputClasses('billingCity')}
-      >
-        <option value="">Select City</option>
-        {cityData?.map((city) => (
-          <option key={city.id} value={city.id}>
-            {city.name}
-          </option>
-        ))}
-      </select>
-      {renderError('billingCity')}
-    </div>
+        {renderLabel('City', 'billingCity')}
+        
+        <Select
+          name="billingCity"
+          value={cityOptions.find(opt => opt.value === formData.billingCity) || null}
+          onChange={(selected) => handleChange({ target: { name: "billingCity", value: selected?.value } })}
+          options={cityOptions}
+         
+          placeholder="Select City"
+        />
+        {renderError('billingCity')}
+      </div>
     <div>
       {renderLabel('Business Type', 'businessType')}
       <select

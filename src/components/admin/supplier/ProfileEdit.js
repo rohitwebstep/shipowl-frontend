@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import { Pencil } from 'lucide-react';
+import Select from 'react-select';
 
 const ProfileEdit = () => {
   const router = useRouter();
@@ -164,17 +165,31 @@ const ProfileEdit = () => {
   const handleCancel = () => {
     setErrors({});
   };
+  const countryOptions = countryData.map((country) => ({
+    value: country.id,
+    label: country.name,
+  }));
+  
+  const stateOptions = stateData?.map((state) => ({
+    value: state.id,
+    label: state.name,
+  }));
+  
+  const cityOptions = cityData?.map((city) => ({
+    value: city.id,
+    label: city.name,
+  }));
 
   return (
     <div className='md:flex gap-4 xl:w-10/12 py-10 bg-white rounded-tl-none rounded-tr-none p-3 xl:p-10 rounded-2xl'>
       <div className='md:w-2/12'>
-        <div className="relative edit-img p-5 w-48 h-48">
+        <div className="relative">
           <Image
             src={previewUrl || profileImg}
             alt="Profile image"
             width={192}
             height={192}
-            className="w-full h-full object-cover rounded-full"
+            className="w-full h-full object-cover rounded-full p-3 "
           />
           <input
             type="file"
@@ -222,25 +237,20 @@ const ProfileEdit = () => {
             </div>
           ))}
 
-          {/* Country Select */}
-          <div className="relative">
+        {/* Country Select */}
+        <div className="relative">
             <label className={labelClasses('permanentCountry')}>
               Country <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <select
-                name="permanentCountry"
-                value={formData.permanentCountry || ''}
-                onChange={handleChange}
-                className={inputClasses('permanentCountry')}
-              >
-                <option value="">Select Country</option>
-                {countryData.map((country) => (
-                  <option key={country.id} value={country.id}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
+              <Select
+              name="permanentCountry"
+              value={countryOptions.find(opt => opt.value === formData.permanentCountry) || null}
+              onChange={(selected) => handleChange({ target: { name: "permanentCountry", value: selected?.value } })}
+              options={countryOptions}
+              placeholder="Select Country"
+
+           />
               {loading && (
                 <div className="absolute inset-y-0 right-3 flex items-center">
                   <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
@@ -258,19 +268,14 @@ const ProfileEdit = () => {
               State <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <select
-                name="permanentState"
-                value={formData.permanentState || ''}
-                onChange={handleChange}
-                className={inputClasses('permanentState')}
-              >
-                <option value="">Select State</option>
-                {stateData.map((state) => (
-                  <option key={state.id} value={state.id}>
-                    {state.name}
-                  </option>
-                ))}
-              </select>
+            <Select
+              name="permanentState"
+              value={stateOptions.find(opt => opt.value === formData.permanentState) || null}
+              onChange={(selected) => handleChange({ target: { name: "permanentState", value: selected?.value } })}
+              options={stateOptions}
+              placeholder="Select State"
+
+           />
               {loading && (
                 <div className="absolute inset-y-0 right-3 flex items-center">
                   <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
@@ -281,26 +286,21 @@ const ProfileEdit = () => {
               <p className="text-red-500 text-sm mt-1">{errors.permanentState}</p>
             )}
           </div>
-
+          </div>
           {/* City Select */}
           <div className="relative">
             <label className={labelClasses('permanentCity')}>
               City <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <select
-                name="permanentCity"
-                value={formData.permanentCity || ''}
-                onChange={handleChange}
-                className={inputClasses('permanentCity')}
-              >
-                <option value="">Select City</option>
-                {cityData.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
+            <Select
+              name="permanentCity"
+              value={cityOptions.find(opt => opt.value === formData.permanentCity) || null}
+              onChange={(selected) => handleChange({ target: { name: "permanentCity", value: selected?.value } })}
+              options={cityOptions}
+              placeholder="Select City"
+
+           />
               {loading && (
                 <div className="absolute inset-y-0 right-3 flex items-center">
                   <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
@@ -311,7 +311,7 @@ const ProfileEdit = () => {
               <p className="text-red-500 text-sm mt-1">{errors.permanentCity}</p>
             )}
           </div>
-        </div>
+       
 
         <div className="flex space-x-4 mt-6">
           <button

@@ -505,7 +505,7 @@ const Dropshipper = () => {
         ) : (
             <div className="bg-white rounded-3xl p-5">
                 <div className="flex flex-wrap justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-[#2B3674]">dropshipper List</h2>
+                    <h2 className="text-2xl font-bold text-[#2B3674]">Dropshipper List</h2>
                     <div className="flex gap-3 flex-wrap items-center">
                         <button
                             onClick={() => setIsPopupOpen((prev) => !prev)}

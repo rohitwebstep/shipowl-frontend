@@ -4,9 +4,7 @@ import { useRouter} from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
 import React, { useState, useCallback, useEffect } from "react";
-import { MoreHorizontal } from "lucide-react";
-import { FaCheck } from "react-icons/fa";
-import { MdModeEdit } from "react-icons/md";
+
 import { useDropshipper } from '../middleware/DropshipperMiddleWareContext';
 const ProfileList = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);

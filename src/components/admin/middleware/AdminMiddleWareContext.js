@@ -17,6 +17,7 @@ export default function AdminMiddleWareProvider({ children }) {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const [openSubMenus, setOpenSubMenus] = useState({});
 
 
     const verifyAdminAuth = useCallback(async () => {
@@ -66,7 +67,7 @@ export default function AdminMiddleWareProvider({ children }) {
 
 
     return (
-        <AdminMiddleWareContext.Provider value={{ adminApiLoading, verifyAdminAuth, error, loading }}>
+        <AdminMiddleWareContext.Provider value={{openSubMenus, setOpenSubMenus, adminApiLoading, verifyAdminAuth, error, loading }}>
             {children}
         </AdminMiddleWareContext.Provider>
     );

@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import { DropshipperProfileContext } from './DropshipperProfileContext';
 import { ProfileContext } from '../supplier/ProfileContext';
+import Select from 'react-select';
+
 const AccountDetails = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -155,6 +157,21 @@ const AccountDetails = () => {
         setErrorsAddress({});
     };
 
+
+
+    const countryOptions = countryData.map((country) => ({
+      value: country.id,
+      label: country.name,
+    }));
+    
+    const stateOptions = stateData.map((state) => ({
+      value: state.id,
+      label: state.name,
+    }));
+    const cityOptions = cityData.map((city) => ({
+      value: city.id,
+      label: city.name,
+    }));
     return (
         <div className=' py-10 bg-white rounded-tl-none rounded-tr-none p-3 xl:p-10 rounded-2xl'>
            
@@ -183,76 +200,70 @@ const AccountDetails = () => {
       </div>
     ))}
 
-    {/* Country Select */}
-    <div>
-      <label className={labelClasses('permanentCountry')}>
-        Country <span className="text-red-500">*</span>
-      </label>
-      <select
-        name="permanentCountry"
-        value={formData.permanentCountry || ''}
-        onChange={handleChange}
-        className={inputClasses('permanentCountry')}
-      >
-        <option value="">Select Country</option>
-        {countryData.map((country) => (
-          <option key={country.id} value={country.id}>
-            {country.name}
-          </option>
-        ))}
-      </select>
-      {errorsAddress.permanentCountry && (
-        <p className="text-red-500 text-sm mt-1">{errorsAddress.permanentCountry}</p>
-      )}
-    </div>
+<div>
+  <label className={labelClasses('permanentCountry')}>
+    Country <span className="text-red-500">*</span>
+  </label>
+  <Select
+    name="permanentCountry"
+    options={countryOptions}
+    value={countryOptions.find((c) => c.value === formData.permanentCountry) || null}
+    onChange={(selected) => {
+      handleChange({ target: { name: 'permanentCountry', value: selected?.value } });
+    }}
+    classNamePrefix="react-select"
+    className="react-select-container"
+    isSearchable
+    placeholder="Select Country"
+  />
+  {errorsAddress.permanentCountry && (
+    <p className="text-red-500 text-sm mt-1">{errorsAddress.permanentCountry}</p>
+  )}
+</div>
 
-    {/* State Select */}
-    <div>
-      <label className={labelClasses('permanentState')}>
-        State <span className="text-red-500">*</span>
-      </label>
-      <select
-        name="permanentState"
-        value={formData.permanentState || ''}
-        onChange={handleChange}
-        className={inputClasses('permanentState')}
-      >
-        <option value="">Select State</option>
-        {stateData.map((state) => (
-          <option key={state.id} value={state.id}>
-            {state.name}
-          </option>
-        ))}
-      </select>
-      {errorsAddress.permanentState && (
-        <p className="text-red-500 text-sm mt-1">{errorsAddress.permanentState}</p>
-      )}
-    </div>
+<div>
+  <label className={labelClasses('permanentState')}>
+    State <span className="text-red-500">*</span>
+  </label>
+  <Select
+    name="permanentState"
+    options={stateOptions}
+    value={stateOptions.find((s) => s.value === formData.permanentState) || null}
+    onChange={(selected) => {
+      handleChange({ target: { name: 'permanentState', value: selected?.value } });
+    }}
+    classNamePrefix="react-select"
+    className="react-select-container"
+    isSearchable
+    placeholder="Select State"
+  />
+  {errorsAddress.permanentState && (
+    <p className="text-red-500 text-sm mt-1">{errorsAddress.permanentState}</p>
+  )}
+</div>
 
-    {/* City Select */}
    
   </div>
   <div>
-      <label className={labelClasses('permanentCity')}>
-        City <span className="text-red-500">*</span>
-      </label>
-      <select
-        name="permanentCity"
-        value={formData.permanentCity || ''}
-        onChange={handleChange}
-        className={inputClasses('permanentCity')}
-      >
-        <option value="">Select City</option>
-        {cityData.map((city) => (
-          <option key={city.id} value={city.id}>
-            {city.name}
-          </option>
-        ))}
-      </select>
-      {errorsAddress.permanentCity && (
-        <p className="text-red-500 text-sm mt-1">{errorsAddress.permanentCity}</p>
-      )}
-    </div>
+  <label className={labelClasses('permanentCity')}>
+    City <span className="text-red-500">*</span>
+  </label>
+  <Select
+    name="permanentCity"
+    options={cityOptions}
+    value={cityOptions.find((c) => c.value === formData.permanentCity) || null}
+    onChange={(selected) =>
+      handleChange({ target: { name: 'permanentCity', value: selected?.value } })
+    }
+    classNamePrefix="react-select"
+    className="react-select-container"
+    isSearchable
+    placeholder="Select City"
+  />
+  {errorsAddress.permanentCity && (
+    <p className="text-red-500 text-sm mt-1">{errorsAddress.permanentCity}</p>
+  )}
+</div>
   {/* Buttons */}
   <div className="flex space-x-4 mt-6">
     <button

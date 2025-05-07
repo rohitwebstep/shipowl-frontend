@@ -20,13 +20,14 @@ function LayoutWrapperInner({ children }) {
   return (
     <div className="main">
       <div className="container">
+      <AdminMiddleWareProvider>
+
         <div className="lg:flex">
           {!isAuthPage && (
             <div className="xl:w-[18.5%] lg:w-[27%] w-full p-2 leftbar">
               <Sidebar />
             </div>
           )}
-        <AdminMiddleWareProvider>
 
           <div className={`px-3 mt-20 lg:mt-0 main-outlet lg-px-0 ${isAuthPage ? "w-full" : "xl:w-[81.5%] lg:w-[73%]"}`}>
             {!isAuthPage && <Header />}
@@ -40,9 +41,9 @@ function LayoutWrapperInner({ children }) {
                 </ProfileProvider>
             </div>
           </div>
-          </AdminMiddleWareProvider>
 
         </div>
+          </AdminMiddleWareProvider>
       </div>
     </div>
   );

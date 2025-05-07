@@ -5,7 +5,7 @@ import Image from "next/image";
 import userImage from "@/app/images/userimage.png";
 import { FaSignOutAlt } from "react-icons/fa";
 import { useSupplier } from "./middleware/SupplierMiddleWareContext";
-
+import React,{useState,useEffect} from "react";
 export default function Header() {
   const pathname = usePathname(); 
   const {verifySupplierAuth} = useSupplier();
@@ -33,6 +33,17 @@ export default function Header() {
   };
 
   const currentPage = pageTitles[pathname] || "Dashboard";
+
+   const [userName, setUserName] = useState('');
+      const [activePanel, setActivePanel] = useState('');
+    
+      useEffect(() => {
+        const data = JSON.parse(localStorage.getItem("shippingData"));
+        if (data) {
+          setUserName(data?.admin?.name || 'User');
+          setActivePanel(data?.project?.active_panel || 'Panel');
+        }
+      }, []);
 const logout=()=>{
   localStorage.removeItem('shippingData');
   verifySupplierAuth();

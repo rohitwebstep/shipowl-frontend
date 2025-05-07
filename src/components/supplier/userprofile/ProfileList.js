@@ -208,13 +208,13 @@ const ProfileList = () => {
               </div>
               <h3 className="text-2xl font-semibold text-[#2B3674] my-4">Company Details</h3>
               <div className="space-y-2 text-[#2B3674]">
-                <p><strong>Company Name:</strong> {suppliers.companyDetail.companyName || 'N/A'}</p>
-                <p><strong>Company PanNumber:</strong> {suppliers.companyDetail.companyPanNumber || 'N/A'}</p>
-                <p><strong>Brand Name:</strong> {suppliers.companyDetail.brandName || 'N/A'}</p>
-                <p><strong>Brand Short Name:</strong> {suppliers.companyDetail.brandShortName || 'N/A'}</p>
-                <p><strong>Billing Address:</strong> {suppliers.companyDetail.billingAddress || 'N/A'}</p>
-                <p><strong>Billing Pincode:</strong> {suppliers.companyDetail.billingPincode || 'N/A'}</p>
-                <p><strong>AadharCardHolderName:</strong> {suppliers.companyDetail.aadharCardHolderName || 'N/A'}</p>
+                <p><strong>Company Name:</strong> {suppliers?.companyDetail?.companyName || 'N/A'}</p>
+                <p><strong>Company PanNumber:</strong> {suppliers?.companyDetail?.companyPanNumber || 'N/A'}</p>
+                <p><strong>Brand Name:</strong> {suppliers?.companyDetail?.brandName || 'N/A'}</p>
+                <p><strong>Brand Short Name:</strong> {suppliers?.companyDetail?.brandShortName || 'N/A'}</p>
+                <p><strong>Billing Address:</strong> {suppliers?.companyDetail?.billingAddress || 'N/A'}</p>
+                <p><strong>Billing Pincode:</strong> {suppliers?.companyDetail?.billingPincode || 'N/A'}</p>
+                <p><strong>AadharCardHolderName:</strong> {suppliers?.companyDetail?.aadharCardHolderName || 'N/A'}</p>
                 
               </div>
               <div className="mt-4 text-right">

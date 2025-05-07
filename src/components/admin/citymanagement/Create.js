@@ -35,10 +35,7 @@ export default function Create() {
     }
   };
 
-  const countryOptions = countryData.map((item) => ({
-    value: item.id || item._id,
-    label: item.name,
-  }));
+ 
   const validate = () => {
 
     const newErrors = {};
@@ -254,6 +251,15 @@ const fetchStateList = useCallback(async (id) => {
     useEffect(()=>{
       fetchState();
     },[fetchState])
+
+    const countryOptions = countryData.map((country) => ({
+      value: country.id,
+      label: country.name,
+    }));
+    const stateOptions = stateData.map((state) => ({
+      value: state.id,
+      label: state.name,
+    }));
           return (
             <div className="p-6 lg:w-10/12 space-y-6">
               <h2 className="text-2xl font-semibold">City Management</h2>
@@ -277,21 +283,19 @@ const fetchStateList = useCallback(async (id) => {
           </div>
           <div className="pt-2">
               <label className="font-bold block text-[#232323]">State</label>
-              <select
-                name="stateId"
-                value={formData.stateId}
-                onChange={handleChange}
-                className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-              >
-                <option value="">Select a state</option>
-                {stateData.map((item) => (
-                  <option key={item.id || item._id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
+              <Select
+              name="stateId"
+              value={stateOptions.find((option) => option.value === formData.stateId)}
+              onChange={(selectedOption) =>
+                handleChange({ target: { name: 'stateId', value: selectedOption?.value } })
+              }
+              options={stateOptions}
+              placeholder="Select a State"
+              className="mt-1"
+              classNamePrefix="react-select"
+            />
               {errors.stateId && (
-                <p className="text-red-500 text-sm mt-1">{errors.countryId}</p>
+                <p className="text-red-500 text-sm mt-1">{errors.stateId}</p>
               )}
             </div>
           <div className="pt-2">

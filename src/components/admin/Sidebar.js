@@ -11,11 +11,12 @@ import {
 import logo from "@/app/images/Shipowllogo.png";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { SiGoogletagmanager } from "react-icons/si";
+import { useAdmin } from "./middleware/AdminMiddleWareContext";
 
 export default function Sidebar() {
+  const{openSubMenus, setOpenSubMenus} = useAdmin();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [openSubMenus, setOpenSubMenus] = useState({});
 
   const toggleSubMenu = (name) => {
     setOpenSubMenus((prev) => ({
@@ -174,15 +175,18 @@ export default function Sidebar() {
                         <span className="font-medium">{item.name}</span>
                       </div>
                       {item.subMenu && (
-                        <span className="font-medium">
+                        <span className="font-medium transform transition-transform duration-300">
                           {openSubMenus[item.name] ? "−" : "+"}
                         </span>
                       )}
                     </button>
 
-                    {/* Submenus */}
-                    {item.subMenu && openSubMenus[item.name] && (
-                      <ul className="px-4 mt-1 space-y-2">
+                    {/* Submenu */}
+                    {item.subMenu && (
+                      <ul
+                        className={`px-4 mt-1 space-y-2 overflow-hidden transform transition-all duration-500 ease-in-out
+                          ${openSubMenus[item.name] ? "max-h-[1000px] translate-x-0" : "max-h-0 translate-x-[-10px] opacity-0"}`}
+                      >
                         {item.subMenu.map((subItem) => (
                           <li key={subItem.name}>
                             <Link href={subItem.href}>

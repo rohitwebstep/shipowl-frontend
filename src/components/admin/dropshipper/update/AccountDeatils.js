@@ -55,13 +55,12 @@ const AccountDetails = () => {
     return (
         <div className='md:flex gap-4 xl:w-10/12 py-10 bg-white rounded-tl-none rounded-tr-none p-3 xl:p-10 rounded-2xl'>
             <div className='md:w-2/12'>
-            <div className="relative edit-img p-5 w-48 h-48">
-            <Image
+              <div className="relative">
+          <Image
   src={previewUrl || profileImg}
   alt="Profile image"
-  width={192}
-  height={192}
-  className="w-full h-full object-cover rounded-full"
+ 
+  className="w-full h-full object-cover rounded-full p-3"
 />
 
 

@@ -61,86 +61,81 @@ const AccountDetails = () => {
     return (
         <div className='md:flex gap-4 xl:w-10/12 py-10 bg-white rounded-tl-none rounded-tr-none p-3 xl:p-10 rounded-2xl'>
             <div className='md:w-2/12'>
-            <div className="relative edit-img p-5 w-48 h-48">
-            <Image
-  src={previewUrl || profileImg}
-  alt="Profile image"
-  width={192}
-  height={192}
-  className="w-full h-full object-cover rounded-full"
-/>
+              <div className="relative">
+          <Image
+            src={previewUrl || profileImg}
+            alt="Profile image"
+            className="w-full h-full object-cover rounded-full p-3 "
+          />
 
+          <input
+          type="file"
+          id="upload"
+          name="profilePicture"
+          accept="image/*"
+          onChange={handleChange}
+          className="hidden"
+          />
 
-  {/* Hidden input */}
-  <input
-    type="file"
-    id="upload"
-    name="profilePicture"
-    accept="image/*"
-    onChange={handleChange}
-    className="hidden"
-  />
-
-  {/* Edit Icon */}
-  <label
-    htmlFor="upload"
-    className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow cursor-pointer"
-  >
-    <Pencil size={18} className="text-gray-600" />
-  </label>
-</div>
+          {/* Edit Icon */}
+          <label
+            htmlFor="upload"
+            className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow cursor-pointer"
+          >
+            <Pencil size={18} className="text-gray-600" />
+          </label>
+        </div>
 
             </div>
 
             <div className="md:w-10/12">
-  <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
-    {/* Basic Inputs */}
-    {[
-      { label: 'Name', name: 'name', type: 'text' },
-      { label: 'Mobile Number', name: 'phoneNumber', type: 'number' },
-      { label: 'Email', name: 'email', type: 'email' },
-      { label: 'Password', name: 'password', type: 'password' },
-      { label: 'Website URL', name: 'website', type: 'text' },
-      { label: 'Referral Code', name: 'referralCode', type: 'text' },
-    ].map(({ label, name, type }) => (
-      <div key={name}>
-        <label className={labelClasses(name)}>
-          {label} <span className="text-red-500">*</span>
-        </label>
-        <input
-          type={type}
-          name={name}
-          value={formData[name] || ''}
-          onChange={handleChange}
-          className={inputClasses(name)}
-        />
-        {errors[name] && (
-          <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
-        )}
-      </div>
-    ))}
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
+            {/* Basic Inputs */}
+            {[
+              { label: 'Name', name: 'name', type: 'text' },
+              { label: 'Mobile Number', name: 'phoneNumber', type: 'number' },
+              { label: 'Email', name: 'email', type: 'email' },
+              { label: 'Password', name: 'password', type: 'password' },
+              { label: 'Website URL', name: 'website', type: 'text' },
+              { label: 'Referral Code', name: 'referralCode', type: 'text' },
+            ].map(({ label, name, type }) => (
+              <div key={name}>
+                <label className={labelClasses(name)}>
+                  {label} <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type={type}
+                  name={name}
+                  value={formData[name] || ''}
+                  onChange={handleChange}
+                  className={inputClasses(name)}
+                />
+                {errors[name] && (
+                  <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
+                )}
+              </div>
+            ))}
 
-  
-  </div>
+          
+          </div>
  
-  {/* Buttons */}
-  <div className="flex space-x-4 mt-6">
-    <button
-      type="button"
-      onClick={handleSubmit}
-      className="px-4 py-2 bg-orange-500 text-white rounded-lg"
-    >
-      Next
-    </button>
-    <button
-      type="button"
-      onClick={handleCancel}
-      className="px-4 py-2 bg-gray-400 text-white rounded-lg"
-    >
-      Cancel
-    </button>
-  </div>
-</div>
+          <div className="flex space-x-4 mt-6">
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="px-4 py-2 bg-orange-500 text-white rounded-lg"
+            >
+              Next
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
 
         </div>
     );

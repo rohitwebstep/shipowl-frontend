@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import { useRouter, useSearchParams } from "next/navigation";
 import { HashLoader } from "react-spinners";
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
+import Select from 'react-select';
 
 export default function Update() {
   const [formData, setFormData] = useState({
@@ -26,6 +27,10 @@ export default function Update() {
   useEffect(() => {
     verifyAdminAuth();
   }, [verifyAdminAuth]);
+  const countryOptions = countryData.map((country) => ({
+    value: country.id,
+    label: country.name,
+  }));
 
   const validate = () => {
     const errors = {};
@@ -251,7 +256,7 @@ export default function Update() {
                 onChange={handleChange}
                 value={formData.name}
                 name="name"
-                className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold"
+                className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3  font-bold"
               />
               {validationErrors.name && (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
@@ -264,7 +269,7 @@ export default function Update() {
                 onChange={handleChange}
                 value={formData.iso2}
                 name="iso2"
-                className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold"
+                className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 font-bold"
               />
               {validationErrors.iso2 && (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.iso2}</p>
@@ -272,19 +277,14 @@ export default function Update() {
             </div>
             <div>
               <label className="font-bold block text-[#232323]">Country</label>
-              <select
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                className="border w-full border-[#DFEAF2] rounded-md p-3 mt-1"
-              >
-                <option value="">Select a country</option>
-                {countryData.map((item) => (
-                  <option key={item.id || item._id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
+              <Select
+                   name="country"
+                   value={countryOptions.find(opt => opt.value === formData.country) || null}
+                   onChange={(selected) => handleChange({ target: { name: "country", value: selected?.value } })}
+                   options={countryOptions}
+                   placeholder="Select Country"
+                  
+                 />
               {validationErrors.country && (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.country}</p>
               )}
@@ -296,7 +296,7 @@ export default function Update() {
                 onChange={handleChange}
                 value={formData.type}
                 name="type"
-                className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold"
+                className="text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3  font-bold"
               />
               {validationErrors.type && (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.type}</p>
