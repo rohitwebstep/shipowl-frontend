@@ -22,7 +22,7 @@ import Logo from "@/app/assets/Shipowl-logo1.png";
 import { HiBars3CenterLeft } from "react-icons/hi2";
 
 const menuItems = [
-  { name: "Home (In progress) (In progress)", icon: Home, href: "/dropshipping", section: "MENU" },
+  { name: "Home (In progress)", icon: Home, href: "/dropshipping", section: "MENU" },
   {
     name: "Manage Orders",
     icon: ShoppingCart,
@@ -35,9 +35,9 @@ const menuItems = [
   },
   { name: "Manage Products (In progress)", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },
   { name: "Profile", icon: Package, href: "/dropshipping/profile", section: "MENU" },
-  { name: "Source a Product (In progress)", icon: Gift, href: "/dropshipping/product/source/create", section: "MENU" },
+  { name: "Source a Product", icon: Gift, href: "/dropshipping/product/source", section: "MENU" },
   { name: "Reports (In progress)", icon: BarChart, href: "/dropshipping/report", section: "MENU" },
-  { name: "Payments (In progress)", icon: CreditCard, href: "/dropshipping/payments", section: "MENU" },
+  { name: "Payments", icon: CreditCard, href: "/dropshipping/payments", section: "MENU" },
   { name: "Manage NDR (In progress)", icon: FileText, href: "/dropshipping/manage-ndr", section: "MENU" },
   { name: "High RTO Pincode (In progress)", icon: MapPin, href: "/dropshipping/high-rto-pincode", section: "OTHERS" },
   { name: "Boosters (In progress)", icon: Volume2, href: "/dropshipping/boosters", section: "OTHERS" },

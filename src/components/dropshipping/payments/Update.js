@@ -1,13 +1,12 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState ,useCallback} from "react";
+import { useRouter ,useSearchParams} from "next/navigation";
 import { useDropshipper } from "../middleware/DropshipperMiddleWareContext";
 import Swal from "sweetalert2";
 import { HashLoader } from "react-spinners";
-export default function Create() {
+export default function Update() {
     const router = useRouter();
-        const [loading, setLoading] = useState(false);
-    
+    const [loading,setLoading] = useState(false);
     const [formData, setFormData] = useState({
         date: "",
         transactionId: "",
@@ -16,7 +15,8 @@ export default function Create() {
         status: "",
     });
     const { verifyDropShipperAuth } = useDropshipper();
-
+  const searchParams = useSearchParams();
+  const id = searchParams.get('id');
     useEffect(()=>{
         verifyDropShipperAuth();
     },[verifyDropShipperAuth]);
@@ -38,13 +38,7 @@ export default function Create() {
         if (!formData.status) errors.status = "Status is required.";
         return errors;
     };
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-[80vh]">
-                <HashLoader size={60} color="#F97316" loading={true} />
-            </div>
-        );
-    }
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -66,7 +60,7 @@ export default function Create() {
     }
 
     try {
-      Swal.fire({ title: "Creating Payments...", allowOutsideClick: false, didOpen: Swal.showLoading });
+      Swal.fire({ title: "Updating Payments...", allowOutsideClick: false, didOpen: Swal.showLoading });
       const formdata = new FormData();
       formdata.append("date", formData.date);
       formdata.append("transactionId", formData.transactionId);
@@ -74,17 +68,17 @@ export default function Create() {
       formdata.append("amount", formData.amount);
       formdata.append("status", formData.status);
 
-      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/payment", {
-        method: "POST",
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/payment/${id}`, {
+        method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
       });
 
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.message || result.error|| "Creation failed");
+      if (!res.ok) throw new Error(result.message || "Creation failed");
 
-      Swal.fire("Payment Created", " Payment has been created successfully!", "success").then(() => {
+      Swal.fire("Payment Updated", " Payment has been Updated successfully!", "success").then(() => {
         setFormData({state: "", country: "", city: "", pincode: "" });
         router.push("/dropshipping/payments");
       });
@@ -99,7 +93,70 @@ export default function Create() {
     const errorStyle = "border-red-500";
     const labelStyle = "block font-medium";
     const errorTextStyle = "text-red-500 text-sm mt-1";
+  const fetchPayments = useCallback(async () => {
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
+    if (dropshipperData?.project?.active_panel !== "dropshipper") {
+        localStorage.removeItem("shippingData");
+        router.push("/dropshipping/auth/login");
+        return;
+    }
+
+    const dropshippertoken = dropshipperData?.security?.token;
+    if (!dropshippertoken) {
+        router.push("/dropshipping/auth/login");
+        return;
+    }
+
+    try {
+        setLoading(true);
+        const response = await fetch(
+            `https://sleeping-owl-we0m.onrender.com/api/payment/${id}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${dropshippertoken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            const errorMessage = await response.json();
+            Swal.fire({
+                icon: "error",
+                title: "Something Wrong!",
+                text: errorMessage.message || "Your session has expired. Please log in again.",
+            });
+            throw new Error(errorMessage.message);
+        }
+
+        const result = await response.json();
+        const payments = result?.payment || {};
+      
+        setFormData({
+            date: payments.date ? payments.date.slice(0, 10) : "",
+            transactionId: payments.transactionId || "",
+            cycle: payments.cycle || "",
+            amount: payments.amount || "",
+            status: payments.status || "",
+          });
+    } catch (error) {
+        console.error("Error fetching Company:", error);
+    } finally {
+        setLoading(false);
+    }
+}, [router, id]);
+ useEffect(()=>{
+    fetchPayments();
+ },[fetchPayments])
+ if (loading) {
+    return (
+        <div className="flex items-center justify-center h-[80vh]">
+            <HashLoader size={60} color="#F97316" loading={true} />
+        </div>
+    );
+}
     return (
         <div className="bg-white lg:w-9/12 mt-10 rounded-2xl p-8 shadow-md">
             <h2 className="text-2xl font-bold text-[#2B3674] mb-6">Create Payment</h2>

@@ -390,8 +390,8 @@ export default function ProductList() {
 
         <button className="bg-[#3965FF] text-white lg:px-8 p-4 py-2 rounded-md">Import</button>
 
-        <Link href="/dropshipping/source/product/create">
-          <button className="bg-[#F98F5C] text-white lg:px-8 p-4 py-2 rounded-md">Add New</button>
+        <Link href="/dropshipping/product/source/create">
+          <button className="bg-[#F98F5C] text-white lg:px-8 p-4 py-3 rounded-md">Add New</button>
         </Link>
       </div>
 

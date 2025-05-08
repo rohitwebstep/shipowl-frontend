@@ -1,57 +1,412 @@
 "use client";
-import { useState } from "react";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import {useEffect, useCallback, useState } from "react";
+import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { FaCheck } from "react-icons/fa";
+import { AiOutlineDelete } from "react-icons/ai";
+import HashLoader from "react-spinners/HashLoader";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import { FaCheck } from "react-icons/fa"; // FontAwesome Check icon
+import 'datatables.net-dt/css/dataTables.dataTables.css';
+import { useDropshipper } from "../middleware/DropshipperMiddleWareContext";
 
-export default function Payment() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(5);
-  const [selected, setSelected] = useState([]);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+export default function Payments() {
+    const [isTrashed, setIsTrashed] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState([]);
+    const { verifyDropShipperAuth } = useDropshipper();
+    const router = useRouter();
+       const [selected, setSelected] = useState([]);
+    
+        const handleCheckboxChange = (id) => {
+            setSelected((prev) =>
+                prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+            );
+        };
+    const fetchPayments = useCallback(async () => {
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    
+        if (dropshipperData?.project?.active_panel !== "dropshipper") {
+            localStorage.removeItem("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+    
+        const dropshippertoken = dropshipperData?.security?.token;
+        if (!dropshippertoken) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+    
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/payment`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${dropshippertoken}`,
+                    },
+                }
+            );
+    
+            const result = await response.json();
+    
+            if (!response.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                });
+                throw new Error(result.message || result.error || "Something Wrong!");
+            }
+    
+            setData(result?.payments || []);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
+    
+    const trashedPayments = useCallback(async () => {
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
-  const payments = [
-    {
-      id: "PAY12345",
-      date: "2025-04-01",
-      day: "Monday",
-      transaction_id: "TXN001001",
-      payment_cycle: "Weekly",
-      amount: 2999,
-      status: "Success",
-    },
-    {
-      id: "PAY12346",
-      date: "2025-04-02",
-      day: "Tuesday",
-      transaction_id: "TXN001002",
-      payment_cycle: "Weekly",
-      amount: 4199,
-      status: "Pending",
-    },
-    {
-      id: "PAY12347",
-      date: "2025-04-03",
-      day: "Wednesday",
-      transaction_id: "TXN001003",
-      payment_cycle: "Monthly",
-      amount: 5999,
-      status: "Failed",
-    },
-  ];
+        if (dropshipperData?.project?.active_panel !== "dropshipper") {
+            localStorage.removeItem("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
+        }
 
-  const handleCheckboxChange = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
+        const dropshippertoken = dropshipperData?.security?.token;
+        if (!dropshippertoken) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
 
-  const totalPages = Math.ceil(payments.length / perPage);
-  const indexOfLast = currentPage * perPage;
-  const indexOfFirst = indexOfLast - perPage;
-  const currentData = payments.slice(indexOfFirst, indexOfLast);
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/payment/trashed`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${dropshippertoken}`,
+                    },
+                }
+            );
 
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text:
+                        errorMessage.error ||
+                        errorMessage.message ||
+                        "Your session has expired. Please log in again.",
+                });
+                throw new Error(
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
+                );
+            }
+
+            const result = await response.json();
+            if (result) {
+                setData(result?.payments || []);
+            }
+        } catch (error) {
+            console.error("Error fetching trashed Payments:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, setData]);
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsTrashed(false);
+            setLoading(true);
+            await verifyDropShipperAuth();
+            await fetchPayments();
+            setLoading(false);
+        };
+        fetchData();
+    }, [fetchPayments, verifyDropShipperAuth]);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && data.length > 0 && !loading) {
+            let table = null;
+
+            Promise.all([
+                import('jquery'),
+                import('datatables.net'),
+                import('datatables.net-dt'),
+                import('datatables.net-buttons'),
+                import('datatables.net-buttons-dt')
+            ]).then(([jQuery]) => {
+                window.jQuery = window.$ = jQuery.default;
+
+                // Destroy existing DataTable if it exists
+                if ($.fn.DataTable.isDataTable('#payments')) {
+                    $('#payments').DataTable().destroy();
+                    $('#payments').empty();
+                }
+
+                // Reinitialize DataTable with new data
+                table = $('#payments').DataTable();
+
+                return () => {
+                    if (table) {
+                        table.destroy();
+                        $('#payments').empty();
+                    }
+                };
+            }).catch((error) => {
+                console.error('Failed to load DataTables dependencies:', error);
+            });
+        }
+    }, [data, loading]);
+
+    const handleEditItem = (item) => {
+        router.push(`/dropshipping/payments/update?id=${item.id}`);
+    };
+
+
+    const handleDelete = async (item) => {
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+        if (dropshipperData?.project?.active_panel !== "dropshipper") {
+            localStorage.removeItem("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const dropshippertoken = dropshipperData?.security?.token;
+        if (!dropshippertoken) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const confirmResult = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        try {
+            Swal.fire({
+                title: "Deleting...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            setLoading(true);
+
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/payment/${item.id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${dropshippertoken}`,
+                    },
+                }
+            );
+
+            Swal.close();
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
+                });
+                setLoading(false);
+                return;
+            }
+
+            const result = await response.json();
+
+            Swal.fire({
+                icon: "success",
+                title: "Trash!",
+                text: result.message || `${item.name} has been Trashed successfully.`,
+            });
+
+            await fetchPayments();
+        } catch (error) {
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handleRestore = useCallback(async (item) => {
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (dropshipperData?.project?.active_panel !== "dropshipper") {
+            localStorage.removeItem("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const dropshippertoken = dropshipperData?.security?.token;
+        if (!dropshippertoken) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/payment/${item?.id}/restore`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${dropshippertoken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text:
+                        errorMessage.error ||
+                        errorMessage.message ||
+                        "Your session has expired. Please log in again.",
+                });
+                throw new Error(
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
+                );
+            }
+
+            const result = await response.json();
+            if (result.status) {
+                Swal.fire({
+                    icon: "success",
+                    title: `Payment Has Been Restored Successfully !`,
+                    text: result.message,
+                });
+                await trashedPayments();
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, trashedPayments]);
+
+    const handlePermanentDelete = async (item) => {
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+        if (dropshipperData?.project?.active_panel !== "dropshipper") {
+            localStorage.removeItem("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const dropshippertoken = dropshipperData?.security?.token;
+        if (!dropshippertoken) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const confirmResult = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+        });
+
+        if (!confirmResult.isConfirmed) return;
+
+        try {
+            Swal.fire({
+                title: "Deleting...",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            setLoading(true);
+
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/payment/${item.id}/destroy`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${dropshippertoken}`,
+                    },
+                }
+            );
+
+            Swal.close();
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
+                });
+                setLoading(false);
+                return;
+            }
+
+            const result = await response.json();
+
+            Swal.fire({
+                icon: "success",
+                title: "Deleted!",
+                text: result.message || `${item.name} has been deleted successfully.`,
+            });
+
+            await trashedPayments();
+        } catch (error) {
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+  if (loading) {
+          return (
+              <div className="flex items-center justify-center h-[80vh]">
+                  <HashLoader size={60} color="#F97316" loading={true} />
+              </div>
+          );
+      }
+
+         
   return (
     <div className="bg-white lg:w-8/12 rounded-3xl p-5">
       <div className="flex flex-wrap justify-between items-center mb-4">
@@ -72,27 +427,43 @@ export default function Payment() {
               </div>
             )}
           </button>
+          <button
+          className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+          onClick={async () => {
+              if (isTrashed) {
+                  setIsTrashed(false);
+                  await fetchPayments();
+              } else {
+                  setIsTrashed(true);
+                  await trashedPayments();
+
+              }
+          }}
+      >
+          {isTrashed ? "Payments Listing (Simple)" : "Trashed Payments"}
+      </button>
           <Link href="/dropshipping/payments/create">
             <button className="bg-[#4285F4] text-white rounded-md p-3 px-8">Add New</button>
           </Link>
         </div>
       </div>
-
-      <div className="overflow-x-auto w-full relative">
-        <table className="w-full">
+{
+    data.length > 0 ? (
+        <div className="overflow-x-auto w-full relative">
+        <table className="w-full" id="payments">
           <thead>
             <tr className="border-b text-[#A3AED0] border-[#E9EDF7] text-sm">
-              <th className="p-2 px-5 uppercase text-left">#<i></i></th>
-              <th className="p-2 px-5 uppercase text-left">Date<i></i></th>
-              <th className="p-2 px-5 uppercase text-left">Transaction ID<i></i></th>
-              <th className="p-2 px-5 uppercase text-left">Cycle<i></i></th>
-              <th className="p-2 px-5 uppercase text-right">Amount<i></i></th>
-              <th className="p-2 px-5 uppercase text-center">Status<i></i></th>
-              <th className="p-2 px-5 uppercase text-center">Actions<i></i></th>
+              <th className="p-2 px-5 uppercase text-left">#</th>
+              <th className="p-2 px-5 uppercase text-left">Date</th>
+              <th className="p-2 px-5 uppercase text-left">Transaction ID</th>
+              <th className="p-2 px-5 uppercase text-left">Cycle</th>
+              <th className="p-2 px-5 uppercase text-right">Amount</th>
+              <th className="p-2 px-5 uppercase text-center">Status</th>
+              <th className="p-2 px-5 uppercase text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {currentData.map((item) => (
+            {data.map((item) => (
               <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-medium text-sm">
                 <td className="p-2 px-5">
                   <label className="flex items-center cursor-pointer">
@@ -108,78 +479,56 @@ export default function Payment() {
                     </div>
                   </label>
                 </td>
-                <td className="p-2 px-5">{item.date} <span className="text-xs text-gray-400">({item.day})</span></td>
-                <td className="p-2 px-5">{item.transaction_id}</td>
-                <td className="p-2 px-5">{item.payment_cycle}</td>
+                <td className="p-2 px-5">
+                {new Date(item.date).toLocaleDateString("en-IN", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                })}
+                </td>
+                <td className="p-2 px-5">{item.transactionId}</td>
+                <td className="p-2 px-5">{item.cycle}</td>
                 <td className="p-2 px-5 text-right">₹{item.amount.toLocaleString()}</td>
                 <td className="p-2 px-5 text-center">
-                  <span
+                <span
                     className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      item.status === "Success"
+                        item.status.toLowerCase() === "success"
                         ? "bg-green-100 text-green-600"
-                        : item.status === "Pending"
+                        : item.status.toLowerCase() === "pending"
                         ? "bg-yellow-100 text-yellow-700"
                         : "bg-red-100 text-red-600"
                     }`}
-                  >
+                    >
                     {item.status}
                   </span>
                 </td>
                 <td className="p-2 px-5 text-center">
-                  <button className="p-1 px-3 rounded bg-orange-500 text-white mr-2">Edit</button>
-                  <button className="p-1 px-3 rounded bg-red-500 text-white">Delete</button>
+                <div className="flex justify-end gap-2">{isTrashed ? (
+                <>
+                    <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                </>
+            ) : (
+                <>
+                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
+                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                </>
+            )}</div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+    ):(
+        <p className="text-center">
+            No Payments Available
+        </p>
+    )
+}
+     
 
-      {/* Pagination */}
-      <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
-        <div className="flex gap-1 items-center">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-1 flex gap-1 items-center text-[#2B3674] rounded disabled:opacity-50"
-          >
-            <MdKeyboardArrowLeft /> Previous
-          </button>
-          {[...Array(totalPages)].map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentPage(index + 1)}
-              className={`px-3 py-1 text-sm rounded ${
-                currentPage === index + 1
-                  ? "bg-[#2B3674] text-white"
-                  : "text-[#2B3674] hover:bg-gray-100"
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 flex gap-1 items-center text-[#2B3674] rounded disabled:opacity-50"
-          >
-            Next <MdKeyboardArrowRight />
-          </button>
-        </div>
-
-        {/* Per Page Selection */}
-        <select
-          value={perPage}
-          onChange={(e) => setPerPage(Number(e.target.value))}
-          className="ml-4 border text-sm rounded px-3 py-2 text-[#2B3674]"
-        >
-          {[5, 10, 15].map((num) => (
-            <option key={num} value={num}>
-              {num} / page
-            </option>
-          ))}
-        </select>
-      </div>
+     
     </div>
   );
 }

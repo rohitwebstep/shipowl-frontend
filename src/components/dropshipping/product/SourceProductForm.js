@@ -209,7 +209,7 @@ const SourceProductForm = () => {
                     <h3 className="text-lg font-semibold">General Information</h3>
                     <div className="grid md:grid-cols-2 grid-cols-1 gap-4 mt-3">
                         <div>
-                            <label className="text-[#777980] block mb-1">Product Name</label>
+                            <label className="text-[#777980] block mb-1">Product Name <span className='text-red-500'>*</span></label>
                             <input
                                 type="text"
                                 name="name"
@@ -220,7 +220,7 @@ const SourceProductForm = () => {
                             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                         </div>
                         <div>
-                            <label className="text-[#777980] block mb-1">Category Type</label>
+                            <label className="text-[#777980] block mb-1">Category Type <span className='text-red-500'>*</span></label>
                             <select
                                 name="category"
                                 value={formData.category}
@@ -235,7 +235,7 @@ const SourceProductForm = () => {
                             {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
                         </div>
                         <div>
-                            <label className="text-[#777980] block mb-1">Expected Price</label>
+                            <label className="text-[#777980] block mb-1">Expected Price <span className='text-red-500'>*</span></label>
                             <input
                                 type="text"
                                 name="expectedPrice"
@@ -246,7 +246,7 @@ const SourceProductForm = () => {
                             {errors.expectedPrice && <p className="text-red-500 text-sm mt-1">{errors.expectedPrice}</p>}
                         </div>
                         <div>
-                            <label className="text-[#777980] block mb-1">Expected Daily Orders</label>
+                            <label className="text-[#777980] block mb-1">Expected Daily Orders <span className='text-red-500'>*</span></label>
                             <select
                                 name="expectedDailyOrders"
                                 value={formData.expectedDailyOrders}
@@ -263,7 +263,7 @@ const SourceProductForm = () => {
                         </div>
                     </div>
                     <div className="mt-3">
-                        <label className="text-[#777980] block mb-1">Product URL</label>
+                        <label className="text-[#777980] block mb-1">Product URL <span className='text-red-500'>*</span></label>
                         <input
                             type="text"
                             name="url"
@@ -294,7 +294,7 @@ const SourceProductForm = () => {
                                   ></div>
                               </div>
                               <span className="ms-2 text-sm text-gray-600">
-                                  Status
+                                  Status <span className='text-red-500'>*</span>
                               </span>
                           </label>
             {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status}</p>}
@@ -303,8 +303,8 @@ const SourceProductForm = () => {
               
 
                 <div className="bg-white shadow p-4 rounded-xl mb-6">
-                    <h3 className="text-lg font-semibold">Product Image</h3>
-                    <label className="text-[#777980] block mt-1">Photo</label>
+                    <h3 className="text-lg font-semibold">Product Image </h3>
+                    <label className="text-[#777980] block mt-1">Photo<span className='text-red-500'>*</span></label>
                     <div className={`border-dashed border-2 ${errors.images ? 'border-red-500' : 'border-gray-300'} bg-[#F9F9FC] rounded-xl p-6 flex flex-col items-center justify-center text-gray-500 mt-3`}>
                         {image ? (
                             <Image src={image} alt="Uploaded" width={128} height={128} className="object-cover rounded-xl" />
