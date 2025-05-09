@@ -64,24 +64,34 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
-
-        const validationError = validateForm(); // returns an object
-
+    
+        const validationError = validateForm();
+    
         if (Object.keys(validationError).length > 0) {
             setFormErrors(validationError);
-            return; // ✅ Stop here if validation fails
+            return;
         }
-
-        setFormErrors({})
+    
+        setFormErrors({});
         setLoading(true);
-
+    
+        // 🌀 Show loading alert
+        Swal.fire({
+            title: "Logging in...",
+            text: "Please wait while we verify your credentials.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
+    
         try {
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/login`, {
+            const response = await fetch(`http://localhost:3001/api/supplier/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-
+    
             if (!response.ok) {
                 const errorMessage = await response.json();
                 Swal.fire({
@@ -91,10 +101,10 @@ export default function Login() {
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Login failed");
             }
-
+    
             const result = await response.json();
             const { token, admin } = result;
-
+    
             const shippingData = {
                 project: {
                     name: "Shipping OWL",
@@ -110,25 +120,34 @@ export default function Login() {
                     token: token,
                 },
             };
-
+    
             localStorage.setItem("shippingData", JSON.stringify(shippingData));
+    
+            // ✅ Show success alert before redirect
+            await Swal.fire({
+                icon: "success",
+                title: "Login Successful",
+                text: "Welcome to your supplier dashboard!",
+                showConfirmButton: true,
+            });
+    
             router.push("/supplier");
-
+    
         } catch (error) {
             console.error("Error:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Login Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
+            if (!Swal.isVisible()) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Login Error",
+                    text: error.message || "Something went wrong. Please try again.",
+                });
+            }
             setError(error.message || "Login failed.");
         } finally {
             setLoading(false);
         }
-
-
-
     };
+    
 
     return (
         <div className="md:flex h-screen w-full ">

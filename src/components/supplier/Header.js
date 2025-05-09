@@ -44,10 +44,31 @@ export default function Header() {
           setActivePanel(data?.project?.active_panel || 'Panel');
         }
       }, []);
-const logout=()=>{
-  localStorage.removeItem('shippingData');
-  verifySupplierAuth();
-}
+      const logout = () => {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You will be logged out of your supplier account.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Yes, log me out",
+          cancelButtonText: "Cancel",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            localStorage.removeItem("shippingData");
+            verifySupplierAuth();
+            Swal.fire({
+              icon: "success",
+              title: "Logged out",
+              text: "You have been logged out successfully.",
+              timer: 1500,
+              showConfirmButton: true,
+            });
+          }
+        });
+      };
+      
   return (
     <header className="md:flex items-center md:mt-16 mt-10 lg:mt-0 justify-between lg:py-7 px-3 p-2 pt-6">
       <div className="md:w-4/12">

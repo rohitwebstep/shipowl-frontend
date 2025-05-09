@@ -34,7 +34,7 @@ const ProfileList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/profile`, {
+            const response = await fetch(`http://localhost:3001/api/dropshipper/profile`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -80,7 +80,7 @@ const ProfileList = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/location/city`,
+                    `http://localhost:3001/api/location/city`,
                     {
                         method: "GET",
                         headers: {
@@ -127,7 +127,7 @@ const ProfileList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                `http://localhost:3001/api/location/state`,
                 {
                     method: "GET",
                     headers: {

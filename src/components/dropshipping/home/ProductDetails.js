@@ -62,7 +62,7 @@ const ProductDetails = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/${id}`, {
+      const response = await fetch(`http://localhost:3001/api/product/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +111,7 @@ const ProductDetails = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product?category=${catId}`, {
+      const response = await fetch(`http://localhost:3001/api/product?category=${catId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

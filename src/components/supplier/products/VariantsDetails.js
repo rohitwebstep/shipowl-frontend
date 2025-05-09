@@ -95,7 +95,7 @@ const [loading,setLoading] = useState(null);
                   }
               });
   
-              const url = `https://sleeping-owl-we0m.onrender.com/api/product/${variantId}/image/${index}?type=${type}`;
+              const url = `http://localhost:3001/api/product/${variantId}/image/${index}?type=${type}`;
   
               const response = await fetch(url, {
                   method: "DELETE",

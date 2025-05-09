@@ -34,7 +34,7 @@ export default function ProductList() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `https://sleeping-owl-we0m.onrender.com/api/product/request/my`,
+                      `http://localhost:3001/api/product/request/my`,
                       {
                           method: "GET",
                           headers: {
@@ -95,7 +95,7 @@ export default function ProductList() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `https://sleeping-owl-we0m.onrender.com/api/product/request/my/trashed`,
+                      `http://localhost:3001/api/product/request/my/trashed`,
                       {
                           method: "GET",
                           headers: {
@@ -170,7 +170,7 @@ export default function ProductList() {
               setLoading(true);
   
               const response = await fetch(
-                  `https://sleeping-owl-we0m.onrender.com/api/product/request/my/${item.id}`,
+                  `http://localhost:3001/api/product/request/my/${item.id}`,
                   {
                       method: "DELETE",
                       headers: {
@@ -238,7 +238,7 @@ export default function ProductList() {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/product/request/my/${item?.id}/restore`,
+                    `http://localhost:3001/api/product/request/my/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -317,7 +317,7 @@ export default function ProductList() {
                 setLoading(true);
     
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/product/request/my/${item.id}/destroy`,
+                    `http://localhost:3001/api/product/request/my/${item.id}/destroy`,
                     {
                         method: "DELETE",
                         headers: {

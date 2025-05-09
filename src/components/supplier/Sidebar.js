@@ -31,7 +31,7 @@ export default function Sidebar() {
         { name: "Dashboard", icon: Home, href: "/supplier" },
         { name: "Product", icon: ShoppingCart, href: "/supplier/product" },
         { name: "New Product Request", icon: Package, href: "/supplier/product/request" },
-        { name: "Orders (In progress)", icon: ClipboardList, href: "/supplier/orders" },
+        { name: "Orders", icon: ClipboardList, href: "/supplier/orders" },
         { name: "Warehouse", icon: Warehouse, href: "/supplier/warehouse" },
         { name: "Category Management", icon: BiSolidCategory, href: "/supplier/category/list" },
         { name: "Brand Management", icon: TbBrandBinance, href: "/supplier/brand/list" },

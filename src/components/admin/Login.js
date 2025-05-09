@@ -43,14 +43,24 @@ export default function Login() {
         e.preventDefault();
         setError(null);
         setLoading(true);
-
+    
+        // 🌀 Show loading Swal
+        Swal.fire({
+            title: "Logging in...",
+            text: "Please wait while we log you in.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
+    
         try {
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/auth/login`, {
+            const response = await fetch(`http://localhost:3001/api/admin/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-
+    
             if (!response.ok) {
                 const errorMessage = await response.json();
                 Swal.fire({
@@ -60,22 +70,22 @@ export default function Login() {
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Login failed");
             }
-
+    
             const result = await response.json();
             const { token, admin } = result;
-
+    
             if (!token || !admin) {
                 throw new Error("Invalid login response. Missing token or admin data.");
             }
-
-            // ✅ Store user session data in localStorage
+    
+            // ✅ Store session in localStorage
             const shippingData = {
                 project: {
                     name: "Shipping OWL",
                     environment: "production",
                     active_panel: "admin",
                 },
-                admin, // Direct assignment as admin object
+                admin,
                 session: {
                     is_authenticated: true,
                     last_active_at: new Date().toISOString(),
@@ -84,23 +94,35 @@ export default function Login() {
                     token,
                 },
             };
-
             localStorage.setItem("shippingData", JSON.stringify(shippingData));
-            // ✅ Redirect after successful login
+    
+            // ✅ Show success alert
+            await Swal.fire({
+                icon: "success",
+                title: "Login Successful",
+                text: "Welcome to Admin Dashboard!",
+                timer: 1500,
+                showConfirmButton: true,
+            });
+    
+            // ✅ Redirect
             router.push("/admin");
-
+    
         } catch (error) {
             console.error("Error:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Login Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
+            if (!Swal.isVisible()) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Login Error",
+                    text: error.message || "Something went wrong. Please try again.",
+                });
+            }
             setError(error.message || "Login failed.");
         } finally {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className="md:flex h-screen w-full">

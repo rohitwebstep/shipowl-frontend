@@ -19,7 +19,7 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch('https://sleeping-owl-we0m.onrender.com/api/dropshipper/auth/password/forget', {
+      const res = await fetch('http://localhost:3001/api/dropshipper/auth/password/forget', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

@@ -19,10 +19,31 @@ const Header = () => {
         setActivePanel(data?.project?.active_panel || 'Panel');
       }
     }, []);
-  const logout=()=>{
-    localStorage.removeItem('shippingData');
-    verifyDropShipperAuth();
-  }
+    const logout = () => {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You will be logged out of your dropshipper account.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, log me out",
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.removeItem("shippingData");
+          verifyDropShipperAuth();
+          Swal.fire({
+            icon: "success",
+            title: "Logged out",
+            text: "You have been logged out successfully.",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        }
+      });
+    };
+    
   return (
     <nav className="fixed rounded-xl lg:relative lg:mt-3 top-0 left-0 w-full bg-white   p-4 flex items-center justify-between lg:shadow-none">
       <button className="p-2 bg-black text-white rounded-full ">

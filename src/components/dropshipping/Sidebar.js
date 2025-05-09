@@ -22,7 +22,7 @@ import Logo from "@/app/assets/Shipowl-logo1.png";
 import { HiBars3CenterLeft } from "react-icons/hi2";
 
 const menuItems = [
-  { name: "Home (In progress)", icon: Home, href: "/dropshipping", section: "MENU" },
+  { name: "Home", icon: Home, href: "/dropshipping", section: "MENU" },
   {
     name: "Manage Orders",
     icon: ShoppingCart,

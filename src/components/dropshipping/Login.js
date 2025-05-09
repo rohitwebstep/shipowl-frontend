@@ -40,14 +40,24 @@ export default function Login() {
         e.preventDefault();
         setError(null);
         setLoading(true);
-
+    
+        // 🌀 Show loading Swal
+        Swal.fire({
+            title: "Logging in...",
+            text: "Please wait while we log you in.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
+    
         try {
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/auth/login`, {
+            const response = await fetch(`http://localhost:3001/api/dropshipper/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-
+    
             if (!response.ok) {
                 const errorMessage = await response.json();
                 Swal.fire({
@@ -57,20 +67,22 @@ export default function Login() {
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Login failed");
             }
-
+    
             const result = await response.json();
             const { token, dropshipper } = result;
-
-
-
-            // ✅ Store user session data in localStorage
+    
+            if (!token || !dropshipper) {
+                throw new Error("Invalid login response. Missing token or dropshipper data.");
+            }
+    
+            // ✅ Store session in localStorage
             const shippingData = {
                 project: {
                     name: "Shipping OWL",
                     environment: "production",
                     active_panel: "dropshipper",
                 },
-                dropshipper, // Direct assignment as admin object
+                dropshipper,
                 session: {
                     is_authenticated: true,
                     last_active_at: new Date().toISOString(),
@@ -79,22 +91,35 @@ export default function Login() {
                     token,
                 },
             };
-
             localStorage.setItem("shippingData", JSON.stringify(shippingData));
+    
+            // ✅ Show success alert
+            await Swal.fire({
+                icon: "success",
+                title: "Login Successful",
+                text: "Welcome to your dropshipping dashboard!",
+                timer: 1500,
+                showConfirmButton: true,
+            });
+    
+            // ✅ Redirect
             router.push("/dropshipping");
-
+    
         } catch (error) {
             console.error("Error:", error);
-            Swal.fire({
-                icon: "error",
-                title: "Login Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
+            if (!Swal.isVisible()) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Login Error",
+                    text: error.message || "Something went wrong. Please try again.",
+                });
+            }
             setError(error.message || "Login failed.");
         } finally {
             setLoading(false);
         }
     };
+    
 
 
 
