@@ -9,6 +9,8 @@ import { ProfileProvider } from "./supplier/ProfileContext";
 import { ProfileEditProvider } from "./supplier/update/ProfileEditContext";
 import AdminMiddleWareProvider from "./middleware/AdminMiddleWareContext";
 import { DropshipperProfileProvider } from "./dropshipper/DropshipperProfileContext";
+import { ProductProvider } from "./addproducts/ProductContext";
+import { ProductProviderEdit } from "./products/ProductContextEdit";
 
 function LayoutWrapperInner({ children }) {
   const pathname = usePathname();
@@ -33,11 +35,15 @@ function LayoutWrapperInner({ children }) {
             {!isAuthPage && <Header />}
             <div className="xl:p-3 md:pt-4 md:px-0">
                 <ProfileProvider>
+                  <ProductProvider>
+                    <ProductProviderEdit>
                   <ProfileEditProvider>
                     <DropshipperProfileProvider>
                       {children}
                     </DropshipperProfileProvider>
                   </ProfileEditProvider>
+                  </ProductProviderEdit>
+                  </ProductProvider>
                 </ProfileProvider>
             </div>
           </div>

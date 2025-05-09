@@ -108,7 +108,7 @@ export default function Orders() {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/order', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/order', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

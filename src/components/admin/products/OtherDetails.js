@@ -26,16 +26,16 @@ export default function OtherDetails() {
     e.preventDefault();
     setLoading(true);
   
-    const supplierData = JSON.parse(localStorage.getItem('shippingData'));
-    if (supplierData?.project?.active_panel !== 'supplier') {
+    const adminData = JSON.parse(localStorage.getItem('shippingData'));
+    if (adminData?.project?.active_panel !== 'admin') {
       localStorage.clear();
-      router.push('/supplier/auth/login');
+      router.push('/admin/auth/login');
       return;
     }
   
-    const token = supplierData?.security?.token;
+    const token = adminData?.security?.token;
     if (!token) {
-      router.push('/supplier/auth/login');
+      router.push('/admin/auth/login');
       return;
     }
   
@@ -99,7 +99,7 @@ export default function OtherDetails() {
       }).then((res) => {
         if (res.isConfirmed) {
           setFormData({});
-          router.push('/supplier/product');
+          router.push('/admin/product');
         }
       });
     } catch (err) {
@@ -214,7 +214,7 @@ export default function OtherDetails() {
           <button
             type="button"
             className="bg-[#8F9BBA] text-white px-14 py-2 rounded-md"
-            onClick={() => router.push('/supplier/product')}
+            onClick={() => router.push('/admin/product')}
           >
             Cancel
           </button>

@@ -1,11 +1,16 @@
 'use client';
 
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Plus, Minus, ImageIcon } from 'lucide-react';
-import { ProductContext } from './ProductContext';
-
+import { ProductContextEdit } from './ProductContextEdit';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import Image from 'next/image';
+import Swal from "sweetalert2";
 export default function VariantDetails() {
-  const { fetchCountry, formData, setFormData, countryData, setActiveTab } = useContext(ProductContext);
+  const { fetchCountry, formData, setFormData, countryData, setActiveTab } = useContext(ProductContextEdit);
 
   useEffect(() => {
     fetchCountry();
@@ -31,7 +36,7 @@ const handleFileChange = (event, index) => {
     }));
   }
 };
-
+const [loading,setLoading] = useState(null);
 
   const addVariant = () => {
     setFormData({
@@ -64,6 +69,79 @@ const handleFileChange = (event, index) => {
     setActiveTab('shipping-details');
   };
 
+    const handleImageDelete = async (index,type,variantId) => {
+          setLoading(true);
+  
+          const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+          if (dropshipperData?.project?.active_panel !== "admin") {
+              localStorage.removeItem("shippingData");
+              router.push("/admin/auth/login");
+              return;
+          }
+  
+          const token = dropshipperData?.security?.token;
+          if (!token) {
+              router.push("/admin/auth/login");
+              return;
+          }
+  
+          try {
+              Swal.fire({
+                  title: 'Deleting Image...',
+                  text: 'Please wait while we remove the image.',
+                  allowOutsideClick: false,
+                  didOpen: () => {
+                      Swal.showLoading();
+                  }
+              });
+  
+              const url = `https://sleeping-owl-we0m.onrender.com/api/product/${variantId}/image/${index}?type=${type}`;
+  
+              const response = await fetch(url, {
+                  method: "DELETE",
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                  },
+              });
+  
+              if (!response.ok) {
+                  Swal.close();
+                  const errorMessage = await response.json();
+                  Swal.fire({
+                      icon: "error",
+                      title: "Delete Failed",
+                      text: errorMessage.message || errorMessage.error || "An error occurred",
+                  });
+                  throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+              }
+  
+              const result = await response.json();
+              Swal.close();
+  
+              if (result) {
+                  Swal.fire({
+                      icon: "success",
+                      title: "Image Deleted",
+                      text: `The image has been deleted successfully!`,
+                      showConfirmButton: true,
+                  }).then((res) => {
+                      if (res.isConfirmed) {
+                      }
+                  });
+              }
+          } catch (error) {
+              console.error("Error:", error);
+              Swal.close();
+              Swal.fire({
+                  icon: "error",
+                  title: "Submission Error",
+                  text: error.message || "Something went wrong. Please try again.",
+              });
+              setError(error.message || "Submission failed.");
+          } finally {
+              setLoading(false);
+          }
+      };
   return (
     <div className="mt-4 p-6 rounded-xl bg-white">
       <div className="md:flex mb-6 justify-between items-center">
@@ -222,7 +300,7 @@ const handleFileChange = (event, index) => {
           </div>
 
           {/* Image Upload */}
-          <div className="md:flex justify-end">
+          <div className="md:flex flex-wrap justify-end">
             <span className="text-orange-500 font-semibold lg:hidden block">Images</span>
             <div className="relative border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
               <ImageIcon className="w-8 h-8 text-gray-400" />
@@ -233,6 +311,63 @@ const handleFileChange = (event, index) => {
                 onChange={(e) => handleFileChange(e, index)}
               />
             </div>
+            {variant.variant_images && (
+              <div className="mt-3 w-full">
+                <Swiper
+                  key={index}
+                  modules={[Navigation]}
+                  slidesPerView={1}
+                  spaceBetween={12}
+                  loop={
+                    Array.isArray(variant.variant_images)
+                      ? variant.variant_images.length > 1
+                      : variant.variant_images.split(',').length > 1
+                  }
+                  navigation={true}
+                  className="mySwiper"
+                >
+                  {(Array.isArray(variant.variant_images)
+                    ? variant.variant_images
+                    : variant.variant_images.split(',').map((url) => url.trim())
+                  ).map((file, index) => (
+                    <SwiperSlide key={index} className="relative group">
+                      <button
+                        type="button"
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10 opacity-90 hover:opacity-100"
+                        onClick={() => {
+                          Swal.fire({
+                            title: 'Are you sure?',
+                            text: 'Do you want to delete this image?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Yes, delete it!',
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                              handleImageDelete(index, 'variant_image',variant.id);
+                            }
+                          });
+                        }}
+                      >
+                        ✕
+                      </button>
+
+                      <Image
+                        src={`https://placehold.co/600x400?text=${index + 1}`
+                         
+                        }
+                        alt={`Image ${index + 1}`}
+                        width={500}
+                        height={500}
+                        className="rounded-lg object-cover w-full h-32"
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            )}
+  
           </div>
 
           {/* Remove Button */}

@@ -44,7 +44,7 @@ export default function Warehouse() {
          try {
              setLoading(true);
              const response = await fetch(
-                 `http://localhost:3001/api/warehouse`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse`,
                  {
                      method: "GET",
                      headers: {
@@ -98,7 +98,7 @@ export default function Warehouse() {
          try {
              setLoading(true);
              const response = await fetch(
-                 `http://localhost:3001/api/warehouse/trashed`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse/trashed`,
                  {
                      method: "GET",
                      headers: {
@@ -223,7 +223,7 @@ export default function Warehouse() {
              setLoading(true);
  
              const response = await fetch(
-                 `http://localhost:3001/api/warehouse/${item.id}`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse/${item.id}`,
                  {
                      method: "DELETE",
                      headers: {
@@ -294,7 +294,7 @@ export default function Warehouse() {
  
              const results = await Promise.all(
                  selected.map(id =>
-                     fetch(`http://localhost:3001/api/warehouse/${id}`, {
+                     fetch(`https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`, {
                          method: "DELETE",
                          headers: {
                              "Content-Type": "application/json",
@@ -339,7 +339,7 @@ export default function Warehouse() {
          try {
              setLoading(true);
              const response = await fetch(
-                 `http://localhost:3001/api/warehouse/${item?.id}/restore`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse/${item?.id}/restore`,
                  {
                      method: "PATCH",
                      headers: {
@@ -420,7 +420,7 @@ export default function Warehouse() {
              setLoading(true);
  
              const response = await fetch(
-                 `http://localhost:3001/api/warehouse/${item.id}/destroy`,
+                 `https://sleeping-owl-we0m.onrender.com/api/warehouse/${item.id}/destroy`,
                  {
                      method: "DELETE",
                      headers: {

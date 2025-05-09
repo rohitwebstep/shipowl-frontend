@@ -32,7 +32,7 @@ export default function AdminMiddleWareProvider({ children }) {
         if (!admin_token) return; // Early exit if no token
 
         try {
-            const response = await fetch(`http://localhost:3001/api/admin/auth/verify`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/auth/verify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

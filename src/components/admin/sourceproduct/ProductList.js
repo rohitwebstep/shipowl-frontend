@@ -18,7 +18,7 @@ export default function ProductList() {
       const [productsRequest,setProductsRequest] = useState([]);
       const [loading,setLoading] = useState(null);
       const router = useRouter();
-      const fetchDropshipper = useCallback(async () => {
+         const fetchDropshipper = useCallback(async () => {
              const adminData = JSON.parse(localStorage.getItem("shippingData"));
      
              if (adminData?.project?.active_panel !== "admin") {
@@ -35,7 +35,7 @@ export default function ProductList() {
      
              try {
                  setLoading(true);
-                 const response = await fetch(`http://localhost:3001/api/dropshipper`, {
+                 const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper`, {
                      method: "GET",
                      headers: {
                          "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export default function ProductList() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `http://localhost:3001/api/product/request`,
+                      `https://sleeping-owl-we0m.onrender.com/api/product/request`,
                       {
                           method: "GET",
                           headers: {
@@ -144,7 +144,7 @@ export default function ProductList() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `http://localhost:3001/api/product/request/trashed`,
+                      `https://sleeping-owl-we0m.onrender.com/api/product/request/trashed`,
                       {
                           method: "GET",
                           headers: {
@@ -219,7 +219,7 @@ export default function ProductList() {
               setLoading(true);
   
               const response = await fetch(
-                  `http://localhost:3001/api/product/request/${item.id}`,
+                  `https://sleeping-owl-we0m.onrender.com/api/product/request/${item.id}`,
                   {
                       method: "DELETE",
                       headers: {
@@ -291,7 +291,7 @@ export default function ProductList() {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `http://localhost:3001/api/product/request/${item?.id}/restore`,
+                    `https://sleeping-owl-we0m.onrender.com/api/product/request/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -370,7 +370,7 @@ export default function ProductList() {
                 setLoading(true);
     
                 const response = await fetch(
-                    `http://localhost:3001/api/product/request/${item.id}/destroy`,
+                    `https://sleeping-owl-we0m.onrender.com/api/product/request/${item.id}/destroy`,
                     {
                         method: "DELETE",
                         headers: {
@@ -435,7 +435,8 @@ export default function ProductList() {
                                 <option key={index} value={item.id}>{item.name}</option>
                             )
                         })}
-                        </select>            </div>
+                        </select> 
+                        </div>
       <div className='flex gap-2'> 
          <button className="bg-[#05CD99] text-white lg:px-8 p-4 py-2 rounded-md">Export</button>
         <button

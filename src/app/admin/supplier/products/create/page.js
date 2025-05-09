@@ -1,5 +1,5 @@
-import React, { Suspense } from 'react';
 import AddProduct from '@/components/admin/addproducts/AddProduct';
+import React, { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 

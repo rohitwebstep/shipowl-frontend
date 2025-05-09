@@ -4,11 +4,10 @@ import { useState, createContext, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 
-export const ProductContextEdit = createContext();
+export const ProductContext = createContext();
 
-const ProductProviderEdit = ({ children }) => {
+const ProductProvider = ({ children }) => {
   const router = useRouter();
-  const [files, setFiles] = useState({});
   const [activeTab, setActiveTab] = useState("product-details");
   const [errors, setErrors] = useState({});
   const [shippingErrors, setShippingErrors] = useState({});
@@ -26,7 +25,7 @@ const ProductProviderEdit = ({ children }) => {
     brand: '',
     origin_country: '',
     shipping_country: '',
-    video: '',
+    video_url: '',
     list_as: '',
     variant_images_0: '',
     variants: [
@@ -42,12 +41,12 @@ const ProductProviderEdit = ({ children }) => {
         rto_price:""
       },
     ],
-    Shipping_time: '',
+    shipping_time: '',
     weight: '',
     package_length: '',
     package_width: '',
     package_height: '',
-    chargable_weight: '',
+    chargeable_weight: '',
     package_weight_image:0,
     package_length_image:0,
     package_width_image:0,
@@ -63,17 +62,17 @@ const ProductProviderEdit = ({ children }) => {
   });
 
   const fetchCategory = useCallback(async () => {
-    const supplierData = JSON.parse(localStorage.getItem('shippingData'));
+    const adminData = JSON.parse(localStorage.getItem('shippingData'));
 
-    if (supplierData?.project?.active_panel !== 'supplier') {
+    if (adminData?.project?.active_panel !== 'admin') {
       localStorage.removeItem('shippingData');
-      router.push('/supplier/auth/login');
+      router.push('/admin/auth/login');
       return;
     }
 
-    const suppliertoken = supplierData?.security?.token;
-    if (!suppliertoken) {
-      router.push('/supplier/auth/login');
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+      router.push('/admin/auth/login');
       return;
     }
 
@@ -82,7 +81,7 @@ const ProductProviderEdit = ({ children }) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${suppliertoken}`,
+          Authorization: `Bearer ${admintoken}`,
         },
       });
 
@@ -109,17 +108,17 @@ const ProductProviderEdit = ({ children }) => {
   }, [router]);
 
   const fetchBrand = useCallback(async () => {
-    const supplierData = JSON.parse(localStorage.getItem('shippingData'));
+    const adminData = JSON.parse(localStorage.getItem('shippingData'));
 
-    if (supplierData?.project?.active_panel !== 'supplier') {
+    if (adminData?.project?.active_panel !== 'admin') {
       localStorage.removeItem('shippingData');
-      router.push('/supplier/auth/login');
+      router.push('/admin/auth/login');
       return;
     }
 
-    const suppliertoken = supplierData?.security?.token;
-    if (!suppliertoken) {
-      router.push('/supplier/auth/login');
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+      router.push('/admin/auth/login');
       return;
     }
 
@@ -128,7 +127,7 @@ const ProductProviderEdit = ({ children }) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${suppliertoken}`,
+          Authorization: `Bearer ${admintoken}`,
         },
       });
 
@@ -153,7 +152,7 @@ const ProductProviderEdit = ({ children }) => {
       console.error('Error fetching brands:', error);
     }
   }, [router]);
-
+  
   const fileFields = [
     { label: 'Package Weight Image', key: 'package_weight_image' },
     { label: 'Package Length Image', key: 'package_length_image' },
@@ -164,6 +163,9 @@ const ProductProviderEdit = ({ children }) => {
   ];
   const fetchCountry = useCallback(async () => {
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
+
+   
+
     const admintoken = adminData?.security?.token;
     if (!admintoken) {
       router.push('/admin/auth/login');
@@ -233,7 +235,11 @@ const ProductProviderEdit = ({ children }) => {
       }
     });
 
-  
+    fileFields.forEach(({ key }) => {
+      if (!formData[key]) {
+        newErrors[key] = `Please upload a file for ${key.replace(/_/g, ' ')}`;
+      }
+    });
 
     setShippingErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -264,14 +270,11 @@ const ProductProviderEdit = ({ children }) => {
   };
 
   return (
-    <ProductContextEdit.Provider
+    <ProductContext.Provider
     value={{
       formData,
-      validateForm2,
-      validateFields,
-      errors, setErrors,
-      shippingErrors, setShippingErrors,
       setFormData,
+      fileFields,
       categoryData,
       setCategoryData,
       brandData,
@@ -279,21 +282,21 @@ const ProductProviderEdit = ({ children }) => {
       countryData,
       setCountryData,
       isEdit,
+      validateForm2,
       setIsEdit,
       fetchCategory,
       fetchBrand,
       fetchCountry,
       loading,
-      fileFields,
-      activeTab,       // ✅ Added
-      setActiveTab,  
-      files, setFiles  // ✅ Added
+      activeTab,  errors, setErrors,shippingErrors, setShippingErrors,
+      validateFields,     // ✅ Added
+      setActiveTab,    // ✅ Added
     }}
   >
     {children}
-  </ProductContextEdit.Provider>
+  </ProductContext.Provider>
   
   );
 };
 
-export { ProductProviderEdit };
+export { ProductProvider };

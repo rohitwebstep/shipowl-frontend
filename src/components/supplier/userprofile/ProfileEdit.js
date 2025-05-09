@@ -46,7 +46,7 @@ const ProfileEdit = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:3001/api/location/state/${formData?.permanentState || id}/cities`,
+          `https://sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState || id}/cities`,
           {
             method: 'GET',
             headers: {
@@ -96,7 +96,7 @@ const ProfileEdit = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:3001/api/location/country/${formData?.permanentCountry || id}/states`,
+          `https://sleeping-owl-we0m.onrender.com/api/location/country/${formData?.permanentCountry || id}/states`,
           {
             method: 'GET',
             headers: {

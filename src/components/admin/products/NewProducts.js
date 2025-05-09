@@ -11,6 +11,7 @@ import { useAdmin } from '../middleware/AdminMiddleWareContext';
 
 export default function NewProducts() {
   const [isTrashed, setIsTrashed] = useState(false);
+  const [suppliers, setSuppliers] = useState([]);
 
       const { verifyAdminAuth } = useAdmin();
       const [productsRequest,setProductsRequest] = useState([]);
@@ -34,7 +35,7 @@ export default function NewProducts() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `http://localhost:3001/api/product/request`,
+                      `https://sleeping-owl-we0m.onrender.com/api/product/request`,
                       {
                           method: "GET",
                           headers: {
@@ -69,14 +70,52 @@ export default function NewProducts() {
                   setLoading(false);
               }
           }, [router, setProductsRequest]);
-          useEffect(() => {
-            const fetchData = async () => {
-              await verifyAdminAuth();
-              await fetchProducts();
-            };
-            fetchData();
-          }, []);
-          
+        const fetchSupplier = useCallback(async () => {
+    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+
+    if (adminData?.project?.active_panel !== "admin") {
+        localStorage.removeItem("shippingData");
+        router.push("/admin/auth/login");
+        return;
+    }
+
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+        router.push("/admin/auth/login");
+        return;
+    }
+
+    try {
+        setLoading(true);
+        const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${admintoken}`,
+            },
+        });
+
+        if (!response.ok) {
+            const errorMessage = await response.json();
+            Swal.fire({
+                icon: "error",
+                title: "Something Wrong!",
+                text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+            });
+            throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
+        }
+
+        const result = await response.json();
+        if (result) {
+            setSuppliers(result?.suppliers || []);
+        }
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+    } finally {
+        setLoading(false);
+    }
+        }, [router, setSuppliers]);
+             
        const trashProducts = useCallback(async () => {
               const adminData = JSON.parse(localStorage.getItem("shippingData"));
       
@@ -95,7 +134,7 @@ export default function NewProducts() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `http://localhost:3001/api/product/request/trashed`,
+                      `https://sleeping-owl-we0m.onrender.com/api/product/request/trashed`,
                       {
                           method: "GET",
                           headers: {
@@ -131,95 +170,6 @@ export default function NewProducts() {
               }
           }, [router, setProductsRequest]);
       
-    const handleDelete = async (item) => {
-          const adminData = JSON.parse(localStorage.getItem("shippingData"));
-          if (adminData?.project?.active_panel !== "admin") {
-              localStorage.removeItem("shippingData");
-              router.push("/admin/auth/login");
-              return;
-          }
-  
-          const admintoken = adminData?.security?.token;
-          if (!admintoken) {
-              router.push("/admin/auth/login");
-              return;
-          }
-  
-          const confirmResult = await Swal.fire({
-              title: "Are you sure?",
-              text: "You won't be able to revert this!",
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#d33",
-              cancelButtonColor: "#3085d6",
-              confirmButtonText: "Yes, delete it!",
-              cancelButtonText: "Cancel",
-          });
-  
-          if (!confirmResult.isConfirmed) return;
-  
-          try {
-              Swal.fire({
-                  title: "Deleting...",
-                  allowOutsideClick: false,
-                  didOpen: () => {
-                      Swal.showLoading();
-                  },
-              });
-  
-              setLoading(true);
-  
-              const response = await fetch(
-                  `http://localhost:3001/api/product/request/${item.id}`,
-                  {
-                      method: "DELETE",
-                      headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${admintoken}`,
-                      },
-                  }
-              );
-  
-              Swal.close();
-  
-              if (!response.ok) {
-                  const errorMessage = await response.json();
-                  Swal.fire({
-                      icon: "error",
-                      title: "Error",
-                      text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                  });
-                  setLoading(false);
-                  return;
-              }
-  
-              const result = await response.json();
-  
-              Swal.fire({
-                  icon: "success",
-                  title: "Trash!",
-                  text: result.message || `${item.name} has been Trashed successfully.`,
-              });
-  
-              await fetchProducts();
-          } catch (error) {
-              Swal.close();
-              Swal.fire({
-                  icon: "error",
-                  title: "Error",
-                  text: error.message || "Something went wrong. Please try again.",
-              });
-          } finally {
-              setLoading(false);
-          }
-      };
-
-      
-    const handleEditItem = (item) => {
-        router.push(`/admin/product/source/update?id=${item.id}`);
-    };
-
-
      const handleRestore = useCallback(async (item) => {
             const adminData = JSON.parse(localStorage.getItem("shippingData"));
     
@@ -238,7 +188,7 @@ export default function NewProducts() {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `http://localhost:3001/api/product/request/${item?.id}/restore`,
+                    `https://sleeping-owl-we0m.onrender.com/api/product/request/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -317,7 +267,7 @@ export default function NewProducts() {
                 setLoading(true);
     
                 const response = await fetch(
-                    `http://localhost:3001/api/product/request/${item.id}/destroy`,
+                    `https://sleeping-owl-we0m.onrender.com/api/product/request/${item.id}/destroy`,
                     {
                         method: "DELETE",
                         headers: {
@@ -360,6 +310,104 @@ export default function NewProducts() {
                 setLoading(false);
             }
         };
+          useEffect(() => {
+            const fetchData = async () => {
+              await verifyAdminAuth();
+              await fetchProducts();
+              await fetchSupplier();
+            };
+            fetchData();
+          }, []);
+ 
+    const handleDelete = async (item) => {
+          const adminData = JSON.parse(localStorage.getItem("shippingData"));
+          if (adminData?.project?.active_panel !== "admin") {
+              localStorage.removeItem("shippingData");
+              router.push("/admin/auth/login");
+              return;
+          }
+  
+          const admintoken = adminData?.security?.token;
+          if (!admintoken) {
+              router.push("/admin/auth/login");
+              return;
+          }
+  
+          const confirmResult = await Swal.fire({
+              title: "Are you sure?",
+              text: "You won't be able to revert this!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#d33",
+              cancelButtonColor: "#3085d6",
+              confirmButtonText: "Yes, delete it!",
+              cancelButtonText: "Cancel",
+          });
+  
+          if (!confirmResult.isConfirmed) return;
+  
+          try {
+              Swal.fire({
+                  title: "Deleting...",
+                  allowOutsideClick: false,
+                  didOpen: () => {
+                      Swal.showLoading();
+                  },
+              });
+  
+              setLoading(true);
+  
+              const response = await fetch(
+                  `https://sleeping-owl-we0m.onrender.com/api/product/request/${item.id}`,
+                  {
+                      method: "DELETE",
+                      headers: {
+                          "Content-Type": "application/json",
+                          Authorization: `Bearer ${admintoken}`,
+                      },
+                  }
+              );
+  
+              Swal.close();
+  
+              if (!response.ok) {
+                  const errorMessage = await response.json();
+                  Swal.fire({
+                      icon: "error",
+                      title: "Error",
+                      text: errorMessage.error || errorMessage.message || "Failed to delete.",
+                  });
+                  setLoading(false);
+                  return;
+              }
+  
+              const result = await response.json();
+  
+              Swal.fire({
+                  icon: "success",
+                  title: "Trash!",
+                  text: result.message || `${item.name} has been Trashed successfully.`,
+              });
+  
+              await fetchProducts();
+          } catch (error) {
+              Swal.close();
+              Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: error.message || "Something went wrong. Please try again.",
+              });
+          } finally {
+              setLoading(false);
+          }
+      };
+
+      
+    const handleEditItem = (item) => {
+        router.push(`/admin/product/source/update?id=${item.id}`);
+    };
+
+   
     
   return (
 <>
@@ -374,7 +422,14 @@ export default function NewProducts() {
       <div className="flex flex-wrap md:justify-between items-center gap-3 justify-center mb-6">
       <div className="w-6/12">
             <label className="block text-sm font-medium text-gray-700">Select Supplier</label>
-            <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"><option></option></select>
+            <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm">
+                 <option>Select Supplier</option>
+                        {suppliers?.map((item,index)=>{
+                            return(
+                                <option key={index} value={item.id}>{item.name}</option>
+                            )
+                        })}
+                        </select> 
             </div>
        <div className='flex gap-2'>
 

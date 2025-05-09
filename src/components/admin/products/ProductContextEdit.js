@@ -63,17 +63,17 @@ const ProductProviderEdit = ({ children }) => {
   });
 
   const fetchCategory = useCallback(async () => {
-    const supplierData = JSON.parse(localStorage.getItem('shippingData'));
+    const adminData = JSON.parse(localStorage.getItem('shippingData'));
 
-    if (supplierData?.project?.active_panel !== 'supplier') {
+    if (adminData?.project?.active_panel !== 'admin') {
       localStorage.removeItem('shippingData');
-      router.push('/supplier/auth/login');
+      router.push('/admin/auth/login');
       return;
     }
 
-    const suppliertoken = supplierData?.security?.token;
-    if (!suppliertoken) {
-      router.push('/supplier/auth/login');
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+      router.push('/admin/auth/login');
       return;
     }
 
@@ -82,7 +82,7 @@ const ProductProviderEdit = ({ children }) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${suppliertoken}`,
+          Authorization: `Bearer ${admintoken}`,
         },
       });
 
@@ -109,17 +109,17 @@ const ProductProviderEdit = ({ children }) => {
   }, [router]);
 
   const fetchBrand = useCallback(async () => {
-    const supplierData = JSON.parse(localStorage.getItem('shippingData'));
+    const adminData = JSON.parse(localStorage.getItem('shippingData'));
 
-    if (supplierData?.project?.active_panel !== 'supplier') {
+    if (adminData?.project?.active_panel !== 'admin') {
       localStorage.removeItem('shippingData');
-      router.push('/supplier/auth/login');
+      router.push('/admin/auth/login');
       return;
     }
 
-    const suppliertoken = supplierData?.security?.token;
-    if (!suppliertoken) {
-      router.push('/supplier/auth/login');
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+      router.push('/admin/auth/login');
       return;
     }
 
@@ -128,7 +128,7 @@ const ProductProviderEdit = ({ children }) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${suppliertoken}`,
+          Authorization: `Bearer ${admintoken}`,
         },
       });
 

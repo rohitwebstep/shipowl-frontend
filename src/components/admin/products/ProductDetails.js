@@ -1,10 +1,9 @@
 'use client';
 
-import { useContext, useEffect } from 'react';
-import { ProductContext } from './ProductContext';
+import { useContext, useEffect} from 'react';
+import { ProductContextEdit } from './ProductContextEdit';
 import "@pathofdev/react-tag-input/build/index.css"; // Required styles
 import ReactTagInput from "@pathofdev/react-tag-input";
-import { HashLoader } from 'react-spinners';
 export default function ProductDetails() {
   const {
     fetchCountry,
@@ -16,9 +15,9 @@ export default function ProductDetails() {
     brandData,
     fetchBrand,
     setActiveTab,
-    validateFields,
-    errors, setErrors,loading
-  } = useContext(ProductContext);
+    errors, setErrors,validateFields,
+
+  } = useContext(ProductContextEdit);
 
 
   useEffect(() => {
@@ -33,7 +32,7 @@ export default function ProductDetails() {
     setErrors({ ...errors, [name]: '' });
   };
   const handleChangeTags = (newTags) => {
- 
+    
   
     setFormData((prevData) => {
       const updatedData = { ...prevData, tags: newTags };
@@ -41,19 +40,12 @@ export default function ProductDetails() {
     });
   };
   
-
+  
   const handleSubmit = () => {
     if (validateFields()) {
       setActiveTab('variants-details')
     }
   };
-  if (loading) {
-    return (
-        <div className="flex items-center justify-center h-[80vh]">
-            <HashLoader size={60} color="#F97316" loading={true} />
-        </div>
-    );
-}
 
   return (
     <div className="mt-4 lg:p-6 p-3 rounded-2xl bg-white">

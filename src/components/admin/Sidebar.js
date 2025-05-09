@@ -82,7 +82,6 @@ export default function Sidebar() {
     },
    
     { title: "Subuser Listing", icon: SiGoogletagmanager, href: "/admin/sub-user/list" },
-    { title: "Admin Listing", icon: SiGoogletagmanager, href: "/admin/list" },
     { title: "Country Management", icon: SiGoogletagmanager, href: "/admin/country/list" },
     { title: "State Management", icon: ShieldCheck, href: "/admin/state/list" },
     { title: "City Management", icon: ShieldCheck, href: "/admin/city/list" },

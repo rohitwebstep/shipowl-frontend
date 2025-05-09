@@ -53,7 +53,7 @@ export default function Create() {
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -83,7 +83,7 @@ export default function Create() {
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:3001/api/location/country/${id}/states`, {
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -113,7 +113,7 @@ export default function Create() {
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:3001/api/location/country`, {
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -124,7 +124,6 @@ export default function Create() {
       if (!res.ok) throw new Error(result.message ||result.error || "Failed to fetch country list");
 
       setCountryData(result?.countries || []);
-      setStateData(result?.states || []);
     } catch (err) {
       Swal.fire("Error", err.message , "error");
     } finally {
@@ -173,7 +172,7 @@ export default function Create() {
       formdata.append("state", formData.state);
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch("http://localhost:3001/api/high-rto", {
+      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/high-rto", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,

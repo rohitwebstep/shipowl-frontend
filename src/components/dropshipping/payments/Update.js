@@ -68,7 +68,7 @@ export default function Update() {
       formdata.append("amount", formData.amount);
       formdata.append("status", formData.status);
 
-      const res = await fetch(`http://localhost:3001/api/payment/${id}`, {
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/payment/${id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
@@ -111,7 +111,7 @@ export default function Update() {
     try {
         setLoading(true);
         const response = await fetch(
-            `http://localhost:3001/api/payment/${id}`,
+            `https://sleeping-owl-we0m.onrender.com/api/payment/${id}`,
             {
                 method: "GET",
                 headers: {

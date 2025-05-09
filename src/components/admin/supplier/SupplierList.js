@@ -26,52 +26,52 @@ const SupplierList = () => {
         // Toggle supplier's bank account view on click
         setExpandedSupplier(expandedSupplier === supplierId ? null : supplierId);
       };
-    const fetchSupplier = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+            const fetchSupplier = useCallback(async () => {
+                const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
+                if (adminData?.project?.active_panel !== "admin") {
+                    localStorage.removeItem("shippingData");
+                    router.push("/admin/auth/login");
+                    return;
+                }
 
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
+                const admintoken = adminData?.security?.token;
+                if (!admintoken) {
+                    router.push("/admin/auth/login");
+                    return;
+                }
 
-        try {
-            setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/supplier`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${admintoken}`,
-                },
-            });
+                try {
+                    setLoading(true);
+                    const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${admintoken}`,
+                        },
+                    });
 
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
-                });
-                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
-            }
+                    if (!response.ok) {
+                        const errorMessage = await response.json();
+                        Swal.fire({
+                            icon: "error",
+                            title: "Something Wrong!",
+                            text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+                        });
+                        throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
+                    }
 
-            const result = await response.json();
-            if (result) {
-                setSuppliers(result?.suppliers || []);
-            }
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, setSuppliers]);
-     const fetchCity = useCallback(async () => {
+                    const result = await response.json();
+                    if (result) {
+                        setSuppliers(result?.suppliers || []);
+                    }
+                } catch (error) {
+                    console.error("Error fetching categories:", error);
+                } finally {
+                    setLoading(false);
+                }
+            }, [router, setSuppliers]);
+            const fetchCity = useCallback(async () => {
                 const adminData = JSON.parse(localStorage.getItem("shippingData"));
             
                 if (adminData?.project?.active_panel !== "admin") {
@@ -89,7 +89,7 @@ const SupplierList = () => {
                 try {
                     setLoading(true);
                     const response = await fetch(
-                        `http://localhost:3001/api/location/city`,
+                        `https://sleeping-owl-we0m.onrender.com/api/location/city`,
                         {
                             method: "GET",
                             headers: {
@@ -136,7 +136,7 @@ const SupplierList = () => {
                     try {
                         setLoading(true);
                         const response = await fetch(
-                            `http://localhost:3001/api/location/state`,
+                            `https://sleeping-owl-we0m.onrender.com/api/location/state`,
                             {
                                 method: "GET",
                                 headers: {
@@ -190,7 +190,7 @@ const SupplierList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/supplier/trashed`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -303,7 +303,7 @@ const SupplierList = () => {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/supplier/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -385,7 +385,7 @@ const SupplierList = () => {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/supplier/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -447,7 +447,7 @@ const SupplierList = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `http://localhost:3001/api/supplier/${item?.id}/restore`,
+                    `https://sleeping-owl-we0m.onrender.com/api/supplier/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {

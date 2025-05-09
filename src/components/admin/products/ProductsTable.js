@@ -8,9 +8,9 @@ import React, { useState, useCallback, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
-import { useSupplier } from "../middleware/SupplierMiddleWareContext";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
+import { useAdmin } from '../middleware/AdminMiddleWareContext';
 const ProductTable = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [showRtoLiveCount, setShowRtoLiveCount] = useState(false);
@@ -18,7 +18,8 @@ const ProductTable = () => {
     const [selectedPickupAddress, setSelectedPickupAddress] = useState('');
     const [selectedModel, setSelectedModel] = useState('');
     const [products, setProducts] = useState([]);
-    const { verifySupplierAuth } = useSupplier();
+    const [suppliers, setSuppliers] = useState([]);
+    const { verifyAdminAuth } = useAdmin();
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -31,17 +32,17 @@ const ProductTable = () => {
       });
       
     const fetchProduct = useCallback(async () => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
-            router.push("/supplier/auth/login");
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
             return;
         }
 
@@ -51,7 +52,7 @@ const ProductTable = () => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${suppliertoken}`,
+                    Authorization: `Bearer ${admintoken}`,
                 },
             });
 
@@ -77,17 +78,17 @@ const ProductTable = () => {
     }, [router, setProducts]);
 
     const trashProducts = useCallback(async () => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
-            router.push("/supplier/auth/login");
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
             return;
         }
 
@@ -97,7 +98,7 @@ const ProductTable = () => {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${suppliertoken}`,
+                    Authorization: `Bearer ${admintoken}`,
                 },
             });
 
@@ -122,16 +123,63 @@ const ProductTable = () => {
         }
     }, [router, setProducts]);
 
+     const fetchSupplier = useCallback(async () => {
+    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    
+    if (adminData?.project?.active_panel !== "admin") {
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
+      return;
+    }
+    
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+      router.push("/admin/auth/login");
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier`, {
+          method: "GET",
+          headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${admintoken}`,
+          },
+      });
+    
+      if (!response.ok) {
+          const errorMessage = await response.json();
+          Swal.fire({
+              icon: "error",
+              title: "Something Wrong!",
+              text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+          });
+          throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
+      }
+    
+      const result = await response.json();
+      if (result) {
+          setSuppliers(result?.suppliers || []);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
+    }
+      }, [router, setSuppliers]);
+
     useEffect(() => {
         const fetchData = async () => {
             setIsTrashed(false);
             setLoading(true);
-            await verifySupplierAuth();
+            await verifyAdminAuth();
             await fetchProduct();
+            await fetchSupplier();
             setLoading(false);
         };
         fetchData();
-    }, [fetchProduct, verifySupplierAuth]);
+    }, [fetchProduct, verifyAdminAuth]);
 
     useEffect(() => {
         if (typeof window !== "undefined" && products.length > 0 && !loading) {
@@ -166,16 +214,16 @@ const ProductTable = () => {
 
 
     const handleDelete = async (item) => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        if (supplierData?.project?.active_panel !== "supplier") {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
-            router.push("/supplier/auth/login");
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
             return;
         }
 
@@ -209,7 +257,7 @@ const ProductTable = () => {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -248,16 +296,16 @@ const ProductTable = () => {
         }
     };
     const handlePermanentDelete = async (item) => {
-        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        if (supplierData?.project?.active_panel !== "supplier") {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+        if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
-        const suppliertoken = supplierData?.security?.token;
-        if (!suppliertoken) {
-            router.push("/supplier/auth/login");
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
             return;
         }
 
@@ -291,7 +339,7 @@ const ProductTable = () => {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${suppliertoken}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
                 }
             );
@@ -331,17 +379,17 @@ const ProductTable = () => {
     };
 
      const handleRestore = useCallback(async (item) => {
-            const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+            const adminData = JSON.parse(localStorage.getItem("shippingData"));
     
-            if (supplierData?.project?.active_panel !== "supplier") {
+            if (adminData?.project?.active_panel !== "admin") {
                 localStorage.removeItem("shippingData");
-                router.push("/supplier/auth/login");
+                router.push("/admin/auth/login");
                 return;
             }
     
-            const suppliertoken = supplierData?.security?.token;
-            if (!suppliertoken) {
-                router.push("/supplier/auth/login");
+            const admintoken = adminData?.security?.token;
+            if (!admintoken) {
+                router.push("/admin/auth/login");
                 return;
             }
     
@@ -353,7 +401,7 @@ const ProductTable = () => {
                         method: "PATCH",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${suppliertoken}`,
+                            Authorization: `Bearer ${admintoken}`,
                         },
                     }
                 );
@@ -399,7 +447,7 @@ const ProductTable = () => {
     };
    
     const handleEdit=(id)=>{
-        router.push(`/supplier/product/update?id=${id}`);
+        router.push(`/admin/product/update?id=${id}`);
     }
 
     return (
@@ -410,24 +458,32 @@ const ProductTable = () => {
                 <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
                 <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>
                 <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
-                    <Link href="/supplier/add-product">Add New</Link>
+                    <Link href="/admin/supplier/products/create">Add New</Link>
                 </button>
                 <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">Filters</button>
             </div>
-
+               <div><label className="block text-sm font-medium text-gray-700">Select Supplier</label>
+                    <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm">
+                        <option>Select Supplier</option>
+                                {suppliers?.map((item,index)=>{
+                                    return(
+                                        <option key={index} value={item.id}>{item.name}</option>
+                            )
+                        })}
+                        </select> </div>
             <div className="flex flex-wrap justify-between gap-4 items-end">
                 <div className="w-full md:w-4/12">
                     <label className="block text-sm font-medium text-gray-700">RTO Address *</label>
                     <select
-  value={selectedRtoAddress}
-  onChange={(e) => setSelectedRtoAddress(e.target.value)}
-  className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
->
-  <option value="">All</option>
-  {[...new Set(products.map(item => item.rtoAddress))].map((addr, index) => (
-    <option key={index} value={addr}>{addr}</option>
-  ))}
-</select>
+                        value={selectedRtoAddress}
+                        onChange={(e) => setSelectedRtoAddress(e.target.value)}
+                        className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
+                        >
+                        <option value="">All</option>
+                        {[...new Set(products.map(item => item.rtoAddress))].map((addr, index) => (
+                            <option key={index} value={addr}>{addr}</option>
+                        ))}
+                        </select>
 
                 </div>
 
@@ -680,7 +736,7 @@ const ProductTable = () => {
             </table>
             </div>
                 ) : (
-                // Render when no suppliers
+                // Render when no admins
                 <div className='text-center'>No Products available</div>
                 )}                
 

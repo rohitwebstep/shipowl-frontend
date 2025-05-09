@@ -35,7 +35,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/sub-user`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin`,
                 {
                     method: "GET",
                     headers: {
@@ -56,7 +56,7 @@ export default function List() {
                 throw new Error(result.message || result.error || "Something Wrong!");
             }
     
-            setData(result?.highRtos || []);
+            setData(result?.admins || []);
         } catch (error) {
             console.error("Error fetching cities:", error);
         } finally {
@@ -82,7 +82,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/sub-user/trashed`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -109,7 +109,7 @@ export default function List() {
 
             const result = await response.json();
             if (result) {
-                setData(result?.highRtos || []);
+                setData(result?.admins || []);
             }
         } catch (error) {
             console.error("Error fetching trashed Subuser:", error);
@@ -208,7 +208,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/sub-user/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -269,7 +269,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/sub-user/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -349,7 +349,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/sub-user/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -450,7 +450,8 @@ export default function List() {
                           <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                               <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Name</th>
                               <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Email</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Permissions</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Role</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Type</th>
                               <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Profile Picture</th>
                               <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
                           </tr>
@@ -462,7 +463,8 @@ export default function List() {
                                            
                                   <td className="p-2 whitespace-nowrap px-5">{item.name}</td>
                                   <td className="p-2 whitespace-nowrap px-5">{item.email}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.Permissions}</td>
+                                  <td className="p-2 whitespace-nowrap px-5">{item.role}</td>
+                                  <td className="p-2 whitespace-nowrap px-5">{item.type}</td>
                                   <td className="p-2 whitespace-nowrap px-5"> <img src={item.image} alt={item.name} /></td>
                                   <td className="p-2 px-5 text-[#8F9BBA] text-center">
 

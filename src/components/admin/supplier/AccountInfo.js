@@ -118,7 +118,7 @@ const AccountInfo = () => {
         didOpen: () => Swal.showLoading()
       });
   
-      const url = "http://localhost:3001/api/supplier";
+      const url = "https://sleeping-owl-we0m.onrender.com/api/supplier";
       const form = new FormData();
   
       for (const key in formData) {

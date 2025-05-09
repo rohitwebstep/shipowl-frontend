@@ -35,15 +35,15 @@ export default function ShippingDetails() {
       setLoading(true);
 
       const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-      if (dropshipperData?.project?.active_panel !== "supplier") {
+      if (dropshipperData?.project?.active_panel !== "admin") {
           localStorage.removeItem("shippingData");
-          router.push("/supplier/auth/login");
+          router.push("/admin/auth/login");
           return;
       }
 
       const token = dropshipperData?.security?.token;
       if (!token) {
-          router.push("/supplier/auth/login");
+          router.push("/admin/auth/login");
           return;
       }
 
