@@ -17,6 +17,7 @@ import { RiFileEditFill } from 'react-icons/ri';
 import { IoCloudDownloadOutline } from 'react-icons/io5';
 import { RxCrossCircled } from 'react-icons/rx';
 import { IoIosArrowDropdown } from 'react-icons/io';
+import 'datatables.net-dt/css/dataTables.dataTables.css';
 
 export default function Orders() {
   const [filter, setFilter] = useState("Actual Ratio");
@@ -106,6 +107,7 @@ export default function Orders() {
       return;
     }
 
+    
     try {
       setLoading(true);
       const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/order', {
@@ -134,6 +136,100 @@ export default function Orders() {
       setLoading(false);
     }
   }, [router]);
+ const handleShipping = useCallback(async (id) => {
+  const supplierData = JSON.parse(localStorage.getItem('shippingData'));
+
+  if (supplierData?.project?.active_panel !== 'supplier') {
+    localStorage.removeItem('shippingData');
+    router.push('/supplier/auth/login');
+    return;
+  }
+
+  const suppliertoken = supplierData?.security?.token;
+  if (!suppliertoken) {
+    router.push('/supplier/auth/login');
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${suppliertoken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.json();
+
+      if (errorMessage.isHighRto === true) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'High RTO Risk',
+          text: 'This order has a high Return-To-Origin (RTO) risk. Do you want to continue?',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, proceed',
+          cancelButtonText: 'Cancel',
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              const confirmResponse = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/confirm`, {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${suppliertoken}`,
+                },
+              });
+
+              if (confirmResponse.ok) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Confirmed',
+                  text: 'Shipping confirmed successfully.',
+                });
+
+                // Optional: refresh order data
+                const updated = await confirmResponse.json();
+                setOrders(updated?.orders || []);
+              } else {
+                const confirmError = await confirmResponse.json();
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: confirmError.message || 'Confirmation failed.',
+                });
+              }
+            } catch (error) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Something went wrong during confirmation.',
+              });
+            }
+          }
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Something went wrong!',
+          text: errorMessage.error || errorMessage.message || 'Please try again.',
+        });
+      }
+
+      return;
+    }
+
+    const result = await response.json();
+    setOrders(result?.orders || []);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+  } finally {
+    setLoading(false);
+  }
+}, [router]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -181,6 +277,41 @@ export default function Orders() {
   const lostCount = orders.filter(order => order.status === 'lost').length;
   const damagedCount = orders.filter(order => order.status === 'damage').length;
 
+
+   useEffect(() => {
+          if (typeof window !== 'undefined' && orders.length > 0 && !loading) {
+              let table = null;
+  
+              Promise.all([
+                  import('jquery'),
+                  import('datatables.net'),
+                  import('datatables.net-dt'),
+                  import('datatables.net-buttons'),
+                  import('datatables.net-buttons-dt')
+              ]).then(([jQuery]) => {
+                  window.jQuery = window.$ = jQuery.default;
+  
+                  // Destroy existing DataTable if it exists
+                  if ($.fn.DataTable.isDataTable('#orderTable')) {
+                      $('#orderTable').DataTable().destroy();
+                      $('#orderTable').empty();
+                  }
+  
+                  // Reinitialize DataTable with new data
+                  table = $('#orderTable').DataTable();
+  
+                  return () => {
+                      if (table) {
+                          table.destroy();
+                          $('#orderTable').empty();
+                      }
+                  };
+              }).catch((error) => {
+                  console.error('Failed to load DataTables dependencies:', error);
+              });
+          }
+      }, [orders, loading]);
+  
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -331,17 +462,14 @@ export default function Orders() {
           </div>
         </div>
         {filteredOrders?.length > 0 ? (
-  <div className="overflow-x-auto">
-  <table className="w-full border-collapse">
+   <div className="overflow-x-auto relative main-outer-wrapper w-full">
+  <table className="md:w-full w-auto display main-tables" id="orderTable">
     <thead>
       <tr className="text-[#A3AED0] border-b border-[#E9EDF7]">
         <th className="p-2 px-5 text-left uppercase">Order ID</th>
         <th className="p-2 px-5 text-left uppercase">Name</th>
         <th className="p-2 px-5 text-left uppercase">Payment Info</th>
-        <th className="p-2 px-5 text-left uppercase">Order Tags</th>
-        <th className="p-2 px-5 text-left uppercase">Seller Tags</th>
         <th className="p-2 px-5 text-left uppercase">Shipment Details</th>
-        <th className="p-2 px-5 text-left uppercase">SLA</th>
         <th className="p-2 px-5 text-center uppercase">Action</th>
       </tr>
     </thead>
@@ -363,7 +491,7 @@ export default function Orders() {
       </div>
     </label>
     <div>
-      <b className="text-black truncate">{order.orderNumber}</b>
+      <b className="text-black truncate uppercase">{order.orderNumber}</b>
       <br />
       <span>
       {typeof order.createdAt === "string" && order.createdAt
@@ -394,17 +522,16 @@ export default function Orders() {
   <span>Value: {order.totalAmount}</span>
   <span className="text-red-500 block">{order.status}</span>
 </td>
-
-<td className="p-2 whitespace-nowrap px-5">N/A</td>
-<td className="p-2 whitespace-nowrap px-5">N/A</td>
-
 <td className="p-2 whitespace-nowrap px-5">
   <span>{order.shippingName}</span>
   <br />
   <span className="text-[#05CD99]">{order.shippingPhone}</span>
   <br />
   <span>{order.shippingAddress}</span>
+  <br />
+  <span>{order.shippingZip}</span>
 </td>
+
 {isNoteModalOpen && (
   <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
     <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
@@ -441,7 +568,6 @@ export default function Orders() {
     </div>
   </div>
 )}
-<td className="p-2 whitespace-nowrap px-5">N/A</td>
 
 <td className="p-2 whitespace-nowrap px-5">
   <ul className="flex gap-2 justify-between">
@@ -456,6 +582,8 @@ export default function Orders() {
   >
     View / Add Notes
   </button>
+   <button className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md text-sm" onClick={()=>handleShipping(order.id)}>Shipping</button>
+
 </td>
 </tr>
 ))}

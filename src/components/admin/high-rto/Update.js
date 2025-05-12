@@ -3,8 +3,8 @@ import { useRouter ,useSearchParams} from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import Select from 'react-select';
 import Swal from "sweetalert2";
-
-export default function Create() {
+import { HashLoader } from "react-spinners";
+export default function Update() {
   const router = useRouter();
   const [loading, setLoading] = useState(null);
   const [showBulkForm, setShowBulkForm] = useState(null);
@@ -269,6 +269,13 @@ export default function Create() {
     }
   };
 
+  if (loading) {
+            return (
+                <div className="flex items-center justify-center h-[80vh]">
+                    <HashLoader size={60} color="#F97316" loading={true} />
+                </div>
+            );
+        }
   
      
   

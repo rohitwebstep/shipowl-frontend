@@ -368,8 +368,7 @@ export default function Warehouse() {
              if (result.status) {
                  Swal.fire({
                      icon: "success",
-                     title: `${item.name} Has Been Restored Successfully !`,
-                     text: result.message,
+                     text: `${item.name} Has Been Restored Successfully !`,
                  });
                  await trashwarehouse();
                  await fetchWarehouse();

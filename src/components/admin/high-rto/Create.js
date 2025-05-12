@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import Select from 'react-select';
 import Swal from "sweetalert2";
-
+import { HashLoader } from "react-spinners";
 export default function Create() {
   const router = useRouter();
   const [loading, setLoading] = useState(null);
@@ -182,7 +182,7 @@ export default function Create() {
 
       if (!res.ok) throw new Error(result.message || "Creation failed");
 
-      Swal.fire("High RTO Created", " Hihg RTO has been created successfully!", "success").then(() => {
+      Swal.fire("High RTO Created", " High RTO has been created successfully!", "success").then(() => {
         setFormData({state: "", country: "", city: "", pincode: "" });
         router.push("/admin/high-rto/list");
       });
@@ -205,6 +205,13 @@ export default function Create() {
       Swal.fire("Please select a file before uploading", "", "warning");
     }
   };
+  if (loading) {
+            return (
+                <div className="flex items-center justify-center h-[80vh]">
+                    <HashLoader size={60} color="#F97316" loading={true} />
+                </div>
+            );
+        }
 
   return (
     <div className="md:w-10/12 p-6 bg-white shadow-md rounded-lg mt-6">

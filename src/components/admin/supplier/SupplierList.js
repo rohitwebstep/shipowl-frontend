@@ -476,8 +476,7 @@ const SupplierList = () => {
                 if (result.status) {
                     Swal.fire({
                         icon: "success",
-                        title: `${item.name} Has Been Restored Successfully !`,
-                        text: result.message,
+                        text: `${item.name} Has Been Restored Successfully !`,
                     });
                     await trashSupplier();
                 }

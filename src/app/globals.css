@@ -14,7 +14,11 @@
 .font-public-sans {
   font-family: var(--font-public-sans), sans-serif;
 }
-
+th.text-left{
+    text-align: left !important;
+}td.text-left{
+    text-align: left !important;
+}
 body {
   font-family: 'Public Sans', sans-serif;
   background: #F1F5F9 !important;

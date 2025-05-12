@@ -5,29 +5,66 @@ import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { AiOutlineDelete } from "react-icons/ai";
 import HashLoader from "react-spinners/HashLoader";
-import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-
+import { useAdmin } from "../middleware/AdminMiddleWareContext";
 
 export default function List() {
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [selected, setSelected] = useState([]);
-    const [stateData, setStateData] = useState([]);
-    const [country, setCountry] = useState([]);
+    const [data, setData] = useState([]);
     const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
-
-    const handleCheckboxChange = (id) => {
-        setSelected((prev) =>
-            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-        );
-    };
-
-    const fetchState = useCallback(async () => {
+    const fetchGoodPincode = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+    
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+    
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `https://sleeping-owl-we0m.onrender.com/api/bad-pincode`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
+    
+            const result = await response.json();
+    
+            if (!response.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                });
+                throw new Error(result.message || result.error || "Something Wrong!");
+            }
+    
+            setData(result?.badPincodes || []);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
+    
+    const trashedGoodPincode = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
         if (adminData?.project?.active_panel !== "admin") {
@@ -45,7 +82,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                `https://sleeping-owl-we0m.onrender.com/api/bad-pincode/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -72,85 +109,29 @@ export default function List() {
 
             const result = await response.json();
             if (result) {
-                setStateData(result?.states || []);
-                setCountry(result?.countries || []);
+                setData(result?.badPincodes || []);
             }
         } catch (error) {
-            console.error("Error fetching state:", error);
+            console.error("Error fetching trashed Bad Performing:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, setStateData]);
+    }, [router, setData]);
 
-    const trashState = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state/trashed`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
-                });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Something Wrong!"
-                );
-            }
-
-            const result = await response.json();
-            if (result) {
-                setStateData(result?.states || []);
-                setCountry(result?.countries || []);
-
-            }
-        } catch (error) {
-            console.error("Error fetching trashed state:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, setStateData]);
 
     useEffect(() => {
         const fetchData = async () => {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
-            await fetchState();
+            await fetchGoodPincode();
             setLoading(false);
         };
         fetchData();
-    }, [fetchState, verifyAdminAuth]);
+    }, [fetchGoodPincode, verifyAdminAuth]);
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && stateData.length > 0 && !loading) {
+        if (typeof window !== 'undefined' && data.length > 0 && !loading) {
             let table = null;
 
             Promise.all([
@@ -163,28 +144,28 @@ export default function List() {
                 window.jQuery = window.$ = jQuery.default;
 
                 // Destroy existing DataTable if it exists
-                if ($.fn.DataTable.isDataTable('#statetable')) {
-                    $('#statetable').DataTable().destroy();
-                    $('#statetable').empty();
+                if ($.fn.DataTable.isDataTable('#rto-table')) {
+                    $('#rto-table').DataTable().destroy();
+                    $('#rto-table').empty();
                 }
 
                 // Reinitialize DataTable with new data
-                table = $('#statetable').DataTable();
+                table = $('#rto-table').DataTable();
 
                 return () => {
                     if (table) {
                         table.destroy();
-                        $('#statetable').empty();
+                        $('#rto-table').empty();
                     }
                 };
             }).catch((error) => {
                 console.error('Failed to load DataTables dependencies:', error);
             });
         }
-    }, [stateData, loading]);
+    }, [data, loading]);
 
     const handleEditItem = (item) => {
-        router.push(`/admin/state/update?id=${item.id}`);
+        router.push(`/admin/bad-pincodes/update?id=${item.id}`);
     };
 
 
@@ -227,7 +208,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/bad-pincode/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -258,7 +239,7 @@ export default function List() {
                 text: result.message || `${item.name} has been Trashed successfully.`,
             });
 
-            await fetchState();
+            await fetchGoodPincode();
         } catch (error) {
             Swal.close();
             Swal.fire({
@@ -270,61 +251,6 @@ export default function List() {
             setLoading(false);
         }
     };
-
-    const handleBulkDelete = async () => {
-        if (selected.length === 0) {
-            Swal.fire("No items selected", "", "info");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: `You will delete ${selected.length} state!`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete them!",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        const admintoken = adminData?.security?.token;
-
-        try {
-            Swal.fire({ title: "Deleting...", didOpen: () => Swal.showLoading() });
-            setLoading(true);
-
-            const results = await Promise.all(
-                selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}`, {
-                        method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${admintoken}`,
-                        },
-                    })
-                )
-            );
-
-            Swal.close();
-            await fetchState();
-            setSelected([]);
-            Swal.fire("Deleted!", `${results.length} state were deleted.`, "success");
-        } catch (error) {
-            Swal.close();
-            Swal.fire("Error", error.message || "Failed to delete", "error");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const exportCsv = () => {
-        const table = $('#statetable').DataTable();
-        table.button('.buttons-csv').trigger();
-    };
-
     const handleRestore = useCallback(async (item) => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -343,7 +269,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/bad-pincode/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -372,16 +298,16 @@ export default function List() {
             if (result.status) {
                 Swal.fire({
                     icon: "success",
-                    text: `${item.name} Has Been Restored Successfully !`,
+                    text:"Pincode Restored Successfully",
                 });
-                await trashState();
+                await trashedGoodPincode();
             }
         } catch (error) {
             console.error("Error:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, trashState]);
+    }, [router, trashedGoodPincode]);
 
     const handlePermanentDelete = async (item) => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -422,7 +348,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/bad-pincode/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -453,7 +379,7 @@ export default function List() {
                 text: result.message || `${item.name} has been deleted successfully.`,
             });
 
-            await trashState();
+            await trashedGoodPincode();
         } catch (error) {
             Swal.close();
             Swal.fire({
@@ -465,129 +391,96 @@ export default function List() {
             setLoading(false);
         }
     };
+  if (loading) {
+          return (
+              <div className="flex items-center justify-center h-[80vh]">
+                  <HashLoader size={60} color="#F97316" loading={true} />
+              </div>
+          );
+      }
 
+         
+                  
     return (
-        <div className="">
-            {loading ? (
-                <div className="flex justify-center items-center h-96">
-                    <HashLoader color="orange" />
-                </div>
-            ) : (
-                <div className="bg-white rounded-3xl p-5 main-outer-wrapper">
-                    <div className="flex flex-wrap justify-between items-center mb-4">
-                        <h2 className="md:text-2xl font-bold text-[#2B3674]">
-                            {isTrashed ? "Trashed state List" : "state List"}
-                        </h2>
-                        <div className="flex gap-3 flex-wrap items-center">
-                            <button
-                                onClick={() => setIsPopupOpen((prev) => !prev)}
-                                className="bg-[#F4F7FE] p-2 rounded-lg relative"
-                            >
-                                <MoreHorizontal className="text-[#F98F5C]" />
-                                {isPopupOpen && (
-                                    <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
-                                        <ul className="py-2 text-sm text-[#2B3674]">
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => exportCsv()}>
-                                                Export CSV
-                                            </li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => handleBulkDelete()}>
-                                                Bulk Delete
-                                            </li>
-                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                                        </ul>
-                                    </div>
-                                )}
-                            </button>
-                            <div className="flex justify-end gap-2">
-                                <button
+        <>
+
+            <div className="bg-white rounded-3xl md:w-8/12 p-5">
+                <div className="flex flex-wrap justify-between items-center mb-4">
+                    <h2 className="text-2xl font-bold text-[#2B3674]">Bad Pincodes List</h2>
+                    <div className="flex gap-3  flex-wrap items-center">
+                        <button
+                            onClick={() => setIsPopupOpen((prev) => !prev)}
+                            className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                        >
+                            <MoreHorizontal className="text-[#F98F5C]" />
+                            {isPopupOpen && (
+                                <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                                    <ul className="py-2 text-sm text-[#2B3674]">
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                    </ul>
+                                </div>
+                            )}
+                        </button>
+                        <div className="flex justify-start gap-5 items-end">
+                        <button
                                     className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                     onClick={async () => {
                                         if (isTrashed) {
                                             setIsTrashed(false);
-                                            await fetchState();
+                                            await fetchGoodPincode();
                                         } else {
                                             setIsTrashed(true);
-                                            await trashState();
+                                            await trashedGoodPincode();
                                         }
                                     }}
                                 >
-                                    {isTrashed ? "state Listing (Simple)" : "Trashed state"}
+                                    {isTrashed ? "Bad Pincodes Listing (Simple)" : "Trashed Pincodes"}
                                 </button>
-                                <button
-                                  
-                                    className="bg-[#4285F4] text-white rounded-md p-2 px-4"
-                                >
-                                    <Link href="/admin/state/create">Add state</Link>
-                                </button>
-                            </div>
+                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/bad-pincodes/create">Add New</Link></button>
                         </div>
                     </div>
-
-                    {stateData.length > 0 ? (
-  <div className="overflow-x-auto w-full relative">
-    <table id="statetable" className="display main-tables w-full">
-      <thead>
-        <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-          <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">State Name</th>
-          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">ISO 2 CODE</th>
-          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
-          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Type</th>
-          <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {stateData.map((item, index) => (
-          <tr key={index} className="bg-white border-b border-[#E9EDF7] hover:bg-gray-50">
-            <td className="px-6 py-4">{item.name}</td>
-            <td className="px-6 py-4">{item.iso2}</td>
-            <td className="px-6 py-4">
-  {
-    (() => {
-      const filtered = country.filter((c) => {
-        const match = c.id === item.countryId;
-        return match;
-      });
-
-
-      const names = filtered.map((c) => {
-        return c.name;
-      });
-      return names.join(', ');
-    })()
-  }
-</td>
-
-
-
-            <td className="px-6 py-4">{item.type}</td>
-               <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
-                <div className="flex justify-center gap-2">
-                    {isTrashed ? (
-                        <>
-                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
-                        </>
-                    ) : (
-                        <>
-                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
-                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
-                        </>
-                    )}
                 </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-                    ) : (
-                    <div className="text-center py-20 text-[#A3AED0] text-lg font-medium">
-                        No State found.
-                    </div>
-                    )}
+              {data.length > 0 ?(
+                    <div className="overflow-x-auto relative main-outer-wrapper w-full">
+            <table className="md:w-full w-auto display main-tables" id="rto-table">
+                      <thead>
+                          <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">SR.</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pincode</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {data.map((item,index) => (
+                              <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">  
+                                  <td className="p-2 whitespace-nowrap text-left px-5">{index+1}</td>
+                                  <td className="p-2 whitespace-nowrap text-left px-5">{item.pincode}</td>
+                                  <td className="p-2 px-5 text-[#8F9BBA] text-center">
+                                    <div className="flex justify-end gap-2">{isTrashed ? (
+                                        <>
+                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
+                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                                        </>
+                                    )}</div>
+                                  </td>
+                              </tr>
+                          ))}
+                      </tbody>
+                  </table>
+              </div>
+              ):(
+                <p className="text-center">No Pincode Found</p>
+              )}
+            </div>
 
-                </div>
-            )}
-        </div>
-    );
+
+        </>
+    )
 }

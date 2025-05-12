@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter,useSearchParams} from "next/navigation";
 import Swal from "sweetalert2";
 import Select from "react-select";
+import { HashLoader } from "react-spinners";
 
-export default function Create() {
+export default function Update() {
   const router = useRouter();
   const [permission, setPermission] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -201,9 +202,9 @@ const handleSubmit = async (e) => {
     });
 
     const result = await res.json();
-    if (!res.ok) throw new Error(result.message || "Failed to create admin");
+    if (!res.ok) throw new Error(result.message || "Failed to Update admin");
 
-    Swal.fire("Success", "The admin Updated successfully!", "success");
+    Swal.fire("Success", "Admin Updated Successfuly!", "success");
     // Reset form
     setFormData({
       name: "",
@@ -315,10 +316,16 @@ const handleSubmit = async (e) => {
     { label: "Website", name: "website", type: "text" },
     { label: "Permanent Address", name: "permanentAddress", type: "text" },
   ];
-
+  if (loading) {
+          return (
+              <div className="flex items-center justify-center h-[80vh]">
+                  <HashLoader size={60} color="#F97316" loading={true} />
+              </div>
+          );
+      }
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white rounded shadow space-y-6">
-      <h2 className="text-xl font-semibold">Create Subuser</h2>
+      <h2 className="text-xl font-semibold">Update Subuser</h2>
 
       <div className="grid grid-cols-2 gap-4">
         {formFields.map(({ label, name, type, required }) => (

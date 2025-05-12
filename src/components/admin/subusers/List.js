@@ -298,8 +298,7 @@ export default function List() {
             if (result.status) {
                 Swal.fire({
                     icon: "success",
-                    title: `Rto Has Been Restored Successfully !`,
-                    text: result.message,
+                    text: `Rto Has Been Restored Successfully !`,
                 });
                 await trashedUsers();
             }

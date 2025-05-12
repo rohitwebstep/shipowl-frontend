@@ -304,8 +304,7 @@ export default function Payments() {
             if (result.status) {
                 Swal.fire({
                     icon: "success",
-                    title: `Payment Has Been Restored Successfully !`,
-                    text: result.message,
+                    text: `Payment Has Been Restored Successfully !`,
                 });
                 await trashedPayments();
             }
