@@ -72,7 +72,8 @@ const CategorySection = () => {
       <div className="container">
         <h2 className="md:text-[24px] text-lg text-[#F98F5C] font-lato font-bold">Top Categories</h2>
         <div className="md:w-[281px] border-b-3 border-[#F98F5C] mt-1 mb-4"></div>
-        <div className="xl:grid grid-cols-7 flex overflow-auto gap-4 py-4 justify-between">
+        {
+          categoryData.length>0 ? ( <div className="xl:grid grid-cols-7 flex overflow-auto gap-4 py-4 justify-between">
           {categoryData.map((category, index) => (
             <div key={index} className="flex w-full md:justify-items-start justify-center p-3 items-center">
               <div>
@@ -88,7 +89,11 @@ const CategorySection = () => {
               </div>
             </div>
           ))}
-        </div>
+        </div>):(
+          <p className='text-center'>No Category Found</p>
+        )
+        }
+       
       </div>
     </section>
   );
