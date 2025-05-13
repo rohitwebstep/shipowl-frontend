@@ -52,7 +52,7 @@ export default function Login() {
         });
     
         try {
-            const response = await fetch(`http://localhost:3001/api/dropshipper/auth/login`, {
+            const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/dropshipper/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),

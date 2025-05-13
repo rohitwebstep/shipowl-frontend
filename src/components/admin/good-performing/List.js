@@ -35,7 +35,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/good-pincode`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/good-pincode`,
                 {
                     method: "GET",
                     headers: {
@@ -82,7 +82,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/good-pincode/trashed`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/good-pincode/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -208,7 +208,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/good-pincode/${item.id}`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/good-pincode/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -269,7 +269,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/good-pincode/${item?.id}/restore`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/good-pincode/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -348,7 +348,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/good-pincode/${item.id}/destroy`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/good-pincode/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

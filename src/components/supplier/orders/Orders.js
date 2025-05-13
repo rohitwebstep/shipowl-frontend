@@ -21,6 +21,7 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 
 export default function Orders() {
   const [filter, setFilter] = useState("Actual Ratio");
+  const [tracking, setTracking] = useState([]);
   const [filters, setFilters] = useState({
     orderId: '',
     productName: '',
@@ -31,6 +32,7 @@ export default function Orders() {
     status: 'All',
     model: 'Warehouse Model',
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const today = new Date();
@@ -110,7 +112,7 @@ export default function Orders() {
     
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/order', {
+      const response = await fetch('http://https://sleeping-owl-we0m.onrender.com/api/order', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +156,7 @@ export default function Orders() {
   try {
     setLoading(true);
 
-    const response = await fetch(`http://localhost:3001/api/order/${id}/shipping`, {
+    const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -176,7 +178,7 @@ export default function Orders() {
         }).then(async (result) => {
           if (result.isConfirmed) {
             try {
-              const confirmResponse = await fetch(`http://localhost:3001/api/order/${id}/shipping/confirm`, {
+              const confirmResponse = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/confirm`, {
                 method: 'POST',
                 headers: {
                   Authorization: `Bearer ${suppliertoken}`,
@@ -192,7 +194,6 @@ export default function Orders() {
 
                 // Optional: refresh order data
                 const updated = await confirmResponse.json();
-                setOrders(updated?.orders || []);
               } else {
                 const confirmError = await confirmResponse.json();
                 Swal.fire({
@@ -222,7 +223,55 @@ export default function Orders() {
     }
 
     const result = await response.json();
-    setOrders(result?.orders || []);
+        fetchOrders();
+``
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+  } finally {
+    setLoading(false);
+  }
+}, [router]);
+ const handleCancel = useCallback(async (id) => {
+  const supplierData = JSON.parse(localStorage.getItem('shippingData'));
+
+  if (supplierData?.project?.active_panel !== 'supplier') {
+    localStorage.removeItem('shippingData');
+    router.push('/supplier/auth/login');
+    return;
+  }
+
+  const suppliertoken = supplierData?.security?.token;
+  if (!suppliertoken) {
+    router.push('/supplier/auth/login');
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/cancel`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${suppliertoken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.json();
+
+    
+        Swal.fire({
+          icon: 'error',
+          title: 'Something went wrong!',
+          text: errorMessage.error || errorMessage.message || 'Please try again.',
+        });
+
+      return;
+    }
+
+    const result = await response.json();
+    fetchOrders();
   } catch (error) {
     console.error('Error fetching orders:', error);
   } finally {
@@ -230,11 +279,66 @@ export default function Orders() {
   }
 }, [router]);
 
+const handleTracking = useCallback(async (id) => {
+  const supplierData = JSON.parse(localStorage.getItem('shippingData'));
+
+  if (supplierData?.project?.active_panel !== 'supplier') {
+    localStorage.removeItem('shippingData');
+    router.push('/supplier/auth/login');
+    return;
+  }
+
+  const suppliertoken = supplierData?.security?.token;
+  if (!suppliertoken) {
+    router.push('/supplier/auth/login');
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/status`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${suppliertoken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.json();
+      Swal.fire({
+        icon: 'error',
+        title: 'Something went wrong!',
+        text: errorMessage.error || errorMessage.message || 'Please try again.',
+      });
+      return;
+    }
+
+    const result = await response.json();
+    setTracking(result?.data || null);
+    setIsModalOpen(true);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+  } finally {
+    setLoading(false);
+  }
+}, [router]);
+
+const closeModal = () => {
+  setIsModalOpen(false);
+  setTracking(null);
+};
+
+
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       await verifySupplierAuth();
       await fetchOrders();
+      setLoading(false);
+
     };
     fetchData();
   }, [verifySupplierAuth, fetchOrders]);
@@ -436,15 +540,7 @@ export default function Orders() {
             >
               <option value="Actual Ratio ">Bulk Action</option>
             </select>
-            <button className="bg-[#F4F7FE] px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
-              <input
-                type="month"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="outline-0 font-dm-sans"
-              />
-            </button>
-            <button
+              <button
               onClick={() => setIsPopupOpen((prev) => !prev)}
               className="bg-[#F4F7FE] p-2 rounded-lg relative"
             >
@@ -459,6 +555,15 @@ export default function Orders() {
                 </div>
               )}
             </button>
+            <button className="bg-[#F4F7FE] px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="outline-0 font-dm-sans"
+              />
+            </button>
+          
           </div>
         </div>
         {filteredOrders?.length > 0 ? (
@@ -467,9 +572,10 @@ export default function Orders() {
     <thead>
       <tr className="text-[#A3AED0] border-b border-[#E9EDF7]">
         <th className="p-2 px-5 text-left uppercase">Order ID</th>
-        <th className="p-2 px-5 text-left uppercase">Name</th>
+        <th className="p-2 px-5 text-left uppercase">Product Info</th>
         <th className="p-2 px-5 text-left uppercase">Payment Info</th>
         <th className="p-2 px-5 text-left uppercase">Shipment Details</th>
+        <th className="p-2 px-5 text-left uppercase">Order Status</th>
         <th className="p-2 px-5 text-center uppercase">Action</th>
       </tr>
     </thead>
@@ -503,24 +609,45 @@ export default function Orders() {
 </td>
 
 <td className="p-2 whitespace-nowrap px-5">
-  {order.items?.length > 0 && (
-    <>
-      <span>Product ID: {order.items[0].productId}</span>
-      <br />
-      <span className="text-sm">
-        Variant: {order.items[0].variantId}
-        <br />
-        Qty: {order.items[0].quantity}
-      </span>
-    </>
+  {order.items?.length > 0 ? (
+    order.items.map((item, index) => (
+      <div key={index} className="mb-4 border-b pb-2">
+        <span className="block font-semibold text-gray-800">
+          {item.product?.name || 'N/A'}
+        </span>
+        <p className="text-sm text-gray-600 mb-1">
+          {item.product?.description || 'No description'}
+        </p>
+        <p className="text-sm text-gray-700">
+          <span className="font-medium">Price:</span> ₹{item.price} &nbsp;
+          <span className="font-medium">Qty:</span> {item.quantity} &nbsp;
+          <span className="font-medium">Total:</span> ₹{item.total}
+        </p>
+      </div>
+    ))
+  ) : (
+    <span>No products</span>
   )}
 </td>
 
+
 <td className="p-2 whitespace-nowrap px-5">
-  <span>Currency: {order.currency}</span>
+  <span>Transaction Id: {order.payment.transactionId}</span>
   <br />
-  <span>Value: {order.totalAmount}</span>
-  <span className="text-red-500 block">{order.status}</span>
+  <span className='block'>Amount: {order.payment.amount}</span>
+<span
+  className={`px-2 py-1 rounded inline-block text-white text-sm capitalize ${
+    order.payment.status === "success"
+      ? "bg-green-500"
+      : order.payment.status === "cancelled"
+      ? "bg-red-500"
+      : order.payment.status === "pending"
+      ? "bg-yellow-500 text-black"
+      : "bg-gray-400"
+  }`}
+>
+  {order.payment.status}
+</span>
 </td>
 <td className="p-2 whitespace-nowrap px-5">
   <span>{order.shippingName}</span>
@@ -570,19 +697,60 @@ export default function Orders() {
 )}
 
 <td className="p-2 whitespace-nowrap px-5">
-  <ul className="flex gap-2 justify-between">
-    <li><RiFileEditFill className="text-black text-2xl" /></li>
-    <li><IoCloudDownloadOutline className="text-black text-2xl" /></li>
-    <li><RxCrossCircled className="text-black text-2xl" /></li>
-    <li><IoIosArrowDropdown className="text-black text-2xl" /></li>
+  <span
+  className={`px-2 py-1 rounded w-max  inline-block text-white text-sm capitalize  ${
+    order.status === "success"
+      ? "bg-green-500"
+      : order.status === "cancelled"
+      ? "bg-red-500"
+      : order.status === "pending"
+      ? "bg-yellow-500 text-black"
+      : "bg-gray-400"
+  }`}
+>
+  {order.status}
+</span>
+</td>
+<td className="p-2 whitespace-nowrap px-5">
+  <ul className="flex gap-6 justify-end ">
+    <li><RiFileEditFill className="text-black text-3xl" /></li>
+    <li><IoCloudDownloadOutline className="text-black text-3xl" /></li>
+    <li><RxCrossCircled className="text-black text-3xl" /></li>
+    <li><IoIosArrowDropdown className="text-black text-3xl" /></li>
   </ul>
+<div className="flex gap-3 justify-end">
   <button
     onClick={() => setIsNoteModalOpen(true)}
-    className="text-[#F98F5C] border rounded-md font-dm-sans p-2 w-full mt-2 text-sm"
+    className="text-[#F98F5C] border rounded-md font-dm-sans p-2 w-auto mt-2 text-sm"
   >
     View / Add Notes
   </button>
-   <button className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md text-sm" onClick={()=>handleShipping(order.id)}>Shipping</button>
+
+ {!order.shippingApiResult?.data?.awb_number ? (
+  <button
+    className="bg-orange-500 text-white font-medium px-4 py-2 rounded-md text-sm"
+    onClick={() => handleShipping(order.id)}
+  >
+    Shipping
+  </button>
+) : order.shippingApiResult?.data?.awb_number ? (
+  <>
+    <button
+      className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md text-sm mr-2"
+      onClick={() => handleTracking(order.id)}
+    >
+      Tracking
+    </button>
+    <button
+      className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md text-sm"
+      onClick={() => handleCancel(order.id)}
+    >
+      Cancel
+    </button>
+  </>
+) : null}
+
+</div>
 
 </td>
 </tr>
@@ -598,9 +766,59 @@ export default function Orders() {
       
         
       </div>
+{isModalOpen && tracking?.trackingData && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg w-full max-w-2xl shadow-lg p-6 relative">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">Tracking Details</h2>
 
-    
+      <div className="mb-4">
+        <p><span className="font-medium">AWB Number:</span> {tracking.awb_number}</p>
+        <p><span className="font-medium">Current Status:</span> {tracking.trackingData.current_status?.status_title}</p>
+        <p><span className="font-medium">Description:</span> {tracking.trackingData.current_status?.status_description}</p>
+        <p><span className="font-medium">Updated At:</span> {tracking.trackingData.current_status?.event_date}</p>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Tracking History</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full border border-gray-300 text-sm">
+            <thead className="bg-gray-100 text-gray-700">
+              <tr>
+                <th className="border px-4 py-2 text-left">Status</th>
+                <th className="border px-4 py-2 text-left">Description</th>
+                <th className="border px-4 py-2 text-left">Location</th>
+                <th className="border px-4 py-2 text-left">Code</th>
+                <th className="border px-4 py-2 text-left">Event Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tracking.trackingData.data?.map((event, index) => (
+                <tr key={index} className="border-t">
+                  <td className="px-4 py-2">{event.status_title}</td>
+                  <td className="px-4 py-2">{event.status_description}</td>
+                  <td className="px-4 py-2">{event.status_location || "—"}</td>
+                  <td className="px-4 py-2">{event.status_code || "—"}</td>
+                  <td className="px-4 py-2">{event.event_date}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <button
+        onClick={closeModal}
+        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+)}
+
 
     </div>
+
+    
   );
 }

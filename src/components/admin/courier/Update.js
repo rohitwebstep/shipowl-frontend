@@ -9,13 +9,13 @@ import Select from 'react-select';
 
 export default function Update() {
     const [companyData,setcompanyData] = useState([])
-    const [stateData,setStateData] = useState([])
     const [formData, setFormData] = useState({
-
         name: "",
         code: "",
         website: "",
         email: "",
+        rtoCharges:"",
+        flatShippingRate:"",
         phoneNumber: "",
         status: "",
     })
@@ -33,16 +33,18 @@ export default function Update() {
     }, [verifyAdminAuth]);
 
     const validate = () => {
-        const newErrors = {};
-        if (!formData.name.trim()) newErrors.name = "Courier name is required.";
-        if (!formData.code.trim()) newErrors.code = "Courier code is required.";
-        if (formData.website && !/^https?:\/\/.+\..+/.test(formData.website))
-          newErrors.website = "Enter a valid website URL.";
-        if (formData.email && !/\S+@\S+\.\S+/.test(formData.email))
-          newErrors.email = "Enter a valid email address.";
-        if (!formData.phoneNumber.trim()) newErrors.phoneNumber = "Phone number is required.";
-        return newErrors;
-      };
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Courier name is required.";
+    if (!formData.flatShippingRate.trim()) newErrors.flatShippingRate = "This Field is required.";
+    if (!formData.rtoCharges.trim()) newErrors.rtoCharges = "This Field is required.";
+    if (!formData.code.trim()) newErrors.code = "Courier code is required.";
+    if (formData.website && !/^https?:\/\/.+\..+/.test(formData.website))
+      newErrors.website = "Enter a valid website URL.";
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Enter a valid email address.";
+    if (!formData.phoneNumber.trim()) newErrors.phoneNumber = "Phone number is required.";
+    return newErrors;
+  };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -70,7 +72,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/courier-company/${id}`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/courier-company/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -99,6 +101,8 @@ export default function Update() {
                 website:companyData?.website || "",
                 email:companyData?.email || "",
                 phoneNumber:companyData?.phoneNumber|| "",
+                rtoCharges:companyData?.rtoCharges || "",
+                flatShippingRate:companyData?.flatShippingRate || "",
                 status: companyData?.status || "active",
               });
               setcompanyData(companyData)
@@ -158,7 +162,7 @@ export default function Update() {
                 }
             });
 
-            const url = `http://localhost:3001/api/courier-company/${id}`;
+            const url = `http://https://sleeping-owl-we0m.onrender.com/api/courier-company/${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {
@@ -194,9 +198,14 @@ export default function Update() {
             }).then((res) => {
                 if (res.isConfirmed) {
                     setFormData({
-                        name: '',
-                        state: '',
-                        countryId: '',
+                        name: "",
+                        code: "",
+                        website: "",
+                        email: "",
+                        rtoCharges:"",
+                        flatShippingRate:"",
+                        phoneNumber: "",
+                        status: "",
                     });
                     router.push("/admin/courier/list");
                 }
@@ -288,7 +297,28 @@ export default function Update() {
             />
             {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber}</p>}
           </div>
-
+           <div>
+            <Label htmlFor="flatShippingRate" required>Flat Shipping Rate</Label>
+            <input
+              type="number"
+              name="flatShippingRate"
+              value={formData.flatShippingRate || ''}
+              onChange={handleChange}
+              className={inputClass("flatShippingRate")}
+            />
+            {errors.flatShippingRate && <p className="text-red-500 text-sm">{errors.flatShippingRate}</p>}
+          </div>
+          <div>
+            <Label htmlFor="rtoCharges" required>RTO charges</Label>
+            <input
+              type="number"
+              name="rtoCharges"
+              value={formData.rtoCharges || ''}
+              onChange={handleChange}
+              className={inputClass("rtoCharges")}
+            />
+            {errors.rtoCharges && <p className="text-red-500 text-sm">{errors.rtoCharges}</p>}
+          </div>
           <div>
             <Label htmlFor="status">Status</Label>
             <select

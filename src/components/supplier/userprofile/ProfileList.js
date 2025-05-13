@@ -32,7 +32,7 @@ const ProfileList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/supplier/profile`, {
+            const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/supplier/profile`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -78,7 +78,7 @@ const ProfileList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/city`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -125,7 +125,7 @@ const ProfileList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/state`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/state`,
                 {
                     method: "GET",
                     headers: {

@@ -80,10 +80,10 @@ export default function List() {
                     <table className="w-full">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">API Key<i></i></th>
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Title<i></i></th>
-                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">description<i></i></th>
-                                <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action<i></i></th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">API Key</th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Title</th>
+                                <th className="p-2 whitespace-nowrap px-5 text-left uppercase">description</th>
+                                <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
                             </tr>
                         </thead>
                         <tbody>

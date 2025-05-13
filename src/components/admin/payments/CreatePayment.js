@@ -171,14 +171,14 @@ export default function CreatePayment() {
                                             <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
                                                 <FaCheck className=" peer-checked:block text-white w-3 h-3" />
                                             </div>
-                                        </label><span className=''>Company Name<i></i></span>
+                                        </label><span className=''>Company Name</span>
                                     </div>
 
                                 </th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Payment Cycle<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Payable Amt. (B2B)<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Wallet Balance<i></i></th>
-                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Model<i></i></th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Payment Cycle</th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Payable Amt. (B2B)</th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Wallet Balance</th>
+                                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Model</th>
                             </tr>
                         </thead>
                         <tbody>

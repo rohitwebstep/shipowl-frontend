@@ -64,13 +64,13 @@ export default function CourierDetails() {
             <thead className="">
               <tr className="text-[#A3AED0] border-b  ">
                 <th className="p-2 ps-0 px-5 whitespace-nowrap text-left uppercase">NAME </th>
-                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Total <i></i></th>
-                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Booked <i></i></th>
-                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">PP <i></i></th>
-                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">IT <i></i></th>
-                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">DL <i></i></th>
-                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Exception <i></i></th>
-                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">RTO <i></i></th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Total </th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Booked </th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">PP </th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">IT </th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">DL </th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">Exception </th>
+                <th className="p-2 px-5 whitespace-nowrap text-left uppercase">RTO </th>
               </tr>
             </thead>
             <tbody>

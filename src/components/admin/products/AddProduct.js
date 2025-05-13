@@ -49,7 +49,7 @@ const AddProduct = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/product/${id}`, {
+      const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/product/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -156,7 +156,7 @@ if (!admintoken) {
 
 try {
   setLoading(true);
-  const response = await fetch(`http://localhost:3001/api/supplier`, {
+  const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/supplier`, {
       method: "GET",
       headers: {
           "Content-Type": "application/json",

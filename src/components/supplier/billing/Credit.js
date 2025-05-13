@@ -134,13 +134,13 @@ export default function Credit() {
                                                                             peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
                                                 <FaCheck className=" peer-checked:block text-white w-3 h-3" />
                                             </div>
-                                        </label><span>Invoice No. #<i></i></span>
+                                        </label><span>Invoice No. #</span>
                                     </div>
                                 </th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Date<i></i></th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase text-red-500">Invoice Period<i></i></th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Amount<i></i></th>
-                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Pdf File Link<i></i></th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Date</th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase text-red-500">Invoice Period</th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Invoice Amount</th>
+                                <th className="p-3 px-5 whitespace-nowrap text-left uppercase">Pdf File Link</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -48,7 +48,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/city`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -97,7 +97,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/city/trashed`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/city/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -222,7 +222,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/location/city/${item.id}`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/city/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -283,7 +283,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/city/${item?.id}/restore`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/city/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -362,7 +362,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/location/city/${item.id}/destroy`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/city/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -433,7 +433,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`http://localhost:3001/api/location/city/${id}`, {
+                    fetch(`http://https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",

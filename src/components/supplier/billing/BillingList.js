@@ -212,18 +212,18 @@ export default function BillingList() {
                                                                             peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
                                                 <FaCheck className=" peer-checked:block text-white w-3 h-3" />
                                             </div>
-                                        </label><span>Date<i></i></span>
+                                        </label><span>Date</span>
                                     </div>
 
                                 </th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Txn Type<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase text-red-500">Ref No#<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Transaction ID<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Credit(₹)<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Debit(₹)<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Closing Balance(₹)<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Model<i></i></th>
-                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Description<i></i></th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Txn Type</th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase text-red-500">Ref No#</th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Transaction ID</th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Credit(₹)</th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Debit(₹)</th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Closing Balance(₹)</th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Model</th>
+                                <th className="p-3 whitespace-nowrap px-5 text-left uppercase">Description</th>
                             </tr>
                         </thead>
                         <tbody>

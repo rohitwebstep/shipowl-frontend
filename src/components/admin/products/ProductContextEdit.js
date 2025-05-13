@@ -78,7 +78,7 @@ const ProductProviderEdit = ({ children }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/category', {
+      const response = await fetch('http://https://sleeping-owl-we0m.onrender.com/api/category', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ const ProductProviderEdit = ({ children }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/brand', {
+      const response = await fetch('http://https://sleeping-owl-we0m.onrender.com/api/brand', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +172,7 @@ const ProductProviderEdit = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/location/country', {
+      const response = await fetch('http://https://sleeping-owl-we0m.onrender.com/api/location/country', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

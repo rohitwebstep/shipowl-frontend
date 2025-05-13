@@ -261,17 +261,17 @@ export default function ManageProducts() {
                                             </div>
 
                                         </label>
-                                        <span>Channel<i></i></span>
+                                        <span>Channel</span>
                                     </div></th>
-                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Model<i></i></th>
-                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">SKU<i></i></th>
-                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Product Details<i></i></th>
-                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Delivery Ratio<i></i></th>
-                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Owl Price<i></i></th>
-                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Selling Price<i></i></th>
-                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Inventory<i></i></th>
-                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Pushed Date & Time<i></i></th>
-                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Action<i></i></th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Model</th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">SKU</th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Product Details</th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Delivery Ratio</th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Owl Price</th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Selling Price</th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Inventory</th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Pushed Date & Time</th>
+                                    <th className="dm p-3 text-left uppercase whitespace-nowrap">Action</th>
                                 </tr>
                             </thead>
                             <tbody>

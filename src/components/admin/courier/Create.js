@@ -12,6 +12,8 @@ export default function Create() {
     website: "",
     email: "",
     phoneNumber: "",
+    rtoCharges:"",
+    flatShippingRate:"",
     status: "active",
   });
 
@@ -29,6 +31,8 @@ export default function Create() {
   const validate = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Courier name is required.";
+    if (!formData.flatShippingRate.trim()) newErrors.flatShippingRate = "This Field is required.";
+    if (!formData.rtoCharges.trim()) newErrors.rtoCharges = "This Field is required.";
     if (!formData.code.trim()) newErrors.code = "Courier code is required.";
     if (formData.website && !/^https?:\/\/.+\..+/.test(formData.website))
       newErrors.website = "Enter a valid website URL.";
@@ -87,7 +91,7 @@ export default function Create() {
   
      
   
-      const url = "http://localhost:3001/api/courier-company";
+      const url = "http://https://sleeping-owl-we0m.onrender.com/api/courier-company";
   
       const response = await fetch(url, {
         method: "POST",
@@ -143,6 +147,8 @@ export default function Create() {
               website: "",
               email: "",
               phoneNumber: "",
+              rtoCharges:"",
+              flatShippingRate:"",
               status: "active",
             });
             setFiles([]);
@@ -245,6 +251,28 @@ export default function Create() {
               className={inputClass("phoneNumber")}
             />
             {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber}</p>}
+          </div>
+          <div>
+            <Label htmlFor="flatShippingRate" required>Flat Shipping Rate</Label>
+            <input
+              type="number"
+              name="flatShippingRate"
+              value={formData.flatShippingRate || ''}
+              onChange={handleChange}
+              className={inputClass("flatShippingRate")}
+            />
+            {errors.flatShippingRate && <p className="text-red-500 text-sm">{errors.flatShippingRate}</p>}
+          </div>
+          <div>
+            <Label htmlFor="rtoCharges" required>RTO charges</Label>
+            <input
+              type="number"
+              name="rtoCharges"
+              value={formData.rtoCharges || ''}
+              onChange={handleChange}
+              className={inputClass("rtoCharges")}
+            />
+            {errors.rtoCharges && <p className="text-red-500 text-sm">{errors.rtoCharges}</p>}
           </div>
 
           <div>

@@ -225,17 +225,17 @@ export default function RTO() {
                         <FaCheck className=" peer-checked:block text-white w-3 h-3" />
                       </div>
                     </label>
-                    <span>Order ID <i></i></span>
+                    <span>Order ID </span>
                   </div>
                 </th>
-                <th className="p-3 whitespace-nowrap uppercase text-left">Name<i></i></th>
-                <th className="p-3 whitespace-nowrap uppercase text-left">Payment Info<i></i></th>
-                <th className="p-3 whitespace-nowrap uppercase text-left">Model<i></i></th>
-                <th className="p-3 whitespace-nowrap uppercase text-left">Shipment Details<i></i></th>
-                <th className="p-3 whitespace-nowrap uppercase text-left">Return tracking number<i></i></th>
-                <th className="p-3 whitespace-nowrap uppercase text-left">Return status<i></i></th>
-                <th className="p-3 whitespace-nowrap uppercase text-left">Return Date<i></i></th>
-                <th className="p-3 whitespace-nowrap uppercase text-center">Action<i></i></th>
+                <th className="p-3 whitespace-nowrap uppercase text-left">Name</th>
+                <th className="p-3 whitespace-nowrap uppercase text-left">Payment Info</th>
+                <th className="p-3 whitespace-nowrap uppercase text-left">Model</th>
+                <th className="p-3 whitespace-nowrap uppercase text-left">Shipment Details</th>
+                <th className="p-3 whitespace-nowrap uppercase text-left">Return tracking number</th>
+                <th className="p-3 whitespace-nowrap uppercase text-left">Return status</th>
+                <th className="p-3 whitespace-nowrap uppercase text-left">Return Date</th>
+                <th className="p-3 whitespace-nowrap uppercase text-center">Action</th>
               </tr>
             </thead>
             <tbody>

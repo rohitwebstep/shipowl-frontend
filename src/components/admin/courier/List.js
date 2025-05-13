@@ -47,7 +47,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/courier-company`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/courier-company`,
                 {
                     method: "GET",
                     headers: {
@@ -94,7 +94,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/courier-company/trashed`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/courier-company/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -219,7 +219,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/courier-company/${item.id}`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/courier-company/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -280,7 +280,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/courier-company/${item?.id}/restore`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/courier-company/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -359,7 +359,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/courier-company/${item.id}/destroy`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/courier-company/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -455,13 +455,15 @@ export default function List() {
                   <table className="w-full" id="courier-companytable">
                       <thead>
                           <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Name<i></i></th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Code<i></i></th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Website<i></i></th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Email<i></i></th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Number<i></i></th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status<i></i></th>
-                              <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action<i></i></th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Name</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Code</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Website</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Email</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Number</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase"> RTO Charges</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase"> Flat Shipping Rate</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status</th>
+                              <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
                           </tr>
                       </thead>
                       <tbody>
@@ -485,17 +487,20 @@ export default function List() {
                                       </div>
 
                                   </td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.code}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.website}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.email}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.phoneNumber}</td>
+                                  <td className="p-2 whitespace-nowrap px-5">{item.code || 'NIL'}</td>
+                                  <td className="p-2 whitespace-nowrap px-5">{item.website || 'NIL'}</td>
+                                  <td className="p-2 whitespace-nowrap px-5">{item.email || 'NIL'}</td>
+                                  <td className="p-2 whitespace-nowrap px-5">{item.phoneNumber || 'NIL'}</td>
+                                  <td className="p-2 whitespace-nowrap px-5">{item.rtoCharges || 'NIL'}</td>
+                                  <td className="p-2 whitespace-nowrap px-5">{item.flatShippingRate || 'NIL'}</td>
                                   <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
                                                 {item.status ? (
                                                     <span className="bg-green-100 text-green-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
                                                 ) : (
                                                     <span className="bg-red-100 text-red-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
                                                 )}
-                                            </td>                                  <td className="p-2 px-5 text-[#8F9BBA] text-center">
+                                            </td>   
+                                  <td className="p-2 px-5 text-[#8F9BBA] text-center">
 
                                     <div className="flex gap-2">{isTrashed ? (
                                         <>

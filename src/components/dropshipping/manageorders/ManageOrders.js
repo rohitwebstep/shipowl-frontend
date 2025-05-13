@@ -191,17 +191,17 @@ export default function ManageOrders() {
                                                 </div>
 
                                             </label>
-                                            <span>Channel<i></i></span>
+                                            <span>Channel</span>
                                         </div>
 
                                     </th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Order ID<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Items<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Payment Info<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Order Tags<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Seller Tags<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Shipment Details<i></i></th>
-                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Action<i></i></th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Order ID</th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Items</th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Payment Info</th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Order Tags</th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Seller Tags</th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Shipment Details</th>
+                                    <th className="font-dm-sans whitespace-nowrap p-3 text-left uppercase">Action</th>
                                 </tr>
                             </thead>
                             <tbody>

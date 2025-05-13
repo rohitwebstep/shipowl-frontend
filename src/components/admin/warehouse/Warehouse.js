@@ -84,12 +84,12 @@ export default function Warehouse() {
           <table className="w-full">
             <thead>
               <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Warehouse Name<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Contact Name<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Address<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Pickup Address<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">RTO Address<i></i></th>
-                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Action<i></i></th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Warehouse Name</th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Contact Name</th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Address</th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Pickup Address</th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">RTO Address</th>
+                <th className="p-2 whitespace-nowrap px-5 text-left font-normal">Action</th>
               </tr>
             </thead>
             <tbody>

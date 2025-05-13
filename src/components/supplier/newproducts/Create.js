@@ -91,7 +91,7 @@ function Create() {
                   });
               }
   
-              const url ="http://localhost:3001/api/product/request";
+              const url ="http://https://sleeping-owl-we0m.onrender.com/api/product/request";
   
               const response = await fetch(url, {
                   method: "POST",

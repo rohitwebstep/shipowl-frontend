@@ -35,7 +35,7 @@ export default function NewProducts() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `http://localhost:3001/api/product/request`,
+                      `http://https://sleeping-owl-we0m.onrender.com/api/product/request`,
                       {
                           method: "GET",
                           headers: {
@@ -87,7 +87,7 @@ export default function NewProducts() {
 
     try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3001/api/supplier`, {
+        const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/supplier`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -134,7 +134,7 @@ export default function NewProducts() {
               try {
                   setLoading(true);
                   const response = await fetch(
-                      `http://localhost:3001/api/product/request/trashed`,
+                      `http://https://sleeping-owl-we0m.onrender.com/api/product/request/trashed`,
                       {
                           method: "GET",
                           headers: {
@@ -188,7 +188,7 @@ export default function NewProducts() {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `http://localhost:3001/api/product/request/${item?.id}/restore`,
+                    `http://https://sleeping-owl-we0m.onrender.com/api/product/request/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -266,7 +266,7 @@ export default function NewProducts() {
                 setLoading(true);
     
                 const response = await fetch(
-                    `http://localhost:3001/api/product/request/${item.id}/destroy`,
+                    `http://https://sleeping-owl-we0m.onrender.com/api/product/request/${item.id}/destroy`,
                     {
                         method: "DELETE",
                         headers: {
@@ -357,7 +357,7 @@ export default function NewProducts() {
               setLoading(true);
   
               const response = await fetch(
-                  `http://localhost:3001/api/product/request/${item.id}`,
+                  `http://https://sleeping-owl-we0m.onrender.com/api/product/request/${item.id}`,
                   {
                       method: "DELETE",
                       headers: {

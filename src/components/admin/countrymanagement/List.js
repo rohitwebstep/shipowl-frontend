@@ -46,7 +46,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/country`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/country`,
                 {
                     method: "GET",
                     headers: {
@@ -100,7 +100,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/country/trashed`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/country/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -233,7 +233,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/location/country/${item.id}`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/country/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -304,7 +304,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`http://localhost:3001/api/location/country/${id}`, {
+                    fetch(`http://https://sleeping-owl-we0m.onrender.com/api/location/country/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -349,7 +349,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/country/${item?.id}/restore`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/country/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -428,7 +428,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/location/country/${item.id}/destroy`,
+                `http://https://sleeping-owl-we0m.onrender.com/api/location/country/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

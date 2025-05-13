@@ -184,14 +184,14 @@ export default function Orders() {
                     <table className="w-full border-collapse">
                         <thead>
                             <tr className="text-[#A3AED0] border-b border-[#E9EDF7]">
-                                <th className="p-2 whitespace-nowrap text-left uppercase">Order ID<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left uppercase">Name<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left uppercase">Payment Info<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left uppercase">Order Tags<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left uppercase">Seller Tags<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left uppercase">Shipment Details<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-left uppercase">SLA<i></i></th>
-                                <th className="p-2 whitespace-nowrap text-center uppercase">Action<i></i></th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Order ID</th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Name</th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Payment Info</th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Order Tags</th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Seller Tags</th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">Shipment Details</th>
+                                <th className="p-2 whitespace-nowrap text-left uppercase">SLA</th>
+                                <th className="p-2 whitespace-nowrap text-center uppercase">Action</th>
                             </tr>
                         </thead>
                         <tbody>
