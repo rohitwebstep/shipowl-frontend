@@ -87,14 +87,53 @@ export default function Create() {
     }
   };
 
-  const handleBulkSubmit = (e) => {
-    e.preventDefault();
-    if (bulkFile) {
-      // Upload logic here
-    } else {
-      Swal.fire("Please select a file before uploading", "", "warning");
-    }
-  };
+const handleBulkSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!bulkFile) {
+    Swal.fire("Please select a file before uploading", "", "warning");
+    return;
+  }
+
+  setLoading(true);
+  const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+  const token = dropshipperData?.security?.token;
+
+  if (dropshipperData?.project?.active_panel !== "admin" || !token) {
+    localStorage.clear();
+    router.push("/admin/auth/login");
+    return;
+  }
+
+  try {
+    Swal.fire({ title: "Uploading Bulk Pincodes...", allowOutsideClick: false, didOpen: Swal.showLoading });
+
+    const formdata = new FormData();
+    formdata.append("badPincodes", bulkFile);
+    const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/bad-pincode/import", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formdata,
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) throw new Error(result.message ||result.error || "Bulk upload failed");
+
+    Swal.fire("Success", "Bulk Bad Pincodes uploaded successfully!", "success").then(() => {
+      setBulkFile(null);
+      setShowBulkForm(false);
+      router.push("/admin/bad-pincodes/list");
+    });
+  } catch (err) {
+    Swal.fire("Error", err.message || "Something went wrong.", "error");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     if (loading) {
               return (
