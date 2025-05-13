@@ -288,8 +288,8 @@ const AdminList = () => {
                 <td className="p-2 px-5">{item.type}</td>
                 <td className="p-2 px-5 text-[#8F9BBA]">
                   <div className="flex justify-center gap-2">
-                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
-                    <AiOutlineDelete className="cursor-pointer text-2xl" />
+                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
+                    <AiOutlineDelete className="cursor-pointer text-3xl" />
                   </div>
                 </td>
               </tr>

@@ -73,7 +73,7 @@ const SourceAProduct = () => {
                 form.append('image', file);
             });
 
-            const url = "https://sleeping-owl-we0m.onrender.com/api/product/request";
+            const url = "http://localhost:3001/api/product/request";
 
             const response = await fetch(url, {
                 method: "POST",
@@ -175,7 +175,7 @@ const SourceAProduct = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/category`, {
+            const response = await fetch(`http://localhost:3001/api/category`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -212,7 +212,7 @@ const SourceAProduct = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper`, {
+            const response = await fetch(`http://localhost:3001/api/dropshipper`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

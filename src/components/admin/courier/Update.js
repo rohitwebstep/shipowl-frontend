@@ -17,7 +17,7 @@ export default function Update() {
         website: "",
         email: "",
         phoneNumber: "",
-        status: "active",
+        status: "",
     })
            
     const searchParams = useSearchParams();
@@ -70,7 +70,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${id}`,
+                `http://localhost:3001/api/courier-company/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -99,7 +99,7 @@ export default function Update() {
                 website:companyData?.website || "",
                 email:companyData?.email || "",
                 phoneNumber:companyData?.phoneNumber|| "",
-                status: companyData?.status ||"active",
+                status: companyData?.status || "active",
               });
               setcompanyData(companyData)
         } catch (error) {
@@ -158,7 +158,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/courier-company/${id}`;
+            const url = `http://localhost:3001/api/courier-company/${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {
@@ -224,8 +224,9 @@ export default function Update() {
     }
 
     return (
-        <section className="add Company xl:w-8/12">
-           <form onSubmit={handleSubmit} className="space-y-4">
+        <section className="add Company bg-white p-3 rounded-md xl:w-8/12">
+        <h2 className="text-xl font-semibold mb-4">Update Courier Company</h2>
+       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid md:grid-cols-2 grid-cols-1 gap-2">
           <div>
             <Label htmlFor="name" required>Courier Name</Label>

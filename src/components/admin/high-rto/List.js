@@ -38,7 +38,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto`,
+                `http://localhost:3001/api/high-rto`,
                 {
                     method: "GET",
                     headers: {
@@ -60,6 +60,16 @@ export default function List() {
             }
     
             setData(result?.highRtos || []);
+            const dataList=result?.highRtos;
+            if(dataList?.stateId){
+            fetchState();
+            }
+            if(dataList?.cityId){
+                await fetchCity();
+            }
+            if(dataList?.countryId){
+             await fetchcountry();
+            }
         } catch (error) {
             console.error("Error fetching cities:", error);
         } finally {
@@ -85,7 +95,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/trashed`,
+                `http://localhost:3001/api/high-rto/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -138,7 +148,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
+                `http://localhost:3001/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -185,7 +195,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                `http://localhost:3001/api/location/state`,
                 {
                     method: "GET",
                     headers: {
@@ -238,7 +248,7 @@ export default function List() {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/location/country`,
+                    `http://localhost:3001/api/location/country`,
                     {
                         method: "GET",
                         headers: {
@@ -281,9 +291,8 @@ export default function List() {
             setLoading(true);
             await verifyAdminAuth();
             await fetchRto();
-            await fetchState();
-            await fetchCity();
-            await fetchcountry();
+
+         
             setLoading(false);
         };
         fetchData();
@@ -367,7 +376,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item.id}`,
+                `http://localhost:3001/api/high-rto/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -428,7 +437,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item?.id}/restore`,
+                `http://localhost:3001/api/high-rto/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -507,7 +516,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item.id}/destroy`,
+                `http://localhost:3001/api/high-rto/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -671,12 +680,12 @@ export default function List() {
                                     <div className="flex justify-end gap-2">{isTrashed ? (
                                         <>
                                             <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
                                         </>
                                     ) : (
                                         <>
-                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
-                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
+                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
                                         </>
                                     )}</div>
 

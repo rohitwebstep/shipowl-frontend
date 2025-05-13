@@ -66,7 +66,7 @@ export default function Create() {
       const formdata = new FormData();
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/bad-pincode", {
+      const res = await fetch("http://localhost:3001/api/bad-pincode", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
@@ -74,14 +74,14 @@ export default function Create() {
 
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.message || "Creation failed");
+      if (!res.ok) throw new Error(result.message || result.error|| "Creation failed");
 
       Swal.fire("Bad Pincodes Created", " Bad Pincodes has been created successfully!", "success").then(() => {
         setFormData({state: "", country: "", city: "", pincode: "" });
         router.push("/admin/bad-pincodes/list");
       });
     } catch (err) {
-      Swal.fire("Error", err.message || "Something went wrong.", "error");
+      Swal.fire("Error", err.message || err.error|| "Something went wrong.", "error");
     } finally {
       setLoading(false);
     }
@@ -110,7 +110,7 @@ const handleBulkSubmit = async (e) => {
 
     const formdata = new FormData();
     formdata.append("badPincodes", bulkFile);
-    const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/bad-pincode/import", {
+    const res = await fetch("http://localhost:3001/api/bad-pincode/import", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -128,7 +128,7 @@ const handleBulkSubmit = async (e) => {
       router.push("/admin/bad-pincodes/list");
     });
   } catch (err) {
-    Swal.fire("Error", err.message || "Something went wrong.", "error");
+    Swal.fire("Error", err.message || err.error|| "Something went wrong.", "error");
   } finally {
     setLoading(false);
   }

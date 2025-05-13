@@ -42,7 +42,7 @@ const Dropshipper = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper`, {
+            const response = await fetch(`http://localhost:3001/api/dropshipper`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -88,7 +88,7 @@ const Dropshipper = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/trashed`, {
+            const response = await fetch(`http://localhost:3001/api/dropshipper/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -201,7 +201,7 @@ const Dropshipper = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/${item.id}`,
+                `http://localhost:3001/api/dropshipper/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -283,7 +283,7 @@ const Dropshipper = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/${item.id}/destroy`,
+                `http://localhost:3001/api/dropshipper/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -345,7 +345,7 @@ const Dropshipper = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/dropshipper/${item?.id}/restore`,
+                    `http://localhost:3001/api/dropshipper/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -413,7 +413,7 @@ const Dropshipper = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/location/city`,
+                    `http://localhost:3001/api/location/city`,
                     {
                         method: "GET",
                         headers: {
@@ -460,7 +460,7 @@ const Dropshipper = () => {
                 try {
                     setLoading(true);
                     const response = await fetch(
-                        `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                        `http://localhost:3001/api/location/state`,
                         {
                             method: "GET",
                             headers: {
@@ -611,18 +611,18 @@ const Dropshipper = () => {
                                                             />
                                                             <AiOutlineDelete
                                                                 onClick={() => handlePermanentDelete(item)} 
-                                                                className="cursor-pointer text-2xl"
+                                                                className="cursor-pointer text-3xl"
                                                             />
                                                         </>
                                                     ) : (
                                                         <>
                                                             <MdModeEdit
                                                                 onClick={() => handleEdit(item.id)} 
-                                                                className="cursor-pointer text-2xl"
+                                                                className="cursor-pointer text-3xl"
                                                             />
                                                             <AiOutlineDelete
                                                                 onClick={() => handleDelete(item)} 
-                                                                className="cursor-pointer text-2xl"
+                                                                className="cursor-pointer text-3xl"
                                                             />
                                                         </>
                                                     )}

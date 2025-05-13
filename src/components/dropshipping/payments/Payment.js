@@ -43,7 +43,7 @@ export default function Payments() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/payment`,
+                `http://localhost:3001/api/payment`,
                 {
                     method: "GET",
                     headers: {
@@ -90,7 +90,7 @@ export default function Payments() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/payment/trashed`,
+                `http://localhost:3001/api/payment/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -214,7 +214,7 @@ export default function Payments() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/payment/${item.id}`,
+                `http://localhost:3001/api/payment/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -275,7 +275,7 @@ export default function Payments() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/payment/${item?.id}/restore`,
+                `http://localhost:3001/api/payment/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -354,7 +354,7 @@ export default function Payments() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/payment/${item.id}/destroy`,
+                `http://localhost:3001/api/payment/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -505,12 +505,12 @@ export default function Payments() {
                 <div className="flex justify-end gap-2">{isTrashed ? (
                 <>
                     <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
                 </>
             ) : (
                 <>
-                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
-                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
+                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
                 </>
             )}</div>
                 </td>

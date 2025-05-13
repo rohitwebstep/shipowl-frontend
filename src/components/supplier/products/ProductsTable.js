@@ -47,7 +47,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product`, {
+            const response = await fetch(`http://localhost:3001/api/product`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -93,7 +93,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
+            const response = await fetch(`http://localhost:3001/api/product/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -204,7 +204,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
+                `http://localhost:3001/api/product/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -286,7 +286,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}/destroy`,
+                `http://localhost:3001/api/product/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -348,7 +348,7 @@ const ProductTable = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
+                    `http://localhost:3001/api/product/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {
@@ -663,12 +663,12 @@ const ProductTable = () => {
                             {isTrashed ? (
                                 <>
                                     <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
                                 </>
                             ) : (
                                 <>
-                                    <MdModeEdit onClick={() => handleEdit(item.id)} className="cursor-pointer text-2xl" />
-                                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                                    <MdModeEdit onClick={() => handleEdit(item.id)} className="cursor-pointer text-3xl" />
+                                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
                                 </>
                             )}
                         </div>

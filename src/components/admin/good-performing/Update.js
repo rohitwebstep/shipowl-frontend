@@ -52,7 +52,7 @@ export default function Update() {
     try {
         setLoading(true);
         const response = await fetch(
-            `https://sleeping-owl-we0m.onrender.com/api/good-pincode/${id}`,
+            `http://localhost:3001/api/good-pincode/${id}`,
             {
                 method: "GET",
                 headers: {
@@ -122,7 +122,7 @@ export default function Update() {
       const formdata = new FormData();
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/good-pincode/${id}`, {
+      const res = await fetch(`http://localhost:3001/api/good-pincode/${id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
@@ -130,7 +130,7 @@ export default function Update() {
 
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.message || "Creation failed");
+      if (!res.ok) throw new Error(result.message || result.error || "Creation failed");
 
       Swal.fire("Updating...", "Good Pincode Has been Updated successfully!", "success").then(() => {
         setFormData({state: "", country: "", city: "", pincode: "" });
@@ -165,7 +165,7 @@ export default function Update() {
 
   return (
     <div className="md:w-10/12 p-6 bg-white shadow-md rounded-lg mt-6">
-      <h2 className="text-xl font-semibold mb-4">Add High RTO</h2>
+      <h2 className="text-xl font-semibold mb-4">Update Pincode</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
           <div>

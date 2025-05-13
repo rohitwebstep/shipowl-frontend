@@ -66,7 +66,7 @@ export default function Create() {
       const formdata = new FormData();
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/good-pincode", {
+      const res = await fetch("http://localhost:3001/api/good-pincode", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
@@ -74,7 +74,7 @@ export default function Create() {
 
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.message || "Creation failed");
+      if (!res.ok) throw new Error(result.message || result.error || "Creation failed");
 
       Swal.fire("Good Pincodes Created", " Good Pincodes has been created successfully!", "success").then(() => {
         setFormData({state: "", country: "", city: "", pincode: "" });
@@ -110,7 +110,7 @@ const handleBulkSubmit = async (e) => {
 
     const formdata = new FormData();
     formdata.append("goodPincodes", bulkFile);
-    const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/good-pincode/import", {
+    const res = await fetch("http://localhost:3001/api/good-pincode/import", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

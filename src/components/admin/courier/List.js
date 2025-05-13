@@ -47,7 +47,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company`,
+                `http://localhost:3001/api/courier-company`,
                 {
                     method: "GET",
                     headers: {
@@ -94,7 +94,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/trashed`,
+                `http://localhost:3001/api/courier-company/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -219,7 +219,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${item.id}`,
+                `http://localhost:3001/api/courier-company/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -280,7 +280,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${item?.id}/restore`,
+                `http://localhost:3001/api/courier-company/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -359,7 +359,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${item.id}/destroy`,
+                `http://localhost:3001/api/courier-company/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -414,7 +414,7 @@ export default function List() {
 
             <div className="bg-white rounded-3xl p-5">
                 <div className="flex flex-wrap justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold text-[#2B3674]">Courier List</h2>
+                    <h2 className="text-2xl font-bold text-[#2B3674]">Courier Company List</h2>
                     <div className="flex gap-3  flex-wrap items-center">
                         <button
                             onClick={() => setIsPopupOpen((prev) => !prev)}
@@ -500,12 +500,12 @@ export default function List() {
                                     <div className="flex gap-2">{isTrashed ? (
                                         <>
                                             <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
                                         </>
                                     ) : (
                                         <>
-                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
-                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
+                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
                                         </>
                                     )}</div>
 

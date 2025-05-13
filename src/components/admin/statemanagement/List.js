@@ -45,7 +45,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                `http://localhost:3001/api/location/state`,
                 {
                     method: "GET",
                     headers: {
@@ -100,7 +100,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state/trashed`,
+                `http://localhost:3001/api/location/state/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -227,7 +227,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state/${item.id}`,
+                `http://localhost:3001/api/location/state/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -298,7 +298,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}`, {
+                    fetch(`http://localhost:3001/api/location/state/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -343,7 +343,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state/${item?.id}/restore`,
+                `http://localhost:3001/api/location/state/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -422,7 +422,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state/${item.id}/destroy`,
+                `http://localhost:3001/api/location/state/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -565,12 +565,12 @@ export default function List() {
                     {isTrashed ? (
                         <>
                             <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-2xl" />
+                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
                         </>
                     ) : (
                         <>
-                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-2xl" />
-                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-2xl" />
+                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
+                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
                         </>
                     )}
                 </div>

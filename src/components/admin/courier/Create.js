@@ -87,7 +87,7 @@ export default function Create() {
   
      
   
-      const url = "https://sleeping-owl-we0m.onrender.com/api/courier-company";
+      const url = "http://localhost:3001/api/courier-company";
   
       const response = await fetch(url, {
         method: "POST",
@@ -135,6 +135,7 @@ export default function Create() {
           text: `The Company has been created successfully!`,
           showConfirmButton: true,
         }).then((res) => {
+          router.push("/admin/courier/list/");
           if (res.isConfirmed) {
             setFormData({
               name: "",
@@ -145,7 +146,6 @@ export default function Create() {
               status: "active",
             });
             setFiles([]);
-            router.push("/admin/courier/list");
           }
         });
       }

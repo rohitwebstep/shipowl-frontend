@@ -95,7 +95,7 @@ const Payment = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper`;
+      const url = `http://localhost:3001/api/dropshipper`;
       const form = new FormData();
 
       // Append formData

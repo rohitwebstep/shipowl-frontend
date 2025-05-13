@@ -53,7 +53,7 @@ export default function Create() {
 
     try {
       setLoading(true);
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+      const res = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -83,7 +83,7 @@ export default function Create() {
 
     try {
       setLoading(true);
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`, {
+      const res = await fetch(`http://localhost:3001/api/location/country/${id}/states`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -113,7 +113,7 @@ export default function Create() {
 
     try {
       setLoading(true);
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country`, {
+      const res = await fetch(`http://localhost:3001/api/location/country`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -172,7 +172,7 @@ export default function Create() {
       formdata.append("state", formData.state);
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/high-rto", {
+      const res = await fetch("http://localhost:3001/api/high-rto", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
@@ -180,14 +180,14 @@ export default function Create() {
 
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.message || "Creation failed");
+      if (!res.ok) throw new Error(result.message || result.error || "Creation failed");
 
       Swal.fire("High RTO Created", " High RTO has been created successfully!", "success").then(() => {
         setFormData({state: "", country: "", city: "", pincode: "" });
         router.push("/admin/high-rto/list");
       });
     } catch (err) {
-      Swal.fire("Error", err.message || "Something went wrong.", "error");
+      Swal.fire("Error", err.message || err.error || "Something went wrong.", "error");
     } finally {
       setLoading(false);
     }
@@ -200,7 +200,6 @@ export default function Create() {
   const handleBulkSubmit = (e) => {
     e.preventDefault();
     if (bulkFile) {
-      // Upload logic here
     } else {
       Swal.fire("Please select a file before uploading", "", "warning");
     }
