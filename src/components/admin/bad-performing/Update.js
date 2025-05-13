@@ -164,7 +164,7 @@ export default function Update() {
 
   return (
     <div className="md:w-10/12 p-6 bg-white shadow-md rounded-lg mt-6">
-      <h2 className="text-xl font-semibold mb-4">Add High RTO</h2>
+      <h2 className="text-xl font-semibold mb-4">Update Pincode</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
           <div>

@@ -6,6 +6,8 @@ import Swal from "sweetalert2";
 import { HashLoader } from "react-spinners";
 export default function Create() {
   const router = useRouter();
+  const [stateLoading, setStateLoading] = useState(null);
+  const [cityLoading, setCityLoading] = useState(null);
   const [loading, setLoading] = useState(null);
   const [showBulkForm, setShowBulkForm] = useState(null);
   const [bulkFile, setBulkFile] = useState(null);
@@ -52,7 +54,7 @@ export default function Create() {
     }
 
     try {
-      setLoading(true);
+      setCityLoading(true);
       const res = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +69,7 @@ export default function Create() {
     } catch (err) {
       Swal.fire("Error", err.message, "error");
     } finally {
-      setLoading(false);
+      setCityLoading(false);
     }
   }, [router]);
 
@@ -82,7 +84,7 @@ export default function Create() {
     }
 
     try {
-      setLoading(true);
+      setStateLoading(true);
       const res = await fetch(`http://localhost:3001/api/location/country/${id}/states`, {
         headers: {
           "Content-Type": "application/json",
@@ -91,13 +93,13 @@ export default function Create() {
       });
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.message || "Failed to fetch states");
+      if (!res.ok) throw new Error(result.message || result.error || "Failed to fetch states");
 
       setStateData(result?.states || []);
     } catch (err) {
       Swal.fire("Error", err.message, "error");
     } finally {
-      setLoading(false);
+      setStateLoading(false);
     }
   }, [router]);
 
@@ -229,19 +231,33 @@ export default function Create() {
             {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
           </div>
 
-          <div>
-            <label className="font-bold block text-[#232323]">State<span className="text-red-500">*</span></label>
-            <Select
-              name="state"
-              value={stateOptions.find(opt => opt.value === formData.state) || null}
-              onChange={(selected) => handleChange({ target: { name: "state", value: selected?.value } })}
-              options={stateOptions}
-              placeholder="Select State"
-            />
-            {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
-          </div>
+        <div className="relative">
+          <label className="font-bold block text-[#232323]">
+            State<span className="text-red-500">*</span>
+          </label>
+          <Select
+            name="state"
+            value={stateOptions.find(opt => opt.value === formData.state) || null}
+            onChange={(selected) =>
+              handleChange({ target: { name: "state", value: selected?.value || "" } })
+            }
+            options={stateOptions}
+            isDisabled={stateLoading}
+            placeholder="Select State"
+            classNamePrefix="react-select"
+          />
+          {stateLoading && (
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <div className="border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+            </div>
+          )}
+          {errors.state && (
+            <p className="text-red-500 text-sm mt-1">{errors.state}</p>
+          )}
+        </div>
 
-          <div>
+
+        <div className="relative">
             <label className="font-bold block text-[#232323]">City<span className="text-red-500">*</span></label>
             <Select
               name="city"
@@ -249,7 +265,13 @@ export default function Create() {
               onChange={(selected) => handleChange({ target: { name: "city", value: selected?.value } })}
               options={cityOptions}
               placeholder="Select City"
+              isDisabled={cityLoading}
             />
+             {cityLoading && (
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <div className="border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+            </div>
+          )}
             {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
           </div>
 

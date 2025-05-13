@@ -11,6 +11,8 @@ import Select from 'react-select';
 const ProfileEdit = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [cityLoading, setCityLoading] = useState(false);
+  const [stateLoading, setStateLoading] = useState(false);
   const {
     formData,
     setFormData,
@@ -40,8 +42,8 @@ const ProfileEdit = () => {
     }
 
     try {
-      setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
+      setCityLoading(true);
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +66,7 @@ const ProfileEdit = () => {
     } catch (error) {
       console.error("Error fetching cities:", error);
     } finally {
-      setLoading(false);
+      setCityLoading(false);
     }
   }, [router]);
 
@@ -83,9 +85,9 @@ const ProfileEdit = () => {
     }
 
     try {
-      setLoading(true);
+      setStateLoading(true);
       const response = await fetch(
-        `http://localhost:3001/api/location/country/${id}/states`,
+        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -110,7 +112,7 @@ const ProfileEdit = () => {
     } catch (error) {
       console.error("Error fetching states:", error);
     } finally {
-      setLoading(false);
+      setStateLoading(false);
     }
   }, [router]);
 
@@ -150,9 +152,16 @@ const ProfileEdit = () => {
     }
   };
 
-  useEffect(() => {
-    fetchCountry();
-  }, [fetchCountry]);
+ useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    await fetchCountry();
+    setLoading(false);
+  };
+  
+  fetchData();
+}, [fetchCountry]);
+
 
   const inputClasses = (field) =>
     `w-full p-3 border rounded-lg font-bold ${
@@ -248,6 +257,7 @@ const ProfileEdit = () => {
               value={countryOptions.find(opt => opt.value === formData.permanentCountry) || null}
               onChange={(selected) => handleChange({ target: { name: "permanentCountry", value: selected?.value } })}
               options={countryOptions}
+              isDisabled={loading}
               placeholder="Select Country"
 
            />
@@ -273,10 +283,11 @@ const ProfileEdit = () => {
               value={stateOptions.find(opt => opt.value === formData.permanentState) || null}
               onChange={(selected) => handleChange({ target: { name: "permanentState", value: selected?.value } })}
               options={stateOptions}
+              isDisabled={stateLoading}
               placeholder="Select State"
 
            />
-              {loading && (
+              {stateLoading && (
                 <div className="absolute inset-y-0 right-3 flex items-center">
                   <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
                 </div>
@@ -299,9 +310,10 @@ const ProfileEdit = () => {
               onChange={(selected) => handleChange({ target: { name: "permanentCity", value: selected?.value } })}
               options={cityOptions}
               placeholder="Select City"
+              isDisabled={cityLoading}
 
            />
-              {loading && (
+              {cityLoading && (
                 <div className="absolute inset-y-0 right-3 flex items-center">
                   <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
                 </div>

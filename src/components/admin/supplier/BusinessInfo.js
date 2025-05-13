@@ -12,6 +12,8 @@ const BusinessInfo = () => {
   const { formData, setFormData,businessErrors, setBusinessErrors, setActiveTab,validateBusiness,requiredFields, countryData, fetchCountry } = useContext(ProfileContext);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [cityLoading, setCityLoading] = useState(false);
+  const [stateLoading, setStateLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -45,9 +47,15 @@ const BusinessInfo = () => {
       [name]: '',
     }));
   };
-  useEffect(() => {
-    fetchCountry();
-  }, [fetchCountry]);
+useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    await fetchCountry();
+    setLoading(false);
+  };
+
+  fetchData();
+}, [fetchCountry]);
 
   const fetchState = useCallback(async (id) => {
     const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -64,7 +72,7 @@ const BusinessInfo = () => {
     }
 
     try {
-      setLoading(true);
+      setStateLoading(true);
       const response = await fetch(
         `http://localhost:3001/api/location/country/${id}/states`,
         {
@@ -91,7 +99,7 @@ const BusinessInfo = () => {
     } catch (error) {
       console.error("Error fetching states:", error);
     } finally {
-      setLoading(false);
+      setStateLoading(false);
     }
   }, [router]);
 
@@ -110,7 +118,7 @@ const BusinessInfo = () => {
     }
 
     try {
-      setLoading(true);
+      setCityLoading(true);
       const response = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
@@ -134,13 +142,9 @@ const BusinessInfo = () => {
     } catch (error) {
       console.error("Error fetching cities:", error);
     } finally {
-      setLoading(false);
+      setCityLoading(false);
     }
   }, [router]);
-
-
- 
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -249,7 +253,7 @@ const BusinessInfo = () => {
     </div>
 
    
-    <div>
+    <div className='relative'>
          {renderLabel('Country', 'billingCountry')}
          
           <Select
@@ -257,21 +261,32 @@ const BusinessInfo = () => {
            value={countryOptions.find(opt => opt.value === formData.billingCountry) || null}
            onChange={(selected) => handleChange({ target: { name: "billingCountry", value: selected?.value } })}
            options={countryOptions}
+           isDisabled={loading}
            placeholder="Select Country"
          />
+            {loading && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
          {renderError('billingCountry')}
        </div>
    
-       <div>
+       <div className='relative'>
          {renderLabel('State', 'billingState')}
          <Select
            name="billingState"
            value={stateOptions.find(opt => opt.value === formData.billingState) || null}
            onChange={(selected) => handleChange({ target: { name: "billingState", value: selected?.value } })}
            options={stateOptions}
-          
+          isDisabled={stateLoading}
            placeholder="Select State"
          />
+            {stateLoading && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
          {renderError('billingState')}
        </div>
 
@@ -280,7 +295,7 @@ const BusinessInfo = () => {
 
   {/* Business Type, Client Entry Type */}
   <div className="grid lg:grid-cols-3 gap-4">
-  <div>
+  <div className='relative'>
         {renderLabel('City', 'billingCity')}
         
         <Select
@@ -288,9 +303,14 @@ const BusinessInfo = () => {
           value={cityOptions.find(opt => opt.value === formData.billingCity) || null}
           onChange={(selected) => handleChange({ target: { name: "billingCity", value: selected?.value } })}
           options={cityOptions}
-         
+          isDisabled={cityLoading}
           placeholder="Select City"
         />
+        {cityLoading && (
+          <div className="absolute inset-y-0 right-3 flex items-center">
+            <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+          </div>
+        )}
         {renderError('billingCity')}
       </div>
     <div>

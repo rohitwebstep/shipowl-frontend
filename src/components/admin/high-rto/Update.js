@@ -243,14 +243,14 @@ export default function Update() {
 
       const result = await res.json();
 
-      if (!res.ok) throw new Error(result.message || "Creation failed");
+      if (!res.ok) throw new Error(result.message || result.error || "Creation failed");
 
       Swal.fire("Updating...", "Rto has been Updated successfully!", "success").then(() => {
         setFormData({state: "", country: "", city: "", pincode: "" });
         router.push("/admin/high-rto/list");
       });
     } catch (err) {
-      Swal.fire("Error", err.message || "Something went wrong.", "error");
+      Swal.fire("Error", err.message || err.error || "Something went wrong.", "error");
     } finally {
       setLoading(false);
     }

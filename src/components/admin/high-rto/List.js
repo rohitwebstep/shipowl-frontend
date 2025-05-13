@@ -20,62 +20,65 @@ export default function List() {
     const [countryData, setCountryData] = useState([]);
     const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
-    const fetchRto = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
+   const fetchRto = useCallback(async () => {
+    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+
+    if (adminData?.project?.active_panel !== "admin") {
+        localStorage.removeItem("shippingData");
+        router.push("/admin/auth/login");
+        return;
+    }
+
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+        router.push("/admin/auth/login");
+        return;
+    }
+
+    try {
+        setLoading(true);
+
+        const response = await fetch(`http://localhost:3001/api/high-rto`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${admintoken}`,
+            },
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            Swal.fire({
+                icon: "error",
+                title: "Something Went Wrong!",
+                text: result.message || result.error || "Your session has expired. Please log in again.",
+            });
+            throw new Error(result.message || result.error || "Something went wrong.");
         }
-    
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
+
+        const highRtos = result?.highRtos || [];
+        setData(highRtos);
+
+        if (highRtos) {
+
+            if (highRtos.stateId) {
+                await fetchState(); // Make sure this is a promise-returning async function
+            }
+            if (highRtos.cityId) {
+                await fetchCity(); // Make sure this is a promise-returning async function
+            }
+            if (highRtos.countryId) {
+                await fetchcountry(); // Make sure this is a promise-returning async function
+            }
         }
-    
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `http://localhost:3001/api/high-rto`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-    
-            const result = await response.json();
-    
-            if (!response.ok) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: result.message || result.error || "Your session has expired. Please log in again.",
-                });
-                throw new Error(result.message || result.error || "Something Wrong!");
-            }
-    
-            setData(result?.highRtos || []);
-            const dataList=result?.highRtos;
-            if(dataList?.stateId){
-            fetchState();
-            }
-            if(dataList?.cityId){
-                await fetchCity();
-            }
-            if(dataList?.countryId){
-             await fetchcountry();
-            }
-        } catch (error) {
-            console.error("Error fetching cities:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router]);
+    } catch (error) {
+        console.error("Error fetching RTO data:", error);
+    } finally {
+        setLoading(false);
+    }
+}, [router]);
+
     
     const trashedRto = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));

@@ -9,6 +9,8 @@ import Select from 'react-select';
 const AccountDetails = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [cityLoading, setCityLoading] = useState(false);
+    const [stateLoading, setStateLoading] = useState(false);
     const {formData, setFormData, setActiveTab,validateAddress,errorsAddress, setErrorsAddress} = useContext(DropshipperProfileContext);
     const {fetchCountry,countryData} = useContext(ProfileContext);
     const [cityData, setCityData] = useState([]);
@@ -29,7 +31,7 @@ const AccountDetails = () => {
         }
 
         try {
-            setLoading(true);
+            setCityLoading(true);
             const response = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
                 method: "GET",
                 headers: {
@@ -53,7 +55,7 @@ const AccountDetails = () => {
         } catch (error) {
             console.error("Error fetching cities:", error);
         } finally {
-            setLoading(false);
+            setCityLoading(false);
         }
     }, [router]);
     const fetchState = useCallback(async (id) => {
@@ -72,7 +74,7 @@ const AccountDetails = () => {
         }
       
         try {
-          setLoading(true);
+          setStateLoading(true);
           const response = await fetch(
             `http://localhost:3001/api/location/country/${id}/states`,
             {
@@ -99,7 +101,7 @@ const AccountDetails = () => {
         } catch (error) {
           console.error("Error fetching states:", error); // <- corrected message: "states" instead of "cities"
         } finally {
-          setLoading(false);
+          setStateLoading(false);
         }
       }, [router]);
       
@@ -140,10 +142,16 @@ const AccountDetails = () => {
             setActiveTab('payment_billing');
         }
     };
+useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    await fetchCountry();
+    setLoading(false);
+  };
 
-    useEffect(() => {
-        fetchCountry();
-    }, [fetchCountry]);
+  fetchData();
+}, []);
+
 
     const inputClasses = (field) =>
         `w-full p-3 border rounded-lg font-bold ${
@@ -200,7 +208,7 @@ const AccountDetails = () => {
       </div>
     ))}
 
-<div>
+  <div className='relative'>
   <label className={labelClasses('permanentCountry')}>
     Country <span className="text-red-500">*</span>
   </label>
@@ -214,14 +222,20 @@ const AccountDetails = () => {
     classNamePrefix="react-select"
     className="react-select-container"
     isSearchable
+    isDisabled={loading}
     placeholder="Select Country"
   />
+    {loading && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
   {errorsAddress.permanentCountry && (
     <p className="text-red-500 text-sm mt-1">{errorsAddress.permanentCountry}</p>
   )}
 </div>
 
-<div>
+  <div className='relative'>
   <label className={labelClasses('permanentState')}>
     State <span className="text-red-500">*</span>
   </label>
@@ -235,8 +249,14 @@ const AccountDetails = () => {
     classNamePrefix="react-select"
     className="react-select-container"
     isSearchable
+    isDisabled={stateLoading}
     placeholder="Select State"
   />
+    {stateLoading && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
   {errorsAddress.permanentState && (
     <p className="text-red-500 text-sm mt-1">{errorsAddress.permanentState}</p>
   )}
@@ -244,7 +264,7 @@ const AccountDetails = () => {
 
    
   </div>
-  <div>
+  <div className='relative'>
   <label className={labelClasses('permanentCity')}>
     City <span className="text-red-500">*</span>
   </label>
@@ -259,7 +279,13 @@ const AccountDetails = () => {
     className="react-select-container"
     isSearchable
     placeholder="Select City"
+    isDisabled={cityLoading}
   />
+    {cityLoading && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
   {errorsAddress.permanentCity && (
     <p className="text-red-500 text-sm mt-1">{errorsAddress.permanentCity}</p>
   )}

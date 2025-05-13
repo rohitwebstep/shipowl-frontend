@@ -7,7 +7,6 @@ import React, { useState, useCallback, useEffect } from "react";
 
 import { useDropshipper } from '../middleware/DropshipperMiddleWareContext';
 const ProfileList = () => {
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
     const { verifyDropShipperAuth } = useDropshipper();
     const [cityData, setCityData] = useState([]);
@@ -15,8 +14,6 @@ const ProfileList = () => {
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(true);
- 
-      
     const fetchSupplier = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
