@@ -5,7 +5,11 @@ import { useRouter,useSearchParams} from "next/navigation";
 import Swal from "sweetalert2";
 import Select from "react-select";
 import { HashLoader } from "react-spinners";
-
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import Image from "next/image";8
+import 'swiper/css/navigation';
 export default function Update() {
   const router = useRouter();
   const [permission, setPermission] = useState([]);
@@ -14,6 +18,10 @@ export default function Update() {
   const [stateData, setStateData] = useState([]);
   const [cityData, setCityData] = useState([]);
   const [errors, setErrors] = useState({});
+const [loadingPermission, setLoadingPermission] = useState(false);
+const [loadingCountries, setLoadingCountries] = useState(false);
+const [loadingStates, setLoadingStates] = useState(false);
+const [loadingCities, setLoadingCities] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -74,14 +82,14 @@ export default function Update() {
 
         const result = await response.json();
         const users = result?.admin || {};
-        if(users?.countryId){
-            fetchStateList(users?.countryId);
+        if(users?.permanentCityId){
+            fetchStateList(users?.permanentCountryId);
         }
-        if(users?.stateId){
-            fetchCity(users?.stateId);
+        if(users?.permanentStateId){
+            fetchCity(users?.permanentStateId);
         }
 
-    setFormData({
+  setFormData({
   name: users?.name || "",
   username: users?.username || "",
   email: users?.email || "",
@@ -96,6 +104,7 @@ export default function Update() {
   permanentState: users?.permanentStateId || "",
   permanentCountry: users?.permanentCountryId || "",
   permissions: users?.permissions?.map((p) => p.permissionId) || [],
+  image:users?.profilePicture || '',
 });
 
     } catch (error) {
@@ -131,14 +140,10 @@ export default function Update() {
       name,
       username,
       email,
-      password,
-      phoneNumber,
       website,
-      profilePicture,
       permanentCountry,
       permanentState,
       permanentCity,
-      type,
       permissions,
     } = formData;
 
@@ -149,18 +154,13 @@ export default function Update() {
     } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
       newErrors.email = "Invalid email format";
     }
-    if (!password.trim()) newErrors.password = "Password is required";
-    if (!profilePicture) newErrors.profilePicture = "Profile picture is required";
-    if (phoneNumber && !/^[0-9]{7,15}$/.test(phoneNumber)) {
-      newErrors.phoneNumber = "Phone number must be 7-15 digits";
-    }
+ 
     if (website && !/^https?:\/\/[\w.-]+\.[a-z]{2,}/i.test(website)) {
       newErrors.website = "Invalid website URL";
     }
     if (!permanentCountry) newErrors.permanentCountry = "Country is required";
     if (!permanentState) newErrors.permanentState = "State is required";
     if (!permanentCity) newErrors.permanentCity = "City is required";
-    if (!type) newErrors.type = "Type is required";
     if (permissions.length === 0) newErrors.permissions = "At least one permission is required";
 
     setErrors(newErrors);
@@ -231,67 +231,89 @@ const handleSubmit = async (e) => {
 };
 
 
-  const fetchProtected = useCallback(async (url, setter, key) => {
-    const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    const token = adminData?.security?.token;
-    if (!token || adminData?.project?.active_panel !== "admin") {
-      localStorage.clear();
-      router.push("/admin/auth/login");
-      return;
-    }
+const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
+  const adminData = JSON.parse(localStorage.getItem("shippingData"));
+  const token = adminData?.security?.token;
+  if (!token || adminData?.project?.active_panel !== "admin") {
+    localStorage.clear();
+    router.push("/admin/auth/login");
+    return;
+  }
 
-    try {
-      const res = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message || `Failed to fetch ${key}`);
-      setter(result[key] || []);
-    } catch (err) {
-      Swal.fire("Error", err.message, "error");
-    }
-  }, [router]);
+  if (setLoading) setLoading(true);
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.message || `Failed to fetch ${key}`);
+    setter(result[key] || []);
+  } catch (err) {
+    Swal.fire("Error", err.message, "error");
+  } finally {
+    if (setLoading) setLoading(false);
+  }
+}, [router]);
+
+  
+
+const fetchPermission = useCallback(() => {
+  fetchProtected(
+    "http://https://sleeping-owl-we0m.onrender.com/api/admin/permission",
+    setPermission,
+    "permissions",
+    setLoadingPermission
+  );
+}, [fetchProtected]);
+
+const fetchCountryAndState = useCallback(() => {
+  fetchProtected(
+    "http://https://sleeping-owl-we0m.onrender.com/api/location/country",
+    setCountryData,
+    "countries",
+    setLoadingCountries
+  );
+}, [fetchProtected]);
+
+const fetchStateList = useCallback((countryId) => {
+  fetchProtected(
+    `http://https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+    setStateData,
+    "states",
+    setLoadingStates
+  );
+}, [fetchProtected]);
+
+const fetchCity = useCallback((stateId) => {
+  fetchProtected(
+    `http://https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+    setCityData,
+    "cities",
+    setLoadingCities
+  );
+}, [fetchProtected]);
+
   useEffect(()=>{
     fetchSubuser();
+    fetchPermission();
+    fetchCountryAndState();
   },[fetchSubuser])
 
-  const fetchPermission = useCallback(() => {
-    fetchProtected(`http://https://sleeping-owl-we0m.onrender.com/api/admin/permission`, setPermission, "permissions");
-  }, [fetchProtected]);
 
-  const fetchCountryAndState = useCallback(() => {
-    fetchProtected(`http://https://sleeping-owl-we0m.onrender.com/api/location/country`, setCountryData, "countries");
-  }, [fetchProtected]);
 
-  const fetchStateList = useCallback((countryId) => {
-    fetchProtected(`http://https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`, setStateData, "states");
-  }, [fetchProtected]);
+    const handleImageDelete = (index) => {
+      const images = formData.image?.split(',') || [];
+      const updatedImages = images.filter((_, i) => i !== index);
+      setFormData((prev) => ({
+        ...prev,
+        image: updatedImages.join(','),
+      }));
+      };
 
-  const fetchCity = useCallback((stateId) => {
-    fetchProtected(`http://https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`, setCityData, "cities");
-  }, [fetchProtected]);
-
-  useEffect(() => {
-    fetchCountryAndState();
-    fetchPermission();
-  }, [fetchCountryAndState, fetchPermission]);
-
-  useEffect(() => {
-    if (formData.permanentCountry) {
-      fetchStateList(formData.permanentCountry);
-      setFormData((prev) => ({ ...prev, permanentState: "", permanentCity: "" }));
-    }
-  }, [formData.permanentCountry, fetchStateList]);
-
-  useEffect(() => {
-    if (formData.permanentState) {
-      fetchCity(formData.permanentState);
-      setFormData((prev) => ({ ...prev, permanentCity: "" }));
-    }
-  }, [formData.permanentState, fetchCity]);
 
   const selectOptions = (data) =>
     data.map((item) => ({
@@ -310,19 +332,18 @@ const handleSubmit = async (e) => {
     { label: "Name", name: "name", type: "text", required: true },
     { label: "Username", name: "username", type: "text", required: true },
     { label: "Email", name: "email", type: "email", required: true },
-    { label: "Password", name: "password", type: "password", required: true },
     { label: "Referral Code", name: "referralCode", type: "text" },
     { label: "Phone Number", name: "phoneNumber", type: "text" },
     { label: "Website", name: "website", type: "text" },
-    { label: "Permanent Address", name: "permanentAddress", type: "text" },
   ];
-  if (loading) {
+  if (loading ||loadingPermission) {
           return (
               <div className="flex items-center justify-center h-[80vh]">
                   <HashLoader size={60} color="#F97316" loading={true} />
               </div>
           );
       }
+      console.log('formData',formData)
   return (
     <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white rounded shadow space-y-6">
       <h2 className="text-xl font-semibold">Update Subuser</h2>
@@ -348,7 +369,17 @@ const handleSubmit = async (e) => {
        
       </div>
        <div>
-          <label className="block font-medium">Profile Picture <span className="text-red-500">*</span></label>
+          <label className="block font-medium">Permanent Address</label>
+          <input
+            type="text"
+            name="permanentAddress"
+            value={formData?.permanentAddress || ''}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+          />
+        </div>
+       <div>
+          <label className="block font-medium">Profile Picture </label>
           <input
             type="file"
             name="profilePicture"
@@ -356,7 +387,56 @@ const handleSubmit = async (e) => {
             onChange={handleChange}
             className="w-full border p-2 rounded"
           />
-          {errors.profilePicture && <p className="text-red-500 text-sm">{errors.profilePicture}</p>}
+           {formData?.image && (
+                                              <div className="mt-2">
+                                                  <Swiper
+                                                      key={formData.id}
+                                                      modules={[Navigation]}
+                                                      slidesPerView={2}
+                                                      loop={formData.image?.split(',').length > 1}
+                                                      navigation={true}
+                                                      className="mySwiper w-full ms-2"
+                                                  >
+                                                      {formData.image?.split(',').map((img, index) => (
+                                                          <SwiperSlide key={index} className="relative gap-3">
+                                                              {/* Delete Button */}
+                                                              <button
+                                                                  type="button"
+                                                                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                                                                  onClick={() => {
+                                                                      Swal.fire({
+                                                                          title: 'Are you sure?',
+                                                                          text: `Do you want to delete this image?`,
+                                                                          icon: 'warning',
+                                                                          showCancelButton: true,
+                                                                          confirmButtonColor: '#d33',
+                                                                          cancelButtonColor: '#3085d6',
+                                                                          confirmButtonText: 'Yes, delete it!'
+                                                                      }).then((result) => {
+                                                                          if (result.isConfirmed) {
+          
+                                                                              handleImageDelete(index); // Call your delete function
+                                                                          }
+                                                                      });
+                                                                  }}
+                                                              >
+                                                                  ✕
+                                                              </button>
+          
+                                                              {/* Image */}
+                                                              <Image
+                                                                  src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                                                                  alt={`Image ${index + 1}`}
+                                                                  width={500}
+                                                                  height={500}
+                                                                  className="me-3 p-2 object-cover rounded"
+                                                              />
+                                                          </SwiperSlide>
+                                                      ))}
+                                                  </Swiper>
+                                              </div>
+          
+                                          )}
         </div>
       <div>
           <label className="block font-medium">Type <span className="text-red-500">*</span></label>
@@ -369,30 +449,49 @@ const handleSubmit = async (e) => {
             <option value= 'main'>Main</option>
             <option value='sub'>Sub</option>
             </select>
-          {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
         </div>
 
       <div className="grid grid-cols-3 gap-4">
         {["permanentCountry", "permanentState", "permanentCity"].map((field) => (
-          <div key={field}>
-            <label className="block font-medium capitalize">
-              {field.replace("permanent", "")} <span className="text-red-500">*</span>
-            </label>
-            <Select
-              name={field}
-              value={selectOptions(
-                field === "permanentCountry" ? countryData : field === "permanentState" ? stateData : cityData
-              ).find((item) => item.value === formData[field])}
-              onChange={(selectedOption) =>
-                setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : "" }))
-              }
-              options={selectOptions(
-                field === "permanentCountry" ? countryData : field === "permanentState" ? stateData : cityData
-              )}
-              isClearable
-            />
-            {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+         <div key={field} className="relative">
+        <label className="block font-medium capitalize">
+          {field.replace("permanent", "")} <span className="text-red-500">*</span>
+        </label>
+
+        <Select
+          isDisabled={
+            (field === "permanentCountry" && loadingCountries) ||
+            (field === "permanentState" && loadingStates) ||
+            (field === "permanentCity" && loadingCities)
+          }
+          name={field}
+          value={selectOptions(
+            field === "permanentCountry" ? countryData :
+            field === "permanentState" ? stateData :
+            cityData
+          ).find((item) => item.value === formData[field])}
+          onChange={(selectedOption) =>
+            setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : "" }))
+          }
+          options={selectOptions(
+            field === "permanentCountry" ? countryData :
+            field === "permanentState" ? stateData :
+            cityData
+          )}
+          isClearable
+        />
+
+        {((field === "permanentCountry" && loadingCountries) ||
+          (field === "permanentState" && loadingStates) ||
+          (field === "permanentCity" && loadingCities)) && (
+          <div className="absolute inset-y-0 right-3 flex items-center">
+            <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
           </div>
+        )}
+
+        {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+      </div>
+
         ))}
       </div>
 

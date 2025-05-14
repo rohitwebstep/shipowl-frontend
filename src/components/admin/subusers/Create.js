@@ -13,7 +13,10 @@ export default function Create() {
   const [stateData, setStateData] = useState([]);
   const [cityData, setCityData] = useState([]);
   const [errors, setErrors] = useState({});
-
+  const [loadingPermission, setLoadingPermission] = useState(false);
+  const [loadingCountries, setLoadingCountries] = useState(false);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -37,6 +40,12 @@ export default function Create() {
       ...prev,
       [name]: type === "file" ? files[0] : value,
     }));
+    if(name=="permanentCountry"){
+      fetchStateList(value);
+    }
+    if(name=="permanentState"){
+      fetchCity(value);
+    }
   };
 
   const handlePermissionChange = (permId) => {
@@ -153,71 +162,79 @@ const handleSubmit = async (e) => {
   }
 };
 
+const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
+  const adminData = JSON.parse(localStorage.getItem("shippingData"));
+  const token = adminData?.security?.token;
+  if (!token || adminData?.project?.active_panel !== "admin") {
+    localStorage.clear();
+    router.push("/admin/auth/login");
+    return;
+  }
 
-  const fetchProtected = useCallback(async (url, setter, key) => {
-    const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    const token = adminData?.security?.token;
-    if (!token || adminData?.project?.active_panel !== "admin") {
-      localStorage.clear();
-      router.push("/admin/auth/login");
-      return;
-    }
+  if (setLoading) setLoading(true);
 
-    try {
-      const res = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message || `Failed to fetch ${key}`);
-      setter(result[key] || []);
-    } catch (err) {
-      Swal.fire("Error", err.message, "error");
-    }
-  }, [router]);
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.message || `Failed to fetch ${key}`);
+    setter(result[key] || []);
+  } catch (err) {
+    Swal.fire("Error", err.message, "error");
+  } finally {
+    if (setLoading) setLoading(false);
+  }
+}, [router]);
+const fetchPermission = useCallback(() => {
+  fetchProtected(
+    "http://https://sleeping-owl-we0m.onrender.com/api/admin/permission",
+    setPermission,
+    "permissions",
+    setLoadingPermission
+  );
+}, [fetchProtected]);
 
-  const fetchPermission = useCallback(() => {
-    fetchProtected(`http://https://sleeping-owl-we0m.onrender.com/api/admin/permission`, setPermission, "permissions");
-  }, [fetchProtected]);
+const fetchCountryAndState = useCallback(() => {
+  fetchProtected(
+    "http://https://sleeping-owl-we0m.onrender.com/api/location/country",
+    setCountryData,
+    "countries",
+    setLoadingCountries
+  );
+}, [fetchProtected]);
 
-  const fetchCountryAndState = useCallback(() => {
-    fetchProtected(`http://https://sleeping-owl-we0m.onrender.com/api/location/country`, setCountryData, "countries");
-  }, [fetchProtected]);
+const fetchStateList = useCallback((countryId) => {
+  fetchProtected(
+    `http://https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+    setStateData,
+    "states",
+    setLoadingStates
+  );
+}, [fetchProtected]);
 
-  const fetchStateList = useCallback((countryId) => {
-    fetchProtected(`http://https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`, setStateData, "states");
-  }, [fetchProtected]);
+const fetchCity = useCallback((stateId) => {
+  fetchProtected(
+    `http://https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+    setCityData,
+    "cities",
+    setLoadingCities
+  );
+}, [fetchProtected]);
+  
+const selectOptions = (data) =>
+data.map((item) => ({
+  value: item.id || item._id,
+  label: item.name,
+}));
 
-  const fetchCity = useCallback((stateId) => {
-    fetchProtected(`http://https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`, setCityData, "cities");
-  }, [fetchProtected]);
-
-  useEffect(() => {
-    fetchCountryAndState();
-    fetchPermission();
-  }, [fetchCountryAndState, fetchPermission]);
-
-  useEffect(() => {
-    if (formData.permanentCountry) {
-      fetchStateList(formData.permanentCountry);
-      setFormData((prev) => ({ ...prev, permanentState: "", permanentCity: "" }));
-    }
-  }, [formData.permanentCountry, fetchStateList]);
-
-  useEffect(() => {
-    if (formData.permanentState) {
-      fetchCity(formData.permanentState);
-      setFormData((prev) => ({ ...prev, permanentCity: "" }));
-    }
-  }, [formData.permanentState, fetchCity]);
-
-  const selectOptions = (data) =>
-    data.map((item) => ({
-      value: item.id || item._id,
-      label: item.name,
-    }));
+useEffect(()=>{
+  fetchPermission();
+  fetchCountryAndState();
+},[fetchPermission,fetchCountryAndState]);
 
   const groupedPermissions = permission.reduce((acc, perm) => {
     if (!acc[perm.panel]) acc[perm.panel] = {};
@@ -289,28 +306,57 @@ const handleSubmit = async (e) => {
             </select>
           {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
         </div>
-
-      <div className="grid grid-cols-3 gap-4">
+ <div className="grid grid-cols-3 gap-4">
         {["permanentCountry", "permanentState", "permanentCity"].map((field) => (
-          <div key={field}>
-            <label className="block font-medium capitalize">
-              {field.replace("permanent", "")} <span className="text-red-500">*</span>
-            </label>
-            <Select
-              name={field}
-              value={selectOptions(
-                field === "permanentCountry" ? countryData : field === "permanentState" ? stateData : cityData
-              ).find((item) => item.value === formData[field])}
-              onChange={(selectedOption) =>
-                setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : "" }))
-              }
-              options={selectOptions(
-                field === "permanentCountry" ? countryData : field === "permanentState" ? stateData : cityData
-              )}
-              isClearable
-            />
-            {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+         <div key={field} className="relative">
+        <label className="block font-medium capitalize">
+          {field.replace("permanent", "")} <span className="text-red-500">*</span>
+        </label>
+
+        <Select
+          isDisabled={
+            (field === "permanentCountry" && loadingCountries) ||
+            (field === "permanentState" && loadingStates) ||
+            (field === "permanentCity" && loadingCities)
+          }
+          name={field}
+          value={selectOptions(
+            field === "permanentCountry" ? countryData :
+            field === "permanentState" ? stateData :
+            cityData
+          ).find((item) => item.value === formData[field])}
+        onChange={(selectedOption) => {
+  const value = selectedOption ? selectedOption.value : "";
+  
+  setFormData((prev) => ({ ...prev, [field]: value }));
+
+  if (field === "permanentCountry") {
+    fetchStateList(value); // <-- call with selected country ID
+  }
+  if (field === "permanentState") {
+    fetchCity(value); // <-- call with selected country ID
+  }
+}}
+
+          options={selectOptions(
+            field === "permanentCountry" ? countryData :
+            field === "permanentState" ? stateData :
+            cityData
+          )}
+          isClearable
+        />
+
+        {((field === "permanentCountry" && loadingCountries) ||
+          (field === "permanentState" && loadingStates) ||
+          (field === "permanentCity" && loadingCities)) && (
+          <div className="absolute inset-y-0 right-3 flex items-center">
+            <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
           </div>
+        )}
+
+        {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+      </div>
+
         ))}
       </div>
 

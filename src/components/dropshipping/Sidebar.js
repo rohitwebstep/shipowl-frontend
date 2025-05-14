@@ -33,6 +33,16 @@ const menuItems = [
       { name: "Pending Orders (In progress)", href: "/dropshipping/pending-orders" }
     ]
   },
+  {
+    name: "Inventory",
+    icon: ShoppingCart,
+    href: "#",
+    section: "MENU",
+    subMenu: [
+      { name: "All Products (In progress)", href: "/dropshipping/product/all" },
+      { name: "My Products (In progress)", href: "/dropshipping/product/my" }
+    ]
+  },
   { name: "Manage Products (In progress)", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },
   { name: "Profile", icon: Package, href: "/dropshipping/profile", section: "MENU" },
   { name: "Source a Product", icon: Gift, href: "/dropshipping/product/source", section: "MENU" },

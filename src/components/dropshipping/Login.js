@@ -69,11 +69,12 @@ export default function Login() {
             }
     
             const result = await response.json();
-            const { token, dropshipper } = result;
-    
-            if (!token || !dropshipper) {
-                throw new Error("Invalid login response. Missing token or dropshipper data.");
+            const { token, dropshipper, admin } = result;
+
+            if (!token || (!dropshipper && !admin)) {
+            throw new Error("Invalid login response. Missing token or user data.");
             }
+
     
             // ✅ Store session in localStorage
             const shippingData = {
