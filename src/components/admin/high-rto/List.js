@@ -38,7 +38,7 @@ export default function List() {
     try {
         setLoading(true);
 
-        const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/high-rto`, {
+        const response = await fetch(`http://localhost:3001/api/high-rto`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -98,7 +98,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/trashed`,
+                `http://localhost:3001/api/high-rto/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -151,7 +151,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
+                `http://localhost:3001/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -198,7 +198,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                `http://localhost:3001/api/location/state`,
                 {
                     method: "GET",
                     headers: {
@@ -251,7 +251,7 @@ export default function List() {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/location/country`,
+                    `http://localhost:3001/api/location/country`,
                     {
                         method: "GET",
                         headers: {
@@ -379,7 +379,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item.id}`,
+                `http://localhost:3001/api/high-rto/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -440,7 +440,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item?.id}/restore`,
+                `http://localhost:3001/api/high-rto/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -519,7 +519,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item.id}/destroy`,
+                `http://localhost:3001/api/high-rto/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

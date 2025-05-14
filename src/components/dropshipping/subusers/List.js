@@ -35,7 +35,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper`,
+                `http://localhost:3001/api/dropshipper`,
                 {
                     method: "GET",
                     headers: {
@@ -82,7 +82,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/trashed`,
+                `http://localhost:3001/api/dropshipper/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -165,7 +165,7 @@ export default function List() {
     }, [data, loading]);
 
     const handleEditItem = (item) => {
-        router.push(`/dropshipper/sub-user/update?id=${item.id}`);
+        router.push(`/dropshipping/sub-user/update?id=${item.id}`);
     };
 
 
@@ -208,7 +208,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/${item.id}`,
+                `http://localhost:3001/api/dropshipper/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -269,7 +269,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/${item?.id}/restore`,
+                `http://localhost:3001/api/dropshipper/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -348,7 +348,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/${item.id}/destroy`,
+                `http://localhost:3001/api/dropshipper/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -438,7 +438,7 @@ export default function List() {
                                 >
                                     {isTrashed ? "Subuser Listing (Simple)" : "Trashed Subuser"}
                                 </button>
-                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/dropshipper/sub-user/create">Add New</Link></button>
+                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/dropshipping/sub-user/create">Add New</Link></button>
                         </div>
                     </div>
                 </div>

@@ -27,7 +27,7 @@ const CategorySection = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("https://sleeping-owl-we0m.onrender.com/api/category", {
+      const response = await fetch("http://localhost:3001/api/category", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

@@ -43,7 +43,9 @@ const menuItems = [
       { name: "My Products (In progress)", href: "/dropshipping/product/my" }
     ]
   },
+  
   { name: "Manage Products (In progress)", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },
+  { name: "Subuser Listing", icon: Package, href: "/dropshipping/sub-user/list", section: "MENU" },
   { name: "Profile", icon: Package, href: "/dropshipping/profile", section: "MENU" },
   { name: "Source a Product", icon: Gift, href: "/dropshipping/product/source", section: "MENU" },
   { name: "Reports (In progress)", icon: BarChart, href: "/dropshipping/report", section: "MENU" },

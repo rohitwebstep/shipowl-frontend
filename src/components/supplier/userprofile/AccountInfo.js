@@ -76,7 +76,7 @@ const AccountInfo = () => {
                       }
                   });
       
-                  const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${formData.id}/bank-account/${id}/image/${index}?type=${type}`;
+                  const url = `http://localhost:3001/api/supplier/${formData.id}/bank-account/${id}/image/${index}?type=${type}`;
                   const response = await fetch(url, {
                       method: "DELETE",
                       headers: {
@@ -192,7 +192,7 @@ const AccountInfo = () => {
           }
         });
 
-        const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/profile/update`; // Ensure the URL is correct
+        const url = `http://localhost:3001/api/supplier/profile/update`; // Ensure the URL is correct
         const form = new FormData();
        console.log('files',files)
         for (const key in files) {

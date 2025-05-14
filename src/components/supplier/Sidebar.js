@@ -34,6 +34,7 @@ export default function Sidebar() {
         { name: "Orders", icon: ClipboardList, href: "/supplier/orders" },
         { name: "Warehouse", icon: Warehouse, href: "/supplier/warehouse" },
         { name: "Category Management", icon: BiSolidCategory, href: "/supplier/category/list" },
+        { name: "Subuser Listing", icon: Package, href: "/supplier/sub-user/list"},
         { name: "Brand Management", icon: TbBrandBinance, href: "/supplier/brand/list" },
         { name: "RTO Orders (In progress)", icon: Package, href: "/supplier/rto-orders" },
         { name: "Profile", icon: User, href: "/supplier/profile" },
@@ -41,12 +42,12 @@ export default function Sidebar() {
         { name: "Billings (In progress)", icon: FileText, href: "/supplier/billings" },
         { name: "Payment (In progress)", icon: CreditCard, href: "/supplier/payment" },
         { name: "Terms & Condition (In progress)", icon: BadgeDollarSign, href: "/supplier/terms" },
+
     ];
 
 
     return (
         <>
-            {/* Mobile Menu Button */}
             <div
                 className="fixed top-0 w-full left-0 z-50 p-2 bg-white rounded-lg lg:hidden shadow-md"
 
