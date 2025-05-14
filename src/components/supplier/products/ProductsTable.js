@@ -47,7 +47,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/product`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -93,7 +93,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -204,7 +204,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `http://https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -286,7 +286,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `http://https://sleeping-owl-we0m.onrender.com/api/product/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -348,7 +348,7 @@ const ProductTable = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `http://https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
+                    `https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {

@@ -78,7 +78,7 @@ const searchParams = useSearchParams();
                 form.append('image', file);
             });
 
-            const url = `http://https://sleeping-owl-we0m.onrender.com/api/product/request/${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/product/request/${id}`;
 
             const response = await fetch(url, {
                 method: "PUT",
@@ -163,7 +163,7 @@ const searchParams = useSearchParams();
                         }
                     });
         
-                    const url = `http://https://sleeping-owl-we0m.onrender.com/api/product/request/my/${id}/image/${index}`;
+                    const url = `https://sleeping-owl-we0m.onrender.com/api/product/request/my/${id}/image/${index}`;
         
                     const response = await fetch(url, {
                         method: "DELETE",
@@ -228,7 +228,7 @@ const fetchProducts = useCallback(async () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://https://sleeping-owl-we0m.onrender.com/api/product/request/my/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/product/request/my/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -312,7 +312,7 @@ const fetchProducts = useCallback(async () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/category`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/category`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

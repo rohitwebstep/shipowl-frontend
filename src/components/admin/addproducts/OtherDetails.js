@@ -95,7 +95,7 @@ export default function OtherDetails() {
         didOpen: () => Swal.showLoading(),
       });
   
-      const url = "http://https://sleeping-owl-we0m.onrender.com/api/product";
+      const url = "https://sleeping-owl-we0m.onrender.com/api/product";
       const form = new FormData();
   
       for (const key in formData) {

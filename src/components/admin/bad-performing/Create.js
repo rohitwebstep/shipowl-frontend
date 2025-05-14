@@ -66,7 +66,7 @@ export default function Create() {
       const formdata = new FormData();
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch("http://https://sleeping-owl-we0m.onrender.com/api/bad-pincode", {
+      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/bad-pincode", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
@@ -110,7 +110,7 @@ const handleBulkSubmit = async (e) => {
 
     const formdata = new FormData();
     formdata.append("badPincodes", bulkFile);
-    const res = await fetch("http://https://sleeping-owl-we0m.onrender.com/api/bad-pincode/import", {
+    const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/bad-pincode/import", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

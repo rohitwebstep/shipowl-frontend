@@ -57,7 +57,7 @@ export default function ShippingDetails() {
               }
           });
 
-          const url = `http://https://sleeping-owl-we0m.onrender.com/api/product/${id}/image/${index}?type=${type}`;
+          const url = `https://sleeping-owl-we0m.onrender.com/api/product/${id}/image/${index}?type=${type}`;
 
           const response = await fetch(url, {
               method: "DELETE",

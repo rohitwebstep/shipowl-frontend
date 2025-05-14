@@ -43,7 +43,7 @@ export default function Payments() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://https://sleeping-owl-we0m.onrender.com/api/payment`,
+                `https://sleeping-owl-we0m.onrender.com/api/payment`,
                 {
                     method: "GET",
                     headers: {
@@ -90,7 +90,7 @@ export default function Payments() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://https://sleeping-owl-we0m.onrender.com/api/payment/trashed`,
+                `https://sleeping-owl-we0m.onrender.com/api/payment/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -214,7 +214,7 @@ export default function Payments() {
             setLoading(true);
 
             const response = await fetch(
-                `http://https://sleeping-owl-we0m.onrender.com/api/payment/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/payment/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -275,7 +275,7 @@ export default function Payments() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://https://sleeping-owl-we0m.onrender.com/api/payment/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/payment/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -354,7 +354,7 @@ export default function Payments() {
             setLoading(true);
 
             const response = await fetch(
-                `http://https://sleeping-owl-we0m.onrender.com/api/payment/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/payment/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

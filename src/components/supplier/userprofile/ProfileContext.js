@@ -81,7 +81,7 @@ const ProfileProvider = ({ children }) => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://https://sleeping-owl-we0m.onrender.com/api/location/country`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
