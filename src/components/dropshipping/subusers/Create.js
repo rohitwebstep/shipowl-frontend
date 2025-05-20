@@ -40,10 +40,10 @@ export default function Create() {
       ...prev,
       [name]: type === "file" ? files[0] : value,
     }));
-    if(name=="permanentCountry"){
+    if (name == "permanentCountry") {
       fetchStateList(value);
     }
-    if(name=="permanentState"){
+    if (name == "permanentState") {
       fetchCity(value);
     }
   };
@@ -99,142 +99,142 @@ export default function Create() {
     return Object.keys(newErrors).length === 0;
   };
 
- // Inside handleSubmit function
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!validate()) return;
+  // Inside handleSubmit function
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
 
-  setLoading(true);
-  const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-  const token = dropshipperData?.security?.token;
+    setLoading(true);
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    const token = dropshipperData?.security?.token;
 
-  const data = new FormData();
+    const data = new FormData();
 
-  // Append all form fields
-  Object.entries(formData).forEach(([key, value]) => {
-    if (key === "permissions") {
-      // Send as JSON string with dropshipper_id: null for creation
-      const permissionsPayload = value.map((permId) => ({
-        dropshipper_id: null,
-        permission_id: permId,
-      }));
-      data.append("permissions", JSON.stringify(permissionsPayload));
-    } else if (value !== null && value !== "") {
-      data.append(key, value);
+    // Append all form fields
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "permissions") {
+        // Send as JSON string with dropshipper_id: null for creation
+        const permissionsPayload = value.map((permId) => ({
+          dropshipper_id: null,
+          permission_id: permId,
+        }));
+        data.append("permissions", JSON.stringify(permissionsPayload));
+      } else if (value !== null && value !== "") {
+        data.append(key, value);
+      }
+    });
+
+    try {
+      const res = await fetch(`http://localhost:3001/api/dropshipper`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: data,
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to create dropshipper");
+
+      Swal.fire("Success", "dropshipper created Successfuly!", "success");
+      // Reset form
+      setFormData({
+        name: "",
+        username: "",
+        email: "",
+        type: "",
+        password: "",
+        profilePicture: null,
+        referralCode: "",
+        phoneNumber: "",
+        website: "",
+        permanentAddress: "",
+        permanentCity: "",
+        permanentState: "",
+        permanentCountry: "",
+        permissions: [],
+      });
+      router.push('/dropshipping/sub-user/list')
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      setLoading(false);
     }
-  });
+  };
 
-  try {
-    const res = await fetch(`http://localhost:3001/api/dropshipper`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: data,
-    });
+  const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    const token = dropshipperData?.security?.token;
+    if (!token || dropshipperData?.project?.active_panel !== "dropshipper") {
+      localStorage.clear();
+      router.push("/dropshipping/auth/login");
+      return;
+    }
 
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.message || "Failed to create dropshipper");
+    if (setLoading) setLoading(true);
 
-    Swal.fire("Success", "dropshipper created Successfuly!", "success");
-    // Reset form
-    setFormData({
-      name: "",
-      username: "",
-      email: "",
-      type: "",
-      password: "",
-      profilePicture: null,
-      referralCode: "",
-      phoneNumber: "",
-      website: "",
-      permanentAddress: "",
-      permanentCity: "",
-      permanentState: "",
-      permanentCountry: "",
-      permissions: [],
-    });
-    router.push('/dropshipping/sub-user/list')
-  } catch (err) {
-    Swal.fire("Error", err.message, "error");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const res = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || result.error || `Failed to fetch ${key}`);
+      setter(result[key] || []);
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      if (setLoading) setLoading(false);
+    }
+  }, [router]);
+  const fetchPermission = useCallback(() => {
+    fetchProtected(
+      "http://localhost:3001/api/dropshipper/permission",
+      setPermission,
+      "permissions",
+      setLoading
+    );
+  }, [fetchProtected]);
 
-const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
-  const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-  const token = dropshipperData?.security?.token;
-  if (!token || dropshipperData?.project?.active_panel !== "dropshipper") {
-    localStorage.clear();
-    router.push("/dropshipping/auth/login");
-    return;
-  }
+  const fetchCountryAndState = useCallback(() => {
+    fetchProtected(
+      "http://localhost:3001/api/location/country",
+      setCountryData,
+      "countries",
+      setLoadingCountries
+    );
+  }, [fetchProtected]);
 
-  if (setLoading) setLoading(true);
+  const fetchStateList = useCallback((countryId) => {
+    fetchProtected(
+      `http://localhost:3001/api/location/country/${countryId}/states`,
+      setStateData,
+      "states",
+      setLoadingStates
+    );
+  }, [fetchProtected]);
 
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.message || `Failed to fetch ${key}`);
-    setter(result[key] || []);
-  } catch (err) {
-    Swal.fire("Error", err.message, "error");
-  } finally {
-    if (setLoading) setLoading(false);
-  }
-}, [router]);
-const fetchPermission = useCallback(() => {
-  fetchProtected(
-    "http://localhost:3001/api/dropshipper/permission",
-    setPermission,
-    "permissions",
-    setLoading
-  );
-}, [fetchProtected]);
+  const fetchCity = useCallback((stateId) => {
+    fetchProtected(
+      `http://localhost:3001/api/location/state/${stateId}/cities`,
+      setCityData,
+      "cities",
+      setLoadingCities
+    );
+  }, [fetchProtected]);
 
-const fetchCountryAndState = useCallback(() => {
-  fetchProtected(
-    "http://localhost:3001/api/location/country",
-    setCountryData,
-    "countries",
-    setLoadingCountries
-  );
-}, [fetchProtected]);
+  const selectOptions = (data) =>
+    data.map((item) => ({
+      value: item.id || item._id,
+      label: item.name,
+    }));
 
-const fetchStateList = useCallback((countryId) => {
-  fetchProtected(
-    `http://localhost:3001/api/location/country/${countryId}/states`,
-    setStateData,
-    "states",
-    setLoadingStates
-  );
-}, [fetchProtected]);
-
-const fetchCity = useCallback((stateId) => {
-  fetchProtected(
-    `http://localhost:3001/api/location/state/${stateId}/cities`,
-    setCityData,
-    "cities",
-    setLoadingCities
-  );
-}, [fetchProtected]);
-  
-const selectOptions = (data) =>
-data.map((item) => ({
-  value: item.id || item._id,
-  label: item.name,
-}));
-
-useEffect(()=>{
-  fetchPermission();
-  fetchCountryAndState();
-},[fetchPermission,fetchCountryAndState]);
+  useEffect(() => {
+    fetchPermission();
+    fetchCountryAndState();
+  }, [fetchPermission, fetchCountryAndState]);
 
   const groupedPermissions = permission.reduce((acc, perm) => {
     if (!acc[perm.panel]) acc[perm.panel] = {};
@@ -254,14 +254,14 @@ useEffect(()=>{
     { label: "Permanent Address", name: "permanentAddress", type: "text" },
   ];
   if (loading) {
-          return (
-              <div className="flex items-center justify-center h-[80vh]">
-                  <HashLoader size={60} color="#F97316" loading={true} />
-              </div>
-          );
-      }
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <HashLoader size={60} color="#F97316" loading={true} />
+      </div>
+    );
+  }
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white rounded shadow space-y-6">
+    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white rounded shadow space-y-2">
       <h2 className="text-xl font-semibold">Create Subuser</h2>
 
       <div className="grid grid-cols-2 gap-4">
@@ -281,81 +281,81 @@ useEffect(()=>{
           </div>
         ))}
 
-       
+
       </div>
-       <div>
-          <label className="block font-medium">Profile Picture <span className="text-red-500">*</span></label>
-          <input
-            type="file"
-            name="profilePicture"
-            accept="image/*"
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          />
-          {errors.profilePicture && <p className="text-red-500 text-sm">{errors.profilePicture}</p>}
-        </div>
       <div>
-          <label className="block font-medium">Type <span className="text-red-500">*</span></label>
-          <select
-            name="type"
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          >
-            <option value= 'main'>Main</option>
-            <option value='sub'>Sub</option>
-            </select>
-          {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
-        </div>
- <div className="grid grid-cols-3 gap-4">
-        {["permanentCountry", "permanentState", "permanentCity"].map((field) => (
-         <div key={field} className="relative">
-        <label className="block font-medium capitalize">
-          {field.replace("permanent", "")} <span className="text-red-500">*</span>
-        </label>
-
-        <Select
-          isDisabled={
-            (field === "permanentCountry" && loadingCountries) ||
-            (field === "permanentState" && loadingStates) ||
-            (field === "permanentCity" && loadingCities)
-          }
-          name={field}
-          value={selectOptions(
-            field === "permanentCountry" ? countryData :
-            field === "permanentState" ? stateData :
-            cityData
-          ).find((item) => item.value === formData[field])}
-        onChange={(selectedOption) => {
-  const value = selectedOption ? selectedOption.value : "";
-  
-  setFormData((prev) => ({ ...prev, [field]: value }));
-
-  if (field === "permanentCountry") {
-    fetchStateList(value); // <-- call with selected country ID
-  }
-  if (field === "permanentState") {
-    fetchCity(value); // <-- call with selected country ID
-  }
-}}
-
-          options={selectOptions(
-            field === "permanentCountry" ? countryData :
-            field === "permanentState" ? stateData :
-            cityData
-          )}
-          isClearable
+        <label className="block font-medium">Profile Picture <span className="text-red-500">*</span></label>
+        <input
+          type="file"
+          name="profilePicture"
+          accept="image/*"
+          onChange={handleChange}
+          className="w-full border p-2 border-gray-300 rounded"
         />
-
-        {((field === "permanentCountry" && loadingCountries) ||
-          (field === "permanentState" && loadingStates) ||
-          (field === "permanentCity" && loadingCities)) && (
-          <div className="absolute inset-y-0 right-3 flex items-center">
-            <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
-          </div>
-        )}
-
-        {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+        {errors.profilePicture && <p className="text-red-500 text-sm">{errors.profilePicture}</p>}
       </div>
+      <div>
+        <label className="block font-medium">Type <span className="text-red-500">*</span></label>
+        <select
+          name="type"
+          onChange={handleChange}
+          className="w-full border p-2 border-gray-300 rounded"
+        >
+          <option value='main'>Main</option>
+          <option value='sub'>Sub</option>
+        </select>
+        {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        {["permanentCountry", "permanentState", "permanentCity"].map((field) => (
+          <div key={field} className="relative">
+            <label className="block font-medium capitalize">
+              {field.replace("permanent", "")} <span className="text-red-500">*</span>
+            </label>
+
+            <Select
+              isDisabled={
+                (field === "permanentCountry" && loadingCountries) ||
+                (field === "permanentState" && loadingStates) ||
+                (field === "permanentCity" && loadingCities)
+              }
+              name={field}
+              value={selectOptions(
+                field === "permanentCountry" ? countryData :
+                  field === "permanentState" ? stateData :
+                    cityData
+              ).find((item) => item.value === formData[field])}
+              onChange={(selectedOption) => {
+                const value = selectedOption ? selectedOption.value : "";
+
+                setFormData((prev) => ({ ...prev, [field]: value }));
+
+                if (field === "permanentCountry") {
+                  fetchStateList(value); // <-- call with selected country ID
+                }
+                if (field === "permanentState") {
+                  fetchCity(value); // <-- call with selected country ID
+                }
+              }}
+
+              options={selectOptions(
+                field === "permanentCountry" ? countryData :
+                  field === "permanentState" ? stateData :
+                    cityData
+              )}
+              isClearable
+            />
+
+            {((field === "permanentCountry" && loadingCountries) ||
+              (field === "permanentState" && loadingStates) ||
+              (field === "permanentCity" && loadingCities)) && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
+
+            {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+          </div>
 
         ))}
       </div>
@@ -376,7 +376,7 @@ useEffect(()=>{
                         checked={formData.permissions.includes(perm.id)}
                         onChange={() => handlePermissionChange(perm.id)}
                       />
-                      <span>{perm.action}</span>
+                       <span className="capitalize">{perm.action}</span>
                     </label>
                   ))}
                 </div>
@@ -387,11 +387,11 @@ useEffect(()=>{
         {errors.permissions && <p className="text-red-500 text-sm">{errors.permissions}</p>}
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-start my-2">
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-8 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
         >
           {loading ? "Submitting..." : "Submit"}
         </button>

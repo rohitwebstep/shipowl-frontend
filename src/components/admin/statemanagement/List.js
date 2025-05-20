@@ -476,7 +476,7 @@ export default function List() {
                 <div className="bg-white rounded-3xl p-5 main-outer-wrapper">
                     <div className="flex flex-wrap justify-between items-center mb-4">
                         <h2 className="md:text-2xl font-bold text-[#2B3674]">
-                            {isTrashed ? "Trashed state List" : "state List"}
+                            {isTrashed ? "Trashed State List" : "State List"}
                         </h2>
                         <div className="flex gap-3 flex-wrap items-center">
                             <button
@@ -525,7 +525,7 @@ export default function List() {
 
                     {stateData.length > 0 ? (
   <div className="overflow-x-auto w-full relative">
-    <table id="statetable" className="display main-tables w-full">
+    <table  className="display main-tables w-full" id="statetable">
       <thead>
         <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
           <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">State Name</th>

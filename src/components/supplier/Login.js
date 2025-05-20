@@ -155,7 +155,7 @@ export default function Login() {
             <div className="md:w-1/2 relative md:p-0 p-6 md:flex md:flex-col justify-center items-center px-3 bg-white lg:px-12">
                 <div className="w-full max-w-sm">
                     <div className="lg:absolute top-7">
-                        <Link href="/supplier/auth/password/forget" className="text-[#A3AED0] text-sm mb-6 inline-block">
+                        <Link href="/supplier" className="text-[#A3AED0] text-sm mb-6 inline-block">
                             ← Back to dashboard
                         </Link>
                     </div>
@@ -214,7 +214,7 @@ export default function Login() {
                                 <input type="checkbox" className="form-checkbox text-[#2B3674]" />
                                 <span className="text-sm text-[#2B3674]">Keep me logged in</span>
                             </label>
-                            <Link href="/" className="text-sm text-[#F98F5C] hover:underline">
+                            <Link href="/supplier/auth/password/forget" className="text-sm text-[#F98F5C] hover:underline">
                                 Forgot password?
                             </Link>
                         </div>
@@ -230,7 +230,7 @@ export default function Login() {
 
                     <p className="text-start text-sm text-[#2B3674] mt-4">
                         Not registered yet?{" "}
-                        <Link href="/" className="text-[#F98F5C] hover:underline">
+                        <Link href="/supplier/auth/register" className="text-[#F98F5C] hover:underline">
                             Create an Account
                         </Link>
                     </p>

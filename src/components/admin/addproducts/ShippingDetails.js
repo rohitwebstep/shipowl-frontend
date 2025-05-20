@@ -5,22 +5,22 @@ import { UploadCloud } from 'lucide-react';
 import { ProductContext } from './ProductContext';
 
 export default function ShippingDetails() {
-  const { formData,validateForm2, setFormData, shippingErrors, fileFields,setActiveTab } = useContext(ProductContext);
+  const { formData, validateForm2, setFormData, shippingErrors, fileFields, setActiveTab } = useContext(ProductContext);
 
 
 
   const handleFileChange = (event, key) => {
     const selectedFiles = Array.from(event.target.files);
-  
+
     // Update formData state with the actual File objects
     setFormData((prev) => ({
       ...prev,
       [key]: selectedFiles,
     }));
   };
-  
-  
-  
+
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,7 +30,7 @@ export default function ShippingDetails() {
     }));
   };
 
-  
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -54,7 +54,7 @@ export default function ShippingDetails() {
               onChange={handleChange}
             >
               <option value="">Select</option>
-              <option value="1">1 Day</option>
+              <option value="24 Hours">24 Hours</option>
               <option value="3">3 Days</option>
               <option value="5">5 Days</option>
             </select>
@@ -71,9 +71,8 @@ export default function ShippingDetails() {
               <input
                 type="number"
                 placeholder={field.includes('weight') ? 'GM' : 'CM'}
-                className={`border placeholder-black placeholder:text-right ${
-                  shippingErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'
-                } mt-2 w-full p-3 rounded-xl`}
+                className={`border placeholder-black placeholder:text-right ${shippingErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'
+                  } mt-2 w-full p-3 rounded-xl`}
                 name={field}
                 value={formData[field] || ''}
                 onChange={handleChange}
@@ -90,21 +89,21 @@ export default function ShippingDetails() {
                 {label} <span className="text-red-500">*</span>
               </label>
               <div className="border-1 relative border-dashed border-red-300 rounded-xl p-6 w-48 h-32 flex flex-col items-center justify-center">
-  <UploadCloud className="w-8 h-8 text-[#232323]" />
-  <span className="text-xs text-[#232323] text-center">
-    {formData[key]?.length > 0 ? (
-      formData[key].join(', ') // Display the file names as a comma-separated list
-    ) : (
-      'Upload'
-    )}
-  </span>
-  <input
-    type="file"
-    multiple
-    className="absolute opacity-0 w-full h-full cursor-pointer"
-    onChange={(e) => handleFileChange(e, key)}
-  />
-</div>
+                <UploadCloud className="w-8 h-8 text-[#232323]" />
+                <span className="text-xs text-[#232323] text-center">
+                  {Array.isArray(formData?.[key]) && formData[key].length > 0
+                    ? formData[key]
+                      .map((file, i) => file.name || `File ${i + 1}`)
+                      .join(', ')
+                    : 'Upload'}
+                </span>
+                <input
+                  type="file"
+                  multiple
+                  className="absolute opacity-0 w-full h-full cursor-pointer"
+                  onChange={(e) => handleFileChange(e, key)}
+                />
+              </div>
 
               {shippingErrors[key] && <p className="text-red-500 text-sm">{shippingErrors[key]}</p>}
             </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect} from 'react';
+import { useContext, useEffect } from 'react';
 import { ProductContextEdit } from './ProductContextEdit';
 import "@pathofdev/react-tag-input/build/index.css"; // Required styles
 import ReactTagInput from "@pathofdev/react-tag-input";
@@ -15,7 +15,7 @@ export default function ProductDetails() {
     brandData,
     fetchBrand,
     setActiveTab,
-    errors, setErrors,validateFields,
+    errors, setErrors, validateFields,
 
   } = useContext(ProductContextEdit);
 
@@ -32,15 +32,15 @@ export default function ProductDetails() {
     setErrors({ ...errors, [name]: '' });
   };
   const handleChangeTags = (newTags) => {
-    
-  
+
+
     setFormData((prevData) => {
       const updatedData = { ...prevData, tags: newTags };
       return updatedData;
     });
   };
-  
-  
+
+
   const handleSubmit = () => {
     if (validateFields()) {
       setActiveTab('variants-details')
@@ -114,20 +114,20 @@ export default function ProductDetails() {
       </div>
 
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4 mt-4">
-     
-      <div>
-  <label className="block text-[#232323] font-semibold">Product Tags<span className="text-red-500">*</span></label>
-  <ReactTagInput
-      name="tags"
-      className={`w-full border ${errors.description ? 'border-red-500' : 'border-[#DFEAF2]'} p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0 h-24`}
 
-      tags={formData.tags || []} // Ensure this is an array of strings
-      onChange={handleChangeTags} // Correctly passing the tag array to update formData
-      placeholder="Type and press enter"
-    />
-              {errors.tags && <p className="text-red-500 text-sm mt-1">{errors.tags}</p>}
+        <div>
+          <label className="block text-[#232323] font-semibold">Product Tags<span className="text-red-500">*</span></label>
+          <ReactTagInput
+            name="tags"
+            className={`w-full border ${errors.description ? 'border-red-500' : 'border-[#DFEAF2]'} p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0 h-24`}
 
-</div>
+            tags={formData.tags || []} // Ensure this is an array of strings
+            onChange={handleChangeTags} // Correctly passing the tag array to update formData
+            placeholder="Type and press enter"
+          />
+          {errors.tags && <p className="text-red-500 text-sm mt-1">{errors.tags}</p>}
+
+        </div>
 
 
         <div>
@@ -205,7 +205,7 @@ export default function ProductDetails() {
             List As <span className="text-red-500">*</span>
           </label>
           <div className="flex flex-wrap gap-4 mt-2">
-            {['warehouse', 'rto', 'both'].map((val) => (
+            {['Selfship', 'Shipowl', 'both'].map((val) => (
               <label key={val} className="flex items-center gap-2">
                 <input
                   type="radio"

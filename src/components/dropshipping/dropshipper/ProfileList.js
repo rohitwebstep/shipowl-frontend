@@ -1,6 +1,6 @@
 "use client";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-import { useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
 import React, { useState, useCallback, useEffect } from "react";
@@ -60,52 +60,52 @@ const ProfileList = () => {
         }
     }, [router, setSuppliers]);
     const fetchCity = useCallback(async () => {
-            const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-        
-            if (supplierData?.project?.active_panel !== "dropshipper") {
-                localStorage.removeItem("shippingData");
-                router.push("/dropshipping/auth/login");
-                return;
-            }
-        
-            const suppliertoken = supplierData?.security?.token;
-            if (!suppliertoken) {
-                router.push("/dropshipping/auth/login");
-                return;
-            }
-        
-            try {
-                setLoading(true);
-                const response = await fetch(
-                    `http://localhost:3001/api/location/city`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${suppliertoken}`,
-                        },
-                    }
-                );
-        
-                const result = await response.json();
-        
-                if (!response.ok) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Something Wrong!",
-                        text: result.message || result.error || "Your session has expired. Please log in again.",
-                    });
-                    throw new Error(result.message || result.error || "Something Wrong!");
+        const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (supplierData?.project?.active_panel !== "dropshipper") {
+            localStorage.removeItem("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const suppliertoken = supplierData?.security?.token;
+        if (!suppliertoken) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `http://localhost:3001/api/location/city`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${suppliertoken}`,
+                    },
                 }
-        
-                setCityData(result?.cities || []);
-            } catch (error) {
-                console.error("Error fetching cities:", error);
-            } finally {
-                setLoading(false);
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                });
+                throw new Error(result.message || result.error || "Something Wrong!");
             }
-        }, [router]);
-    
+
+            setCityData(result?.cities || []);
+        } catch (error) {
+            console.error("Error fetching cities:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
+
     const fetchState = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -159,7 +159,7 @@ const ProfileList = () => {
             setLoading(false);
         }
     }, [router, setStateData]);
-            
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -174,63 +174,61 @@ const ProfileList = () => {
         fetchData();
     }, [fetchSupplier, verifyDropShipperAuth]);
 
-    const [selected, setSelected] = useState([]);
-   
-    const handleCheckboxChange = (id) => {
-        setSelected((prev) => (prev.includes(id) ? prev.filter((suppliers) => suppliers !== id) : [...prev, id]));
-    };
-   
-    const handleEdit=()=>{
+    const handleEdit = () => {
         router.push(`/dropshipping/profile/update`);
     }
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
+    }
+
     return (
-        loading ? (
-            <div className="flex justify-center items-center h-96">
-                <HashLoader color="orange" />
-            </div>
-        ) : (
-            <div className="grid gap-6 grid-cols-2 ">
+
+        <div className="grid gap-6 grid-cols-2 ">
             <div className="bg-white rounded-2xl p-6 shadow-md">
-              <h3 className="text-xl font-semibold text-[#2B3674] mb-4">Personal Information</h3>
-              <div className="space-y-2 text-[#2B3674]">
-                <p><strong>Name:</strong> {suppliers.name || 'N/A'}</p>
-                <p><strong>Email:</strong> {suppliers.email || 'N/A'}</p>
-                <p><strong>Date of Birth:</strong> {suppliers.dateOfBirth || 'N/A'}</p>
-                <p><strong>Website Url:</strong> {suppliers.website || 'N/A'}</p>
-                <p><strong>Referral Code:</strong> {suppliers.referralCode || 'N/A'}</p>
-                <p><strong>Permanent Address:</strong> {suppliers.permanentAddress || 'N/A'}</p>
-                <p><strong>State:</strong> {stateData.find(s => s.id === suppliers.permanentStateId)?.name || 'N/A'}</p>
-                <p><strong>City:</strong> {cityData.find(c => c.id === suppliers.permanentCityId)?.name || 'N/A'}</p>
-                <p><strong>Postal Code:</strong> {suppliers.permanentPostalCode || 'N/A'}</p>
-              </div>
-              <div className="mt-4 text-right">
-                <button onClick={() => handleEdit(suppliers.id)} className='bg-orange-500 text-white p-3 rounded-md'>Update Profile</button>
-              </div>
-            </div>
-          
-            <div className="bg-white rounded-2xl p-6 shadow-md ">
-              <h3 className="text-xl font-semibold text-[#2B3674] mb-4">Bank Account Details</h3>
-              {Array.isArray(suppliers.bankAccounts) && suppliers.bankAccounts.length > 0 ? (
-                <div className="space-y-4">
-                  {suppliers.bankAccounts.map((bank, index) => (
-                    <div key={bank.id} className="bg-white p-4 rounded-lg border">
-                      <p><strong>Account Holder Name:</strong> {bank.accountHolderName}</p>
-                      <p><strong>Account Number:</strong> {bank.accountNumber}</p>
-                      <p><strong>Bank Name:</strong> {bank.bankName}</p>
-                      <p><strong>Branch:</strong> {bank.bankBranch}</p>
-                      <p><strong>Account Type:</strong> {bank.accountType}</p>
-                      <p><strong>IFSC Code:</strong> {bank.ifscCode}</p>
-                     
-                    </div>
-                  ))}
+                <h3 className="text-xl font-semibold text-[#2B3674] mb-4">Personal Information</h3>
+                <div className="space-y-2 text-[#2B3674]">
+                    <p><strong>Name:</strong> {suppliers.name || 'N/A'}</p>
+                    <p><strong>Email:</strong> {suppliers.email || 'N/A'}</p>
+                    <p><strong>Date of Birth:</strong> {suppliers.dateOfBirth || 'N/A'}</p>
+                    <p><strong>Website Url:</strong> {suppliers.website || 'N/A'}</p>
+                    <p><strong>Referral Code:</strong> {suppliers.referralCode || 'N/A'}</p>
+                    <p><strong>Permanent Address:</strong> {suppliers.permanentAddress || 'N/A'}</p>
+                    <p><strong>State:</strong> {stateData.find(s => s.id === suppliers.permanentStateId)?.name || 'N/A'}</p>
+                    <p><strong>City:</strong> {cityData.find(c => c.id === suppliers.permanentCityId)?.name || 'N/A'}</p>
+                    <p><strong>Postal Code:</strong> {suppliers.permanentPostalCode || 'N/A'}</p>
                 </div>
-              ) : (
-                <p className="text-[#A3AED0]">No bank account details available.</p>
-              )}
+                <div className="mt-4 text-right">
+                    <button onClick={() => handleEdit(suppliers.id)} className='bg-orange-500 text-white p-3 rounded-md'>Update Profile</button>
+                </div>
             </div>
-          </div>
-          
-        )
+
+            <div className="bg-white rounded-2xl p-6 shadow-md ">
+                <h3 className="text-xl font-semibold text-[#2B3674] mb-4">Bank Account Details</h3>
+                {Array.isArray(suppliers.bankAccounts) && suppliers.bankAccounts.length > 0 ? (
+                    <div className="space-y-4">
+                        {suppliers.bankAccounts.map((bank, index) => (
+                            <div key={bank.id} className="bg-white p-4 rounded-lg border">
+                                <p><strong>Account Holder Name:</strong> {bank.accountHolderName}</p>
+                                <p><strong>Account Number:</strong> {bank.accountNumber}</p>
+                                <p><strong>Bank Name:</strong> {bank.bankName}</p>
+                                <p><strong>Branch:</strong> {bank.bankBranch}</p>
+                                <p><strong>Account Type:</strong> {bank.accountType}</p>
+                                <p><strong>IFSC Code:</strong> {bank.ifscCode}</p>
+
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-[#A3AED0]">No bank account details available.</p>
+                )}
+            </div>
+        </div>
+
     );
 
 };

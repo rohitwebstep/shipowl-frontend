@@ -181,7 +181,7 @@ const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
       },
     });
     const result = await res.json();
-    if (!res.ok) throw new Error(result.message || `Failed to fetch ${key}`);
+    if (!res.ok) throw new Error(result.message || result.error || `Failed to fetch ${key}`);
     setter(result[key] || []);
   } catch (err) {
     Swal.fire("Error", err.message, "error");
@@ -261,7 +261,7 @@ useEffect(()=>{
           );
       }
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white rounded shadow space-y-6">
+    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white rounded shadow space-y-2">
       <h2 className="text-xl font-semibold">Create Subuser</h2>
 
       <div className="grid grid-cols-2 gap-4">
@@ -376,7 +376,7 @@ useEffect(()=>{
                         checked={formData.permissions.includes(perm.id)}
                         onChange={() => handlePermissionChange(perm.id)}
                       />
-                      <span>{perm.action}</span>
+                       <span className="capitalize">{perm.action}</span>
                     </label>
                   ))}
                 </div>
@@ -387,11 +387,11 @@ useEffect(()=>{
         {errors.permissions && <p className="text-red-500 text-sm">{errors.permissions}</p>}
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-start my-2">
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-8 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
         >
           {loading ? "Submitting..." : "Submit"}
         </button>

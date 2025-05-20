@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useState ,useCallback} from "react";
-import { useRouter ,useSearchParams} from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDropshipper } from "../middleware/DropshipperMiddleWareContext";
 import Swal from "sweetalert2";
 import { HashLoader } from "react-spinners";
 export default function Update() {
     const router = useRouter();
-    const [loading,setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         date: "",
         transactionId: "",
@@ -15,11 +15,11 @@ export default function Update() {
         status: "",
     });
     const { verifyDropShipperAuth } = useDropshipper();
-  const searchParams = useSearchParams();
-  const id = searchParams.get('id');
-    useEffect(()=>{
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
+    useEffect(() => {
         verifyDropShipperAuth();
-    },[verifyDropShipperAuth]);
+    }, [verifyDropShipperAuth]);
 
     const [formErrors, setFormErrors] = useState({});
 
@@ -38,128 +38,128 @@ export default function Update() {
         if (!formData.status) errors.status = "Status is required.";
         return errors;
     };
-  
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
 
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-    const token = dropshipperData?.security?.token;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
 
-    if (dropshipperData?.project?.active_panel !== "dropshipper" || !token) {
-      localStorage.clear();
-      router.push("/dropshipping/auth/login");
-      return;
-    }
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+        const token = dropshipperData?.security?.token;
 
-    const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setLoading(false);
-      return;
-    }
+        if (dropshipperData?.project?.active_panel !== "dropshipper" || !token) {
+            localStorage.clear();
+            router.push("/dropshipping/auth/login");
+            return;
+        }
 
-    try {
-      Swal.fire({ title: "Updating Payments...", allowOutsideClick: false, didOpen: Swal.showLoading });
-      const formdata = new FormData();
-      formdata.append("date", formData.date);
-      formdata.append("transactionId", formData.transactionId);
-      formdata.append("cycle", formData.cycle);
-      formdata.append("amount", formData.amount);
-      formdata.append("status", formData.status);
+        const newErrors = validate();
+        if (Object.keys(newErrors).length > 0) {
+            setFormErrors(newErrors);
+            setLoading(false);
+            return;
+        }
 
-      const res = await fetch(`http://localhost:3001/api/payment/${id}`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formdata,
-      });
+        try {
+            Swal.fire({ title: "Updating Payments...", allowOutsideClick: false, didOpen: Swal.showLoading });
+            const formdata = new FormData();
+            formdata.append("date", formData.date);
+            formdata.append("transactionId", formData.transactionId);
+            formdata.append("cycle", formData.cycle);
+            formdata.append("amount", formData.amount);
+            formdata.append("status", formData.status);
 
-      const result = await res.json();
+            const res = await fetch(`http://localhost:3001/api/payment/${id}`, {
+                method: "PUT",
+                headers: { Authorization: `Bearer ${token}` },
+                body: formdata,
+            });
 
-      if (!res.ok) throw new Error(result.message || "Creation failed");
+            const result = await res.json();
 
-      Swal.fire("Payment Updated", " Payment has been Updated successfully!", "success").then(() => {
-        setFormData({state: "", country: "", city: "", pincode: "" });
-        router.push("/dropshipping/payments");
-      });
-    } catch (err) {
-      Swal.fire("Error", err.message || "Something went wrong.", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+            if (!res.ok) throw new Error(result.message || "Creation failed");
+
+            Swal.fire("Payment Updated", " Payment has been Updated successfully!", "success").then(() => {
+                setFormData({ state: "", country: "", city: "", pincode: "" });
+                router.push("/dropshipping/payments");
+            });
+        } catch (err) {
+            Swal.fire("Error", err.message || "Something went wrong.", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const inputBaseStyle = "border w-full rounded-md p-2 mt-2";
     const errorStyle = "border-red-500";
     const labelStyle = "block font-medium";
     const errorTextStyle = "text-red-500 text-sm mt-1";
-  const fetchPayments = useCallback(async () => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    const fetchPayments = useCallback(async () => {
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
-        localStorage.removeItem("shippingData");
-        router.push("/dropshipping/auth/login");
-        return;
-    }
-
-    const dropshippertoken = dropshipperData?.security?.token;
-    if (!dropshippertoken) {
-        router.push("/dropshipping/auth/login");
-        return;
-    }
-
-    try {
-        setLoading(true);
-        const response = await fetch(
-            `http://localhost:3001/api/payment/${id}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${dropshippertoken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            const errorMessage = await response.json();
-            Swal.fire({
-                icon: "error",
-                title: "Something Wrong!",
-                text: errorMessage.message || "Your session has expired. Please log in again.",
-            });
-            throw new Error(errorMessage.message);
+        if (dropshipperData?.project?.active_panel !== "dropshipper") {
+            localStorage.removeItem("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
         }
 
-        const result = await response.json();
-        const payments = result?.payment || {};
-      
-        setFormData({
-            date: payments.date ? payments.date.slice(0, 10) : "",
-            transactionId: payments.transactionId || "",
-            cycle: payments.cycle || "",
-            amount: payments.amount || "",
-            status: payments.status || "",
-          });
-    } catch (error) {
-        console.error("Error fetching Company:", error);
-    } finally {
-        setLoading(false);
+        const dropshippertoken = dropshipperData?.security?.token;
+        if (!dropshippertoken) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `http://localhost:3001/api/payment/${id}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${dropshippertoken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: errorMessage.message || "Your session has expired. Please log in again.",
+                });
+                throw new Error(errorMessage.message);
+            }
+
+            const result = await response.json();
+            const payments = result?.payment || {};
+
+            setFormData({
+                date: payments.date ? payments.date.slice(0, 10) : "",
+                transactionId: payments.transactionId || "",
+                cycle: payments.cycle || "",
+                amount: payments.amount || "",
+                status: payments.status || "",
+            });
+        } catch (error) {
+            console.error("Error fetching Company:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, id]);
+    useEffect(() => {
+        fetchPayments();
+    }, [fetchPayments])
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
     }
-}, [router, id]);
- useEffect(()=>{
-    fetchPayments();
- },[fetchPayments])
- if (loading) {
-    return (
-        <div className="flex items-center justify-center h-[80vh]">
-            <HashLoader size={60} color="#F97316" loading={true} />
-        </div>
-    );
-}
     return (
         <div className="bg-white lg:w-9/12 mt-10 rounded-2xl p-8 shadow-md">
-            <h2 className="text-2xl font-bold text-[#2B3674] mb-6">Create Payment</h2>
+            <h2 className="text-2xl font-bold text-[#2B3674] mb-6">Update Payment</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-2">
@@ -174,7 +174,7 @@ export default function Update() {
                             value={formData.date || ''}
                             onChange={handleChange}
                             className={`${inputBaseStyle} text-[#718EBF] border-[#DFEAF2] ${formErrors.date ? errorStyle : ""}`}
-                            
+
                         />
                         {formErrors.date && <p className={errorTextStyle}>{formErrors.date}</p>}
                     </div>
@@ -191,7 +191,7 @@ export default function Update() {
                             onChange={handleChange}
                             placeholder="TXN000123"
                             className={`${inputBaseStyle} text-[#718EBF] border-[#DFEAF2] ${formErrors.transactionId ? errorStyle : ""}`}
-                            
+
                         />
                         {formErrors.transactionId && <p className={errorTextStyle}>{formErrors.transactionId}</p>}
                     </div>
@@ -226,7 +226,7 @@ export default function Update() {
                             min="0"
                             placeholder="5000"
                             className={`${inputBaseStyle} text-[#718EBF] border-[#DFEAF2] ${formErrors.amount ? errorStyle : ""}`}
-                            
+
                         />
                         {formErrors.amount && <p className={errorTextStyle}>{formErrors.amount}</p>}
                     </div>
@@ -240,7 +240,7 @@ export default function Update() {
                         value={formData.status || ''}
                         onChange={handleChange}
                         className={`${inputBaseStyle} text-[#718EBF] border-[#DFEAF2] ${formErrors.amount ? errorStyle : ""}`}
-                        >
+                    >
                         <option value="Success">Success</option>
                         <option value="Pending">Pending</option>
                         <option value="Failed">Failed</option>
@@ -255,7 +255,7 @@ export default function Update() {
                         type="submit"
                         className="bg-orange-500 text-white font-medium px-6 py-3 rounded-lg hover:bg-[#3367d6]"
                     >
-                        Create Payment
+                        Update Payment
                     </button>
                 </div>
             </form>

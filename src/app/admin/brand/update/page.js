@@ -1,12 +1,12 @@
 'use client'
 
 import React, { Suspense } from 'react';
-import AddProduct from '@/components/supplier/products/AddProduct';
+import Update from '@/components/admin/brand/Update'
 
 function Page() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <AddProduct />
+      <Update />
     </Suspense>
   );
 }

@@ -39,11 +39,10 @@ const menuItems = [
     href: "#",
     section: "MENU",
     subMenu: [
-      { name: "All Products (In progress)", href: "/dropshipping/product/all" },
-      { name: "My Products (In progress)", href: "/dropshipping/product/my" }
+      { name: "All Products", href: "/dropshipping/product/all" },
+      { name: "My Products", href: "/dropshipping/product/my" }
     ]
   },
-  
   { name: "Manage Products (In progress)", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },
   { name: "Subuser Listing", icon: Package, href: "/dropshipping/sub-user/list", section: "MENU" },
   { name: "Profile", icon: Package, href: "/dropshipping/profile", section: "MENU" },
@@ -59,11 +58,23 @@ const menuItems = [
 ];
 
 const Sidebar = () => {
+  const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState({});
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const pathname = usePathname();
 
-  // Close sidebar on outside click
+  useEffect(() => {
+    const initialOpenMenus = {};
+    menuItems.forEach((item) => {
+      if (item.subMenu) {
+        const isSubActive = item.subMenu.some((subItem) => pathname === subItem.href);
+        if (isSubActive) {
+          initialOpenMenus[item.name] = true;
+        }
+      }
+    });
+    setOpenMenus(initialOpenMenus);
+  }, [pathname]);
+
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (isSidebarOpen && !event.target.closest("aside")) {
@@ -95,7 +106,7 @@ const Sidebar = () => {
       )}
 
       <aside
-        className={`fixed top-0 left-0 w-72 sidebar h-[500px] lg:h-full overflow-auto   bg-white z-50 rounded-xl lg:w-full shadow-lg p-4 transform transition-transform duration-300 ease-in-out
+        className={`fixed top-0 left-0 w-72 sidebar h-[500px] lg:h-full overflow-auto bg-white z-50 rounded-xl lg:w-full shadow-lg p-4 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
         lg:translate-x-0 lg:relative w-64 lg:h-full`}
       >
@@ -113,50 +124,72 @@ const Sidebar = () => {
               <ul className="space-y-2">
                 {menuItems
                   .filter((item) => item.section === section)
-                  .map((item) => (
-                    <li key={item.name}>
-                      {item.subMenu ? (
-                        <button
-                          onClick={() => toggleSubMenu(item.name)}
-                          className={`font-lato font-medium w-full flex items-center justify-between p-3 border-l-4 rounded-md hover:bg-[#2C3454] hover:border-[#F98F5C] hover:text-white 
-                          ${pathname === item.href || openMenus[item.name] ? "bg-[#2C3454] text-white border-[#F98F5C]" : "bg-[#F0F1F3] border-[#667085]"}`}
-                        >
-                          <span className="flex items-center">
+                  .map((item) => {
+                    const isActiveParent = pathname === item.href.concat('/');
+                    console.log('isActiveParent', isActiveParent)
+                    const isActiveChild = item.subMenu?.some((sub) => pathname === sub.href.concat('/'));
+                    const isActive = isActiveParent || isActiveChild;
+
+                    return (
+                      <li key={item.name}>
+                        {item.subMenu ? (
+                          <>
+                            <button
+                              onClick={() => toggleSubMenu(item.name)}
+                              className={`font-lato font-medium w-full flex items-center justify-between p-3 border-l-4 rounded-md transition-colors
+                                ${isActive
+                                  ? "bg-[#2C3454] text-white border-[#F98F5C]"
+                                  : "bg-[#F0F1F3] text-[#2C3454] border-[#667085] hover:bg-[#2C3454] hover:text-white hover:border-[#F98F5C]"}
+                              `}
+                            >
+                              <span className="flex items-center">
+                                <item.icon className="w-5 h-5 mr-2" /> {item.name}
+                              </span>
+                              <ChevronDown
+                                className={`w-4 h-4 transition-transform ${openMenus[item.name] ? "rotate-180" : ""
+                                  }`}
+                              />
+                            </button>
+
+                            {openMenus[item.name] && (
+                              <ul className="ml-6 mt-1 space-y-1 text-sm">
+                                {item.subMenu.map((subItem) => {
+                                  const isSubActive = pathname === subItem.href.concat('/');
+                                  return (
+                                    <li key={subItem.name}>
+                                      <a
+                                        href={subItem.href}
+                                        className={`flex items-center font-lato font-medium p-3 border-l-4 rounded-md transition-colors
+                                          ${isSubActive
+                                            ? "bg-[#2C3454] text-white border-[#F98F5C]"
+                                            : "bg-[#F0F1F3] text-[#2C3454] border-[#667085] hover:bg-[#2C3454] hover:text-white hover:border-[#F98F5C]"}
+                                        `}
+                                        onClick={() => setIsSidebarOpen(false)}
+                                      >
+                                        {subItem.name}
+                                      </a>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            )}
+                          </>
+                        ) : (
+                          <a
+                            href={item.href}
+                            className={`font-lato font-medium flex items-center p-3 border-l-4 rounded-md transition-colors
+                              ${pathname === item.href.concat('/')
+                                ? "bg-[#2C3454] text-white border-[#F98F5C]"
+                                : "bg-[#F0F1F3] text-[#2C3454] border-[#667085] hover:bg-[#2C3454] hover:text-white hover:border-[#F98F5C]"}
+                            `}
+                            onClick={() => setIsSidebarOpen(false)}
+                          >
                             <item.icon className="w-5 h-5 mr-2" /> {item.name}
-                          </span>
-                          <ChevronDown
-                            className={`w-4 h-4 transition-transform ${openMenus[item.name] ? "rotate-180" : ""
-                              }`}
-                          />
-                        </button>
-                      ) : (
-                        <a
-                          href={item.href}
-                          onClick={() => setIsSidebarOpen(false)}
-                          className={`font-lato font-medium flex items-center text-[#2C3454] p-3 rounded-md hover:bg-[#2C3454] hover:text-white hover:border-[#F98F5C] border-l-4 
-                          ${pathname === item.href.concat('/') ? "bg-[#2C3454] text-white border-[#F98F5C]" : "bg-[#F0F1F3] border-[#667085]"}`}
-                        >
-                          <item.icon className="w-5 h-5 mr-2" /> {item.name}
-                        </a>
-                      )}
-                      {item.subMenu && openMenus[item.name] && (
-                        <ul className="ml-6 mt-1 space-y-1 text-sm text-gray-700">
-                          {item.subMenu.map((subItem) => (
-                            <li key={subItem.name}>
-                              <a
-                                href={subItem.href}
-                                className={`block p-3 text-[#2C3454] hover:bg-[#2C3454] hover:text-white rounded-md 
-                                ${pathname === subItem.href ? "bg-[#2C3454] text-white font-semibold" : ""}`}
-                                onClick={() => setIsSidebarOpen(false)}
-                              >
-                                {subItem.name}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  ))}
+                          </a>
+                        )}
+                      </li>
+                    );
+                  })}
               </ul>
             </div>
           ))}

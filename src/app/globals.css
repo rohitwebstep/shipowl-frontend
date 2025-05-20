@@ -11,14 +11,15 @@
   font-family: var(--font-dm-sans), sans-serif;
 }
 
-.font-public-sans {
-  font-family: var(--font-public-sans), sans-serif;
+
+th.text-left {
+  text-align: left !important;
 }
-th.text-left{
-    text-align: left !important;
-}td.text-left{
-    text-align: left !important;
+
+td.text-left {
+  text-align: left !important;
 }
+
 body {
   font-family: 'Public Sans', sans-serif;
   background: #F1F5F9 !important;
@@ -202,14 +203,17 @@ table tr th:last-child {
   color: #2b3674;
   font-weight: 500;
 }
+
 .main-outer-wrapper .dt-info {
   color: #2b3674;
   font-weight: 500;
 }
+
 .main-tables {
   border: none !important;
   background: transparent !important;
 }
+
 .main-outer-wrapper .dt-paging.paging_full_numbers button.dt-paging-button.current {
   box-shadow: none;
   background-color: #2B3674 !important;
@@ -239,20 +243,26 @@ table tr th:last-child {
   color: inherit !important;
   box-shadow: none !important;
 }
-.mySwiper{
+
+.mySwiper {
   margin-left: 1px !important;
 }
 
-.swiper-button-prev, .swiper-button-next {
+.swiper-button-prev,
+.swiper-button-next {
   color: orange !important;
 }
 
-.swiper-button-prev:after, .swiper-button-next:after {
+.swiper-button-prev:after,
+.swiper-button-next:after {
   font-size: 17px !important;
 }
-td:hover,th:hover{
+
+td:hover,
+th:hover {
   outline: none !important;
 }
+
 .css-hlgwow {
   padding: 8px !important;
 }

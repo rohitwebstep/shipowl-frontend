@@ -1,5 +1,5 @@
 "use client";
-import {useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
@@ -18,28 +18,28 @@ export default function Payments() {
     const [data, setData] = useState([]);
     const { verifyDropShipperAuth } = useDropshipper();
     const router = useRouter();
-       const [selected, setSelected] = useState([]);
-    
-        const handleCheckboxChange = (id) => {
-            setSelected((prev) =>
-                prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-            );
-        };
+    const [selected, setSelected] = useState([]);
+
+    const handleCheckboxChange = (id) => {
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+    };
     const fetchPayments = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-    
+
         if (dropshipperData?.project?.active_panel !== "dropshipper") {
             localStorage.removeItem("shippingData");
             router.push("/dropshipping/auth/login");
             return;
         }
-    
+
         const dropshippertoken = dropshipperData?.security?.token;
         if (!dropshippertoken) {
             router.push("/dropshipping/auth/login");
             return;
         }
-    
+
         try {
             setLoading(true);
             const response = await fetch(
@@ -52,9 +52,9 @@ export default function Payments() {
                     },
                 }
             );
-    
+
             const result = await response.json();
-    
+
             if (!response.ok) {
                 Swal.fire({
                     icon: "error",
@@ -63,7 +63,7 @@ export default function Payments() {
                 });
                 throw new Error(result.message || result.error || "Something Wrong!");
             }
-    
+
             setData(result?.payments || []);
         } catch (error) {
             console.error("Error fetching cities:", error);
@@ -71,7 +71,7 @@ export default function Payments() {
             setLoading(false);
         }
     }, [router]);
-    
+
     const trashedPayments = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -397,137 +397,136 @@ export default function Payments() {
             setLoading(false);
         }
     };
-  if (loading) {
-          return (
-              <div className="flex items-center justify-center h-[80vh]">
-                  <HashLoader size={60} color="#F97316" loading={true} />
-              </div>
-          );
-      }
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
+    }
 
-         
-  return (
-    <div className="bg-white lg:w-8/12 rounded-3xl p-5">
-      <div className="flex flex-wrap justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-[#2B3674]">Payments</h2>
-        <div className="flex gap-3 flex-wrap items-center">
-          <button
-            onClick={() => setIsPopupOpen((prev) => !prev)}
-            className="bg-[#F4F7FE] p-2 rounded-lg relative"
-          >
-            <MoreHorizontal className="text-[#F98F5C]" />
-            {isPopupOpen && (
-              <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
-                <ul className="py-2 text-sm text-[#2B3674]">
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                </ul>
-              </div>
-            )}
-          </button>
-          <button
-          className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-          onClick={async () => {
-              if (isTrashed) {
-                  setIsTrashed(false);
-                  await fetchPayments();
-              } else {
-                  setIsTrashed(true);
-                  await trashedPayments();
 
-              }
-          }}
-      >
-          {isTrashed ? "Payments Listing (Simple)" : "Trashed Payments"}
-      </button>
-          <Link href="/dropshipping/payments/create">
-            <button className="bg-[#4285F4] text-white rounded-md p-3 px-8">Add New</button>
-          </Link>
-        </div>
-      </div>
-{
-    data.length > 0 ? (
-        <div className="overflow-x-auto w-full relative">
-        <table className="w-full" id="payments">
-          <thead>
-            <tr className="border-b text-[#A3AED0] border-[#E9EDF7] text-sm">
-              <th className="p-2 px-5 uppercase text-left">#</th>
-              <th className="p-2 px-5 uppercase text-left">Date</th>
-              <th className="p-2 px-5 uppercase text-left">Transaction ID</th>
-              <th className="p-2 px-5 uppercase text-left">Cycle</th>
-              <th className="p-2 px-5 uppercase text-right">Amount</th>
-              <th className="p-2 px-5 uppercase text-center">Status</th>
-              <th className="p-2 px-5 uppercase text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item) => (
-              <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-medium text-sm">
-                <td className="p-2 px-5">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(item.id)}
-                      onChange={() => handleCheckboxChange(item.id)}
-                      className="peer hidden"
-                    />
-                    <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                      peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                      <FaCheck className="peer-checked:block text-white w-3 h-3" />
-                    </div>
-                  </label>
-                </td>
-                <td className="p-2 px-5">
-                {new Date(item.date).toLocaleDateString("en-IN", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                })}
-                </td>
-                <td className="p-2 px-5">{item.transactionId}</td>
-                <td className="p-2 px-5">{item.cycle}</td>
-                <td className="p-2 px-5 text-right">₹{item.amount.toLocaleString()}</td>
-                <td className="p-2 px-5 text-center">
-                <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        item.status.toLowerCase() === "success"
-                        ? "bg-green-100 text-green-600"
-                        : item.status.toLowerCase() === "pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-600"
-                    }`}
+    return (
+        <div className="bg-white lg:w-8/12 rounded-3xl p-5">
+            <div className="flex flex-wrap justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#2B3674]">Payments</h2>
+                <div className="flex gap-3 flex-wrap items-center">
+                    <button
+                        onClick={() => setIsPopupOpen((prev) => !prev)}
+                        className="bg-[#F4F7FE] p-2 rounded-lg relative"
                     >
-                    {item.status}
-                  </span>
-                </td>
-                <td className="p-2 px-5 text-center">
-                <div className="flex justify-end gap-2">{isTrashed ? (
-                <>
-                    <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
-                </>
-            ) : (
-                <>
-                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
-                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
-                </>
-            )}</div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    ):(
-        <p className="text-center">
-            No Payments Available
-        </p>
-    )
-}
-     
+                        <MoreHorizontal className="text-[#F98F5C]" />
+                        {isPopupOpen && (
+                            <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                                <ul className="py-2 text-sm text-[#2B3674]">
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                                </ul>
+                            </div>
+                        )}
+                    </button>
+                    <button
+                        className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                        onClick={async () => {
+                            if (isTrashed) {
+                                setIsTrashed(false);
+                                await fetchPayments();
+                            } else {
+                                setIsTrashed(true);
+                                await trashedPayments();
 
-     
-    </div>
-  );
+                            }
+                        }}
+                    >
+                        {isTrashed ? "Payments Listing (Simple)" : "Trashed Payments"}
+                    </button>
+                    <Link href="/dropshipping/payments/create">
+                        <button className="bg-[#4285F4] text-white rounded-md p-3 px-8">Add New</button>
+                    </Link>
+                </div>
+            </div>
+            {
+                data.length > 0 ? (
+                    <div className="overflow-x-auto relative main-outer-wrapper w-full">
+                        <table className="md:w-full w-auto display main-tables" id="payments">
+                            <thead>
+                                <tr className="border-b text-[#A3AED0] border-[#E9EDF7] text-sm">
+                                    <th className="p-2 px-5 uppercase text-left">#</th>
+                                    <th className="p-2 px-5 uppercase text-left">Date</th>
+                                    <th className="p-2 px-5 uppercase text-left">Transaction ID</th>
+                                    <th className="p-2 px-5 uppercase text-left">Cycle</th>
+                                    <th className="p-2 px-5 uppercase text-right">Amount</th>
+                                    <th className="p-2 px-5 uppercase text-center">Status</th>
+                                    <th className="p-2 px-5 uppercase text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.map((item) => (
+                                    <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-medium text-sm">
+                                        <td className="p-2 px-5">
+                                            <label className="flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected.includes(item.id)}
+                                                    onChange={() => handleCheckboxChange(item.id)}
+                                                    className="peer hidden"
+                                                />
+                                                <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                      peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                    <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                                                </div>
+                                            </label>
+                                        </td>
+                                        <td className="p-2 px-5">
+                                            {new Date(item.date).toLocaleDateString("en-IN", {
+                                                year: "numeric",
+                                                month: "short",
+                                                day: "numeric",
+                                            })}
+                                        </td>
+                                        <td className="p-2 px-5">{item.transactionId}</td>
+                                        <td className="p-2 px-5">{item.cycle}</td>
+                                        <td className="p-2 px-5 text-right">₹{item.amount.toLocaleString()}</td>
+                                        <td className="p-2 px-5 text-center">
+                                            <span
+                                                className={`px-2 py-1 rounded-full text-xs font-semibold ${item.status.toLowerCase() === "success"
+                                                        ? "bg-green-100 text-green-600"
+                                                        : item.status.toLowerCase() === "pending"
+                                                            ? "bg-yellow-100 text-yellow-700"
+                                                            : "bg-red-100 text-red-600"
+                                                    }`}
+                                            >
+                                                {item.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-2 px-5 text-center">
+                                            <div className="flex justify-end gap-2">{isTrashed ? (
+                                                <>
+                                                    <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                                                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
+                                                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                                </>
+                                            )}</div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p className="text-center">
+                        No Payments Available
+                    </p>
+                )
+            }
+
+
+
+        </div>
+    );
 }

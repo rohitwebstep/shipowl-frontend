@@ -8,7 +8,6 @@ export const ProductContextEdit = createContext();
 
 const ProductProviderEdit = ({ children }) => {
   const router = useRouter();
-  const [files, setFiles] = useState({});
   const [activeTab, setActiveTab] = useState("product-details");
   const [errors, setErrors] = useState({});
   const [shippingErrors, setShippingErrors] = useState({});
@@ -17,6 +16,8 @@ const ProductProviderEdit = ({ children }) => {
   const [countryData, setCountryData] = useState([]);
   const [isEdit, setIsEdit] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [files, setFiles] = useState({});
+
   const [formData, setFormData] = useState({
     category: '',
     name: '',
@@ -26,7 +27,7 @@ const ProductProviderEdit = ({ children }) => {
     brand: '',
     origin_country: '',
     shipping_country: '',
-    video: '',
+    video_url: '',
     list_as: '',
     variant_images_0: '',
     variants: [
@@ -35,31 +36,26 @@ const ProductProviderEdit = ({ children }) => {
         sku: '',
         qty: 1,
         currency: '',
-        article_id: '',
         suggested_price:"",
         shipowl_price:"",
         rto_suggested_price:"",
         rto_price:""
       },
     ],
-    Shipping_time: '',
+    shipping_time: '24 Hours',
     weight: '',
     package_length: '',
     package_width: '',
     package_height: '',
-    chargable_weight: '',
+    chargeable_weight: '',
     package_weight_image:0,
     package_length_image:0,
     package_width_image:0,
     package_height_image:0,
     product_detail_video:0,
     training_guidance_video:0,
-    upc: '',
-    ean: '',
     hsn_code: '',
     tax_rate: '',
-    rto_address: '',
-    pickup_address: '',
   });
 
   const fetchCategory = useCallback(async () => {
@@ -153,7 +149,7 @@ const ProductProviderEdit = ({ children }) => {
       console.error('Error fetching brands:', error);
     }
   }, [router]);
-
+  
   const fileFields = [
     { label: 'Package Weight Image', key: 'package_weight_image' },
     { label: 'Package Length Image', key: 'package_length_image' },
@@ -164,6 +160,9 @@ const ProductProviderEdit = ({ children }) => {
   ];
   const fetchCountry = useCallback(async () => {
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
+
+   
+
     const admintoken = adminData?.security?.token;
     if (!admintoken) {
       router.push('/admin/auth/login');
@@ -216,28 +215,50 @@ const ProductProviderEdit = ({ children }) => {
     video: 'Product Video URL',
     list_as: 'List As',
   };
-  const validateForm2 = () => {
-    const newErrors = {};
-    const requiredFields = [
-      'shipping_time',
-      'weight',
-      'package_length',
-      'package_width',
-      'package_height',
-      'chargable_weight',
-    ];
+const validateForm2 = () => {
+  const newErrors = {};
 
-    requiredFields.forEach((field) => {
-      if (!formData[field]) {
-        newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
-      }
-    });
+  const requiredFields = [
+    'shipping_time',
+    'weight',
+    'package_length',
+    'package_width',
+    'package_height',
+    'chargable_weight',
+  ];
 
-  
+  // Validate simple fields
+  requiredFields.forEach((field) => {
+    if (!formData[field]) {
+      newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
+    }
+  });
 
-    setShippingErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  // Validate image/file uploads
+  fileFields.forEach(({ key }) => {
+    const uploadedFiles = files[key];
+    const existingFiles = formData[key];
+
+    const hasNewUpload =
+      Array.isArray(uploadedFiles) &&
+      uploadedFiles.length > 0 &&
+      uploadedFiles.some((file) => file instanceof File || file.name);
+
+    const hasExistingUpload =
+      typeof existingFiles === 'string' &&
+      existingFiles.split(',').map((f) => f.trim()).filter(Boolean).length > 0;
+
+    if (!hasNewUpload && !hasExistingUpload) {
+      newErrors[key] = `Please upload a file for ${key.replace(/_/g, ' ')}`;
+    }
+  });
+
+  setShippingErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+
+  console.log('files',files)
 
   const validateFields = () => {
     const requiredFields = [
@@ -267,11 +288,8 @@ const ProductProviderEdit = ({ children }) => {
     <ProductContextEdit.Provider
     value={{
       formData,
-      validateForm2,
-      validateFields,
-      errors, setErrors,
-      shippingErrors, setShippingErrors,
       setFormData,
+      fileFields,
       categoryData,
       setCategoryData,
       brandData,
@@ -279,13 +297,14 @@ const ProductProviderEdit = ({ children }) => {
       countryData,
       setCountryData,
       isEdit,
+      validateForm2,
       setIsEdit,
       fetchCategory,
       fetchBrand,
       fetchCountry,
       loading,
-      fileFields,
-      activeTab,       // ✅ Added
+      activeTab,  errors, setErrors,shippingErrors, setShippingErrors,
+      validateFields,     // ✅ Added
       setActiveTab,  
       files, setFiles  // ✅ Added
     }}

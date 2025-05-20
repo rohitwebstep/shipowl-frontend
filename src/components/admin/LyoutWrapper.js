@@ -22,34 +22,34 @@ function LayoutWrapperInner({ children }) {
   return (
     <div className="main">
       <div className="container">
-      <AdminMiddleWareProvider>
+        <AdminMiddleWareProvider>
 
-        <div className="lg:flex">
-          {!isAuthPage && (
-            <div className="xl:w-[18.5%] lg:w-[27%] w-full p-2 leftbar">
-              <Sidebar />
-            </div>
-          )}
+          <div className="lg:flex">
+            {!isAuthPage && (
+              <div className="xl:w-[18.5%] lg:w-[27%] w-full p-2 leftbar">
+                <Sidebar />
+              </div>
+            )}
 
-          <div className={`px-3 mt-20 lg:mt-0 main-outlet lg-px-0 ${isAuthPage ? "w-full" : "xl:w-[81.5%] lg:w-[73%]"}`}>
-            {!isAuthPage && <Header />}
-            <div className="xl:p-3 md:pt-4 md:px-0">
-                <ProfileProvider>
-                  <ProductProvider>
-                    <ProductProviderEdit>
-                  <ProfileEditProvider>
-                    <DropshipperProfileProvider>
-                      {children}
-                    </DropshipperProfileProvider>
-                  </ProfileEditProvider>
-                  </ProductProviderEdit>
-                  </ProductProvider>
-                </ProfileProvider>
+            <div className={`px-3 mt-20 lg:mt-0 main-outlet lg-px-0 ${isAuthPage ? "w-full" : "xl:w-[81.5%] lg:w-[73%]"}`}>
+              {!isAuthPage && <Header />}
+              <div className="xl:p-3 md:pt-4 md:px-0">
+                <ProductProviderEdit>
+                  <ProfileProvider>
+                    <ProductProvider>
+                      <ProfileEditProvider>
+                        <DropshipperProfileProvider>
+                          {children}
+                        </DropshipperProfileProvider>
+                      </ProfileEditProvider>
+                    </ProductProvider>
+                  </ProfileProvider>
+                </ProductProviderEdit>
+              </div>
             </div>
+
           </div>
-
-        </div>
-          </AdminMiddleWareProvider>
+        </AdminMiddleWareProvider>
       </div>
     </div>
   );

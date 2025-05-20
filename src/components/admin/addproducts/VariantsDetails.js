@@ -44,7 +44,6 @@ const handleFileChange = (event, index) => {
           qty: 1,
           currency: 'INR',
           product_link: '',
-          articleId: '',
           suggested_price: '',
           shipowl_price: '',
           rto_suggested_price: '',
@@ -81,7 +80,6 @@ const handleFileChange = (event, index) => {
         <span className="text-[#A3AED0] whitespace-nowrap">Warehouse Model</span>
         <span className="text-[#A3AED0] whitespace-nowrap">RTO Model</span>
         <span className="text-[#A3AED0] whitespace-nowrap">Product Link</span>
-        <span className="text-[#A3AED0] whitespace-nowrap">Article Id</span>
         <span className="text-[#A3AED0] whitespace-nowrap text-right">Images</span>
         <div className="flex justify-end">
           <button className="bg-green-500 text-white p-2 rounded-lg" onClick={addVariant}>
@@ -208,18 +206,7 @@ const handleFileChange = (event, index) => {
 />
 
           </div>
-
-          {/* Article ID */}
-          <div>
-            <span className="text-orange-500 font-semibold lg:hidden block">Article Id</span>
-            <input
-              type="text"
-              placeholder="Article Id"
-              className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]"
-              value={variant.articleId || ''}
-              onChange={(e) => handleChange(index, 'articleId', e.target.value)}
-            />
-          </div>
+       
 
           {/* Image Upload */}
           <div className="md:flex justify-end">

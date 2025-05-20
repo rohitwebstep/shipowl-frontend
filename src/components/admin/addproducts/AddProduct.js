@@ -7,7 +7,7 @@ import VariantsDetails from "./VariantsDetails";
 import ShippingDetails from "./ShippingDetails";
 import OtherDetails from "./OtherDetails";
 
-const AddProduct = () => {
+const Tabs = () => {
   const { activeTab, setActiveTab,validateForm2,validateFields } = useContext(ProductContext); // use context instead of local state
   const handleTabClick = async (tabId) => {
     if (activeTab === 'product-details') {
@@ -22,7 +22,7 @@ const AddProduct = () => {
 
     setActiveTab(tabId);
   };
-  const AddProduct = [
+  const tabs = [
     { id: "product-details", label: "Product Details" },
     { id: "variants-details", label: "Variants Details" },
     { id: "shipping-details", label: "Shipping Details" },
@@ -61,4 +61,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default Tabs;

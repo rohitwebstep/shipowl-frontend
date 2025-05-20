@@ -9,7 +9,7 @@ export const ProductContextEdit = createContext();
 const ProductProviderEdit = ({ children }) => {
   const router = useRouter();
   const [files, setFiles] = useState({});
-  const [activeTab, setActiveTab] = useState("product-details");
+const [activeTab,setActiveTab] = useState("product-details");
   const [errors, setErrors] = useState({});
   const [shippingErrors, setShippingErrors] = useState({});
   const [categoryData, setCategoryData] = useState([]);

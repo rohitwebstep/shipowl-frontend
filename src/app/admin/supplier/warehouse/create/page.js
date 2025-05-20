@@ -1,10 +1,10 @@
 import AddWarehouse from '@/components/admin/warehouse/AddWarehouse'
 import React from 'react'
 
-export default function Page() {
+const page = () => {
   return (
-    <div>
-      {typeof window !== 'undefined' ? <AddWarehouse /> : null}
-    </div>
+    <div><AddWarehouse/></div>
   )
 }
+
+export default page

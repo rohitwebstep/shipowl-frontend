@@ -6,6 +6,8 @@ import userImage from "@/app/images/userimage.png";
 import { FaSignOutAlt } from "react-icons/fa";
 import { useSupplier } from "./middleware/SupplierMiddleWareContext";
 import React,{useState,useEffect} from "react";
+import Swal from 'sweetalert2';
+
 export default function Header() {
   const pathname = usePathname(); 
   const {verifySupplierAuth} = useSupplier();

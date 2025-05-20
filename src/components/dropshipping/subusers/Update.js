@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter,useSearchParams} from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
 import Select from "react-select";
 import { HashLoader } from "react-spinners";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
-import Image from "next/image";8
+import Image from "next/image"; 8
 import 'swiper/css/navigation';
 export default function Update() {
   const router = useRouter();
@@ -18,10 +18,10 @@ export default function Update() {
   const [stateData, setStateData] = useState([]);
   const [cityData, setCityData] = useState([]);
   const [errors, setErrors] = useState({});
-const [loadingPermission, setLoadingPermission] = useState(false);
-const [loadingCountries, setLoadingCountries] = useState(false);
-const [loadingStates, setLoadingStates] = useState(false);
-const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingPermission, setLoadingPermission] = useState(false);
+  const [loadingCountries, setLoadingCountries] = useState(false);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -39,80 +39,80 @@ const [loadingCities, setLoadingCities] = useState(false);
     permanentCountry: "",
     permissions: [],
   });
- const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
   const id = searchParams.get('id');
 
   const fetchSubuser = useCallback(async () => {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
     if (dropshipperData?.project?.active_panel !== "dropshipper") {
-        localStorage.removeItem("shippingData");
-        router.push("/dropshipping/auth/login");
-        return;
+      localStorage.removeItem("shippingData");
+      router.push("/dropshipping/auth/login");
+      return;
     }
 
     const dropshippertoken = dropshipperData?.security?.token;
     if (!dropshippertoken) {
-        router.push("/dropshipping/auth/login");
-        return;
+      router.push("/dropshipping/auth/login");
+      return;
     }
 
     try {
-        setLoading(true);
-        const response = await fetch(
-            `http://localhost:3001/api/dropshipper/${id}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${dropshippertoken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            const errorMessage = await response.json();
-            Swal.fire({
-                icon: "error",
-                title: "Something Wrong!",
-                text: errorMessage.message || "Your session has expired. Please log in again.",
-            });
-            throw new Error(errorMessage.message);
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:3001/api/dropshipper/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${dropshippertoken}`,
+          },
         }
+      );
 
-        const result = await response.json();
-        const users = result?.dropshipper || {};
-        if(users?.permanentCityId){
-            fetchStateList(users?.permanentCountryId);
-        }
-        if(users?.permanentStateId){
-            fetchCity(users?.permanentStateId);
-        }
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Something Wrong!",
+          text: errorMessage.message || "Your session has expired. Please log in again.",
+        });
+        throw new Error(errorMessage.message);
+      }
 
-  setFormData({
-  name: users?.name || "",
-  username: users?.username || "",
-  email: users?.email || "",
-  type: users?.type || "",
-  password: "", // keep password blank for security
-  profilePicture: users?.profilePicture || null,
-  referralCode: users?.referralCode || "",
-  phoneNumber: users?.phoneNumber || "",
-  website: users?.website || "",
-  permanentAddress: users?.permanentAddress || "",
-  permanentCity: users?.permanentCityId || "",
-  permanentState: users?.permanentStateId || "",
-  permanentCountry: users?.permanentCountryId || "",
-  permissions: users?.permissions?.map((p) => p.permissionId) || [],
-  image:users?.profilePicture || '',
-});
+      const result = await response.json();
+      const users = result?.dropshipper || {};
+      if (users?.permanentCityId) {
+        fetchStateList(users?.permanentCountryId);
+      }
+      if (users?.permanentStateId) {
+        fetchCity(users?.permanentStateId);
+      }
+
+      setFormData({
+        name: users?.name || "",
+        username: users?.username || "",
+        email: users?.email || "",
+        type: users?.type || "",
+        password: "", // keep password blank for security
+        profilePicture: users?.profilePicture || null,
+        referralCode: users?.referralCode || "",
+        phoneNumber: users?.phoneNumber || "",
+        website: users?.website || "",
+        permanentAddress: users?.permanentAddress || "",
+        permanentCity: users?.permanentCityId || "",
+        permanentState: users?.permanentStateId || "",
+        permanentCountry: users?.permanentCountryId || "",
+        permissions: users?.permissions?.map((p) => p.permissionId) || [],
+        image: users?.profilePicture || '',
+      });
 
     } catch (error) {
-        console.error("Error fetching Company:", error);
+      console.error("Error fetching Company:", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-}, [router, id]);
+  }, [router, id]);
 
 
   const handleChange = (e) => {
@@ -124,7 +124,7 @@ const [loadingCities, setLoadingCities] = useState(false);
   };
 
 
-  
+
   const handlePermissionChange = (permId) => {
     setFormData((prev) => ({
       ...prev,
@@ -154,7 +154,7 @@ const [loadingCities, setLoadingCities] = useState(false);
     } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
       newErrors.email = "Invalid email format";
     }
- 
+
     if (website && !/^https?:\/\/[\w.-]+\.[a-z]{2,}/i.test(website)) {
       newErrors.website = "Invalid website URL";
     }
@@ -167,152 +167,152 @@ const [loadingCities, setLoadingCities] = useState(false);
     return Object.keys(newErrors).length === 0;
   };
 
- // Inside handleSubmit function
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!validate()) return;
+  // Inside handleSubmit function
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
 
-  setLoading(true);
-  const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-  const token = dropshipperData?.security?.token;
+    setLoading(true);
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    const token = dropshipperData?.security?.token;
 
-  const data = new FormData();
+    const data = new FormData();
 
-  // Append all form fields
-  Object.entries(formData).forEach(([key, value]) => {
-    if (key === "permissions") {
-      // Send as JSON string with dropshipper_id: null for creation
-      const permissionsPayload = value.map((permId) => ({
-        dropshipper_id: null,
-        permission_id: permId,
-      }));
-      data.append("permissions", JSON.stringify(permissionsPayload));
-    } else if (value !== null && value !== "") {
-      data.append(key, value);
+    // Append all form fields
+    Object.entries(formData).forEach(([key, value]) => {
+      if (key === "permissions") {
+        // Send as JSON string with dropshipper_id: null for creation
+        const permissionsPayload = value.map((permId) => ({
+          dropshipper_id: null,
+          permission_id: permId,
+        }));
+        data.append("permissions", JSON.stringify(permissionsPayload));
+      } else if (value !== null && value !== "") {
+        data.append(key, value);
+      }
+    });
+
+    try {
+      const res = await fetch(`http://localhost:3001/api/dropshipper/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: data,
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to Update dropshipper");
+
+      Swal.fire("Success", "dropshipper Updated Successfuly!", "success");
+      // Reset form
+      setFormData({
+        name: "",
+        username: "",
+        email: "",
+        type: "",
+        password: "",
+        profilePicture: null,
+        referralCode: "",
+        phoneNumber: "",
+        website: "",
+        permanentAddress: "",
+        permanentCity: "",
+        permanentState: "",
+        permanentCountry: "",
+        permissions: [],
+      });
+      router.push('/dropshipping/sub-user/list')
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      setLoading(false);
     }
-  });
-
-  try {
-    const res = await fetch(`http://localhost:3001/api/dropshipper/${id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: data,
-    });
-
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.message || "Failed to Update dropshipper");
-
-    Swal.fire("Success", "dropshipper Updated Successfuly!", "success");
-    // Reset form
-    setFormData({
-      name: "",
-      username: "",
-      email: "",
-      type: "",
-      password: "",
-      profilePicture: null,
-      referralCode: "",
-      phoneNumber: "",
-      website: "",
-      permanentAddress: "",
-      permanentCity: "",
-      permanentState: "",
-      permanentCountry: "",
-      permissions: [],
-    });
-    router.push('/dropshipping/sub-user/list')
-  } catch (err) {
-    Swal.fire("Error", err.message, "error");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
-const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
-  const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-  const token = dropshipperData?.security?.token;
-  if (!token || dropshipperData?.project?.active_panel !== "dropshipper") {
-    localStorage.clear();
-    router.push("/dropshipping/auth/login");
-    return;
-  }
+  const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    const token = dropshipperData?.security?.token;
+    if (!token || dropshipperData?.project?.active_panel !== "dropshipper") {
+      localStorage.clear();
+      router.push("/dropshipping/auth/login");
+      return;
+    }
 
-  if (setLoading) setLoading(true);
+    if (setLoading) setLoading(true);
 
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.message || `Failed to fetch ${key}`);
-    setter(result[key] || []);
-  } catch (err) {
-    Swal.fire("Error", err.message, "error");
-  } finally {
-    if (setLoading) setLoading(false);
-  }
-}, [router]);
+    try {
+      const res = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || result.error || `Failed to fetch ${key}`);
+      setter(result[key] || []);
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      if (setLoading) setLoading(false);
+    }
+  }, [router]);
 
-  
 
-const fetchPermission = useCallback(() => {
-  fetchProtected(
-    "http://localhost:3001/api/dropshipper/permission",
-    setPermission,
-    "permissions",
-    setLoading
-  );
-}, [fetchProtected]);
 
-const fetchCountryAndState = useCallback(() => {
-  fetchProtected(
-    "http://localhost:3001/api/location/country",
-    setCountryData,
-    "countries",
-    setLoadingCountries
-  );
-}, [fetchProtected]);
+  const fetchPermission = useCallback(() => {
+    fetchProtected(
+      "http://localhost:3001/api/dropshipper/permission",
+      setPermission,
+      "permissions",
+      setLoading
+    );
+  }, [fetchProtected]);
 
-const fetchStateList = useCallback((countryId) => {
-  fetchProtected(
-    `http://localhost:3001/api/location/country/${countryId}/states`,
-    setStateData,
-    "states",
-    setLoadingStates
-  );
-}, [fetchProtected]);
+  const fetchCountryAndState = useCallback(() => {
+    fetchProtected(
+      "http://localhost:3001/api/location/country",
+      setCountryData,
+      "countries",
+      setLoadingCountries
+    );
+  }, [fetchProtected]);
 
-const fetchCity = useCallback((stateId) => {
-  fetchProtected(
-    `http://localhost:3001/api/location/state/${stateId}/cities`,
-    setCityData,
-    "cities",
-    setLoadingCities
-  );
-}, [fetchProtected]);
+  const fetchStateList = useCallback((countryId) => {
+    fetchProtected(
+      `http://localhost:3001/api/location/country/${countryId}/states`,
+      setStateData,
+      "states",
+      setLoadingStates
+    );
+  }, [fetchProtected]);
 
-  useEffect(()=>{
+  const fetchCity = useCallback((stateId) => {
+    fetchProtected(
+      `http://localhost:3001/api/location/state/${stateId}/cities`,
+      setCityData,
+      "cities",
+      setLoadingCities
+    );
+  }, [fetchProtected]);
+
+  useEffect(() => {
     fetchSubuser();
     fetchPermission();
     fetchCountryAndState();
-  },[fetchSubuser])
+  }, [fetchSubuser])
 
 
 
-    const handleImageDelete = (index) => {
-      const images = formData.image?.split(',') || [];
-      const updatedImages = images.filter((_, i) => i !== index);
-      setFormData((prev) => ({
-        ...prev,
-        image: updatedImages.join(','),
-      }));
-      };
+  const handleImageDelete = (index) => {
+    const images = formData.image?.split(',') || [];
+    const updatedImages = images.filter((_, i) => i !== index);
+    setFormData((prev) => ({
+      ...prev,
+      image: updatedImages.join(','),
+    }));
+  };
 
 
   const selectOptions = (data) =>
@@ -336,16 +336,16 @@ const fetchCity = useCallback((stateId) => {
     { label: "Phone Number", name: "phoneNumber", type: "text" },
     { label: "Website", name: "website", type: "text" },
   ];
-  if (loading ||loadingPermission) {
-          return (
-              <div className="flex items-center justify-center h-[80vh]">
-                  <HashLoader size={60} color="#F97316" loading={true} />
-              </div>
-          );
-      }
-      console.log('formData',formData)
+  if (loading || loadingPermission) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <HashLoader size={60} color="#F97316" loading={true} />
+      </div>
+    );
+  }
+  console.log('formData', formData)
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white rounded shadow space-y-6">
+    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto p-6 bg-white rounded shadow space-y-2">
       <h2 className="text-xl font-semibold">Update Subuser</h2>
 
       <div className="grid grid-cols-2 gap-4">
@@ -366,131 +366,140 @@ const fetchCity = useCallback((stateId) => {
           </div>
         ))}
 
-       
+
       </div>
-       <div>
-          <label className="block font-medium">Permanent Address</label>
-          <input
-            type="text"
-            name="permanentAddress"
-            value={formData?.permanentAddress || ''}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          />
-        </div>
-       <div>
-          <label className="block font-medium">Profile Picture </label>
-          <input
-            type="file"
-            name="profilePicture"
-            accept="image/*"
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          />
-           {formData?.image && (
-                                              <div className="mt-2">
-                                                  <Swiper
-                                                      key={formData.id}
-                                                      modules={[Navigation]}
-                                                      slidesPerView={2}
-                                                      loop={formData.image?.split(',').length > 1}
-                                                      navigation={true}
-                                                      className="mySwiper w-full ms-2"
-                                                  >
-                                                      {formData.image?.split(',').map((img, index) => (
-                                                          <SwiperSlide key={index} className="relative gap-3">
-                                                              {/* Delete Button */}
-                                                              <button
-                                                                  type="button"
-                                                                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                                                                  onClick={() => {
-                                                                      Swal.fire({
-                                                                          title: 'Are you sure?',
-                                                                          text: `Do you want to delete this image?`,
-                                                                          icon: 'warning',
-                                                                          showCancelButton: true,
-                                                                          confirmButtonColor: '#d33',
-                                                                          cancelButtonColor: '#3085d6',
-                                                                          confirmButtonText: 'Yes, delete it!'
-                                                                      }).then((result) => {
-                                                                          if (result.isConfirmed) {
-          
-                                                                              handleImageDelete(index); // Call your delete function
-                                                                          }
-                                                                      });
-                                                                  }}
-                                                              >
-                                                                  ✕
-                                                              </button>
-          
-                                                              {/* Image */}
-                                                              <Image
-                                                                  src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
-                                                                  alt={`Image ${index + 1}`}
-                                                                  width={500}
-                                                                  height={500}
-                                                                  className="me-3 p-2 object-cover rounded"
-                                                              />
-                                                          </SwiperSlide>
-                                                      ))}
-                                                  </Swiper>
-                                              </div>
-          
-                                          )}
-        </div>
       <div>
-          <label className="block font-medium">Type <span className="text-red-500">*</span></label>
-          <select
-            name="type"
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-            value={formData?.type || ''}
-          >
-            <option value= 'main'>Main</option>
-            <option value='sub'>Sub</option>
-            </select>
-        </div>
+        <label className="block font-medium">Permanent Address</label>
+        <input
+          type="text"
+          name="permanentAddress"
+          value={formData?.permanentAddress || ''}
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-2 rounded"
+        />
+      </div>
+      <div>
+        <label className="block font-medium">Profile Picture </label>
+        <input
+          type="file"
+          name="profilePicture"
+          accept="image/*"
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-2 rounded"
+        />
+        {formData?.image && (
+          <div className="mt-2">
+            <Swiper
+              key={formData.id}
+              modules={[Navigation]}
+              slidesPerView={2}
+              loop={formData.image?.split(',').length > 1}
+              navigation={true}
+              className="mySwiper w-full ms-2"
+            >
+              {formData.image?.split(',').map((img, index) => (
+                <SwiperSlide key={index} className="relative gap-3">
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                    onClick={() => {
+                      Swal.fire({
+                        title: 'Are you sure?',
+                        text: `Do you want to delete this image?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+
+                          handleImageDelete(index); // Call your delete function
+                        }
+                      });
+                    }}
+                  >
+                    ✕
+                  </button>
+
+                  {/* Image */}
+                  <Image
+                    src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                    alt={`Image ${index + 1}`}
+                    width={500}
+                    height={500}
+                    className="me-3 p-2 object-cover rounded"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+
+        )}
+      </div>
+      <div>
+        <label className="block font-medium">Type <span className="text-red-500">*</span></label>
+        <select
+          name="type"
+          onChange={handleChange}
+          className="w-full border border-gray-300 p-2 rounded"
+          value={formData?.type || ''}
+        >
+          <option value='main'>Main</option>
+          <option value='sub'>Sub</option>
+        </select>
+      </div>
 
       <div className="grid grid-cols-3 gap-4">
         {["permanentCountry", "permanentState", "permanentCity"].map((field) => (
-         <div key={field} className="relative">
-        <label className="block font-medium capitalize">
-          {field.replace("permanent", "")} <span className="text-red-500">*</span>
-        </label>
+          <div key={field} className="relative">
+            <label className="block font-medium capitalize">
+              {field.replace("permanent", "")} <span className="text-red-500">*</span>
+            </label>
 
-        <Select
-          isDisabled={
-            (field === "permanentCountry" && loadingCountries) ||
-            (field === "permanentState" && loadingStates) ||
-            (field === "permanentCity" && loadingCities)
-          }
-          name={field}
-          value={selectOptions(
-            field === "permanentCountry" ? countryData :
-            field === "permanentState" ? stateData :
-            cityData
-          ).find((item) => item.value === formData[field])}
-          onChange={(selectedOption) =>
-            setFormData((prev) => ({ ...prev, [field]: selectedOption ? selectedOption.value : "" }))
-          }
-          options={selectOptions(
-            field === "permanentCountry" ? countryData :
-            field === "permanentState" ? stateData :
-            cityData
-          )}
-          isClearable
-        />
+            <Select
+              isDisabled={
+                (field === "permanentCountry" && loadingCountries) ||
+                (field === "permanentState" && loadingStates) ||
+                (field === "permanentCity" && loadingCities)
+              }
+              name={field}
+              value={selectOptions(
+                field === "permanentCountry" ? countryData :
+                  field === "permanentState" ? stateData :
+                    cityData
+              ).find((item) => item.value === formData[field])}
+             onChange={(selectedOption) => {
+                const value = selectedOption ? selectedOption.value : "";
 
-        {((field === "permanentCountry" && loadingCountries) ||
-          (field === "permanentState" && loadingStates) ||
-          (field === "permanentCity" && loadingCities)) && (
-          <div className="absolute inset-y-0 right-3 flex items-center">
-            <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                setFormData((prev) => ({ ...prev, [field]: value }));
+
+                if (field === "permanentCountry") {
+                  fetchStateList(value); // <-- call with selected country ID
+                }
+                if (field === "permanentState") {
+                  fetchCity(value); // <-- call with selected country ID
+                }
+              }}
+              options={selectOptions(
+                field === "permanentCountry" ? countryData :
+                  field === "permanentState" ? stateData :
+                    cityData
+              )}
+              isClearable
+            />
+
+            {((field === "permanentCountry" && loadingCountries) ||
+              (field === "permanentState" && loadingStates) ||
+              (field === "permanentCity" && loadingCities)) && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
+
+            {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
           </div>
-        )}
-
-        {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
-      </div>
 
         ))}
       </div>
@@ -511,7 +520,7 @@ const fetchCity = useCallback((stateId) => {
                         checked={formData.permissions.includes(perm.id)}
                         onChange={() => handlePermissionChange(perm.id)}
                       />
-                      <span>{perm.action}</span>
+                       <span className="capitalize">{perm.action}</span>
                     </label>
                   ))}
                 </div>
@@ -522,11 +531,11 @@ const fetchCity = useCallback((stateId) => {
         {errors.permissions && <p className="text-red-500 text-sm">{errors.permissions}</p>}
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-start my-2">
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-8 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
         >
           {loading ? "Submitting..." : "Submit"}
         </button>

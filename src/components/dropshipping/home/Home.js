@@ -5,7 +5,6 @@ import { useDropshipper } from '../middleware/DropshipperMiddleWareContext'
 import Banner from './Banner'
 import CategorySection from './CatogorySection'
 import NewlyLaunched from './NewlyLaunched'
-import PotentialHeros from './PotentialHeros'
 import React, { useEffect } from 'react'
 
 const Home = () => {
@@ -18,7 +17,6 @@ const Home = () => {
             <Banner />
             <CategorySection />
             <NewlyLaunched />
-            <PotentialHeros />
         </>
 
     )

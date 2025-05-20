@@ -10,9 +10,7 @@ import { ProfileProvider } from "../admin/supplier/ProfileContext";
 
 function LayoutWrapperInner({ children }) {
     const pathname = usePathname();
-    const isAuthPage = pathname === '/dropshipping/auth/login/' ||
-                       pathname === '/dropshipping/auth/password/forget/' ||
-                       pathname === '/dropshipping/auth/password/reset/';
+    const isAuthPage = pathname === '/dropshipping/auth/login/' || pathname === '/dropshipping/auth/password/forget/' || pathname === '/dropshipping/auth/password/reset/' ||pathname === '/dropshipping/auth/register/' ||pathname === '/dropshipping/auth/register/verify/' ;
 
     return (
         <div className="main">
@@ -23,8 +21,7 @@ function LayoutWrapperInner({ children }) {
                             <Sidebar />
                         </div>
                     )}
-                                                        <DropshipperMiddleWareProvider>
-
+                      <DropshipperMiddleWareProvider>
                     <div className={`px-3 mt-20 lg:mt-0 main-outlet lg-px-0 ${isAuthPage ? "w-full" : "xl:w-[81.5%] lg:w-[77%]"}`}>
                         {!isAuthPage && <Header />}
                         <div className="md:p-7 xl:p-3 md:pt-0">

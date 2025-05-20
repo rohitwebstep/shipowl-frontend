@@ -5,9 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Swal from 'sweetalert2';
 
 export default function OtherDetails() {
-  const { formData, setFormData ,files} = useContext(ProductContextEdit);
+  const { formData, setFormData, files } = useContext(ProductContextEdit);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [errors, setErrors] = useState({});
 
   const searchParams = useSearchParams();
@@ -25,20 +24,20 @@ export default function OtherDetails() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
     if (adminData?.project?.active_panel !== 'admin') {
       localStorage.clear();
       router.push('/admin/auth/login');
       return;
     }
-  
+
     const token = adminData?.security?.token;
     if (!token) {
       router.push('/admin/auth/login');
       return;
     }
-  
+
     try {
       Swal.fire({
         title: 'Updating Product...',
@@ -48,18 +47,18 @@ export default function OtherDetails() {
           Swal.showLoading();
         },
       });
-  
+
       const url = `http://localhost:3001/api/product/${id}`;
       const form = new FormData();
-  
+
       // Combine formData and files for unified processing
       const combinedData = { ...formData, ...files };
-  
+
       for (const key in combinedData) {
         const value = combinedData[key];
-  
+
         if (value === null || value === undefined || value === '') continue;
-  
+
         if (Array.isArray(value) && value[0] instanceof File) {
           value.forEach((file) => form.append(key, file));
         } else if (value instanceof File) {
@@ -70,7 +69,7 @@ export default function OtherDetails() {
           form.append(key, value);
         }
       }
-  
+
       const response = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -78,10 +77,10 @@ export default function OtherDetails() {
         },
         body: form,
       });
-  
+
       const result = await response.json();
       Swal.close();
-  
+
       if (!response.ok) {
         Swal.fire({
           icon: 'error',
@@ -90,7 +89,7 @@ export default function OtherDetails() {
         });
         throw new Error(result.message || result.error || 'Update failed');
       }
-  
+
       Swal.fire({
         icon: 'success',
         title: 'Product Updated',
@@ -99,7 +98,7 @@ export default function OtherDetails() {
       }).then((res) => {
         if (res.isConfirmed) {
           setFormData({});
-          router.push('/admin/product');
+          router.push('/admin/products/list');
         }
       });
     } catch (err) {
@@ -110,37 +109,16 @@ export default function OtherDetails() {
         title: 'Submission Error',
         text: err.message || 'Something went wrong. Please try again.',
       });
-      setError(err.message || 'Submission failed.');
     } finally {
       setLoading(false);
     }
   };
-  
+
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="xl:w-11/12 mt-4 p-6 rounded-2xl bg-white">
-        <div className="grid md:grid-cols-3 gap-4 mb-4">
-          <div>
-            <label htmlFor="upc" className="font-bold block uppercase">UPC</label>
-            <input
-              type="text"
-              name="upc"
-              value={formData.upc || ''}
-              onChange={handleChange}
-              className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full"
-            />
-          </div>
-          <div>
-            <label htmlFor="ean" className="font-bold block uppercase">EAN</label>
-            <input
-              type="text"
-              name="ean"
-              value={formData.ean || ''}
-              onChange={handleChange}
-              className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full"
-            />
-          </div>
+        <div className="grid md:grid-cols-2 gap-4 mb-4">
           <div>
             <label htmlFor="hsn_code" className="font-bold block uppercase">HSN Code</label>
             <input
@@ -151,9 +129,6 @@ export default function OtherDetails() {
               className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full"
             />
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 mb-4">
           <div>
             <label htmlFor="tax_rate" className="font-bold block">
               Tax Rate (GST) <span className="text-red-500">*</span>
@@ -169,39 +144,6 @@ export default function OtherDetails() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label htmlFor="rto_address" className="font-bold block">
-              RTO Address <span className="text-red-500">*</span>
-            </label>
-            <select
-              name="rto_address"
-              value={formData.rto_address || ''}
-              onChange={handleChange}
-              className={`border p-3 mt-2 rounded-md w-full ${errors.rto_address ? 'border-red-500' : 'border-[#DFEAF2]'}`}
-            >
-              <option value="">Select RTO Address</option>
-              <option value="Address 1">Address 1</option>
-            </select>
-            {errors.rto_address && <p className="text-red-500 text-sm mt-1">{errors.rto_address}</p>}
-          </div>
-
-          <div>
-            <label htmlFor="pickup_address" className="font-bold block">
-              Pickup Address <span className="text-red-500">*</span>
-            </label>
-            <select
-              name="pickup_address"
-              value={formData.pickup_address || ''}
-              onChange={handleChange}
-              className={`border p-3 mt-2 rounded-md w-full ${errors.pickup_address ? 'border-red-500' : 'border-[#DFEAF2]'}`}
-            >
-              <option value="">Select Pickup Address</option>
-              <option value="Address 1">Address 1</option>
-            </select>
-            {errors.pickup_address && <p className="text-red-500 text-sm mt-1">{errors.pickup_address}</p>}
-          </div>
-        </div>
 
         <div className="flex flex-wrap gap-4">
           <button

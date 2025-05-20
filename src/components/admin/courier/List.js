@@ -451,8 +451,8 @@ export default function List() {
                     </div>
                 </div>
               {data.length > 0 ?(
-                  <div className="overflow-x-auto w-full relative">
-                  <table className="w-full" id="courier-companytable">
+                  <div className="overflow-x-auto relative main-outer-wrapper w-full">
+                        <table className="md:w-full w-auto display main-tables" id="courier-companytable">
                       <thead>
                           <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                               <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Name</th>

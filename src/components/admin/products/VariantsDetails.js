@@ -18,13 +18,14 @@ export default function VariantDetails() {
 
   const numericFields = ['qty', 'suggested_price', 'shipowl_price', 'rto_suggested_price', 'rto_price'];
 
-  const handleChange = (index, field, value) => {
-    const updatedVariants = [...formData.variants];
-    updatedVariants[index][field] = numericFields.includes(field)
-      ? value === '' ? '' : Number(value)
-      : value;
-    setFormData({ ...formData, variants: updatedVariants });
+const handleChange = (index, field, value) => {
+  const updatedVariants = [...formData.variants];
+  updatedVariants[index] = {
+    ...updatedVariants[index], // ensure shallow copy of the variant object
+    [field]: numericFields.includes(field) ? (value === '' ? '' : Number(value)) : value,
   };
+  setFormData({ ...formData, variants: updatedVariants });
+};
 
 const handleFileChange = (event, index) => {
   const selectedFiles = Array.from(event.target.files);
@@ -36,7 +37,8 @@ const handleFileChange = (event, index) => {
     }));
   }
 };
-const [loading,setLoading] = useState(null);
+
+  const [loading, setLoading] = useState(null);
 
   const addVariant = () => {
     setFormData({
@@ -49,7 +51,6 @@ const [loading,setLoading] = useState(null);
           qty: 1,
           currency: 'INR',
           product_link: '',
-          articleId: '',
           suggested_price: '',
           shipowl_price: '',
           rto_suggested_price: '',
@@ -69,79 +70,79 @@ const [loading,setLoading] = useState(null);
     setActiveTab('shipping-details');
   };
 
-    const handleImageDelete = async (index,type,variantId) => {
-          setLoading(true);
-  
-          const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-          if (dropshipperData?.project?.active_panel !== "admin") {
-              localStorage.removeItem("shippingData");
-              router.push("/admin/auth/login");
-              return;
+  const handleImageDelete = async (index, type, variantId) => {
+    setLoading(true);
+
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    if (dropshipperData?.project?.active_panel !== "admin") {
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    const token = dropshipperData?.security?.token;
+    if (!token) {
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: 'Deleting Image...',
+        text: 'Please wait while we remove the image.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const url = `http://localhost:3001/api/product/${variantId}/image/${index}?type=${type}`;
+
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        Swal.close();
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: errorMessage.message || errorMessage.error || "An error occurred",
+        });
+        throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+      }
+
+      const result = await response.json();
+      Swal.close();
+
+      if (result) {
+        Swal.fire({
+          icon: "success",
+          title: "Image Deleted",
+          text: `The image has been deleted successfully!`,
+          showConfirmButton: true,
+        }).then((res) => {
+          if (res.isConfirmed) {
           }
-  
-          const token = dropshipperData?.security?.token;
-          if (!token) {
-              router.push("/admin/auth/login");
-              return;
-          }
-  
-          try {
-              Swal.fire({
-                  title: 'Deleting Image...',
-                  text: 'Please wait while we remove the image.',
-                  allowOutsideClick: false,
-                  didOpen: () => {
-                      Swal.showLoading();
-                  }
-              });
-  
-              const url = `http://localhost:3001/api/product/${variantId}/image/${index}?type=${type}`;
-  
-              const response = await fetch(url, {
-                  method: "DELETE",
-                  headers: {
-                      Authorization: `Bearer ${token}`,
-                  },
-              });
-  
-              if (!response.ok) {
-                  Swal.close();
-                  const errorMessage = await response.json();
-                  Swal.fire({
-                      icon: "error",
-                      title: "Delete Failed",
-                      text: errorMessage.message || errorMessage.error || "An error occurred",
-                  });
-                  throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
-              }
-  
-              const result = await response.json();
-              Swal.close();
-  
-              if (result) {
-                  Swal.fire({
-                      icon: "success",
-                      title: "Image Deleted",
-                      text: `The image has been deleted successfully!`,
-                      showConfirmButton: true,
-                  }).then((res) => {
-                      if (res.isConfirmed) {
-                      }
-                  });
-              }
-          } catch (error) {
-              console.error("Error:", error);
-              Swal.close();
-              Swal.fire({
-                  icon: "error",
-                  title: "Submission Error",
-                  text: error.message || "Something went wrong. Please try again.",
-              });
-              setError(error.message || "Submission failed.");
-          } finally {
-              setLoading(false);
-          }
-      };
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Submission Error",
+        text: error.message || "Something went wrong. Please try again.",
+      });
+      setError(error.message || "Submission failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="mt-4 p-6 rounded-xl bg-white">
       <div className="md:flex mb-6 justify-between items-center">
@@ -159,7 +160,6 @@ const [loading,setLoading] = useState(null);
         <span className="text-[#A3AED0] whitespace-nowrap">Warehouse Model</span>
         <span className="text-[#A3AED0] whitespace-nowrap">RTO Model</span>
         <span className="text-[#A3AED0] whitespace-nowrap">Product Link</span>
-        <span className="text-[#A3AED0] whitespace-nowrap">Article Id</span>
         <span className="text-[#A3AED0] whitespace-nowrap text-right">Images</span>
         <div className="flex justify-end">
           <button className="bg-green-500 text-white p-2 rounded-lg" onClick={addVariant}>
@@ -277,33 +277,27 @@ const [loading,setLoading] = useState(null);
           <div>
             <span className="text-orange-500 font-semibold lg:hidden block">Product Link</span>
             <input
-  type="text"
-  placeholder="Link"
-  id="product_link"
-  className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]"
-  value={variant.product_link || ''}
-  onChange={(e) => handleChange(index, 'product_link', e.target.value)}
-/>
-
-          </div>
-
-          {/* Article ID */}
-          <div>
-            <span className="text-orange-500 font-semibold lg:hidden block">Article Id</span>
-            <input
               type="text"
-              placeholder="Article Id"
+              placeholder="Link"
+              id="product_link"
               className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2]"
-              value={variant.articleId || ''}
-              onChange={(e) => handleChange(index, 'articleId', e.target.value)}
+              value={variant.product_link || ''}
+              onChange={(e) => handleChange(index, 'product_link', e.target.value)}
             />
+
           </div>
+
+
 
           {/* Image Upload */}
           <div className="md:flex flex-wrap justify-end">
             <span className="text-orange-500 font-semibold lg:hidden block">Images</span>
             <div className="relative border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
               <ImageIcon className="w-8 h-8 text-gray-400" />
+              {Array.isArray(variant?.variant_images) && variant.variant_images.length > 0
+                ? variant.variant_images.map((file, i) => file.name || `File ${i + 1}`).join(', ')
+                : 'Upload'}
+
               <input
                 type="file"
                 multiple
@@ -345,7 +339,7 @@ const [loading,setLoading] = useState(null);
                             confirmButtonText: 'Yes, delete it!',
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              handleImageDelete(index, 'variant_image',variant.id);
+                              handleImageDelete(index, 'variant_image', variant.id);
                             }
                           });
                         }}
@@ -355,7 +349,7 @@ const [loading,setLoading] = useState(null);
 
                       <Image
                         src={`https://placehold.co/600x400?text=${index + 1}`
-                         
+
                         }
                         alt={`Image ${index + 1}`}
                         width={500}
@@ -367,7 +361,7 @@ const [loading,setLoading] = useState(null);
                 </Swiper>
               </div>
             )}
-  
+
           </div>
 
           {/* Remove Button */}

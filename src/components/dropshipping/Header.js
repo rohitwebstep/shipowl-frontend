@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { IoIosArrowDown } from "react-icons/io";
 import { FaSignOutAlt } from 'react-icons/fa';
 import { useDropshipper } from './middleware/DropshipperMiddleWareContext';
+import Swal from 'sweetalert2';
 const Header = () => {
   const {verifyDropShipperAuth} = useDropshipper();
     const [userName, setUserName] = useState('');
@@ -38,7 +39,7 @@ const Header = () => {
             title: "Logged out",
             text: "You have been logged out successfully.",
             timer: 1500,
-            showConfirmButton: false,
+            showConfirmButton: true,
           });
         }
       });

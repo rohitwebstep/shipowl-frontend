@@ -18,6 +18,7 @@ export default function AdminMiddleWareProvider({ children }) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [openSubMenus, setOpenSubMenus] = useState({});
+    const [suppliers, setSuppliers] = useState([]);
 
 
     const verifyAdminAuth = useCallback(async () => {
@@ -63,11 +64,56 @@ export default function AdminMiddleWareProvider({ children }) {
             setLoading(false);
         }
     }, [router]);
+        const fetchSupplier = useCallback(async () => {
+            const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    
+            if (adminData?.project?.active_panel !== "admin") {
+                localStorage.removeItem("shippingData");
+                router.push("/admin/auth/login");
+                return;
+            }
+    
+            const admintoken = adminData?.security?.token;
+            if (!admintoken) {
+                router.push("/admin/auth/login");
+                return;
+            }
+    
+            try {
+                setLoading(true);
+                const response = await fetch(`http://localhost:3001/api/supplier`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                });
+    
+                if (!response.ok) {
+                    const errorMessage = await response.json();
+                    Swal.fire({
+                        icon: "error",
+                        title: "Something Wrong!",
+                        text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+                    });
+                    throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
+                }
+    
+                const result = await response.json();
+                if (result) {
+                    setSuppliers(result?.suppliers || []);
+                }
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            } finally {
+                setLoading(false);
+            }
+        }, [router, setSuppliers]);
 
 
 
     return (
-        <AdminMiddleWareContext.Provider value={{openSubMenus, setOpenSubMenus, adminApiLoading, verifyAdminAuth, error, loading }}>
+        <AdminMiddleWareContext.Provider value={{openSubMenus,fetchSupplier,suppliers, setSuppliers, setOpenSubMenus, adminApiLoading, verifyAdminAuth, error, loading }}>
             {children}
         </AdminMiddleWareContext.Provider>
     );

@@ -60,7 +60,7 @@ export default function Create() {
 
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+      setFormErrors(newErrors);
       setLoading(false);
       return;
     }

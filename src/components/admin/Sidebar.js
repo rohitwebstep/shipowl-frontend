@@ -14,7 +14,7 @@ import { SiGoogletagmanager } from "react-icons/si";
 import { useAdmin } from "./middleware/AdminMiddleWareContext";
 
 export default function Sidebar() {
-  const{openSubMenus, setOpenSubMenus} = useAdmin();
+  const { openSubMenus, setOpenSubMenus } = useAdmin();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -26,19 +26,22 @@ export default function Sidebar() {
   };
 
   const menuSections = [
+
+    { title: "Category Management", icon: SiGoogletagmanager, href: "/admin/category/list" },
+    { title: "Brand Management", icon: SiGoogletagmanager, href: "/admin/brand/list" },
+    { title: "Product Management", icon: Package, href: "/admin/products/list" },
+
     {
       children: [
         {
           name: "Supplier Dashboard",
           icon: LuLayoutDashboard,
           subMenu: [
-            { icon: ClipboardList, name: "Create Supplier ", href: "/admin/supplier/create" },
             { icon: ClipboardList, name: "Supplier List ", href: "/admin/supplier/list" },
-            { name: "Product(In progress)", icon: Package, href: "/admin/supplier/products/list" },
-            { name: "New Product Request(In progress)", icon: ClipboardList, href: "/admin/supplier/products/new" },
+            { name: "New Product Request", icon: ClipboardList, href: "/admin/products/new" },
             { name: "Orders(In progress)", icon: ShoppingCart, href: "/admin/supplier/orders" },
-            { name: "Warehouse(In progress)", icon: Warehouse, href: "/admin/supplier/warehouse/list" },
-            { name: "RTO Orders(In progress)", icon: ClipboardList, href: "/admin/supplier/orders/rto-orders" },
+            { name: "Warehouse", icon: Warehouse, href: "/admin/supplier/warehouse/list" },
+            { name: "RTO Management (in progress)", icon: ClipboardList, href: "/admin/supplier/orders/rto-orders" },
             { name: "Billings(In progress)", icon: BadgeDollarSign, href: "/admin/billing" },
             { name: "Payment(In progress)", icon: CreditCard, href: "/admin/payments" },
           ],
@@ -82,7 +85,7 @@ export default function Sidebar() {
         },
       ],
     },
-   
+
     { title: "Subuser Listing", icon: SiGoogletagmanager, href: "/admin/sub-user/list" },
     { title: "Country Management", icon: SiGoogletagmanager, href: "/admin/country/list" },
     { title: "State Management", icon: ShieldCheck, href: "/admin/state/list" },

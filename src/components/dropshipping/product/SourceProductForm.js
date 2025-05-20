@@ -22,7 +22,7 @@ const SourceProductForm = () => {
         expectedDailyOrders: '',
         url: '',
         images: [],
-        status:''
+        status: ''
     });
 
     const handleSubmit = async (e) => {
@@ -67,7 +67,7 @@ const SourceProductForm = () => {
             form.append("expectedPrice", formData.expectedPrice);
             form.append("expectedDailyOrders", formData.expectedDailyOrders);
             form.append("url", formData.url);
-            form.append("status", formData.status);  
+            form.append("status", formData.status);
             formData.images.forEach((file) => {
                 form.append('image', file);
             });
@@ -113,7 +113,7 @@ const SourceProductForm = () => {
                             images: [],
                         });
                         setImage(null);
-                        router.push("/dropshipper/new-product-request");
+                        router.push("/dropshipping/product/source");
                     }
                 });
             }
@@ -144,18 +144,19 @@ const SourceProductForm = () => {
     };
 
     const handleChange = (e) => {
-        const { name, type, value, checked ,files} = e.target;
-    
+        const { name, type, value, checked, files } = e.target;
+
         if (type === 'file') {
-          const fileArray = Array.from(files);
-          setFormData(prev => ({ ...prev, images: fileArray }));
+            const fileArray = Array.from(files);
+            setFormData(prev => ({ ...prev, images: fileArray }));
         } else {
-          setFormData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? (checked ? true : false) : value
-        }));    }
-      };
-    
+            setFormData((prev) => ({
+                ...prev,
+                [name]: type === 'checkbox' ? (checked ? true : false) : value
+            }));
+        }
+    };
+
 
     const fetchCategory = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
@@ -201,9 +202,9 @@ const SourceProductForm = () => {
 
     return (
         <div className="md:w-8/12">
-        <form onSubmit={handleSubmit} className="w-full py-6">
-            <h2 className="md:text-3xl text-xl font-semibold text-[#F98F5C]">Source A Product</h2>
-            <div className="border-b-4 w-3/12 border-[#F98F5C] mb-4"></div>
+            <form onSubmit={handleSubmit} className="w-full py-6">
+                <h2 className="md:text-3xl text-xl font-semibold text-[#F98F5C]">Source A Product</h2>
+                <div className="border-b-4 w-3/12 border-[#F98F5C] mb-4"></div>
 
                 <div className="bg-white shadow p-4 rounded-xl mb-6">
                     <h3 className="text-lg font-semibold">General Information</h3>
@@ -229,7 +230,7 @@ const SourceProductForm = () => {
                             >
                                 <option value="">Select a category type</option>
                                 {categoryData.map((cat) => (
-                                    <option key={cat._id} value={cat._id}>{cat.name}</option>
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                                 ))}
                             </select>
                             {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
@@ -275,32 +276,32 @@ const SourceProductForm = () => {
                         {errors.url && <p className="text-red-500 text-sm mt-1">{errors.url}</p>}
                     </div>
                     <div>
-          
-          <label className="flex mt-2 items-center cursor-pointer">
-                              <input
-                                  type="checkbox"
-                                  name='status'
-                                  className="sr-only"
-                                  checked={formData.status || ''}
-                                  onChange={handleChange}
-                              />
-                              <div
-                                  className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${formData.status ? "bg-orange-500" : ""
-                                      }`}
-                              >
-                                  <div
-                                      className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${formData.status ? "translate-x-5" : ""
-                                          }`}
-                                  ></div>
-                              </div>
-                              <span className="ms-2 text-sm text-gray-600">
-                                  Status <span className='text-red-500'>*</span>
-                              </span>
-                          </label>
-            {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status}</p>}
-          </div>
+
+                        <label className="flex mt-2 items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name='status'
+                                className="sr-only"
+                                checked={formData.status || ''}
+                                onChange={handleChange}
+                            />
+                            <div
+                                className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${formData.status ? "bg-orange-500" : ""
+                                    }`}
+                            >
+                                <div
+                                    className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${formData.status ? "translate-x-5" : ""
+                                        }`}
+                                ></div>
+                            </div>
+                            <span className="ms-2 text-sm text-gray-600">
+                                Status <span className='text-red-500'>*</span>
+                            </span>
+                        </label>
+                        {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status}</p>}
+                    </div>
                 </div>
-              
+
 
                 <div className="bg-white shadow p-4 rounded-xl mb-6">
                     <h3 className="text-lg font-semibold">Product Image </h3>

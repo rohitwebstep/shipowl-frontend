@@ -34,14 +34,13 @@ const ProductProvider = ({ children }) => {
         sku: '',
         qty: 1,
         currency: '',
-        article_id: '',
         suggested_price:"",
         shipowl_price:"",
         rto_suggested_price:"",
         rto_price:""
       },
     ],
-    shipping_time: '',
+    shipping_time: '24 Hours',
     weight: '',
     package_length: '',
     package_width: '',
@@ -53,12 +52,8 @@ const ProductProvider = ({ children }) => {
     package_height_image:0,
     product_detail_video:0,
     training_guidance_video:0,
-    upc: '',
-    ean: '',
     hsn_code: '',
     tax_rate: '',
-    rto_address: '',
-    pickup_address: '',
   });
 
   const fetchCategory = useCallback(async () => {

@@ -6,14 +6,13 @@ import ProductDetails from './ProductDetails';
 import VariantsDetails from './VariantsDetails';
 import ShippingDetails from './ShippingDetails';
 import OtherDetails from './OtherDetails';
-import { ProductContextEdit } from "./ProductContextEdit";
 import Swal from 'sweetalert2';
 import { HashLoader } from "react-spinners";
+import { ProductContextEdit } from "./ProductContextEdit";
 const AddProduct = () => {
-  
+
   const [loading, setLoading] = useState(false);
-  const [suppliers, setSuppliers] = useState([]);
-  const {activeTab, setActiveTab,setFormData,validateFields,validateForm2 } = useContext(ProductContextEdit);
+  const { activeTab, setActiveTab, setFormData, validateFields, validateForm2 } = useContext(ProductContextEdit);
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -96,7 +95,6 @@ const AddProduct = () => {
           qty: variant.qty || 1,
           variant_images: variant.image || '',
           currency: variant.currency || '',
-          article_id: variant.article_id || '',
           product_link: variant.product_link || '',
           suggested_price: variant.suggested_price || '',
           shipowl_price: variant.shipowl_price || '',
@@ -109,20 +107,16 @@ const AddProduct = () => {
         package_width: products.package_width || '',
         package_height: products.package_height || '',
         chargable_weight: products.chargeable_weight || '',
-        package_weight_image:products.package_weight_image ||  '',
-        package_length_image: products.package_length_image ||  '',
-        package_width_image:  products.package_width_image ||'',
-        package_height_image:products.package_height_image ||'',
-        product_detail_video: products.product_detail_video|| '',
-        training_guidance_video:products.training_guidance_video || '',
-        upc: products.upc || '',
-        ean: products.ean || '',
+        package_weight_image: products.package_weight_image || '',
+        package_length_image: products.package_length_image || '',
+        package_width_image: products.package_width_image || '',
+        package_height_image: products.package_height_image || '',
+        product_detail_video: products.product_detail_video || '',
+        training_guidance_video: products.training_guidance_video || '',
         hsn_code: products.hsnCode || '',
         tax_rate: products.taxRate || '',
-        rto_address: products.rtoAddress || '',
-        pickup_address: products.pickupAddress || '',
       });
-      
+
     } catch (error) {
       console.error("Error fetching product:", error);
     } finally {
@@ -130,7 +124,7 @@ const AddProduct = () => {
     }
   }, [router, id, setFormData]);
 
-  
+
 
   const tabs = [
     { id: "product-details", label: "Product Details" },
@@ -139,87 +133,32 @@ const AddProduct = () => {
     { id: "other-details", label: "Other Details" },
   ];
 
-  const fetchSupplier = useCallback(async () => {
-const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-if (adminData?.project?.active_panel !== "admin") {
-  localStorage.removeItem("shippingData");
-  router.push("/admin/auth/login");
-  return;
-}
-
-const admintoken = adminData?.security?.token;
-if (!admintoken) {
-  router.push("/admin/auth/login");
-  return;
-}
-
-try {
-  setLoading(true);
-  const response = await fetch(`http://localhost:3001/api/supplier`, {
-      method: "GET",
-      headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${admintoken}`,
-      },
-  });
-
-  if (!response.ok) {
-      const errorMessage = await response.json();
-      Swal.fire({
-          icon: "error",
-          title: "Something Wrong!",
-          text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
-      });
-      throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
-  }
-
-  const result = await response.json();
-  if (result) {
-      setSuppliers(result?.suppliers || []);
-  }
-} catch (error) {
-  console.error("Error fetching categories:", error);
-} finally {
-  setLoading(false);
-}
-  }, [router, setSuppliers]);
 
   useEffect(() => {
     if (id) fetchProducts();
-    fetchSupplier();
   }, [fetchProducts, id]);
   if (loading) {
     return (
-        <div className="flex items-center justify-center h-[80vh]">
-            <HashLoader size={60} color="#F97316" loading={true} />
-        </div>
+      <div className="flex items-center justify-center h-[80vh]">
+        <HashLoader size={60} color="#F97316" loading={true} />
+      </div>
     );
-}
+  }
   return (
     <div className="w-full xl:p-6">
       <div className="bg-white rounded-3xl p-5">
-         <label className="block text-sm font-medium text-gray-700">Select Supplier</label>
-            <select className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm">
-                 <option>Select Supplier</option>
-                        {suppliers?.map((item,index)=>{
-                            return(
-                                <option key={index} value={item.id}>{item.name}</option>
-                            )
-                        })}
-                        </select> 
+
         <div className="flex border-b overflow-auto border-[#F4F5F7]">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => handleTabClick(tab.id)}
-            className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${
-              activeTab === tab.id
-                ? 'border-b-3 border-orange-500 text-orange-500'
-                : 'text-[#718EBF]'
-            }`}
-          >
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => handleTabClick(tab.id)}
+              className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${activeTab === tab.id
+                  ? 'border-b-3 border-orange-500 text-orange-500'
+                  : 'text-[#718EBF]'
+                }`}
+            >
               {tab.label}
             </button>
           ))}

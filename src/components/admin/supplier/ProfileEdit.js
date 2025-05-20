@@ -169,7 +169,7 @@ const ProfileEdit = () => {
     }`;
 
   const labelClasses = (field) =>
-    `block font-bold mb-1 ${errors[field] ? 'text-red-500' : 'text-[#232323]'}`;
+    `block font-bold mb-1 text-[#232323]`;
 
   const handleCancel = () => {
     setErrors({});
