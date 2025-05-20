@@ -114,7 +114,7 @@ const [imagePreview, setImagePreview] = useState(null);
 
 
     try {
-  const res = await fetch(`http://localhost:3001/api/dropshipper/auth/registration`, {
+  const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/auth/registration`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -179,7 +179,7 @@ console.log('errors',errors)
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "http://localhost:3001/api/location/country",
+      "https://sleeping-owl-we0m.onrender.com/api/location/country",
       setCountryData,
       "countries",
       setLoadingCountries
@@ -188,7 +188,7 @@ console.log('errors',errors)
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `http://localhost:3001/api/location/country/${countryId}/states`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -197,7 +197,7 @@ console.log('errors',errors)
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `http://localhost:3001/api/location/state/${stateId}/cities`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities

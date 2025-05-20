@@ -46,7 +46,7 @@ const ProfileEdit = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:3001/api/location/state/${formData?.permanentState || id}/cities`,
+          `https://sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState || id}/cities`,
           {
             method: 'GET',
             headers: {
@@ -96,7 +96,7 @@ const ProfileEdit = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:3001/api/location/country/${formData?.permanentCountry || id}/states`,
+          `https://sleeping-owl-we0m.onrender.com/api/location/country/${formData?.permanentCountry || id}/states`,
           {
             method: 'GET',
             headers: {
@@ -224,7 +224,7 @@ const ProfileEdit = () => {
             { label: 'Date of Birth', name: 'dateOfBirth', type: 'date' },
             { label: 'Present Address', name: 'currentAddress', type: 'text' },
             { label: 'Permanent Address', name: 'permanentAddress', type: 'text' },
-            { label: 'Postal Code', name: 'permanentPostalCode', type: 'text' },
+            { label: 'Postal Code', name: 'permanentPostalCode', type: 'number' },
           ].map(({ label, name, type }) => (
             <div key={name}>
               <label className={labelClasses(name)}>

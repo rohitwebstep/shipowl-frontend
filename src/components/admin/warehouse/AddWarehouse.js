@@ -50,7 +50,7 @@ export default function AddWarehouse() {
         try {
             setLoadingCity(true)
             const response = await fetch(
-                `http://localhost:3001/api/location/state/${id}/cities`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`,
                 {
                     method: "GET",
                     headers: {
@@ -97,7 +97,7 @@ export default function AddWarehouse() {
         try {
             setLoadingState(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/country/${value}/states`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/country/${value}/states`,
                 {
                     method: "GET",
                     headers: {
@@ -151,7 +151,7 @@ export default function AddWarehouse() {
         try {
             setLoadingCountry(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/country`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/country`,
                 {
                     method: "GET",
                     headers: {
@@ -275,7 +275,7 @@ export default function AddWarehouse() {
                 }
             });
 
-            const url = "http://localhost:3001/api/warehouse";
+            const url = "https://sleeping-owl-we0m.onrender.com/api/warehouse";
 
             const form = new FormData();
             for (const key in formData) {
@@ -470,7 +470,7 @@ export default function AddWarehouse() {
                                 Postal Code <span className="text-red-500">*</span>
                             </label>
                             <input
-                                type="text"
+                                type="number"
                                 onChange={handleChange}
                                 name="postal_code"
                                 id="postal_code"

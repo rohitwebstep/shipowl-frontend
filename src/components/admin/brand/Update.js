@@ -86,7 +86,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/brand/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -183,7 +183,7 @@ export default function Update() {
                 });
             }
 
-            const url = `http://localhost:3001/api/brand/${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`;
 
             const response = await fetch(url, {
                 method: "PUT",
@@ -261,7 +261,7 @@ export default function Update() {
                 }
             });
 
-            const url = `http://localhost:3001/api/brand/${id}/image/${index}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}/image/${index}`;
 
             const response = await fetch(url, {
                 method: "DELETE",

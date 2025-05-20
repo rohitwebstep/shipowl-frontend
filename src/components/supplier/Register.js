@@ -141,7 +141,7 @@ export default function Register() {
   }
 
     try {
-      const res = await fetch(`http://localhost:3001/api/supplier/auth/registration`, {
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/registration`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -214,7 +214,7 @@ const fetchProtected = useCallback(async (url, setter, key, setLoadingFn) => {
 
 const fetchCountryAndState = useCallback(() => {
   fetchProtected(
-    "http://localhost:3001/api/location/country",
+    "https://sleeping-owl-we0m.onrender.com/api/location/country",
     setCountryData,
     "countries",             // ✅ make sure backend response uses this key
     setLoadingCountries
@@ -223,7 +223,7 @@ const fetchCountryAndState = useCallback(() => {
 
 const fetchState = useCallback(() => {
   fetchProtected(
-    "http://localhost:3001/api/location/state",
+    "https://sleeping-owl-we0m.onrender.com/api/location/state",
     setStates,
     "states",         // ⚠️ verify that your API returns a `billingstates` key
     setBillingStateLoading
@@ -232,7 +232,7 @@ const fetchState = useCallback(() => {
 
 const fetchStateList = useCallback((countryId) => {
   fetchProtected(
-    `http://localhost:3001/api/location/country/${countryId}/states`,
+    `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
     setStateData,
     "states",
     setLoadingStates
@@ -241,7 +241,7 @@ const fetchStateList = useCallback((countryId) => {
 
 const fetchCity = useCallback((stateId) => {
   fetchProtected(
-    `http://localhost:3001/api/location/state/${stateId}/cities`,
+    `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
     setCityData,
     "cities",
     setLoadingCities
@@ -250,7 +250,7 @@ const fetchCity = useCallback((stateId) => {
 
 const fetchCity2 = useCallback((stateId) => {
   fetchProtected(
-    `http://localhost:3001/api/location/state/${stateId}/cities`,
+    `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
     setCity,
     "cities",               // ⚠️ This key must match your API response structure
     setBillingCityLoading
@@ -455,7 +455,7 @@ const fetchCity2 = useCallback((stateId) => {
                   Postal Code <span className="text-red-600">*</span>
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   id="permanentPostalCode"
                   name="permanentPostalCode"
                   value={formData.permanentPostalCode}

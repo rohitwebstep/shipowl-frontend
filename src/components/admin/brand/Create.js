@@ -102,7 +102,7 @@ export default function Create() {
                 });
             }
 
-            const url = "http://localhost:3001/api/brand";
+            const url = "https://sleeping-owl-we0m.onrender.com/api/brand";
 
             const response = await fetch(url, {
                 method: "POST",

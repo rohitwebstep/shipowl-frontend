@@ -55,7 +55,7 @@ export default function Update() {
             
                 try {
                     const response = await fetch(
-                        `http://localhost:3001/api/location/state/${id}/cities`,
+                        `https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`,
                         {
                             method: "GET",
                             headers: {
@@ -100,7 +100,7 @@ export default function Update() {
     
             try {
                 const response = await fetch(
-                    `http://localhost:3001/api/location/country/${value}/states`,
+                    `https://sleeping-owl-we0m.onrender.com/api/location/country/${value}/states`,
                     {
                         method: "GET",
                         headers: {
@@ -153,7 +153,7 @@ export default function Update() {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `http://localhost:3001/api/location/country`,
+                    `https://sleeping-owl-we0m.onrender.com/api/location/country`,
                     {
                         method: "GET",
                         headers: {
@@ -238,7 +238,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/warehouse/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -320,7 +320,7 @@ export default function Update() {
                 }
             });
 
-            const url = `http://localhost:3001/api/warehouse/${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`;
             const form = new FormData();
             for (const key in formData) {
                 if (formData[key]) {
@@ -536,7 +536,7 @@ export default function Update() {
           Postal Code <span className="text-red-500">*</span>
         </label>
         <input
-          type="text"
+          type="number"
           value={formData?.postal_code}
           onChange={handleChange}
           name="postal_code"
