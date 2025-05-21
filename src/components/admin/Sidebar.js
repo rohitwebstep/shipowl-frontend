@@ -54,7 +54,6 @@ export default function Sidebar() {
           name: "Dropshipping Dashboard",
           icon: LuLayoutDashboard,
           subMenu: [
-            { name: "Create Dropshippers", icon: ShoppingCart, href: "/admin/dropshipper/create" },
             { name: "Dropshippers List", icon: LuLayoutDashboard, href: "/admin/dropshipper/list" },
             { name: "Manage Orders(In progress)", icon: ShoppingCart, href: "/admin/dropshipper/manage-orders" },
             { name: "Manage Products(In progress)", icon: Package, href: "/admin/dropshipper/manage-products" },
@@ -92,6 +91,7 @@ export default function Sidebar() {
     { title: "City Management", icon: ShieldCheck, href: "/admin/city/list" },
     { title: "Settings(In progress)", icon: Settings, href: "/admin/setting" },
     { title: "Profile(In progress)", icon: User, href: "/admin/profile" },
+    { title: "Bank Details Update Requests", icon: User, href: "/admin/bankaccount-update-requests" },
     { title: "Terms & Condition(In progress)", icon: ShieldCheck, href: "/admin/terms" },
   ];
 

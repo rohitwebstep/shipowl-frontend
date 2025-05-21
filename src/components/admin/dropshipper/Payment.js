@@ -95,7 +95,7 @@ const Payment = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper`;
+      const url = `http://localhost:3001/api/dropshipper`;
       const form = new FormData();
 
       // Append formData
@@ -165,7 +165,7 @@ const Payment = () => {
   };
 
   return (
-    <div className="bg-white lg:p-10 p-3 rounded-2xl">
+    <div className="bg-white lg:p-10 rounded-tl-none rounded-tr-none  p-3 rounded-2xl">
       <h3 className="font-semibold text-[#FF702C] underline text-sm">Bank Account Details</h3>
 
       {Array.isArray(formData.bankAccounts) &&
@@ -250,7 +250,7 @@ const Payment = () => {
         </div>
       ))}
 
-      <div className="py-4">
+      {/* <div className="py-4">
         <button
           type="button"
           onClick={handleAddBankAccount}
@@ -258,7 +258,7 @@ const Payment = () => {
         >
           Add More Bank Account
         </button>
-      </div>
+      </div> */}
 
       {/* KYC Details */}
       <div>

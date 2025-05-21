@@ -125,7 +125,7 @@ export default function Create() {
     });
 
     try {
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin`, {
+      const res = await fetch(`http://localhost:3001/api/admin`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -191,7 +191,7 @@ export default function Create() {
   }, [router]);
   const fetchPermission = useCallback(() => {
     fetchProtected(
-      "https://sleeping-owl-we0m.onrender.com/api/admin/permission",
+      "http://localhost:3001/api/admin/permission",
       setPermission,
       "permissions",
       setLoading
@@ -200,7 +200,7 @@ export default function Create() {
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "https://sleeping-owl-we0m.onrender.com/api/location/country",
+      "http://localhost:3001/api/location/country",
       setCountryData,
       "countries",
       setLoadingCountries
@@ -209,7 +209,7 @@ export default function Create() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+      `http://localhost:3001/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -218,7 +218,7 @@ export default function Create() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+      `http://localhost:3001/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities

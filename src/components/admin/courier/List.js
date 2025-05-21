@@ -47,7 +47,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company`,
+                `http://localhost:3001/api/courier-company`,
                 {
                     method: "GET",
                     headers: {
@@ -94,7 +94,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/trashed`,
+                `http://localhost:3001/api/courier-company/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -219,7 +219,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${item.id}`,
+                `http://localhost:3001/api/courier-company/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -280,7 +280,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${item?.id}/restore`,
+                `http://localhost:3001/api/courier-company/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -359,7 +359,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${item.id}/destroy`,
+                `http://localhost:3001/api/courier-company/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

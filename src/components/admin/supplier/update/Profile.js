@@ -1,18 +1,17 @@
 "use client";
 
-import { useContext ,useCallback,useEffect, useState} from "react";
+import { useContext, useCallback, useEffect, useState } from "react";
 import ProfileEdit from './ProfileEdit'
 import BusinessInfo from './BusinessInfo';
-import AccountInfo from './AccountInfo';
 import { ProfileEditContext } from "./ProfileEditContext";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { HashLoader } from 'react-spinners';
 export default function Profile() {
 
-  const {activeTab,validateBusiness,validate,formData, setActiveTab,setFormData,setCityData,setStateData} = useContext(ProfileEditContext);
+  const { activeTab, validateBusiness, validate, formData, setActiveTab, setFormData, setCityData, setStateData } = useContext(ProfileEditContext);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const handleTabClick = async (tabId) => {
     if (activeTab === 'profile-edit') {
       const isValid = await validate();
@@ -47,7 +46,7 @@ export default function Profile() {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/${id}`, {
+      const response = await fetch(`http://localhost:3001/api/supplier/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -70,10 +69,10 @@ export default function Profile() {
 
       const companyDetail = suppliers?.companyDetail || {};
       const bankAccounts = suppliers?.bankAccounts || [];
-      if(suppliers.permanentCountryId){
+      if (suppliers.permanentCountryId) {
         fetchState(suppliers.permanentCountryId);
       }
-      if(suppliers.permanentStateId){
+      if (suppliers.permanentStateId) {
         fetchCity(suppliers.permanentStateId);
       }
 
@@ -91,7 +90,7 @@ export default function Profile() {
         permanentPostalCode: suppliers.permanentPostalCode || "",
         permanentCountry: suppliers.permanentCountryId || "",
         profilePicture: suppliers.profilePicture || "",
-      
+
         companyName: companyDetail.companyName || "",
         brandName: companyDetail.brandName || "",
         brandShortName: companyDetail.brandShortName || "",
@@ -115,32 +114,9 @@ export default function Profile() {
         documentName: companyDetail.documentName || "",
         documentImage: companyDetail.documentImage || "",
         companyid: companyDetail.id || "",
-      
-        bankAccounts: bankAccounts.length > 0 
-          ? bankAccounts.map((account) => ({
-              accountHolderName: account.accountHolderName || "",
-              id: account.id || "",
-              accountNumber: account.accountNumber || "",
-              bankName: account.bankName || "",
-              bankBranch: account.bankBranch || "",
-              accountType: account.accountType || "",
-              ifscCode: account.ifscCode || "",
-              cancelledChequeImage: account.cancelledChequeImage || "",
-            }))
-          : [
-              {
-                accountHolderName: "",
-                accountNumber: "",
-                bankName: "",
-                bankBranch: "",
-                accountType: "",
-                ifscCode: "",
-                cancelledChequeImage: ""
-              },
-            ],
       });
-      
-      
+
+
     } catch (error) {
       console.error("Error fetching supplier:", error);
     } finally {
@@ -148,110 +124,109 @@ export default function Profile() {
     }
   }, [router, id, setFormData]);
 
-    const fetchCity = useCallback(async (id) => {
-          const adminData = JSON.parse(localStorage.getItem("shippingData"));
-          if (adminData?.project?.active_panel !== "admin") {
-              localStorage.removeItem("shippingData");
-              router.push("/admin/auth/login");
-              return;
-          }
-  
-          const admintoken = adminData?.security?.token;
-          if (!admintoken) {
-              router.push("/admin/auth/login");
-              return;
-          }
-  
-          try {
-              setLoading(true);
-              const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState||id}/cities`, {
-                  method: "GET",
-                  headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${admintoken}`,
-                  },
-              });
-  
-              const result = await response.json();
-  
-              if (!response.ok) {
-                  Swal.fire({
-                      icon: "error",
-                      title: "Something Wrong!",
-                      text: result.message || result.error || "Your session has expired. Please log in again.",
-                  });
-                  throw new Error(result.message || result.error || "Something Wrong!");
-              }
-  
-              setCityData(result?.cities || []);
-          } catch (error) {
-              console.error("Error fetching cities:", error);
-          } finally {
-              setLoading(false);
-          }
-      }, [router]);
-      const fetchState = useCallback(async (id) => {
-        console.log('id',id)
-          const adminData = JSON.parse(localStorage.getItem("shippingData"));
-          
-          if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-          }
-        
-          const admintoken = adminData?.security?.token;
-          if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-          }
-        
-          try {
-            setLoading(true);
-            const response = await fetch(
-              `https://sleeping-owl-we0m.onrender.com/api/location/country/${ formData?.permanentCountry|| id}/states`,
-              {
-                method: "GET",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${admintoken}`,
-                },
-              }
-            );
-        
-            const result = await response.json();
-        
-            if (!response.ok) {
-              Swal.fire({
-                icon: "error",
-                title: "Something went wrong!",
-                text: result.message || result.error || "Your session has expired. Please log in again.",
-              });
-              throw new Error(result.message || result.error || "Something Wrong!");
-            }
-        
-            setStateData(result?.states || []);
-          } catch (error) {
-            console.error("Error fetching states:", error); // <- corrected message: "states" instead of "cities"
-          } finally {
-            setLoading(false);
-          }
-        }, [router]);
+  const fetchCity = useCallback(async (id) => {
+    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    if (adminData?.project?.active_panel !== "admin") {
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:3001/api/location/state/${formData?.permanentState || id}/cities`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${admintoken}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        Swal.fire({
+          icon: "error",
+          title: "Something Wrong!",
+          text: result.message || result.error || "Your session has expired. Please log in again.",
+        });
+        throw new Error(result.message || result.error || "Something Wrong!");
+      }
+
+      setCityData(result?.cities || []);
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+  const fetchState = useCallback(async (id) => {
+    console.log('id', id)
+    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+
+    if (adminData?.project?.active_panel !== "admin") {
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    const admintoken = adminData?.security?.token;
+    if (!admintoken) {
+      router.push("/admin/auth/login");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:3001/api/location/country/${formData?.permanentCountry || id}/states`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${admintoken}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong!",
+          text: result.message || result.error || "Your session has expired. Please log in again.",
+        });
+        throw new Error(result.message || result.error || "Something Wrong!");
+      }
+
+      setStateData(result?.states || []);
+    } catch (error) {
+      console.error("Error fetching states:", error); // <- corrected message: "states" instead of "cities"
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
 
   useEffect(() => {
     if (id) fetchSupplier();
   }, [fetchSupplier, id]);
-    if (loading) {
-      return (
-          <div className="flex items-center justify-center h-[80vh]">
-              <HashLoader size={60} color="#F97316" loading={true} />
-          </div>
-      );
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <HashLoader size={60} color="#F97316" loading={true} />
+      </div>
+    );
   }
   const tabs = [
     { id: "profile-edit", label: "Personal Information" },
     { id: "business-info", label: "Business Information" },
-    { id: "account-info", label: "Account Information" },
   ];
 
 
@@ -259,16 +234,15 @@ export default function Profile() {
   return (
     <div className="">
       <div className={`flex border-b bg-white pt-5 xl:gap-8 overflow-auto px-4 rounded-tl-2xl rounded-tr-2xl  border-[#F4F5F7] ${activeTab == "profile-edit" ? "xl:w-10/12" : "w-full"}`}>
-      {tabs.map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
             onClick={() => handleTabClick(tab.id)}
-            className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${
-              activeTab === tab.id
+            className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${activeTab === tab.id
                 ? 'border-b-3 border-orange-500 text-orange-500'
                 : 'text-[#718EBF]'
-            }`}
+              }`}
           >
             {tab.label}
           </button>
@@ -278,7 +252,6 @@ export default function Profile() {
       <div className="">
         {activeTab === "profile-edit" && <ProfileEdit />}
         {activeTab === "business-info" && <BusinessInfo />}
-        {activeTab === "account-info" && <AccountInfo />}
       </div>
 
     </div>

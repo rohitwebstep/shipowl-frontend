@@ -3,7 +3,6 @@
 import { useContext ,useCallback,useEffect, useState} from "react";
 import ProfileEdit from './ProfileEdit'
 import BusinessInfo from './BusinessInfo';
-import AccountInfo from './AccountInfo';
 import { ProfileContext } from "./ProfileContext";
 import { useRouter } from 'next/navigation';
 import { HashLoader } from 'react-spinners';
@@ -45,7 +44,7 @@ export default function Profile() {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/profile`, {
+      const response = await fetch(`http://localhost:3001/api/supplier/profile`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -113,29 +112,6 @@ export default function Profile() {
         documentName: companyDetail.documentName || "",
         documentImage: companyDetail.documentImage || "",
         companyid: companyDetail.id || "",
-      
-        bankAccounts: bankAccounts.length > 0 
-          ? bankAccounts.map((account) => ({
-              accountHolderName: account.accountHolderName || "",
-              id: account.id || "",
-              accountNumber: account.accountNumber || "",
-              bankName: account.bankName || "",
-              bankBranch: account.bankBranch || "",
-              accountType: account.accountType || "",
-              ifscCode: account.ifscCode || "",
-              cancelledChequeImages: account.cancelledChequeImage || "",
-            }))
-          : [
-              {
-                accountHolderName: "",
-                accountNumber: "",
-                bankName: "",
-                bankBranch: "",
-                accountType: "",
-                ifscCode: "",
-                cancelledChequeImage: ""
-              },
-            ],
       });
       
       
@@ -162,7 +138,7 @@ export default function Profile() {
   
           try {
               setLoading(true);
-              const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState||id}/cities`, {
+              const response = await fetch(`http://localhost:3001/api/location/state/${formData?.permanentState||id}/cities`, {
                   method: "GET",
                   headers: {
                       "Content-Type": "application/json",
@@ -206,7 +182,7 @@ export default function Profile() {
           try {
             setLoading(true);
             const response = await fetch(
-              `https://sleeping-owl-we0m.onrender.com/api/location/country/${ formData?.permanentCountry|| id}/states`,
+              `http://localhost:3001/api/location/country/${ formData?.permanentCountry|| id}/states`,
               {
                 method: "GET",
                 headers: {
@@ -247,8 +223,7 @@ export default function Profile() {
   }
   const tabs = [
     { id: "profile-edit", label: "Personal Information" },
-    { id: "business-info", label: "Business Information" },
-    { id: "account-info", label: "Account Information" },
+    { id: "business-info", label: "Business Information" }
   ];
 
 
@@ -275,7 +250,6 @@ export default function Profile() {
       <div className="">
         {activeTab === "profile-edit" && <ProfileEdit />}
         {activeTab === "business-info" && <BusinessInfo />}
-        {activeTab === "account-info" && <AccountInfo />}
       </div>
 
     </div>

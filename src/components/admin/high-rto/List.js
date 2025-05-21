@@ -1,5 +1,5 @@
 "use client";
-import {useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
@@ -20,66 +20,66 @@ export default function List() {
     const [countryData, setCountryData] = useState([]);
     const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
-   const fetchRto = useCallback(async () => {
-    const adminData = JSON.parse(localStorage.getItem("shippingData"));
+    const fetchRto = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-    if (adminData?.project?.active_panel !== "admin") {
-        localStorage.removeItem("shippingData");
-        router.push("/admin/auth/login");
-        return;
-    }
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
 
-    const admintoken = adminData?.security?.token;
-    if (!admintoken) {
-        router.push("/admin/auth/login");
-        return;
-    }
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
 
-    try {
-        setLoading(true);
+        try {
+            setLoading(true);
 
-        const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/high-rto`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${admintoken}`,
-            },
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            Swal.fire({
-                icon: "error",
-                title: "Something Went Wrong!",
-                text: result.message || result.error || "Your session has expired. Please log in again.",
+            const response = await fetch(`http://localhost:3001/api/high-rto`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${admintoken}`,
+                },
             });
-            throw new Error(result.message || result.error || "Something went wrong.");
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Went Wrong!",
+                    text: result.message || result.error || "Your session has expired. Please log in again.",
+                });
+                throw new Error(result.message || result.error || "Something went wrong.");
+            }
+
+            const highRtos = result?.highRtos || [];
+            setData(highRtos);
+
+            if (highRtos) {
+
+                if (highRtos.stateId) {
+                    await fetchState(); // Make sure this is a promise-returning async function
+                }
+                if (highRtos.cityId) {
+                    await fetchCity(); // Make sure this is a promise-returning async function
+                }
+                if (highRtos.countryId) {
+                    await fetchcountry(); // Make sure this is a promise-returning async function
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching RTO data:", error);
+        } finally {
+            setLoading(false);
         }
+    }, [router]);
 
-        const highRtos = result?.highRtos || [];
-        setData(highRtos);
 
-        if (highRtos) {
-
-            if (highRtos.stateId) {
-                await fetchState(); // Make sure this is a promise-returning async function
-            }
-            if (highRtos.cityId) {
-                await fetchCity(); // Make sure this is a promise-returning async function
-            }
-            if (highRtos.countryId) {
-                await fetchcountry(); // Make sure this is a promise-returning async function
-            }
-        }
-    } catch (error) {
-        console.error("Error fetching RTO data:", error);
-    } finally {
-        setLoading(false);
-    }
-}, [router]);
-
-    
     const trashedRto = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -98,7 +98,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/trashed`,
+                `http://localhost:3001/api/high-rto/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -135,23 +135,23 @@ export default function List() {
     }, [router, setData]);
     const fetchCity = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    
+
         if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
-    
+
         const admintoken = adminData?.security?.token;
         if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
-    
+
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
+                `http://localhost:3001/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -160,9 +160,9 @@ export default function List() {
                     },
                 }
             );
-    
+
             const result = await response.json();
-    
+
             if (!response.ok) {
                 Swal.fire({
                     icon: "error",
@@ -171,7 +171,7 @@ export default function List() {
                 });
                 throw new Error(result.message || result.error || "Something Wrong!");
             }
-    
+
             setCityData(result?.cities || []);
         } catch (error) {
             console.error("Error fetching cities:", error);
@@ -179,7 +179,7 @@ export default function List() {
             setLoading(false);
         }
     }, [router]);
-    
+
     const fetchState = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -198,7 +198,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                `http://localhost:3001/api/location/state`,
                 {
                     method: "GET",
                     headers: {
@@ -233,60 +233,60 @@ export default function List() {
             setLoading(false);
         }
     }, [router, setStateData]);
-     const fetchcountry = useCallback(async () => {
-            const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    
-            if (adminData?.project?.active_panel !== "admin") {
-                localStorage.removeItem("shippingData");
-                router.push("/admin/auth/login");
-                return;
-            }
-    
-            const admintoken = adminData?.security?.token;
-            if (!admintoken) {
-                router.push("/admin/auth/login");
-                return;
-            }
-    
-            try {
-                setLoading(true);
-                const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/location/country`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${admintoken}`,
-                        },
-                    }
+    const fetchcountry = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(
+                `http://localhost:3001/api/location/country`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text:
+                        errorMessage.error ||
+                        errorMessage.message ||
+                        "Your session has expired. Please log in again.",
+                });
+                throw new Error(
+                    errorMessage.message || errorMessage.error || "Something Wrong!"
                 );
-    
-                if (!response.ok) {
-                    const errorMessage = await response.json();
-                    Swal.fire({
-                        icon: "error",
-                        title: "Something Wrong!",
-                        text:
-                            errorMessage.error ||
-                            errorMessage.message ||
-                            "Your session has expired. Please log in again.",
-                    });
-                    throw new Error(
-                        errorMessage.message || errorMessage.error || "Something Wrong!"
-                    );
-                }
-    
-                const result = await response.json();
-                if (result) {
-                    setCountryData(result?.countries || []);
-                }
-            } catch (error) {
-                console.error("Error fetching categories:", error);
-            } finally {
-                setLoading(false);
             }
-        }, [router, setCountryData]);
-    
+
+            const result = await response.json();
+            if (result) {
+                setCountryData(result?.countries || []);
+            }
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, setCountryData]);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -295,7 +295,7 @@ export default function List() {
             await verifyAdminAuth();
             await fetchRto();
 
-         
+
             setLoading(false);
         };
         fetchData();
@@ -379,7 +379,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item.id}`,
+                `http://localhost:3001/api/high-rto/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -440,7 +440,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item?.id}/restore`,
+                `http://localhost:3001/api/high-rto/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -519,7 +519,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/high-rto/${item.id}/destroy`,
+                `http://localhost:3001/api/high-rto/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -562,16 +562,16 @@ export default function List() {
             setLoading(false);
         }
     };
-  if (loading) {
-          return (
-              <div className="flex items-center justify-center h-[80vh]">
-                  <HashLoader size={60} color="#F97316" loading={true} />
-              </div>
-          );
-      }
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
+    }
 
-         
-                  
+
+
     return (
         <>
 
@@ -595,114 +595,114 @@ export default function List() {
                             )}
                         </button>
                         <div className="flex justify-start gap-5 items-end">
-                        <button
-                                    className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-                                    onClick={async () => {
-                                        if (isTrashed) {
-                                            setIsTrashed(false);
-                                            await fetchRto();
-                                        } else {
-                                            setIsTrashed(true);
-                                            await trashedRto();
-                                        }
-                                    }}
-                                >
-                                    {isTrashed ? "High Rto Listing (Simple)" : "Trashed High Rto"}
-                                </button>
+                            <button
+                                className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                onClick={async () => {
+                                    if (isTrashed) {
+                                        setIsTrashed(false);
+                                        await fetchRto();
+                                    } else {
+                                        setIsTrashed(true);
+                                        await trashedRto();
+                                    }
+                                }}
+                            >
+                                {isTrashed ? "High Rto Listing (Simple)" : "Trashed High Rto"}
+                            </button>
                             <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/high-rto/create">Add New</Link></button>
                         </div>
                     </div>
                 </div>
-              {data.length > 0 ?(
-                      <div className="overflow-x-auto relative main-outer-wrapper w-full">
-            <table className="md:w-full w-auto display main-tables" id="rto-table">
-                      <thead>
-                          <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">State</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">City</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pincode</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {data.map((item) => (
-                              <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                              <td className="px-6 py-4">
+                {data.length > 0 ? (
+                    <div className="overflow-x-auto relative main-outer-wrapper w-full">
+                        <table className="md:w-full w-auto display main-tables" id="rto-table">
+                            <thead>
+                                <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">State</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">City</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Pincode</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.map((item) => (
+                                    <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                        <td className="px-6 py-4">
                                             {
                                                 (() => {
-                                                const filtered = countryData.filter((c) => {
-                                                    const match = c.id === item.countryId;
-                                                    return match;
-                                                });
+                                                    const filtered = countryData.filter((c) => {
+                                                        const match = c.id === item.countryId;
+                                                        return match;
+                                                    });
 
 
-                                                const names = filtered.map((c) => {
-                                                    return c.name;
-                                                });
-                                                return names.join(', ');
+                                                    const names = filtered.map((c) => {
+                                                        return c.name;
+                                                    });
+                                                    return names.join(', ');
                                                 })()
                                             }
-                                            </td> 
-                                              <td className="px-6 py-4">
+                                        </td>
+                                        <td className="px-6 py-4">
                                             {
                                                 (() => {
-                                                const filtered = stateData.filter((c) => {
-                                                    const match = c.id === item.stateId;
-                                                    return match;
-                                                });
+                                                    const filtered = stateData.filter((c) => {
+                                                        const match = c.id === item.stateId;
+                                                        return match;
+                                                    });
 
 
-                                                const names = filtered.map((c) => {
-                                                    return c.name;
-                                                });
-                                                return names.join(', ');
+                                                    const names = filtered.map((c) => {
+                                                        return c.name;
+                                                    });
+                                                    return names.join(', ');
                                                 })()
                                             }
-                                            </td> 
-                                            <td className="px-6 py-4">
+                                        </td>
+                                        <td className="px-6 py-4">
                                             {
                                                 (() => {
-                                                const filtered = cityData.filter((c) => {
-                                                    const match = c.id === item.cityId;
-                                                    return match;
-                                                });
+                                                    const filtered = cityData.filter((c) => {
+                                                        const match = c.id === item.cityId;
+                                                        return match;
+                                                    });
 
 
-                                                const names = filtered.map((c) => {
-                                                    return c.name;
-                                                });
-                                                return names.join(', ');
+                                                    const names = filtered.map((c) => {
+                                                        return c.name;
+                                                    });
+                                                    return names.join(', ');
                                                 })()
                                             }
-                                            </td>  
-                                           
-                                  <td className="p-2 whitespace-nowrap px-5">{item.pincode}</td>
-                                  <td className="p-2 px-5 text-[#8F9BBA] text-center">
+                                        </td>
 
-                                    <div className="flex justify-end gap-2">{isTrashed ? (
-                                        <>
-                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
-                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
-                                        </>
-                                    )}</div>
+                                        <td className="p-2 whitespace-nowrap px-5">{item.pincode}</td>
+                                        <td className="p-2 px-5 text-[#8F9BBA] text-center">
 
-                                  </td>
-                              </tr>
-                          ))}
-                      </tbody>
-                  </table>
-              </div>
-              ):(
-                <p className="text-center">No Rto Found</p>
-              )}
+                                            <div className="flex justify-end gap-2">{isTrashed ? (
+                                                <>
+                                                    <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                                                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
+                                                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                                </>
+                                            )}</div>
 
-               
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p className="text-center">No Rto Found</p>
+                )}
+
+
             </div>
 
 

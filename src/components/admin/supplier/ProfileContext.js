@@ -8,10 +8,11 @@ const ProfileContext = createContext();
 const ProfileProvider = ({ children }) => {
   const [errors, setErrors] = useState({});
   const [businessErrors, setBusinessErrors] = useState({});
+  const [activeMainTab, setActiveMainTab] = useState('create-supplier');
+  const [activeSubTab, setActiveSubTab] = useState('profile-edit');
 
   const [loading, setLoading] = useState(false);
   const [countryData, setCountryData] = useState([]);
-  const [activeTab, setActiveTab] = useState("profile-edit");
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -65,7 +66,7 @@ const ProfileProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country`, {
+      const response = await fetch(`http://localhost:3001/api/location/country`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -138,7 +139,7 @@ const ProfileProvider = ({ children }) => {
     return Object.keys(newErrors).length === 0;
   };
   return (
-    <ProfileContext.Provider value={{ fetchCountry, errors, businessErrors, setBusinessErrors, validate, requiredFields, validateBusiness, setErrors, formData, activeTab, countryData, setActiveTab, setFormData }}>
+    <ProfileContext.Provider value={{ fetchCountry, errors,activeMainTab, setActiveMainTab, businessErrors, setBusinessErrors, validate, requiredFields, validateBusiness, setErrors, formData, activeSubTab, setActiveSubTab, countryData, setFormData }}>
       {children}
     </ProfileContext.Provider>
   );

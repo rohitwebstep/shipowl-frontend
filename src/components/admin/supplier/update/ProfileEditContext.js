@@ -50,19 +50,8 @@ const ProfileEditProvider = ({ children }) => {
       additionalDocumentUpload: "", 
       documentId: "",
       documentName: "",
-      documentImage: "",  
-      cancelledChequeImage_0:"",      
-      bankAccounts: [
-        {
-        accountHolderName: "",
-        accountNumber: "",
-        bankName: "",
-        bankBranch: "",
-        accountType: "",
-        ifscCode: "",
-        }
+      documentImage: "",       
       
-      ],
   });
 
     const fetchCountry = useCallback(async () => {
@@ -81,7 +70,7 @@ const ProfileEditProvider = ({ children }) => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country`, {
+            const response = await fetch(`http://localhost:3001/api/location/country`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

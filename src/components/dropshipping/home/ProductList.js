@@ -50,7 +50,7 @@ const ProductList = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product?type=all`,
+        `http://localhost:3001/api/dropshipper/product?type=all`,
         {
           method: "GET",
           headers: {
@@ -127,7 +127,7 @@ const ProductList = () => {
       form.append('price', inventoryData.price);
       form.append('status', inventoryData.status);
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product";
+      const url = "http://localhost:3001/api/dropshipper/product";
 
       const response = await fetch(url, {
         method: "POST",

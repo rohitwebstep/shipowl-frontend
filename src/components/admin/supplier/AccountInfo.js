@@ -1,7 +1,6 @@
 'use client';
 
-import { useContext, useState } from 'react';
-import { ProfileContext } from './ProfileContext';
+import {useState } from 'react';
 import BankAccountList from './BankAccountList';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
@@ -75,7 +74,7 @@ const handleChange = (e) => {
       didOpen: () => Swal.showLoading(),
     });
 
-    const url = "https://sleeping-owl-we0m.onrender.com/api/supplier/profile/bank-account/change-request";
+    const url = "http://localhost:3001/api/supplier/profile/bank-account/change-request";
     const form = new FormData();
 
     for (const key in formData) {

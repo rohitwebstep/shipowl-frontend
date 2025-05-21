@@ -31,7 +31,7 @@ export default function NewProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/product/request`,
+                `http://localhost:3001/api/product/request`,
                 {
                     method: "GET",
                     headers: {

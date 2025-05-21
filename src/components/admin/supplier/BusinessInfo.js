@@ -74,7 +74,7 @@ const BusinessInfo = () => {
     try {
       setStateLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+        `http://localhost:3001/api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -119,7 +119,7 @@ const BusinessInfo = () => {
 
     try {
       setCityLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+      const response = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -174,7 +174,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/supplier";
+      const url = "http://localhost:3001/api/supplier";
       const form = new FormData();
 
       for (const key in formData) {
@@ -311,7 +311,7 @@ const BusinessInfo = () => {
     label: city.name,
   }));
   return (
-    <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 rounded-tl-none rounded-tr-none rounded-2xl">
+    <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 md:w-10/12 rounded-tl-none rounded-tr-none rounded-2xl">
       <div className="grid lg:grid-cols-3 py-5 gap-4">
         {/* Company Name, Brand Name, Short Brand Name */}
         <div>
@@ -490,7 +490,7 @@ const BusinessInfo = () => {
               <input
                 type={type}
                 name={name}
-                {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name], onChange: handleChange })}
+                {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name] || '', onChange: handleChange })}
                 className={inputClasses(name)}
               />
               {renderError(name)}
@@ -535,7 +535,7 @@ const BusinessInfo = () => {
             <input
               type={type}
               name={name}
-              {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name], onChange: handleChange })}
+              {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name] || '', onChange: handleChange })}
               className={inputClasses(name)}
             />
           </div>

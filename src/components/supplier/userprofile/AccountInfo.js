@@ -3,7 +3,7 @@
 import { useContext, useState } from 'react';
 import { ProfileContext } from './ProfileContext';
 import Swal from 'sweetalert2';
-import { useRouter,useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
@@ -11,7 +11,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 const AccountInfo = () => {
-  const { formData, setFormData,files } = useContext(ProfileContext);
+  const { formData, setFormData, files } = useContext(ProfileContext);
   const [errors, setErrors] = useState([{}]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -38,89 +38,89 @@ const AccountInfo = () => {
     if (files.length > 0) {
       const updatedAccounts = [...formData.bankAccounts];
       const imageKey = 'cancelledChequeImage';
-  
+
       // Initialize as array if not present or not an array
       if (!Array.isArray(updatedAccounts[index][imageKey])) {
         updatedAccounts[index][imageKey] = [];
       }
-  
+
       updatedAccounts[index][imageKey].push(...files); // Add multiple files
       setFormData({ ...formData, bankAccounts: updatedAccounts });
     }
   };
-  
 
-   const handleImageDelete = async (index,type,id) => {
-              setLoading(true);
-      
-              const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-              if (dropshipperData?.project?.active_panel !== "supplier") {
-                  localStorage.removeItem("shippingData");
-                  router.push("/supplier/auth/login");
-                  return;
-              }
-      
-              const token = dropshipperData?.security?.token;
-              if (!token) {
-                  router.push("/supplier/auth/login");
-                  return;
-              }
-      
-              try {
-                  Swal.fire({
-                      title: 'Deleting Image...',
-                      text: 'Please wait while we remove the image.',
-                      allowOutsideClick: false,
-                      didOpen: () => {
-                          Swal.showLoading();
-                      }
-                  });
-      
-                  const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${formData.id}/bank-account/${id}/image/${index}?type=${type}`;
-                  const response = await fetch(url, {
-                      method: "DELETE",
-                      headers: {
-                          Authorization: `Bearer ${token}`,
-                      },
-                  });
-      
-                  if (!response.ok) {
-                      Swal.close();
-                      const errorMessage = await response.json();
-                      Swal.fire({
-                          icon: "error",
-                          title: "Delete Failed",
-                          text: errorMessage.message || errorMessage.error || "An error occurred",
-                      });
-                      throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
-                  }
-      
-                  const result = await response.json();
-                  Swal.close();
-      
-                  if (result) {
-                      Swal.fire({
-                          icon: "success",
-                          title: "Image Deleted",
-                          text: `The image has been deleted successfully!`,
-                          showConfirmButton: true,
-                      }).then((res) => {
-                          if (res.isConfirmed) {
-                          }
-                      });
-                  }
-              } catch (error) {
-                  console.error("Error:", error);
-                  Swal.close();
-                  Swal.fire({
-                      icon: "error",
-                      title: "Submission Error",
-                      text: error.message || "Something went wrong. Please try again.",
-                  });
-              } finally {
-                  setLoading(false);
-              }
-          };
+
+  const handleImageDelete = async (index, type, id) => {
+    setLoading(true);
+
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    if (dropshipperData?.project?.active_panel !== "supplier") {
+      localStorage.removeItem("shippingData");
+      router.push("/supplier/auth/login");
+      return;
+    }
+
+    const token = dropshipperData?.security?.token;
+    if (!token) {
+      router.push("/supplier/auth/login");
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: 'Deleting Image...',
+        text: 'Please wait while we remove the image.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const url = `http://localhost:3001/api/supplier/${formData.id}/bank-account/${id}/image/${index}?type=${type}`;
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        Swal.close();
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: errorMessage.message || errorMessage.error || "An error occurred",
+        });
+        throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+      }
+
+      const result = await response.json();
+      Swal.close();
+
+      if (result) {
+        Swal.fire({
+          icon: "success",
+          title: "Image Deleted",
+          text: `The image has been deleted successfully!`,
+          showConfirmButton: true,
+        }).then((res) => {
+          if (res.isConfirmed) {
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Submission Error",
+        text: error.message || "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validate = () => {
     const newErrors = formData.bankAccounts.map(account => {
@@ -192,35 +192,35 @@ const AccountInfo = () => {
           }
         });
 
-        const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/profile/update`; // Ensure the URL is correct
+        const url = `http://localhost:3001/api/supplier/profile/update`; // Ensure the URL is correct
         const form = new FormData();
-       console.log('files',files)
+        console.log('files', files)
         for (const key in files) {
           const value = files[key];
-          console.log('key',key)
+          console.log('key', key)
 
           // Skip null, undefined, or empty values
           if (value === null || value === undefined || value === '') continue;
-      
+
           // Special handling for file inputs
           if (['panCardImage', 'gstDocument', 'additionalDocumentUpload', 'documentImage', 'aadharCardImage', 'profilePicture'].includes(key)) {
-              if (Array.isArray(value)) {
-                  // Append each file in the array
-                  value.forEach(file => {
-                      form.append(key, file, file.name);
-                  });
-              } else if (value instanceof File) {
-                  // Single file input
-                  form.append(key, value, value.name);
-              }
+            if (Array.isArray(value)) {
+              // Append each file in the array
+              value.forEach(file => {
+                form.append(key, file, file.name);
+              });
+            } else if (value instanceof File) {
+              // Single file input
+              form.append(key, value, value.name);
+            }
           }
-      }
+        }
         for (const key in formData) {
           const value = formData[key];
           if (value === null || value === undefined || value === '') continue;
           if (['panCardImage', 'gstDocument', 'additionalDocumentUpload', 'documentImage', 'aadharCardImage', 'profilePicture'].includes(key)) {
             continue;
-        }
+          }
 
           // ✅ Special handling for date fields
           if (key === 'dateOfBirth' && value) {
@@ -240,21 +240,21 @@ const AccountInfo = () => {
           // ✅ bankAccounts array
           else if (key === 'bankAccounts') {
             value.forEach((bank, bankIndex) => {
-                const file = bank['cancelledChequeImage'];
-                const fileNameWithIndex = `cancelledChequeImage${bankIndex}`;
-        
-                if (Array.isArray(file)) {
-                    // Append each file in the array
-                    file.forEach(fileItem => {
-                        form.append(fileNameWithIndex, fileItem, fileItem.name);
-                    });
-                } else if (file instanceof File) {
-                    // Single file input
-                    form.append(fileNameWithIndex, file, file.name);
-                }
+              const file = bank['cancelledChequeImage'];
+              const fileNameWithIndex = `cancelledChequeImage${bankIndex}`;
+
+              if (Array.isArray(file)) {
+                // Append each file in the array
+                file.forEach(fileItem => {
+                  form.append(fileNameWithIndex, fileItem, fileItem.name);
+                });
+              } else if (file instanceof File) {
+                // Single file input
+                form.append(fileNameWithIndex, file, file.name);
+              }
             });
             form.append('bankAccounts', JSON.stringify(value));
-        }
+          }
           // ✅ Other arrays
           else if (Array.isArray(value)) {
             form.append(key, JSON.stringify(value));
@@ -328,7 +328,7 @@ const AccountInfo = () => {
       {formData.bankAccounts.map((account, index) => (
         <div key={index} className="grid lg:grid-cols-3 items-center border p-3 rounded-md mb-3 gap-4 py-5">
           {/* Form Fields for Account Info */}
-          {[ 
+          {[
             ['Account Holder Name', 'accountHolderName'],
             ['Account Number', 'accountNumber'],
             ['Bank Name', 'bankName'],
@@ -344,11 +344,10 @@ const AccountInfo = () => {
                 name={name}
                 value={account[name]}
                 onChange={(e) => handleChange(index, e)}
-                className={`w-full p-3 border rounded-lg font-bold ${
-                  errors[index]?.[name]
+                className={`w-full p-3 border rounded-lg font-bold ${errors[index]?.[name]
                     ? 'border-red-500 text-red-500'
                     : 'border-[#DFEAF2] text-[#718EBF]'
-                }`}
+                  }`}
               />
               {errors[index]?.[name] && (
                 <p className="text-red-500 text-sm mt-1">{errors[index][name]}</p>
@@ -365,11 +364,10 @@ const AccountInfo = () => {
               name="accountType"
               value={account.accountType}
               onChange={(e) => handleChange(index, e)}
-              className={`w-full p-3 border rounded-lg font-bold ${
-                errors[index]?.accountType
+              className={`w-full p-3 border rounded-lg font-bold ${errors[index]?.accountType
                   ? 'border-red-500 text-red-500'
                   : 'border-[#DFEAF2] text-[#718EBF]'
-              }`}
+                }`}
             >
               <option value="">Select Type</option>
               <option value="Savings">Savings</option>
@@ -391,49 +389,49 @@ const AccountInfo = () => {
               className="w-full p-3 border rounded-lg font-bold"
             />
 
-{account.cancelledChequeImages && (
-  <Swiper navigation modules={[Navigation]} spaceBetween={10} slidesPerView={3}>
-    {(
-      Array.isArray(account.cancelledChequeImages)
-        ? account.cancelledChequeImages
-        : account.cancelledChequeImages.split(',')
-    ).map((img, imgIndex) => (
-      <SwiperSlide key={imgIndex}>
-        <div className="relative">
-          {/* Delete Button */}
-          <button
-            type="button"
-            className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-            onClick={() => {
-              Swal.fire({
-                title: 'Are you sure?',
-                text: 'Do you want to delete this image?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!',
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  handleImageDelete(imgIndex, 'cancelledChequeImage');
-                }
-              });
-            }}
-          >
-            ✕
-          </button>
-          <Image
-            src={`https://placehold.co/600x400?text=${imgIndex + 1}` || img.trim()}
-            alt={`Image ${imgIndex + 1}`}
-            width={500}
-            height={500}
-            className="me-3 p-2 object-cover rounded"
-          />
-        </div>
-      </SwiperSlide>
-    ))}
-  </Swiper>
-)}
+            {account.cancelledChequeImages && (
+              <Swiper navigation modules={[Navigation]} spaceBetween={10} slidesPerView={3}>
+                {(
+                  Array.isArray(account.cancelledChequeImages)
+                    ? account.cancelledChequeImages
+                    : account.cancelledChequeImages.split(',')
+                ).map((img, imgIndex) => (
+                  <SwiperSlide key={imgIndex}>
+                    <div className="relative">
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                        onClick={() => {
+                          Swal.fire({
+                            title: 'Are you sure?',
+                            text: 'Do you want to delete this image?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Yes, delete it!',
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                              handleImageDelete(imgIndex, 'cancelledChequeImage');
+                            }
+                          });
+                        }}
+                      >
+                        ✕
+                      </button>
+                      <Image
+                        src={`https://placehold.co/600x400?text=${imgIndex + 1}` || img.trim()}
+                        alt={`Image ${imgIndex + 1}`}
+                        width={500}
+                        height={500}
+                        className="me-3 p-2 object-cover rounded"
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
 
           </div>
 

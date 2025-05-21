@@ -72,7 +72,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product?type=${type}`, {
+            const response = await fetch(`http://localhost:3001/api/supplier/product?type=${type}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -118,7 +118,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/trashed`, {
+            const response = await fetch(`http://localhost:3001/api/supplier/product/my/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -164,7 +164,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category`,
+                `http://localhost:3001/api/category`,
                 {
                     method: "GET",
                     headers: {
@@ -237,7 +237,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${item.id}`,
+                `http://localhost:3001/api/supplier/product/my/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -319,7 +319,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${item.id}/destroy`,
+                `http://localhost:3001/api/supplier/product/my/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -381,7 +381,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${item?.id}/restore`,
+                `http://localhost:3001/api/supplier/product/my/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -490,7 +490,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${item.id}`,
+                `http://localhost:3001/api/supplier/product/my/${item.id}`,
                 {
                     method: "GET",
                     headers: {
@@ -564,7 +564,7 @@ const ProductTable = () => {
             form.append('price', inventoryData.price);
             form.append('status', inventoryData.status);
 
-            const url = isEdit ? `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${id}` : "https://sleeping-owl-we0m.onrender.com/api/supplier/product";
+            const url = isEdit ? `http://localhost:3001/api/supplier/product/my/${id}` : "http://localhost:3001/api/supplier/product";
 
             const response = await fetch(url, {
                 method: isEdit ? 'PUT' : "POST",
