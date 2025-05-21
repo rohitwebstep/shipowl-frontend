@@ -37,7 +37,7 @@ export default function DropshipperMiddleWareProvider({ children }) {
         }
 
         try {
-            const response = await fetch(`http://localhost:3001/api/dropshipper/auth/verify`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/auth/verify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

@@ -12,10 +12,9 @@ import 'swiper/css/navigation';
 import Select from 'react-select';
 
 const BusinessInfo = () => {
-  const { formData, requiredFields, businessErrors, validateBusiness, setBusinessErrors, setFiles, setFormData, stateData, cityData, setCityData, setStateData, setActiveTab, countryData, fetchCountry } = useContext(ProfileContext);
+  const { formData, requiredFields, businessErrors, validateBusiness, setBusinessErrors, files, setFiles, setFormData, stateData, cityData, setCityData, setStateData, setActiveTab, countryData } = useContext(ProfileContext);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -50,9 +49,6 @@ const BusinessInfo = () => {
     }));
   };
 
-  useEffect(() => {
-    fetchCountry();
-  }, [fetchCountry]);
 
   const fetchState = useCallback(async (id) => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -71,7 +67,7 @@ const BusinessInfo = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:3001/api/location/country/${id}/states`,
+        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -116,7 +112,7 @@ const BusinessInfo = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -168,7 +164,7 @@ const BusinessInfo = () => {
         }
       });
 
-      const url = `http://localhost:3001/api/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -242,7 +238,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = `http://localhost:3001/api/supplier/profile/update`; // Ensure the URL is correct
+      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/profile/update`; // Ensure the URL is correct
       const form = new FormData();
       for (const key in files) {
         const value = files[key];
@@ -265,28 +261,12 @@ const BusinessInfo = () => {
         }
       }
       for (const key in formData) {
-        const value = formData[key];
-
-        if (value === null || value === undefined || value === '') continue;
-
-        if (
-          ['panCardImage', 'gstDocument', 'additionalDocumentUpload', 'documentImage', 'aadharCardImage', 'profilePicture'].includes(key)
-        ) {
-          if (Array.isArray(value)) {
-            value.forEach(file => form.append(key, file, file.name));
-          } else if (value instanceof File) {
-            form.append(key, value, value.name);
-          }
-        } else if (key === 'dateOfBirth' && value) {
-          const formattedDate = new Date(value).toLocaleDateString('en-GB');
+        if (key === 'dateOfBirth' && formData[key]) {
+          const formattedDate = new Date(formData[key]).toLocaleDateString('en-GB');
           form.append(key, formattedDate);
-        } else if (value instanceof FileList) {
-          Array.from(value).forEach(file => form.append(key, file));
-
-        } else if (Array.isArray(value) || typeof value === 'object') {
-          form.append(key, JSON.stringify(value));
-        } else {
-          form.append(key, value);
+          console.log(typeof formattedDate); // Should be string
+        } else if (formData[key] !== null && formData[key] !== '') {
+          form.append(key, formData[key]);
         }
       }
 
@@ -642,8 +622,9 @@ const BusinessInfo = () => {
             onChange={handleChange}
             className={inputClasses('panCardImage')}
           />
-          <div className="py-6">
-            {formData.panCardImage?.length > 0 && (
+
+          {formData.panCardImage?.length > 0 && (
+            <div className="py-6">
               <div className="mt-2">
                 <Swiper
                   key={formData.id}
@@ -688,10 +669,10 @@ const BusinessInfo = () => {
                     </SwiperSlide>
                   ))}
                 </Swiper>
-              </div>
-            )}
+              </div>    </div>
+          )}
 
-          </div>
+
         </div>
 
         {/* Aadhar Card Image Upload */}
@@ -704,8 +685,8 @@ const BusinessInfo = () => {
             onChange={handleChange}
             className={inputClasses('aadharCardImage')}
           />
-          <div className="py-6">
             <div className="mt-2">
+          <div className="py-6">
               {formData?.aadharCardImage?.length > 0 && (
 
                 <Swiper

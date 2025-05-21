@@ -13,6 +13,7 @@ export default function Register() {
   const [countryData, setCountryData] = useState([]);
   const [states, setStates] = useState([]);
   const [city, setCity] = useState([]);
+  const [country, setCountry] = useState([]);
   const [stateData, setStateData] = useState([]);
   const [cityData, setCityData] = useState([]);
   const [errors, setErrors] = useState({});
@@ -21,6 +22,7 @@ export default function Register() {
   const [loadingCities, setLoadingCities] = useState(false);
   const [billingStateLoading, setBillingStateLoading] = useState(false);
   const [billingCityLoading, setBillingCityLoading] = useState(false);
+  const [billingCountryLoading, setBillingCountryLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -130,19 +132,19 @@ export default function Register() {
     const token = dropshipperData?.security?.token;
 
     const data = new FormData();
-    
- for (const key in formData) {
-  if (key === 'dateOfBirth' && formData[key]) {
-    const formattedDate = new Date(formData[key]).toLocaleDateString('en-GB');
-    data.append(key, formattedDate);
-    console.log(typeof formattedDate); // Should be string
-  } else if (formData[key] !== null && formData[key] !== '') {
-    data.append(key, formData[key]);
-  }
-}
+
+    for (const key in formData) {
+      if (key === 'dateOfBirth' && formData[key]) {
+        const formattedDate = new Date(formData[key]).toLocaleDateString('en-GB');
+        data.append(key, formattedDate);
+        console.log(typeof formattedDate); // Should be string
+      } else if (formData[key] !== null && formData[key] !== '') {
+        data.append(key, formData[key]);
+      }
+    }
 
     try {
-      const res = await fetch(`http://localhost:3001/api/supplier/auth/registration`, {
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/registration`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -215,16 +217,16 @@ export default function Register() {
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "http://localhost:3001/api/location/country",
+      "https://sleeping-owl-we0m.onrender.com/api/location/country",
       setCountryData,
       "countries",             // ✅ make sure backend response uses this key
       setLoadingCountries
     );
   }, [fetchProtected]);
 
-  const fetchState = useCallback(() => {
+  const fetchState = useCallback((countryId) => {
     fetchProtected(
-      "http://localhost:3001/api/location/state",
+      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
       setStates,
       "states",         // ⚠️ verify that your API returns a `billingstates` key
       setBillingStateLoading
@@ -233,7 +235,7 @@ export default function Register() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `http://localhost:3001/api/location/country/${countryId}/states`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -242,7 +244,7 @@ export default function Register() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `http://localhost:3001/api/location/state/${stateId}/cities`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities
@@ -251,10 +253,18 @@ export default function Register() {
 
   const fetchCity2 = useCallback((stateId) => {
     fetchProtected(
-      `http://localhost:3001/api/location/state/${stateId}/cities`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
       setCity,
       "cities",               // ⚠️ This key must match your API response structure
       setBillingCityLoading
+    );
+  }, [fetchProtected]);
+  const fetchContry2 = useCallback(() => {
+    fetchProtected(
+      `https://sleeping-owl-we0m.onrender.com/api/location/country`,
+      setCountry,
+      "countries",               // ⚠️ This key must match your API response structure
+      setBillingCountryLoading
     );
   }, [fetchProtected]);
 
@@ -267,8 +277,8 @@ export default function Register() {
 
   useEffect(() => {
     fetchCountryAndState();
-    fetchState();
-  }, [fetchCountryAndState, fetchState]);
+    fetchContry2();
+  }, [fetchCountryAndState]);
 
   if (loading) {
     return (
@@ -284,7 +294,7 @@ export default function Register() {
       className="md:w-8/12 mx-auto p-8 bg-white rounded-xl shadow-lg space-y-8 border border-gray-100"
     >
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Create an Account</h2>
-      <div className="space-y-4">
+      <div className="">
         <h3 className="text-lg font-semibold text-gray-700  pb-2">Profile Photo</h3>
 
         <div className="w-full space-y-3">
@@ -320,7 +330,7 @@ export default function Register() {
 
 
         {/* Basic Info */}
-        <div className="  pt-4 grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="  grid grid-cols-1 md:grid-cols-2 gap-2">
           <h3 className="text-lg md:col-span-2 font-semibold text-gray-700  pb-2">Basic Info</h3>
 
           <div>
@@ -412,7 +422,7 @@ export default function Register() {
               name="currentAddress"
               value={formData.currentAddress || ''}
               onChange={handleChange}
-              rows={3}
+              rows={2}
               className={`w-full border rounded px-3 py-2 ${errors.currentAddress ? "border-red-600" : "border-gray-300"
                 }`}
             />
@@ -423,7 +433,7 @@ export default function Register() {
         </div>
 
         {/* Permanent Address */}
-        <div className=" pt-4 space-y-4">
+        <div className=" ">
           <h3 className="text-lg font-semibold text-gray-700  pb-2">Permanent Address</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -521,10 +531,17 @@ export default function Register() {
         </div>
 
         {/* Company & Brand Info */}
-        <div className=" pt-4 space-y-4">
+      
+
+        {/* Billing Address */}
+        
+
+
+      </div>
+        <div className=" ">
           <h3 className="text-lg font-semibold text-gray-700  pb-2">Company & Brand Information</h3>
 
-          <div className="grid gap-3">
+          <div className="grid md:grid-cols-3 gap-3">
             <div>
               <label className="block text-sm mb-1" htmlFor="companyName">
                 Company Name <span className="text-red-600">*</span>
@@ -580,12 +597,10 @@ export default function Register() {
             </div>
           </div>
         </div>
-
-        {/* Billing Address */}
-        <div className=" pt-4 space-y-4">
+      <div className=" ">
           <h3 className="text-lg font-semibold text-gray-700  pb-2">Billing Address</h3>
 
-          <div className="  gap-2">
+          <div className=" gap-2">
             <div className="md:col-span-2">
               <label className="block text-sm mb-1" htmlFor="billingAddress">
                 Address <span className="text-red-600">*</span>
@@ -622,14 +637,18 @@ export default function Register() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {['billingState', 'billingCity'].map((field) => {
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {['billingCountry', 'billingState', 'billingCity'].map((field) => {
                 const loading =
+                  (field === 'billingCountry' && billingCountryLoading) ||
                   (field === 'billingState' && billingStateLoading) ||
                   (field === 'billingCity' && billingCityLoading);
-
                 const options = selectOptions(
-                  field === 'billingState' ? states : city
+                  field === 'billingCountry'
+                    ? country
+                    : field === 'billingState'
+                      ? states
+                      : city
                 );
 
                 return (
@@ -645,6 +664,7 @@ export default function Register() {
                         const value = selectedOption ? selectedOption.value : '';
                         setFormData((prev) => ({ ...prev, [field]: value }));
 
+                        if (field === 'billingCountry') fetchState(value);
                         if (field === 'billingState') fetchCity2(value);
                       }}
                       options={options}
@@ -667,9 +687,6 @@ export default function Register() {
           </div>
 
         </div>
-
-
-      </div>
       <button
         type="submit"
         className="w-auto px-10 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded"

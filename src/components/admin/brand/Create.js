@@ -83,7 +83,7 @@ export default function Create() {
 
         try {
             Swal.fire({
-                title: isEdit ? 'Updating Brand...' : 'Creating Brand...',
+                title: 'Creating Brand...',
                 text: 'Please wait while we save your brand.',
                 allowOutsideClick: false,
                 didOpen: () => {
@@ -102,7 +102,7 @@ export default function Create() {
                 });
             }
 
-            const url = "http://localhost:3001/api/brand";
+            const url = "https://sleeping-owl-we0m.onrender.com/api/brand";
 
             const response = await fetch(url, {
                 method: "POST",

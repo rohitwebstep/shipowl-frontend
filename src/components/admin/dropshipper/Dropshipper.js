@@ -38,7 +38,7 @@ const Dropshipper = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/dropshipper`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/dropshipper`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -84,7 +84,7 @@ const Dropshipper = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/dropshipper/trashed`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/dropshipper/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -197,7 +197,7 @@ const Dropshipper = () => {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/dropshipper/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -279,7 +279,7 @@ const Dropshipper = () => {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/dropshipper/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -341,7 +341,7 @@ const Dropshipper = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/dropshipper/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -409,7 +409,7 @@ const Dropshipper = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/city`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -456,7 +456,7 @@ const Dropshipper = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/state`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
                 {
                     method: "GET",
                     headers: {

@@ -3,8 +3,9 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect,useContext } from "react";
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
+import { ProfileContext } from './ProfileContext';
 const ProfileList = () => {
     const [suppliers, setSuppliers] = useState([]);
     const { verifySupplierAuth } = useSupplier();
@@ -14,6 +15,7 @@ const ProfileList = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
 
+  const {setActiveTab} = useContext(ProfileContext);
 
     const fetchSupplier = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -32,7 +34,7 @@ const ProfileList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/supplier/profile`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/profile`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -78,7 +80,7 @@ const ProfileList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/city`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -125,7 +127,7 @@ const ProfileList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/location/state`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
                 {
                     method: "GET",
                     headers: {
@@ -178,6 +180,7 @@ const ProfileList = () => {
 
 
     const handleEdit = () => {
+        setActiveTab('profile-edit')
         router.push(`/supplier/profile/update`);
     }
     const handleEditBank = () => {

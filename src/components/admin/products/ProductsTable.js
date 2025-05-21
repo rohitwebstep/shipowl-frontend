@@ -4,14 +4,18 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useContext ,useCallback, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
+import { ProductContextEdit } from './ProductContextEdit';
+
 const ProductTable = () => {
+    const { setActiveTab } = useContext(ProductContextEdit);
+
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [showRtoLiveCount, setShowRtoLiveCount] = useState(false);
     const [selectedModel, setSelectedModel] = useState('');
@@ -52,7 +56,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/product`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -98,7 +102,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/product/trashed`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -144,7 +148,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/category`,
+                `https://sleeping-owl-we0m.onrender.com/api/category`,
                 {
                     method: "GET",
                     headers: {
@@ -259,7 +263,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/product/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -341,7 +345,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/product/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -403,7 +407,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/product/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -453,6 +457,7 @@ const ProductTable = () => {
     };
 
     const handleEdit = (id) => {
+        setActiveTab('product-details');
         router.push(`/admin/products/update?id=${id}`);
     }
 
@@ -463,7 +468,7 @@ const ProductTable = () => {
                 <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">Import Inventory</button>
                 <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
                 <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>
-                <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
+                <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() => setActiveTab('product-details')}>
                     <Link href="/admin/products/create">Add New</Link>
                 </button>
                 <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">Filters</button>

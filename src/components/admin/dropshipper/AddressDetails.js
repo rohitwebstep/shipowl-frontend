@@ -32,7 +32,7 @@ const AccountDetails = () => {
 
         try {
             setCityLoading(true);
-            const response = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const AccountDetails = () => {
         try {
           setStateLoading(true);
           const response = await fetch(
-            `http://localhost:3001/api/location/country/${id}/states`,
+            `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
             {
               method: "GET",
               headers: {
@@ -186,7 +186,7 @@ useEffect(() => {
 
    <div className="">
   <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
-    {/* Basic Inputs */}
+   
     {[
       { label: 'Permanent Address', name: 'permanentAddress', type: 'text' },
       { label: 'Postal Code', name: 'permanentPostalCode', type: 'number' },

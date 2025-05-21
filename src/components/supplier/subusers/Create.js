@@ -125,7 +125,7 @@ const handleSubmit = async (e) => {
   });
 
   try {
-    const res = await fetch(`http://localhost:3001/api/supplier`, {
+    const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -191,7 +191,7 @@ const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
 }, [router]);
 const fetchPermission = useCallback(() => {
   fetchProtected(
-    "http://localhost:3001/api/supplier/permission",
+    "https://sleeping-owl-we0m.onrender.com/api/supplier/permission",
     setPermission,
     "permissions",
     setLoading
@@ -200,7 +200,7 @@ const fetchPermission = useCallback(() => {
 
 const fetchCountryAndState = useCallback(() => {
   fetchProtected(
-    "http://localhost:3001/api/location/country",
+    "https://sleeping-owl-we0m.onrender.com/api/location/country",
     setCountryData,
     "countries",
     setLoadingCountries
@@ -209,7 +209,7 @@ const fetchCountryAndState = useCallback(() => {
 
 const fetchStateList = useCallback((countryId) => {
   fetchProtected(
-    `http://localhost:3001/api/location/country/${countryId}/states`,
+    `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
     setStateData,
     "states",
     setLoadingStates
@@ -218,7 +218,7 @@ const fetchStateList = useCallback((countryId) => {
 
 const fetchCity = useCallback((stateId) => {
   fetchProtected(
-    `http://localhost:3001/api/location/state/${stateId}/cities`,
+    `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
     setCityData,
     "cities",
     setLoadingCities

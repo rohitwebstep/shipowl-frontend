@@ -41,7 +41,7 @@ export default function MyProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/product?type=my`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product?type=my`,
                 {
                     method: "GET",
                     headers: {
@@ -108,7 +108,7 @@ export default function MyProducts() {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/dropshipper/product/my/trashed`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -170,7 +170,7 @@ export default function MyProducts() {
             form.append('price', inventoryData.price);
             form.append('status', inventoryData.status);
 
-            const url = `http://localhost:3001/api/dropshipper/product/my/${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${id}`;
 
             const response = await fetch(url, {
                 method: 'PUT',
@@ -265,7 +265,7 @@ export default function MyProducts() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/product/my/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -347,7 +347,7 @@ export default function MyProducts() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/product/my/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -409,7 +409,7 @@ export default function MyProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/product/my/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -468,7 +468,7 @@ export default function MyProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/product/my/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${item.id}`,
                 {
                     method: "GET",
                     headers: {

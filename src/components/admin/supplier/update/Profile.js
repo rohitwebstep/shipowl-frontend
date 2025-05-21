@@ -8,23 +8,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { HashLoader } from 'react-spinners';
 export default function Profile() {
 
-  const { activeTab, validateBusiness, validate, formData, setActiveTab, setFormData, setCityData, setStateData } = useContext(ProfileEditContext);
+  const { activeTab, validateBusiness, validate, fetchCountry, formData, setActiveTab, setFormData, setCityData, setStateData } = useContext(ProfileEditContext);
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const handleTabClick = async (tabId) => {
-    if (activeTab === 'profile-edit') {
-      const isValid = await validate();
-      if (!isValid) return;
-    }
 
-    if (activeTab === 'business-info') {
-      const isValid = await validateBusiness();
-      if (!isValid) return;
-    }
-
-    setActiveTab(tabId);
-  };
 
   const id = searchParams.get("id");
 
@@ -46,7 +34,7 @@ export default function Profile() {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/supplier/${id}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -66,14 +54,25 @@ export default function Profile() {
 
       const result = await response.json();
       const suppliers = result?.supplier || {};
-
       const companyDetail = suppliers?.companyDetail || {};
-      const bankAccounts = suppliers?.bankAccounts || [];
-      if (suppliers.permanentCountryId) {
-        fetchState(suppliers.permanentCountryId);
+      if (activeTab == "profile-edit") {
+        await fetchCountry();
+        if (suppliers.permanentCountryId) {
+          await fetchState(suppliers.permanentCountryId);
+        }
+        if (suppliers.permanentStateId) {
+          await fetchCity(suppliers.permanentStateId);
+        }
       }
-      if (suppliers.permanentStateId) {
-        fetchCity(suppliers.permanentStateId);
+
+      if (activeTab == "business-info") {
+        await fetchCountry();
+        if (companyDetail.billingCountryId) {
+          await fetchState(companyDetail.billingCountryId);
+        }
+        if (companyDetail.billingStateId) {
+          await fetchCity(companyDetail.billingStateId);
+        }
       }
 
       setFormData({
@@ -81,8 +80,7 @@ export default function Profile() {
         id: suppliers.id || "",
         username: suppliers.username || "",
         email: suppliers.email || "",
-        password: "", // keep password empty for security
-        dateOfBirth: suppliers.dateOfBirth || "",
+        dateOfBirth: formData.dateOfBirth || suppliers.dateOfBirth || "",
         currentAddress: suppliers.currentAddress || "",
         permanentAddress: suppliers.permanentAddress || "",
         permanentCity: suppliers.permanentCityId || "",
@@ -96,9 +94,9 @@ export default function Profile() {
         brandShortName: companyDetail.brandShortName || "",
         billingAddress: companyDetail.billingAddress || "",
         billingPincode: companyDetail.billingPincode || "",
-        billingState: companyDetail.billingState || "",
-        billingCountry: companyDetail.billingCountry || "",
-        billingCity: companyDetail.billingCity || "",
+        billingState: companyDetail.billingStateId || "",
+        billingCountry: companyDetail.billingCountryId || "",
+        billingCity: companyDetail.billingCityId || "",
         businessType: companyDetail.businessType || "",
         clientEntryType: companyDetail.clientEntryType || "",
         gstNumber: companyDetail.gstNumber || "",
@@ -140,7 +138,7 @@ export default function Profile() {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/location/state/${formData?.permanentState || id}/cities`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState || id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -167,7 +165,6 @@ export default function Profile() {
     }
   }, [router]);
   const fetchState = useCallback(async (id) => {
-    console.log('id', id)
     const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
     if (adminData?.project?.active_panel !== "admin") {
@@ -185,7 +182,7 @@ export default function Profile() {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:3001/api/location/country/${formData?.permanentCountry || id}/states`,
+        `https://sleeping-owl-we0m.onrender.com/api/location/country/${formData?.permanentCountry || id}/states`,
         {
           method: "GET",
           headers: {
@@ -228,7 +225,20 @@ export default function Profile() {
     { id: "profile-edit", label: "Personal Information" },
     { id: "business-info", label: "Business Information" },
   ];
+  const handleTabClick = async (tabId) => {
+    if (activeTab === 'profile-edit') {
+      const isValid = await validate();
+      if (!isValid) return;
+    }
 
+    if (activeTab === 'business-info') {
+
+      const isValid = await validateBusiness();
+      if (!isValid) return;
+    }
+
+    setActiveTab(tabId);
+  };
 
 
   return (
@@ -240,8 +250,8 @@ export default function Profile() {
             type="button"
             onClick={() => handleTabClick(tab.id)}
             className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${activeTab === tab.id
-                ? 'border-b-3 border-orange-500 text-orange-500'
-                : 'text-[#718EBF]'
+              ? 'border-b-3 border-orange-500 text-orange-500'
+              : 'text-[#718EBF]'
               }`}
           >
             {tab.label}

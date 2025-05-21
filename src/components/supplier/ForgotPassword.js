@@ -19,7 +19,7 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/supplier/auth/password/forget', {
+      const res = await fetch('https://sleeping-owl-we0m.onrender.com/api/supplier/auth/password/forget', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -28,7 +28,7 @@ export default function ForgotPassword() {
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.message || 'Something went wrong');
+        throw new Error(result.message || result.error || 'Something went wrong');
       }
 
       Swal.fire('Success', 'Password reset link sent to your email.', 'success');

@@ -11,7 +11,7 @@ import Select from 'react-select';
 const ProfileEdit = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const { formData,validate ,errors,setErrors ,setFormData,fetchCountry, stateData,cityData, setCityData, setStateData,setActiveTab,countryData} = useContext(ProfileEditContext);
+    const { formData,validate ,errors,setErrors ,setFormData, stateData,cityData, setCityData, setStateData,setActiveTab,countryData} = useContext(ProfileEditContext);
     const [previewUrl, setPreviewUrl] = useState(null);
     const fetchCity = useCallback(async (id) => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -29,7 +29,7 @@ const ProfileEdit = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/location/state/${formData?.permanentState||id}/cities`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState||id}/cities`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -75,7 +75,7 @@ const ProfileEdit = () => {
         try {
           setLoading(true);
           const response = await fetch(
-            `http://localhost:3001/api/location/country/${ formData?.permanentCountry|| id}/states`,
+            `https://sleeping-owl-we0m.onrender.com/api/location/country/${ formData?.permanentCountry|| id}/states`,
             {
               method: "GET",
               headers: {
@@ -154,9 +154,7 @@ const ProfileEdit = () => {
         }
     };
 
-    useEffect(() => {
-        fetchCountry();
-    }, [fetchCountry]);
+   
 
     const inputClasses = (field) =>
         `w-full p-3 border rounded-lg font-bold ${

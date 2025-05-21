@@ -118,6 +118,14 @@ const AccountDetails = () => {
 
           
           </div>
+          <div>
+            <label className="block font-bold  text-[#232323]">Status</label>
+            <select name="status"   onChange={handleChange}
+            className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-1 font-bold } `} value={formData?.status || ''}>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            </div>
  
           <div className="flex space-x-4 mt-6">
             <button

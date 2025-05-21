@@ -36,6 +36,7 @@ const DropshipperProfileProvider = ({ children }) => {
           phoneNumber: "",
           website: "",
           referralCode: "",
+          status:"active",
         
           permanentAddress: "",
           permanentCity: "",
@@ -44,24 +45,14 @@ const DropshipperProfileProvider = ({ children }) => {
           permanentPostalCode: "",
         
           gstNumber: "",
-          gstDocument: null, // or fileInput.files[0]
-          
+          gstDocument: null, 
+        
           panCardHolderName: "",
           aadharCardHolderName: "",
           panCardImage: null, // or fileInput.files[0]
           aadharCardImage: null, // or fileInput.files[0]
         
-          bankAccounts: [
-            {
-              accountHolderName: "",
-              accountNumber: "",
-              bankName: "",
-              bankBranch: "",
-              accountType: "",
-              ifscCode: "",
-              paymentMethod: ""
-            }
-          ]
+          
         });
    const fetchSupplier = useCallback(async () => {
       const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -81,7 +72,7 @@ const DropshipperProfileProvider = ({ children }) => {
   
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3001/api/dropshipper/${id}`, {
+        const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -103,7 +94,7 @@ const DropshipperProfileProvider = ({ children }) => {
         const suppliers = result.dropshipper || {};
         
         const companyDetail = suppliers?.companyDetail || {};
-        const bankAccounts = suppliers?.bankAccounts || [];
+        const bankAccounts = suppliers?.bankAccount || [];
         
         if (suppliers.permanentCountryId) {
           fetchState(suppliers.permanentCountryId);
@@ -112,57 +103,37 @@ const DropshipperProfileProvider = ({ children }) => {
           fetchCity(suppliers.permanentStateId);
         }
 
-        const normalizedBankAccounts = bankAccounts.length > 0
-  ? bankAccounts.map(account => ({
-      id: account.id || "",
-      accountHolderName: account.accountHolderName || "",
-      accountNumber: account.accountNumber || "",
-      bankName: account.bankName || "",
-      bankBranch: account.bankBranch || "",
-      accountType: account.accountType || "",
-      ifscCode: account.ifscCode || "",
-      paymentMethod: account.paymentMethod || ""
-    }))
-  : [
-      {
-        accountHolderName: "",
-        accountNumber: "",
-        bankName: "",
-        bankBranch: "",
-        accountType: "",
-        ifscCode: "",
-        paymentMethod: ""
-      }
-    ];
+      
 
         
-        setFormData({
-          profilePicture: suppliers.profilePicture || null,
-          name: suppliers.name || "",
-          id: suppliers.id || "",
-          email: suppliers.email || "",
-          password: suppliers.password || "",
-          phoneNumber: suppliers.phoneNumber || "",
-          website: companyDetail?.website || "",
-          referralCode: companyDetail?.referralCode || "",
-        
-          permanentAddress: suppliers.permanentAddress || "",
-          permanentCity: suppliers.permanentCityId || "",
-          permanentState: suppliers.permanentStateId || "",
-          permanentCountry: suppliers.permanentCountryId || "",
-          permanentPostalCode: suppliers.permanentPostalCode || "",
-        
-          gstNumber: companyDetail?.gstNumber || "",
-          gstDocument: companyDetail?.gstDocument || null,
-          companyid: companyDetail?.id || null,
-
-          
-          panCardHolderName: companyDetail?.panCardHolderName || "",
-          aadharCardHolderName: companyDetail?.aadharCardHolderName || "",
-          panCardImage: companyDetail?.panCardImage || null,
-          aadharCardImage: companyDetail?.aadharCardImage || null,
-        
-          bankAccounts:normalizedBankAccounts
+         setFormData({
+                   profilePicture: suppliers.profilePicture || null,
+                   name: suppliers.name || "",
+                   id: suppliers.id || "",
+                   email: suppliers.email || "",
+                   password: suppliers.password || "",
+                   phoneNumber: suppliers.phoneNumber || "",
+                   website: suppliers?.website || "",
+                   referralCode: suppliers?.referralCode || "",
+                 
+                   permanentAddress: suppliers.permanentAddress || "",
+                   permanentCity: suppliers.permanentCityId || "",
+                   permanentState: suppliers.permanentStateId || "",
+                   permanentCountry: suppliers.permanentCountryId || "",
+                   permanentPostalCode: suppliers.permanentPostalCode || "",
+                 
+                   gstNumber: companyDetail?.gstNumber || "",
+                   gstDocument: companyDetail?.gstDocument || null,
+                   companyid: companyDetail?.id || null,
+                   status: suppliers?.status || 'active',
+         
+                   
+                   panCardHolderName: companyDetail?.panCardHolderName || "",
+                   aadharCardHolderName: companyDetail?.aadharCardHolderName || "",
+                   panCardImage: companyDetail?.panCardImage || null,
+                   aadharCardImage: companyDetail?.aadharCardImage || null,
+                 
+           
         });
         
         
@@ -191,7 +162,7 @@ const DropshipperProfileProvider = ({ children }) => {
   
           try {
               setLoading(true);
-              const response = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
+              const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
                   method: "GET",
                   headers: {
                       "Content-Type": "application/json",
@@ -211,7 +182,6 @@ const DropshipperProfileProvider = ({ children }) => {
               }
   
               setCityData(result?.cities || []);
-              setStateData(result?.states || []);
           } catch (error) {
               console.error("Error fetching cities:", error);
           } finally {
@@ -236,7 +206,7 @@ const DropshipperProfileProvider = ({ children }) => {
           try {
             setLoading(true);
             const response = await fetch(
-              `http://localhost:3001/api/location/country/${id}/states`,
+              `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
               {
                 method: "GET",
                 headers: {
