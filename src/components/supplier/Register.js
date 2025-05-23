@@ -146,7 +146,7 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch(`http://localhost:3001/api/supplier/auth/registration`, {
+      const res = await fetch(`hhttps://sleeping-owl-we0m.onrender.com/api/supplier/auth/registration`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
