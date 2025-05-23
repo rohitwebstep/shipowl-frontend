@@ -312,7 +312,7 @@ const fetchProducts = useCallback(async () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/category`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/category`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

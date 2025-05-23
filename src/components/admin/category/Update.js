@@ -66,7 +66,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category/${id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/category/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -142,7 +142,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}`;
+            const url = `https://sleeping-owl-we0m.onrender.com/api/admin/category/${id}`;
             const form = new FormData();
             form.append('name', formData.name);
             form.append('description', formData.description);
@@ -236,7 +236,7 @@ export default function Update() {
                     }
                 });
     
-                const url = `https://sleeping-owl-we0m.onrender.com/api/category/${id}/image/${index}`;
+                const url = `https://sleeping-owl-we0m.onrender.com/api/admin/category/${id}/image/${index}`;
     
                 const response = await fetch(url, {
                     method: "DELETE",
