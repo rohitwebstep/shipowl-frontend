@@ -40,7 +40,7 @@ export const useAdminActions = (baseEndpoint, resultKey = "data") => {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/${baseEndpoint}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/${baseEndpoint}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -62,7 +62,7 @@ export const useAdminActions = (baseEndpoint, resultKey = "data") => {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/${baseEndpoint}/trashed`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/${baseEndpoint}/trashed`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -97,7 +97,7 @@ export const useAdminActions = (baseEndpoint, resultKey = "data") => {
 
     try {
       Swal.showLoading();
-      const res = await fetch(`http://localhost:3001/api/${baseEndpoint}/${id}`, {
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/${baseEndpoint}/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -118,7 +118,7 @@ export const useAdminActions = (baseEndpoint, resultKey = "data") => {
     if (!token) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/${baseEndpoint}/${id}/restore`, {
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/${baseEndpoint}/${id}/restore`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -157,7 +157,7 @@ export const useAdminActions = (baseEndpoint, resultKey = "data") => {
     });
 
     try {
-      const response = await fetch(`http://localhost:3001/api/${baseEndpoint}/${id}/destroy`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/${baseEndpoint}/${id}/destroy`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

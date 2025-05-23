@@ -86,7 +86,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/admin/category`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/category`,
                 {
                     method: "GET",
                     headers: {

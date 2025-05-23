@@ -41,7 +41,7 @@ const NewlyLaunched = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/dropshipper/product/inventory?type=${type}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=${type}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +89,7 @@ const NewlyLaunched = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/dropshipper/product/my-inventory/trashed`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/trashed`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -255,7 +255,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:3001/api/dropshipper/product/my-inventory/${item.id}`,
+        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}`,
         {
           method: "GET",
           headers: {
@@ -341,7 +341,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
 
 
 
-      const url = isEdit ? `http://localhost:3001/api/dropshipper/product/my-inventory/${id}` : "http://localhost:3001/api/dropshipper/product/my-inventory";
+      const url = isEdit ? `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}` : "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: isEdit ? 'PUT' : "POST",
@@ -438,7 +438,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       setLoading(true);
 
       const response = await fetch(
-        `http://localhost:3001/api/dropshipper/product/my-inventory/${item.id}`,
+        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}`,
         {
           method: "DELETE",
           headers: {
@@ -520,7 +520,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       setLoading(true);
 
       const response = await fetch(
-        `http://localhost:3001/api/dropshipper/product/my-inventory/${item.id}/destroy`,
+        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}/destroy`,
         {
           method: "DELETE",
           headers: {
@@ -582,7 +582,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:3001/api/dropshipper/product/my-inventory/${item?.id}/restore`,
+        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item?.id}/restore`,
         {
           method: "PATCH",
           headers: {

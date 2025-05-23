@@ -82,7 +82,7 @@ const Payment = () => {
         }
       });
 
-      const url = `http://localhost:3001/api/admin/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `https://sleeping-owl-we0m.onrender.com/api/admin/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -170,7 +170,7 @@ const Payment = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      const url = `http://localhost:3001/api/admin/dropshipper/${formData?.id}/profile/update`;
+      const url = `https://sleeping-owl-we0m.onrender.com/api/admin/dropshipper/${formData?.id}/profile/update`;
       const form = new FormData();
 
       // Append uploaded files
