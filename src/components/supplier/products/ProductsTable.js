@@ -10,6 +10,7 @@ import { FaCheck } from "react-icons/fa";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
+import Image from 'next/image';
 const ProductTable = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("my");
@@ -21,8 +22,11 @@ const ProductTable = () => {
     const { verifySupplierAuth } = useSupplier();
     const [isTrashed, setIsTrashed] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
+    const [showVariantPopup, setShowVariantPopup] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const filteredProducts = products.filter((item) => {
         const matchesCategory = category
             ? String(item.categoryId) === String(category)
@@ -43,17 +47,17 @@ const ProductTable = () => {
     const [showPopup, setShowPopup] = useState(false);
     const [inventoryData, setInventoryData] = useState({
         productId: "",
-        status: "",
-        stock: "",
-        price: "",
+        variant: []
     });
-    const handleChange = (e) => {
-        const { name, type, value, checked } = e.target;
-        setInventoryData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
+    const handleVariantChange = (id, field, value) => {
+        setInventoryData((prevData) => ({
+            ...prevData,
+            variant: prevData.variant.map((v) =>
+                v.id === id ? { ...v, [field]: field === 'qty' || field === 'shipowl_price' ? Number(value) : value } : v
+            ),
         }));
     };
+
 
     const fetchProduct = useCallback(async (type) => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -72,7 +76,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product?type=${type}`, {
+            const response = await fetch(`http://localhost:3001/api/supplier/product/my-inventory?type=${type}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -101,6 +105,7 @@ const ProductTable = () => {
         }
     }, [router, setProducts]);
 
+
     const trashProducts = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -118,7 +123,7 @@ const ProductTable = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/trashed`, {
+            const response = await fetch(`http://localhost:3001/api/supplier/product/my-inventory/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -164,7 +169,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category`,
+                `http://localhost:3001/api/supplier/category`,
                 {
                     method: "GET",
                     headers: {
@@ -237,7 +242,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${item.id}`,
+                `http://localhost:3001/api/supplier/product/my-inventory/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -268,7 +273,7 @@ const ProductTable = () => {
                 text: result.message || `${item.name} has been Trashed successfully.`,
             });
 
-            await fetchProduct();
+            await fetchProduct('my');
         } catch (error) {
             Swal.close();
             Swal.fire({
@@ -319,7 +324,7 @@ const ProductTable = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${item.id}/destroy`,
+                `http://localhost:3001/api/supplier/product/my-inventory/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -381,7 +386,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${item?.id}/restore`,
+                `http://localhost:3001/api/supplier/product/my-inventory/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -490,7 +495,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${item.id}`,
+                `http://localhost:3001/api/supplier/product/my-inventory/${item.id}`,
                 {
                     method: "GET",
                     headers: {
@@ -514,11 +519,18 @@ const ProductTable = () => {
             const items = result?.supplierProduct || {};
 
             setInventoryData({
-                productId: items.id || "",
-                status: items.status || "",
-                stock: items.stock || "",
-                price: items.price || "",
+                productId: items.productId || "", // or items.product?.id if you prefer
+                variant: (items.variants || []).map((v) => ({
+                    variantId: v.productVariantId,
+                    stock: v.stock,
+                    price: v.price,
+                    status: v.status,
+                    color: v.variant?.color || '',
+                    sku: v.variant?.sku || '',
+                    image: v.variant?.image || '',
+                }))
             });
+
             setShowPopup(true);
 
         } catch (error) {
@@ -527,10 +539,9 @@ const ProductTable = () => {
             setLoading(false);
         }
 
-        console.log('item', item)
     }
 
-
+    console.log(inventoryData)
     const handleSubmit = async (e, id) => {
         e.preventDefault();
         setLoading(true);
@@ -559,12 +570,19 @@ const ProductTable = () => {
             });
 
             const form = new FormData();
-            form.append('productId', inventoryData.productId);
-            form.append('stock', inventoryData.stock);
-            form.append('price', inventoryData.price);
-            form.append('status', inventoryData.status);
+            const simplifiedVariants = inventoryData.variant.map((v) => ({
+                variantId: v.id || v.variantId,
+                stock: v.stock,
+                price: v.price,
+                status: v.status
+            }));
 
-            const url = isEdit ? `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my/${id}` : "https://sleeping-owl-we0m.onrender.com/api/supplier/product";
+            form.append('productId', inventoryData.productId);
+            form.append('variants', JSON.stringify(simplifiedVariants));
+
+
+
+            const url = isEdit ? `http://localhost:3001/api/supplier/product/my-inventory/${id}` : "http://localhost:3001/api/supplier/product/my-inventory";
 
             const response = await fetch(url, {
                 method: isEdit ? 'PUT' : "POST",
@@ -599,9 +617,7 @@ const ProductTable = () => {
                 if (res.isConfirmed) {
                     setInventoryData({
                         productId: "",
-                        stock: "",
-                        price: "",
-                        status: "",
+                        variant: [],
                     });
                     setShowPopup(false);
                     fetchProduct('my');
@@ -635,35 +651,6 @@ const ProductTable = () => {
             </div>
 
             <div className="flex flex-wrap gap-4 items-end">
-                {/* <div className="w-full md:w-4/12">
-                    <label className="block text-sm font-medium text-gray-700">RTO Address *</label>
-                    <select
-                        value={selectedRtoAddress}
-                        onChange={(e) => setSelectedRtoAddress(e.target.value)}
-                        className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
-                    >
-                        <option value="">All</option>
-                        {[...new Set(products.map(item => item.rtoAddress))].map((addr, index) => (
-                            <option key={index} value={addr}>{addr}</option>
-                        ))}
-                    </select>
-
-                </div>
-
-                <div className="w-full md:w-3/12">
-                    <label className="block text-sm font-medium text-gray-700">Pickup Address *</label>
-                    <select
-                        value={selectedPickupAddress}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
-                    >
-                        <option value="">All</option>
-                        {[...new Set(products.map(item => item.pickupAddress))].map((addr, index) => (
-                            <option key={index} value={addr}>{addr}</option>
-                        ))}
-                    </select>
-
-                </div> */}
 
                 <div className="md:w-4/12">
                     <label className="block text-sm font-medium text-gray-700">Select Model</label>
@@ -759,7 +746,7 @@ const ProductTable = () => {
                                                 await fetchProduct('my');
                                             } else {
                                                 setIsTrashed(true);
-                                                await trashProducts();
+                                                await trashProducts('my');
                                             }
                                         }}
                                     >
@@ -777,6 +764,7 @@ const ProductTable = () => {
                                 onClick={() => {
                                     setActiveTab(tab.key),
                                         fetchProduct(tab.key)
+                                    setIsTrashed(false)
 
                                 }}
                                 className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
@@ -816,6 +804,11 @@ const ProductTable = () => {
                                         {activeTab === "notmy" && (
                                             <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
                                                 Add to List
+                                            </th>
+                                        )}
+                                        {activeTab === "notmy" && (
+                                            <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                                View Variant
                                             </th>
                                         )}
                                         {showRtoLiveCount && (
@@ -866,21 +859,30 @@ const ProductTable = () => {
                                                         </div>
                                                     </label>
 
-                                                    <span className="truncate"> {item.name || 'NIL'}</span>
+                                                    <span className="truncate"> {item?.product?.name || item.name || 'NIL'}</span>
                                                 </div>
                                             </td>
-                                            <td className="p-2 px-5  text-left  capitalize whitespace-nowrap">{item.description || 'NIL'}</td>
-                                            <td className="p-2 px-5  text-left  capitalize whitespace-nowrap">{item.main_sku || 'NIL'}</td>
-                                            <td className="p-2 px-5  text-left  capitalize whitespace-nowrap text-red-500">{item.lowestOthersupplierPrice || 'NIL'}</td>
+                                            <td className="p-2 px-5  text-left  capitalize whitespace-nowrap">{item?.product?.description || item.description || 'NIL'}</td>
+                                            <td className="p-2 px-5  text-left  capitalize whitespace-nowrap">{item?.product?.main_sku || item.main_sku || 'NIL'}</td>
+                                            <td className="p-2 px-5  text-left  capitalize whitespace-nowrap text-red-500">{item.lowestOthersupplierPrice || item?.lowestOthersupplierPrice || item.product?.lowestOthersupplierPrice || 'NIL'}</td>
                                             {(() => {
-                                                const variant = item.variants[0] || {};
+                                                let variant = {};
+                                                if (item.variants && item.variants.length > 0) {
+                                                    variant = item.variants[0];
+                                                }
+
                                                 return (
                                                     <>
-                                                        <td className="p-2 px-5  text-left  capitalize whitespace-nowrap">{variant.shipowl_price || 'NIL'}</td>
-                                                        <td className="p-2 px-5  text-left  capitalize whitespace-nowrap">{variant.qty || 'NIL'}</td>
+                                                        <td className="p-2 px-5 text-left capitalize whitespace-nowrap">
+                                                            {variant.shipowl_price || 'NIL'}
+                                                        </td>
+                                                        <td className="p-2 px-5 text-left capitalize whitespace-nowrap">
+                                                            {variant.qty || 'NIL'}
+                                                        </td>
                                                     </>
                                                 );
                                             })()}
+
                                             {activeTab === "notmy" && (
                                                 <td className="p-2 px-5 text-left  capitalize whitespace-nowrap">
                                                     <button
@@ -888,9 +890,7 @@ const ProductTable = () => {
                                                             setShowPopup(true),
                                                                 setInventoryData({
                                                                     productId: item.id,
-                                                                    status: "",
-                                                                    stock: "",
-                                                                    price: "",
+                                                                    variant: item.variants,
                                                                 })
                                                         }}
                                                         className="py-2 px-4 text-white rounded-md text-sm bg-[#2B3674]"
@@ -898,6 +898,20 @@ const ProductTable = () => {
                                                         Add To Inventory
                                                     </button>
 
+                                                </td>
+                                            )}
+
+                                            {activeTab === "notmy" && (
+                                                <td className="p-2 px-5 text-left capitalize whitespace-nowrap">
+                                                    <button
+                                                        onClick={() => {
+                                                            setSelectedProduct(item); // `item` is your current product row
+                                                            setShowVariantPopup(true);
+                                                        }}
+                                                        className="py-2 px-4 text-white rounded-md text-sm bg-[#3965FF]"
+                                                    >
+                                                        View Variants
+                                                    </button>
                                                 </td>
                                             )}
 
@@ -927,9 +941,9 @@ const ProductTable = () => {
                                             <td className="p-2 px-5  text-left  capitalize whitespace-nowrap">
                                                 <button
                                                     className={` py-2 text-white rounded-md text-sm p-3 uppercase  min-w-[95px]
-                                                  ${item.supplierStatus === "Done" ? "bg-green-500" : item.supplierStatus === "Pending" ? "bg-[#FFB547]" : "bg-[#05CD99]"}`}
+                                                  ${item?.supplier?.status === "Done" ? "bg-green-500" : item.supplierStatus === "Pending" ? "bg-[#FFB547]" : "bg-[#05CD99]"}`}
                                                 >
-                                                    {item.supplierStatus || 'NIL'}
+                                                    {item?.supplier?.status || 'NIL'}
                                                 </button>
                                             </td>
                                             {!showRtoLiveCount && (
@@ -938,7 +952,7 @@ const ProductTable = () => {
                                                         className={`py-2 text-white rounded-md text-sm p-3 uppercase min-w-[95px] 
     ${item.list_as?.toLowerCase() === "shipowl" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
                                                     >
-                                                        {item.list_as || 'NIL'}
+                                                        {item?.product?.list_as || 'NIL'}
                                                     </button>
                                                 </td>
                                             )}
@@ -970,55 +984,93 @@ const ProductTable = () => {
                                                     </div>
                                                 </td>
                                             )}
-                                            {showPopup && (
+                                         
+
+                                        </tr>
+
+                                    ))}
+                                </tbody>
+                            </table>
+                            {showPopup && (
                                                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                                                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                                                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
                                                         <h2 className="text-xl font-semibold mb-4">Add to Inventory</h2>
+                                                        <table className="min-w-full table-auto border border-gray-200">
+                                                            <thead>
+                                                                <tr className="bg-gray-100">
+                                                                    <th className="border px-4 py-2">Image</th>
+                                                                    <th className="border px-4 py-2">Color</th>
+                                                                    <th className="border px-4 py-2">Stock</th>
+                                                                    <th className="border px-4 py-2">Price</th>
+                                                                    <th className="border px-4 py-2">Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {inventoryData.variant?.map((variant) => (
+                                                                    <tr key={variant.id}>
+                                                                        <td className="border px-4 py-2">
+                                                                            <Image
+                                                                                height={40}
+                                                                                width={40}
+                                                                                src={variant.image || "/placeholder.png"}
+                                                                                alt={variant.color || "NIL"}
+                                                                            />
+                                                                        </td>
+                                                                        <td className="border px-4 py-2">{variant.color || "NIL"}</td>
+                                                                        <td className="border px-4 py-2">
+                                                                            <input
+                                                                                type="number"
+                                                                                placeholder="Stock"
+                                                                                name="stock"
+                                                                                className="w-full border rounded p-2"
+                                                                                value={variant.stock}
+                                                                                onChange={(e) =>
+                                                                                    handleVariantChange(variant.id, "stock", e.target.value)
+                                                                                }
+                                                                            />
+                                                                        </td>
+                                                                        <td className="border px-4 py-2">
+                                                                            <input
+                                                                                type="number"
+                                                                                name="price"
+                                                                                placeholder="Price"
+                                                                                className="w-full border rounded p-2"
+                                                                                value={variant.price}
+                                                                                onChange={(e) =>
+                                                                                    handleVariantChange(variant.id, "price", e.target.value)
+                                                                                }
+                                                                            />
+                                                                        </td>
+                                                                        <td className="border px-4 py-2">
+                                                                            <label className="flex mt-2 items-center cursor-pointer">
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    name="status"
+                                                                                    className="sr-only"
+                                                                                    checked={variant.status || false}
+                                                                                    onChange={(e) =>
+                                                                                        handleVariantChange(variant.id, "status", e.target.checked)
+                                                                                    }
+                                                                                />
+                                                                                <div
+                                                                                    className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variant.status ? "bg-orange-500" : ""
+                                                                                        }`}
+                                                                                >
+                                                                                    <div
+                                                                                        className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variant.status ? "translate-x-5" : ""
+                                                                                            }`}
+                                                                                    ></div>
+                                                                                </div>
+                                                                                <span className="ms-2 text-sm text-gray-600">Status</span>
+                                                                            </label>
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
 
-                                                        <div className="space-y-3">
 
-                                                            <input
-                                                                type="number"
-                                                                placeholder="Stock"
-                                                                name='stock'
-                                                                className="w-full border rounded p-2"
-                                                                value={inventoryData.stock}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <input
-                                                                type="number"
-                                                                name='price'
-                                                                placeholder="Price"
-                                                                className="w-full border rounded p-2"
-                                                                value={inventoryData.price}
-                                                                onChange={handleChange}
-                                                            />
-                                                            <div>
 
-                                                                <label className="flex mt-2 items-center cursor-pointer">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        name='status'
-                                                                        className="sr-only"
-                                                                        checked={inventoryData.status || ''}
-                                                                        onChange={handleChange}
-                                                                    />
-                                                                    <div
-                                                                        className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${inventoryData.status ? "bg-orange-500" : ""
-                                                                            }`}
-                                                                    >
-                                                                        <div
-                                                                            className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${inventoryData.status ? "translate-x-5" : ""
-                                                                                }`}
-                                                                        ></div>
-                                                                    </div>
-                                                                    <span className="ms-2 text-sm text-gray-600">
-                                                                        Status
-                                                                    </span>
-                                                                </label>
-
-                                                            </div>
-                                                        </div>
 
                                                         <div className="flex justify-end space-x-3 mt-6">
                                                             <button
@@ -1040,12 +1092,45 @@ const ProductTable = () => {
                                                     </div>
                                                 </div>
                                             )}
-                                        </tr>
+                                            {showVariantPopup && selectedProduct && (
+                                                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                                                    <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
+                                                        <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
 
-                                    ))}
-                                </tbody>
-                            </table>
+                                                        <table className="min-w-full table-auto border border-gray-200">
+                                                            <thead>
+                                                                <tr className="bg-gray-100">
+                                                                    <th className="border px-4 py-2">Image</th>
+                                                                    <th className="border px-4 py-2">SKU</th>
+                                                                    <th className="border px-4 py-2">Color</th>
+                                                                    <th className="border px-4 py-2">Qty</th>
+                                                                    <th className="border px-4 py-2">ShipOwl Price</th>
+                                                                    <th className="border px-4 py-2">RTO Price</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {selectedProduct.variants?.map((variant) => (
+                                                                    <tr key={variant.id}>
+                                                                        <td className="border px-4 py-2"><Image height={20} width={20} src={variant.sku} alt={variant.name || 'NIL'} /></td>
+                                                                        <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.qty ?? 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.shipowl_price ?? 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.rto_price ?? 'NIL'}</td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
 
+                                                        <button
+                                                            onClick={() => setShowVariantPopup(false)}
+                                                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
 
                         </div>
                     ) : (

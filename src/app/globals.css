@@ -29,7 +29,9 @@ body {
   width: 100%;
   max-width: 100% !important;
 }
-
+.react-select__control.css-13cymwt-control {
+    border: 1px solid #dfeaf2;
+}
 
 .dm {
   font-family: "DM Sans", sans-serif;

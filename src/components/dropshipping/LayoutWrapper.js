@@ -10,28 +10,29 @@ import { ProfileProvider } from "../admin/supplier/ProfileContext";
 
 function LayoutWrapperInner({ children }) {
     const pathname = usePathname();
-    const isAuthPage = pathname === '/dropshipping/auth/login/' || pathname === '/dropshipping/auth/password/forget/' || pathname === '/dropshipping/auth/password/reset/' ||pathname === '/dropshipping/auth/register/' ||pathname === '/dropshipping/auth/register/verify/' ;
+    const isAuthPage = pathname === '/dropshipping/auth/login/' || pathname === '/dropshipping/auth/password/forget/' || pathname === '/dropshipping/auth/password/reset/' || pathname === '/dropshipping/auth/register/' || pathname === '/dropshipping/auth/register/verify/';
 
     return (
         <div className="main">
             <div className="container">
-                <div className="lg:flex ">
+                <div className={`${!isAuthPage ? "lg:flex" : ""} `}>
                     {!isAuthPage && (
                         <div className="xl:w-[18.5%] lg:w-[23%] w-full p-2 leftbar">
                             <Sidebar />
                         </div>
                     )}
-                      <DropshipperMiddleWareProvider>
-                    <div className={`px-3 mt-20 lg:mt-0 main-outlet lg-px-0 ${isAuthPage ? "w-full" : "xl:w-[81.5%] lg:w-[77%]"}`}>
-                        {!isAuthPage && <Header />}
-                        <div className="md:p-7 xl:p-3 md:pt-0">
-                            <ProfileProvider>
-                                <DropshipperProfileProvider>
+
+                    <DropshipperMiddleWareProvider>
+                        <div className={`px-3 mt-20 lg:mt-0  lg-px-0 ${isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[73%]"}`}>
+                            {!isAuthPage && <Header />}
+                            <div className="md:p-7 xl:p-3 md:pt-0">
+                                <ProfileProvider>
+                                    <DropshipperProfileProvider>
                                         {children}
-                                </DropshipperProfileProvider>
-                            </ProfileProvider>
+                                    </DropshipperProfileProvider>
+                                </ProfileProvider>
+                            </div>
                         </div>
-                    </div>
                     </DropshipperMiddleWareProvider>
 
                 </div>

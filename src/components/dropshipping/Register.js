@@ -3,11 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import Select from "react-select";
+// import Select from "react-select";
 import { HashLoader } from "react-spinners";
+import dynamic from 'next/dynamic';
+
+const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function Register() {
   const router = useRouter();
-const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [countryData, setCountryData] = useState([]);
   const [stateData, setStateData] = useState([]);
@@ -21,6 +24,7 @@ const [imagePreview, setImagePreview] = useState(null);
     email: "",
     permanentPostalCode: "",
     password: "",
+    status: "active",
     profilePicture: null,
     referralCode: "",
     phoneNumber: "",
@@ -33,16 +37,16 @@ const [imagePreview, setImagePreview] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-     if (name === "profilePicture" && files && files[0]) {
-    const file = files[0];
-   setFormData((prev) => ({
-      ...prev,
-      [name]: type === "file" ? files[0] : value,
-    }));    setImagePreview(URL.createObjectURL(file)); // Set preview
-  } else {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }
-    
+    if (name === "profilePicture" && files && files[0]) {
+      const file = files[0];
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "file" ? files[0] : value,
+      })); setImagePreview(URL.createObjectURL(file)); // Set preview
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+
     if (name == "permanentCountry") {
       fetchStateList(value);
     }
@@ -59,8 +63,6 @@ const [imagePreview, setImagePreview] = useState(null);
       name,
       email,
       password,
-      phoneNumber,
-      website,
       profilePicture,
       permanentCountry,
       permanentState,
@@ -76,12 +78,6 @@ const [imagePreview, setImagePreview] = useState(null);
     }
     if (!password.trim()) newErrors.password = "Password is required";
     if (!profilePicture) newErrors.profilePicture = "Profile picture is required";
-    if (phoneNumber && !/^[0-9]{7,15}$/.test(phoneNumber)) {
-      newErrors.phoneNumber = "Phone number must be 7-15 digits";
-    }
-    if (website && !/^https?:\/\/[\w.-]+\.[a-z]{2,}/i.test(website)) {
-      newErrors.website = "Invalid website URL";
-    }
     if (!permanentCountry) newErrors.permanentCountry = "Country is required";
     if (!permanentState) newErrors.permanentState = "State is required";
     if (!permanentCity) newErrors.permanentCity = "City is required";
@@ -101,63 +97,63 @@ const [imagePreview, setImagePreview] = useState(null);
     const token = dropshipperData?.security?.token;
 
     const data = new FormData();
- for (const key in formData) {
-  if (formData[key] !== null && formData[key] !== "") {
-    if (key === "profilePicture") {
-      data.append("profilePicture", formData[key]);
-    } else {
-      data.append(key, formData[key]);
+    for (const key in formData) {
+      if (formData[key] !== null && formData[key] !== "") {
+        if (key === "profilePicture") {
+          data.append("profilePicture", formData[key]);
+        } else {
+          data.append(key, formData[key]);
+        }
+      }
     }
-  }
-}
 
 
 
     try {
-  const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/auth/registration`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: data,
-  });
+      const res = await fetch(`http://localhost:3001/api/dropshipper/auth/registration`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: data,
+      });
 
-  const result = await res.json();
-  if (!res.ok) throw new Error(result.message || "Failed to create dropshipper");
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to create dropshipper");
 
-  Swal.fire({
-    title: "Success",
-    text: "Dropshipper Registered Successfully!",
-    icon: "success",
-    confirmButtonText: "Go to Login",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      router.push('/dropshipping/auth/login');
+      Swal.fire({
+        title: "Success",
+        text: "Dropshipper Registered Successfully!",
+        icon: "success",
+        confirmButtonText: "Go to Login",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push('/dropshipping/auth/login');
+        }
+      });
+
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        status: "",
+        profilePicture: null,
+        referralCode: "",
+        phoneNumber: "",
+        website: "",
+        permanentAddress: "",
+        permanentCity: "",
+        permanentState: "",
+        permanentCountry: "",
+      });
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      setLoading(false);
     }
-  });
-
-  // Reset form
-  setFormData({
-    name: "",
-    email: "",
-    password: "",
-    profilePicture: null,
-    referralCode: "",
-    phoneNumber: "",
-    website: "",
-    permanentAddress: "",
-    permanentCity: "",
-    permanentState: "",
-    permanentCountry: "",
-  });
-} catch (err) {
-  Swal.fire("Error", err.message, "error");
-} finally {
-  setLoading(false);
-}
 
   };
-console.log('errors',errors)
   const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
     if (setLoading) setLoading(true);
 
@@ -179,7 +175,7 @@ console.log('errors',errors)
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "https://sleeping-owl-we0m.onrender.com/api/location/country",
+      "http://localhost:3001/api/location/country",
       setCountryData,
       "countries",
       setLoadingCountries
@@ -188,7 +184,7 @@ console.log('errors',errors)
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+      `http://localhost:3001/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -197,7 +193,7 @@ console.log('errors',errors)
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+      `http://localhost:3001/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities
@@ -232,171 +228,189 @@ console.log('errors',errors)
     );
   }
   return (
-<form
-  onSubmit={handleSubmit}
-  className="max-w-5xl mx-auto p-8 bg-white rounded-xl shadow-lg space-y-8 border border-gray-100"
->
-  <h2 className="text-2xl font-bold text-gray-800 mb-4">Create an Account</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-5xl mx-auto p-8 bg-white rounded-xl space-y-8 border border-gray-100"
+    >
+      {/* <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">Register</h2> */}
 
-  <div className="flex flex-col md:flex-row gap-8">
-    {/* Left: Profile Picture */}
-    <div className="md:w-1/3 space-y-4">
-  <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Profile Photo</h3>
+      <div className=" gap-8">
+        {/* Left: Profile Picture */}
+        <div className="">
+          {/* <h3 className="text-lg font-semibold text-gray-700  pb-2">Profile Photo</h3> */}
 
-  <div className="w-full space-y-3">
-    <label className="block text-sm font-medium text-gray-700">
-      Upload Profile Picture <span className="text-red-500">*</span>
-    </label>
-    <input
-      type="file"
-      name="profilePicture"
-      accept="image/*"
-      onChange={handleChange}
-      className={`w-full border px-3 py-2 rounded-md shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 ${
-        errors.profilePicture ? 'border-red-500' : 'border-gray-300'
-      }`}
-    />
-    {errors.profilePicture && (
-      <p className="text-red-500 text-sm">{errors.profilePicture}</p>
-    )}
+          <div className="w-full space-y-3">
+            <label className="block text-[#232323] font-bold mb-1">
+              Upload Profile Picture <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="file"
+              name="profilePicture"
+              accept="image/*"
+              onChange={handleChange}
+              className={`w-full p-3  file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100  border rounded-lg font-bold ${errors.profilePicture ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+                }`}
+            />
+            {errors.profilePicture && (
+              <p className="text-red-500 text-sm">{errors.profilePicture}</p>
+            )}
 
-    {imagePreview && (
-      <div className="mt-2">
-        <img
-          src={imagePreview}
-          alt="Profile Preview"
-          className="rounded-md border border-gray-200 shadow-sm w-48 h-48 object-cover"
-        />
-      </div>
-    )}
-  </div>
-</div>
+            {imagePreview && (
+              <div className="mt-2">
+                <img
+                  src={imagePreview}
+                  alt="Profile Preview"
+                  className="rounded-md border border-gray-200  w-48 h-48 object-cover"
+                />
+              </div>
+            )}
+          </div>
+        </div>
 
 
-    {/* Right: Form Fields */}
-    <div className="md:w-2/3 space-y-8">
-      {/* Basic Info */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Basic Information</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {formFields.map(({ label, name, type, required }) => (
-            <div key={name}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {label} {required && <span className="text-red-500">*</span>}
+        {/* Right: Form Fields */}
+        <div className="">
+          {/* Basic Info */}
+          <div className="mt-4">
+            <h3 className="text-sm font-semibold text-orange-600  pb-2">Basic Information</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {formFields.map(({ label, name, type, required }) => (
+                <div key={name}>
+                  <label className="block text-[#232323] font-bold mb-1">
+                    {label} {required && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    type={type}
+                    name={name}
+                    value={formData[name] || ''}
+                    onChange={handleChange}
+                    className={`w-full p-3 border rounded-lg font-bold ${errors[name] ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+                      }`}
+                  />
+                  {errors[name] && (
+                    <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Address Info */}
+          <div className="mt-4">
+            <h3 className="text-sm font-semibold text-orange-600  pb-2">Permanent Address</h3>
+
+            <div>
+              <label className="block text-[#232323] font-bold mb-1 ">Street Address</label>
+              <input
+                type="text"
+                name="permanentAddress"
+                value={formData.permanentAddress || ''}
+                onChange={handleChange}
+                className={`w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]`} />
+            </div>
+
+            <div>
+              <label className="block text-[#232323] font-bold mb-1 ">
+                Postal Code <span className="text-red-500">*</span>
               </label>
               <input
-                type={type}
-                name={name}
-                value={formData[name] || ''}
+                type="number"
+                name="permanentPostalCode"
+                value={formData.permanentPostalCode || ''}
                 onChange={handleChange}
-                className={`w-full border rounded-md px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-                  errors[name] ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full p-3 border rounded-lg font-bold ${errors.permanentPostalCode ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+                  }`}
               />
-              {errors[name] && (
-                <p className="text-red-500 text-sm mt-1">{errors[name]}</p>
+              {errors.permanentPostalCode && (
+                <p className="text-red-500 text-sm mt-1">{errors.permanentPostalCode}</p>
               )}
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Address Info */}
-      <div className="space-y-6">
-        <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">Permanent Address</h3>
+            {/* Country, State, City */}
+            <div className="grid grid-cols-1 mt-3 sm:grid-cols-3 gap-6">
+              {['permanentCountry', 'permanentState', 'permanentCity'].map((field) => {
+                const loading =
+                  (field === 'permanentCountry' && loadingCountries) ||
+                  (field === 'permanentState' && loadingStates) ||
+                  (field === 'permanentCity' && loadingCities);
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
-          <input
-            type="text"
-            name="permanentAddress"
-            value={formData.permanentAddress || ''}
-            onChange={handleChange}
-            className="w-full border border-gray-300 px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-        </div>
+                const options = selectOptions(
+                  field === 'permanentCountry'
+                    ? countryData
+                    : field === 'permanentState'
+                      ? stateData
+                      : cityData
+                );
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Postal Code <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="number"
-            name="permanentPostalCode"
-            value={formData.permanentPostalCode || ''}
-            onChange={handleChange}
-            className={`w-full border px-3 py-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-              errors.permanentPostalCode ? 'border-red-500' : 'border-gray-300'
-            }`}
-          />
-          {errors.permanentPostalCode && (
-            <p className="text-red-500 text-sm mt-1">{errors.permanentPostalCode}</p>
-          )}
-        </div>
+                return (
+                  <div key={field} className="relative">
+                    <label className="block text-[#232323] font-bold mb-1 capitalize">
+                      {field.replace('permanent', '')} <span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                      isDisabled={loading}
+                      name={field}
+                      value={options.find((item) => item.value === formData[field]) || ''}
+                      onChange={(selectedOption) => {
+                        const value = selectedOption ? selectedOption.value : '';
+                        setFormData((prev) => ({ ...prev, [field]: value }));
 
-        {/* Country, State, City */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {['permanentCountry', 'permanentState', 'permanentCity'].map((field) => {
-            const loading =
-              (field === 'permanentCountry' && loadingCountries) ||
-              (field === 'permanentState' && loadingStates) ||
-              (field === 'permanentCity' && loadingCities);
-
-            const options = selectOptions(
-              field === 'permanentCountry'
-                ? countryData
-                : field === 'permanentState'
-                ? stateData
-                : cityData
-            );
-
-            return (
-              <div key={field} className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
-                  {field.replace('permanent', '')} <span className="text-red-500">*</span>
-                </label>
-                <Select
-                  isDisabled={loading}
-                  name={field}
-                  value={options.find((item) => item.value === formData[field]) || ''}
-                  onChange={(selectedOption) => {
-                    const value = selectedOption ? selectedOption.value : '';
-                    setFormData((prev) => ({ ...prev, [field]: value }));
-
-                    if (field === 'permanentCountry') fetchStateList(value);
-                    if (field === 'permanentState') fetchCity(value);
-                  }}
-                  options={options}
-                  isClearable
-                  classNamePrefix="react-select"
-                />
-                {loading && (
-                  <div className="absolute inset-y-0 right-3 flex items-center">
-                    <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                        if (field === 'permanentCountry') fetchStateList(value);
+                        if (field === 'permanentState') fetchCity(value);
+                      }}
+                      options={options}
+                      isClearable
+                      classNamePrefix="react-select"
+                    />
+                    {loading && (
+                      <div className="absolute inset-y-0 right-3 flex items-center">
+                        <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                      </div>
+                    )}
+                    {errors[field] && (
+                      <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
+                    )}
                   </div>
-                )}
-                {errors[field] && (
-                  <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+      <div className="">
+        <label className="block text-[#232323] font-bold mb-1">
+          Status
+        </label>
+        <select
+          name="status"
+          value={formData.status || ''}
+          onChange={handleChange}
+          className={`w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]
+                }`}          >
+          <option value="">Select Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
 
-  {/* Submit Button */}
-  <div className="flex justify-end pt-6">
-    <button
-      type="submit"
-      disabled={loading}
-      className="px-6 py-2 text-white bg-orange-600 hover:bg-orange-700 rounded-md transition disabled:opacity-50"
-    >
-      {loading ? 'Submitting...' : 'Register'}
-    </button>
-  </div>
-</form>
+      <div className="flex space-x-4 mt-6">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="px-4 py-2 bg-orange-500 text-white rounded-lg"
+          disabled={loading}
+        >
+          {loading ? 'Saving...' : 'Save'}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
 
   );
 }

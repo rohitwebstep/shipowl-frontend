@@ -7,12 +7,10 @@ import Link from 'next/link';
 import Swal from 'sweetalert2';
 import { IoIosArrowForward } from 'react-icons/io';
 import { HashLoader } from 'react-spinners';
-
 import productimg from '@/app/assets/product1.png';
 import coupen from '@/app/assets/coupen.png';
 import gift from '@/app/assets/gift.png';
 import ship from '@/app/assets/delivery.png';
-
 const tabs = [
   { key: "my", label: "My Products" },
   { key: "all", label: "All Products" },
@@ -43,7 +41,7 @@ const NewlyLaunched = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product?type=${type}`, {
+      const response = await fetch(`http://localhost:3001/api/dropshipper/product/inventory?type=${type}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +89,7 @@ const NewlyLaunched = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/trashed`, {
+      const response = await fetch(`http://localhost:3001/api/dropshipper/product/my-inventory/trashed`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -210,25 +208,98 @@ const NewlyLaunched = () => {
 const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetchProduct, activeTab }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showVariantPopup, setShowVariantPopup] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const router = useRouter();
   const [inventoryData, setInventoryData] = useState({
     supplierProductId: "",
-    status: "",
-    stock: "",
-    price: "",
+    variant: []
   });
-  // Single tab state shared by both sections
-  const handleChange = (e) => {
-    const { name, type, value, checked } = e.target;
-    setInventoryData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
+  const handleVariantChange = (id, field, value) => {
+    setInventoryData((prevData) => ({
+      ...prevData,
+      variant: prevData.variant.map((v) =>
+        v.id === id
+          ? {
+              ...v,
+              [field]:
+                field === 'dropStock' || field === 'dropPrice'
+                  ? Number(value)
+                  : value,
+            }
+          : v
+      ),
     }));
   };
+  
 
   const [isEdit, setIsEdit] = useState(false);
 
+  const handleEdit = async (item) => {
+    setIsEdit(true);
+    const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+
+    if (supplierData?.project?.active_panel !== "dropshipper") {
+      localStorage.removeItem("shippingData");
+      router.push("/dropshipper/auth/login");
+      return;
+    }
+
+    const suppliertoken = supplierData?.security?.token;
+    if (!suppliertoken) {
+      router.push("/dropshipper/auth/login");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:3001/api/dropshipper/product/my-inventory/${item.id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${suppliertoken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Something Wrong!",
+          text: errorMessage.message || "Your session has expired. Please log in again.",
+        });
+        throw new Error(errorMessage.message);
+      }
+
+      const result = await response.json();
+      const items = result?.dropshipperProduct || {};
+
+      setInventoryData({
+        productId: items.productId || "", // or items.product?.id if you prefer
+        variant: (items.variants || []).map((v) => ({
+          variantId: v.productVariantId,
+          dropStock: v.stock,
+          dropPrice: v.price,
+          Dropstatus: v.status,
+          image: v.variant?.image || '',
+        }))
+      });
+
+      setShowPopup(true);
+
+    } catch (error) {
+      console.error("Error fetching category:", error);
+    } finally {
+      setLoading(false);
+    }
+
+  }
+
+  console.log(inventoryData)
   const handleSubmit = async (e, id) => {
     e.preventDefault();
     setLoading(true);
@@ -236,13 +307,13 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
     if (dropshipperData?.project?.active_panel !== "dropshipper") {
       localStorage.clear("shippingData");
-      router.push("/dropshipping/auth/login");
+      router.push("/dropshipper/auth/login");
       return;
     }
 
     const token = dropshipperData?.security?.token;
     if (!token) {
-      router.push("/dropshipping/auth/login");
+      router.push("/dropshipper/auth/login");
       return;
     }
 
@@ -256,13 +327,21 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
         }
       });
 
-      const form = new FormData();
-      form.append('supplierProductId', inventoryData.supplierProductId);
-      form.append('stock', inventoryData.stock);
-      form.append('price', inventoryData.price);
-      form.append('status', inventoryData.status);
 
-      const url = isEdit ? `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${id}` : "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product";
+      const form = new FormData();
+      const simplifiedVariants = inventoryData.variant.map((v) => ({
+        variantId: v.id || v.variantId,
+        stock: v.dropStock,
+        price: v.dropPrice,
+        status: v.Dropstatus
+      }));
+
+      form.append('supplierProductId', inventoryData.supplierProductId);
+      form.append('variants', JSON.stringify(simplifiedVariants));
+
+
+
+      const url = isEdit ? `http://localhost:3001/api/dropshipper/product/my-inventory/${id}` : "http://localhost:3001/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: isEdit ? 'PUT' : "POST",
@@ -296,17 +375,16 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       }).then((res) => {
         if (res.isConfirmed) {
           setInventoryData({
-            supplierProductId: "",
-            stock: "",
-            price: "",
-            status: "",
+            productId: "",
+            variant: [],
           });
           setShowPopup(false);
           fetchProduct('my');
-          setActiveTab('my')
-          setIsEdit(false)
+          setActiveTab('my');
+          setIsEdit(false);
         }
       });
+
 
     } catch (error) {
       console.error("Error:", error);
@@ -320,7 +398,6 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       setLoading(false);
     }
   };
-
 
   const handleDelete = async (item) => {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
@@ -361,7 +438,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       setLoading(true);
 
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${item.id}`,
+        `http://localhost:3001/api/dropshipper/product/my-inventory/${item.id}`,
         {
           method: "DELETE",
           headers: {
@@ -443,7 +520,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       setLoading(true);
 
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${item.id}/destroy`,
+        `http://localhost:3001/api/dropshipper/product/my-inventory/${item.id}/destroy`,
         {
           method: "DELETE",
           headers: {
@@ -505,7 +582,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${item?.id}/restore`,
+        `http://localhost:3001/api/dropshipper/product/my-inventory/${item?.id}/restore`,
         {
           method: "PATCH",
           headers: {
@@ -544,64 +621,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       setLoading(false);
     }
   }, [router, trashProducts]);
-  const handleEdit = async (item) => {
-    setIsEdit(true);
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.removeItem("shippingData");
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    const dropshippertoken = dropshipperData?.security?.token;
-    if (!dropshippertoken) {
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my/${item.id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${dropshippertoken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorMessage = await response.json();
-        Swal.fire({
-          icon: "error",
-          title: "Something Wrong!",
-          text: errorMessage.message || "Your session has expired. Please log in again.",
-        });
-        throw new Error(errorMessage.message);
-      }
-
-      const result = await response.json();
-      const items = result?.dropshipperProduct || {};
-
-      setInventoryData({
-        supplierProductId: items.id || "",
-        status: items.status || "",
-        stock: items.stock || "",
-        price: items.price || "",
-      });
-      setShowPopup(true);
-
-    } catch (error) {
-      console.error("Error fetching category:", error);
-    } finally {
-      setLoading(false);
-    }
-
-    console.log('item', item)
-  }
   return (
     <>
       <div className="flex justify-between items-center mb-4 mt-6">
@@ -614,8 +634,8 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       <div className="md:w-[293px] border-b-3 border-[#F98F5C] mt-1 mb-4"></div>
 
 
-      <div className="products-grid grid xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
-        <div className="h-full rounded-xl shadow-xl overflow-hidden cursor-default">
+      <div className="products-grid  grid xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
+        <div className="grid bg-[#212B36] rounded-xl shadow-xl overflow-hidden cursor-default">
           <Image src={productimg} alt={`Best of ${title}`} className={`w-full  object-cover ${activeTab == "notmy" ? "max-h-[300px]" : "max-h-[270px]"}`} />
           <div className="bg-[#212B36] bg-opacity-50 p-4 px-2 text-center text-white">
             <p className="text-[16px] font-semibold font-lato">Best of {title}</p>
@@ -686,9 +706,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                       setShowPopup(true);
                       setInventoryData({
                         supplierProductId: product.id,
-                        status: "",
-                        stock: "",
-                        price: "",
+                        variant: product.variants
                       });
                     }}
                     className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#2B3674]"
@@ -696,44 +714,97 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                     Add To Inventory
                   </button>
                 )}
+                {activeTab === "notmy" && (
+                  <button
+                    onClick={() => {
+                      setSelectedProduct(product); // `item` is your current product row
+                      setShowVariantPopup(true);
+                    }}
+                    className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
+                  >
+                    View Variants
+                  </button>
+                )}
 
                 {showPopup && (
                   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
                       <h2 className="text-xl font-semibold mb-4">Add to Inventory</h2>
-                      <div className="space-y-3">
-                        <input
-                          type="number"
-                          placeholder="Stock"
-                          name="stock"
-                          className="w-full border rounded p-2"
-                          value={inventoryData.stock}
-                          onChange={handleChange}
-                        />
-                        <input
-                          type="number"
-                          name="price"
-                          placeholder="Price"
-                          className="w-full border rounded p-2"
-                          value={inventoryData.price}
-                          onChange={handleChange}
-                        />
-                        <div>
-                          <label className="flex mt-2 items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              name="status"
-                              className="sr-only"
-                              checked={inventoryData.status || false}
-                              onChange={handleChange}
-                            />
-                            <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${inventoryData.status ? "bg-orange-500" : ""}`}>
-                              <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${inventoryData.status ? "translate-x-5" : ""}`}></div>
-                            </div>
-                            <span className="ms-2 text-sm text-gray-600">Status</span>
-                          </label>
-                        </div>
-                      </div>
+                      <table className="min-w-full table-auto border border-gray-200">
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th className="border px-4 py-2">Image</th>
+                            <th className="border px-4 py-2">Stock</th>
+                            <th className="border px-4 py-2">Price</th>
+                            <th className="border px-4 py-2">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {inventoryData.variant?.map((variant) => (
+                            <tr key={variant.id}>
+                              <td className="border px-4 py-2">
+                                <Image
+                                  height={40}
+                                  width={40}
+                                  src={variant.image || "/placeholder.png"}
+                                  alt={variant.color || "NIL"}
+                                />
+                              </td>
+                              <td className="border px-4 py-2">
+                                <input
+                                  type="number"
+                                  placeholder="Stock"
+                                  name="dropStock"
+                                  className="w-full border rounded p-2"
+                                  value={variant.dropStock}
+                                  onChange={(e) =>
+                                    handleVariantChange(variant.id, "dropStock", e.target.value)
+                                  }
+                                />
+                              </td>
+                              <td className="border px-4 py-2">
+                                <input
+                                  type="number"
+                                  name="dropPrice"
+                                  placeholder="Price"
+                                  className="w-full border rounded p-2"
+                                  value={variant.dropPrice}
+                                  onChange={(e) =>
+                                    handleVariantChange(variant.id, "dropPrice", e.target.value)
+                                  }
+                                />
+                              </td>
+                              <td className="border px-4 py-2">
+                                <label className="flex mt-2 items-center cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    name="Dropstatus"
+                                    className="sr-only"
+                                    checked={variant.Dropstatus || false}
+                                    onChange={(e) =>
+                                      handleVariantChange(variant.id, "Dropstatus", e.target.checked)
+                                    }
+                                  />
+                                  <div
+                                    className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variant.Dropstatus ? "bg-orange-500" : ""
+                                      }`}
+                                  >
+                                    <div
+                                      className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variant.Dropstatus ? "translate-x-5" : ""
+                                        }`}
+                                    ></div>
+                                  </div>
+                                  <span className="ms-2 text-sm text-gray-600">Status</span>
+                                </label>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+
+
+
+
                       <div className="flex justify-end space-x-3 mt-6">
                         <button
                           onClick={() => {
@@ -751,6 +822,53 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                           Submit
                         </button>
                       </div>
+                    </div>
+                  </div>
+                )}
+                {showVariantPopup && selectedProduct && (
+                  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
+                      <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+
+                      <table className="min-w-full table-auto border border-gray-200">
+                        <thead>
+                          <tr className="bg-gray-100">
+                            <th className="border px-4 py-2">Image</th>
+                            <th className="border px-4 py-2">SKU</th>
+                            <th className="border px-4 py-2">Color</th>
+                            <th className="border px-4 py-2">Qty</th>
+                            <th className="border px-4 py-2">ShipOwl Price</th>
+                            <th className="border px-4 py-2">RTO Price</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedProduct.variants?.map((variant) => (
+                            <tr key={variant.id}>
+                              <td className="border px-4 py-2">
+                                <Image
+                                  height={40}
+                                  width={40}
+                                  src={variant.variant.image}
+                                  alt={variant.variant.sku || 'NIL'}
+                                />
+                              </td>
+                              <td className="border px-4 py-2">{variant.variant.sku || 'NIL'}</td>
+                              <td className="border px-4 py-2">{variant.variant.color || 'NIL'}</td>
+                              <td className="border px-4 py-2">{variant.variant.qty ?? 'NIL'}</td>
+                              <td className="border px-4 py-2">{variant.variant.shipowl_price ?? 'NIL'}</td>
+                              <td className="border px-4 py-2">{variant.variant.rto_price ?? 'NIL'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+
+                      </table>
+
+                      <button
+                        onClick={() => setShowVariantPopup(false)}
+                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+                      >
+                        ×
+                      </button>
                     </div>
                   </div>
                 )}

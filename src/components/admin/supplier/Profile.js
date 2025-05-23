@@ -7,7 +7,7 @@ import AccountInfo from './AccountInfo';
 import { ProfileContext } from './ProfileContext';
 
 export default function Profile() {
-  const { validate, validateBusiness ,activeSubTab, setActiveSubTab,activeMainTab, setActiveMainTab} = useContext(ProfileContext);
+  const { validate, validateBusiness ,activeSubTab, setActiveSubTab} = useContext(ProfileContext);
 
 
   // const mainTabs = [

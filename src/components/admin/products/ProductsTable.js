@@ -1,10 +1,9 @@
 "use client";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
-
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
-import React, { useState, useContext ,useCallback, useEffect } from "react";
+import React, { useState, useContext, useCallback, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
@@ -12,6 +11,7 @@ import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { ProductContextEdit } from './ProductContextEdit';
+import { useAdminActions } from '@/components/commonfunctions/MainContext';
 
 const ProductTable = () => {
     const { setActiveTab } = useContext(ProductContextEdit);
@@ -25,7 +25,34 @@ const ProductTable = () => {
     const { verifyAdminAuth } = useAdmin();
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [selected, setSelected] = useState([]);
+    const [selectedMonth, setSelectedMonth] = useState(() => {
+        const today = new Date();
+        return today.toISOString().slice(0, 7);
+    });
+    const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/product", "products");
+
+    const handleCheckboxChange = (id) => {
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+    };
+
+    const handleToggleTrash = async () => {
+        setIsTrashed(prev => !prev);
+        if (!isTrashed) {
+            await fetchTrashed(setProducts, setLoading);
+        } else {
+            await fetchAll(setProducts, setLoading);
+        }
+    };
+
+    const handleSoftDelete = (id) => softDelete(id, () => fetchAll(setProducts, setLoading));
+    const handleRestore = (id) => restore(id, () => fetchTrashed(setProducts, setLoading));
+    const handleDestroy = (id) => destroy(id, () => fetchTrashed(setProducts, setLoading));
+
+
     const filteredProducts = products.filter((item) => {
         const matchesCategory = category
             ? String(item.categoryId) === String(category)
@@ -39,97 +66,8 @@ const ProductTable = () => {
         return matchesCategory && matchesModel;
     });
 
-    const fetchProduct = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
 
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${admintoken}`,
-                },
-            });
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
-                });
-                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
-            }
-
-            const result = await response.json();
-            if (result) {
-                setProducts(result?.products || []);
-            }
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, setProducts]);
-
-    const trashProducts = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/trashed`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${admintoken}`,
-                },
-            });
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
-                });
-                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
-            }
-
-            const result = await response.json();
-            if (result) {
-                setProducts(result?.products || []);
-            }
-        } catch (error) {
-            console.error("Error fetching trashed categories:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, setProducts]);
     const fetchCategory = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -148,7 +86,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/category`,
+                `http://localhost:3001/api/admin/category`,
                 {
                     method: "GET",
                     headers: {
@@ -185,12 +123,12 @@ const ProductTable = () => {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
-            await fetchProduct();
+            await fetchAll(setProducts, setLoading);
             await fetchCategory();
             setLoading(false);
         };
         fetchData();
-    }, [fetchProduct, verifyAdminAuth]);
+    }, [verifyAdminAuth]);
 
     useEffect(() => {
         if (typeof window !== "undefined" && products.length > 0 && !loading) {
@@ -223,244 +161,6 @@ const ProductTable = () => {
     }, [products, loading]);
 
 
-
-    const handleDelete = async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        try {
-            Swal.fire({
-                title: "Deleting...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
-            setLoading(true);
-
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            Swal.close();
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                });
-                setLoading(false);
-                return;
-            }
-
-            const result = await response.json();
-
-            Swal.fire({
-                icon: "success",
-                title: "Trash!",
-                text: result.message || `${item.name} has been Trashed successfully.`,
-            });
-
-            await fetchProduct();
-        } catch (error) {
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-    const handlePermanentDelete = async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        try {
-            Swal.fire({
-                title: "Deleting...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
-            setLoading(true);
-
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/product/${item.id}/destroy`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            Swal.close();
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                });
-                setLoading(false);
-                return;
-            }
-
-            const result = await response.json();
-
-            Swal.fire({
-                icon: "success",
-                title: "Deleted!",
-                text: result.message || `${item.name} has been deleted successfully.`,
-            });
-
-            await trashProducts();
-        } catch (error) {
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleRestore = useCallback(async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/product/${item?.id}/restore`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
-                });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Something Wrong!"
-                );
-            }
-
-            const result = await response.json();
-            if (result.status) {
-                Swal.fire({
-                    icon: "success",
-                    text: `${item.name} Has Been Restored Successfully !`,
-                });
-                await trashProducts();
-            }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, trashProducts]);
-
-    const [selected, setSelected] = useState([]);
-    const [selectedMonth, setSelectedMonth] = useState(() => {
-        const today = new Date();
-        return today.toISOString().slice(0, 7);
-    });
-    const handleCheckboxChange = (id) => {
-        setSelected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
-    };
-
-    const handleEdit = (id) => {
-        setActiveTab('product-details');
-        router.push(`/admin/products/update?id=${id}`);
-    }
-
     return (
         <div className="">
             <div className="flex flex-wrap md:justify-end justify-items-center gap-2 mb-4">
@@ -475,35 +175,7 @@ const ProductTable = () => {
             </div>
 
             <div className="flex flex-wrap gap-4 items-end">
-                {/* <div className="w-full md:w-4/12">
-                    <label className="block text-sm font-medium text-gray-700">RTO Address *</label>
-                    <select
-                        value={selectedRtoAddress}
-                        onChange={(e) => setSelectedRtoAddress(e.target.value)}
-                        className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
-                    >
-                        <option value="">All</option>
-                        {[...new Set(products.map(item => item.rtoAddress))].map((addr, index) => (
-                            <option key={index} value={addr}>{addr}</option>
-                        ))}
-                    </select>
 
-                </div>
-
-                <div className="w-full md:w-3/12">
-                    <label className="block text-sm font-medium text-gray-700">Pickup Address *</label>
-                    <select
-                        value={selectedPickupAddress}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
-                    >
-                        <option value="">All</option>
-                        {[...new Set(products.map(item => item.pickupAddress))].map((addr, index) => (
-                            <option key={index} value={addr}>{addr}</option>
-                        ))}
-                    </select>
-
-                </div> */}
 
                 <div className="md:w-4/12">
                     <label className="block text-sm font-medium text-gray-700">Select Model</label>
@@ -591,18 +263,10 @@ const ProductTable = () => {
                             </button>
                             <div className="flex justify-end gap-2">
                                 <button
-                                    className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-                                    onClick={async () => {
-                                        if (isTrashed) {
-                                            setIsTrashed(false);
-                                            await fetchProduct();
-                                        } else {
-                                            setIsTrashed(true);
-                                            await trashProducts();
-                                        }
-                                    }}
+                                    className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                    onClick={handleToggleTrash}
                                 >
-                                    {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
+                                    {isTrashed ? "Products Listing (Simple)" : "Trashed Products"}
                                 </button>
 
                             </div>
@@ -745,19 +409,21 @@ const ProductTable = () => {
                                                 </td>
                                             )}
                                             <td className="p-2 px-5 capitalize  text-left whitespace-nowrap  text-[#8F9BBA]">
-                                                <div className="flex justify-center gap-2">
-                                                    {isTrashed ? (
-                                                        <>
-                                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <MdModeEdit onClick={() => handleEdit(item.id)} className="cursor-pointer text-3xl" />
-                                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
-                                                        </>
-                                                    )}
-                                                </div>
+                                                <div className="flex gap-2"> {isTrashed ? (
+                                                    <>
+                                                        <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />
+                                                        <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <MdModeEdit onClick={() => {
+                                                            router.push(`/admin/products/update?id=${item.id}`);
+                                                            setActiveTab('product-details');
+                                                        }
+                                                        } className="cursor-pointer text-3xl" />
+                                                        <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                    </>
+                                                )}</div>
                                             </td>
                                         </tr>
                                     ))}

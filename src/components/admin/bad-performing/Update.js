@@ -50,7 +50,7 @@ export default function Update() {
     try {
         setLoading(true);
         const response = await fetch(
-            `https://sleeping-owl-we0m.onrender.com/api/bad-pincode/${id}`,
+            `http://localhost:3001/api/bad-pincode/${id}`,
             {
                 method: "GET",
                 headers: {
@@ -120,7 +120,7 @@ export default function Update() {
       const formdata = new FormData();
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/bad-pincode/${id}`, {
+      const res = await fetch(`http://localhost:3001/api/bad-pincode/${id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
@@ -170,7 +170,7 @@ export default function Update() {
           <div>
             <label className="font-bold block text-[#232323]">Pincode<span className="text-red-500">*</span></label>
             <input
-              type="text"
+              type="number"
               name="pincode"
               value={formData.pincode || ''}
               onChange={handleChange}

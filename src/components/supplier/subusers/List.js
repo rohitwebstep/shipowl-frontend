@@ -12,7 +12,7 @@ import { useSupplier } from "../middleware/SupplierMiddleWareContext";
 export default function List() {
     const [isTrashed, setIsTrashed] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const { verifySupplierAuth } = useSupplier();
     const router = useRouter();
@@ -34,7 +34,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier`,
+                `http://localhost:3001/api/supplier`,
                 {
                     method: "GET",
                     headers: {
@@ -81,7 +81,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/trashed`,
+                `http://localhost:3001/api/supplier/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -207,7 +207,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item.id}`,
+                `http://localhost:3001/api/supplier/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -268,7 +268,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item?.id}/restore`,
+                `http://localhost:3001/api/supplier/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -347,7 +347,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item.id}/destroy`,
+                `http://localhost:3001/api/supplier/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

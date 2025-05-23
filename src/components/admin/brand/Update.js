@@ -65,28 +65,28 @@ export default function Update() {
                 title: "Invalid brand",
                 text: "No brand ID provided.",
             });
-            router.push("/supplier/brand/list");
+            router.push("/admin/brand/list");
             return;
         }
 
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (supplierData?.project?.active_panel !== "supplier") {
+        if (supplierData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
         const suppliertoken = supplierData?.security?.token;
         if (!suppliertoken) {
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`,
+                `http://localhost:3001/api/brand/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -142,15 +142,15 @@ export default function Update() {
         setLoading(true);
 
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (dropshipperData?.project?.active_panel !== "supplier") {
+        if (dropshipperData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
         const token = dropshipperData?.security?.token;
         if (!token) {
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
@@ -183,7 +183,7 @@ export default function Update() {
                 });
             }
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}`;
+            const url = `http://localhost:3001/api/brand/${id}`;
 
             const response = await fetch(url, {
                 method: "PUT",
@@ -217,7 +217,7 @@ export default function Update() {
                     if (res.isConfirmed) {
                         setFormData({ name: '', description: '', image: '', status: false });
                         setFiles([]);
-                        router.push("/supplier/brand/list");
+                        router.push("/admin/brand/list");
                     }
                 });
             }
@@ -239,15 +239,15 @@ export default function Update() {
         setLoading(true);
 
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (dropshipperData?.project?.active_panel !== "supplier") {
+        if (dropshipperData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
         const token = dropshipperData?.security?.token;
         if (!token) {
-            router.push("/supplier/auth/login");
+            router.push("/admin/auth/login");
             return;
         }
 
@@ -261,7 +261,7 @@ export default function Update() {
                 }
             });
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/brand/${id}/image/${index}`;
+            const url = `http://localhost:3001/api/brand/${id}/image/${index}`;
 
             const response = await fetch(url, {
                 method: "DELETE",

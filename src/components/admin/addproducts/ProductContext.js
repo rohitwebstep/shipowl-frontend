@@ -34,10 +34,10 @@ const ProductProvider = ({ children }) => {
         sku: '',
         qty: 1,
         currency: '',
-        suggested_price:"",
-        shipowl_price:"",
-        rto_suggested_price:"",
-        rto_price:""
+        suggested_price: "",
+        shipowl_price: "",
+        rto_suggested_price: "",
+        rto_price: ""
       },
     ],
     shipping_time: '24 Hours',
@@ -46,14 +46,17 @@ const ProductProvider = ({ children }) => {
     package_width: '',
     package_height: '',
     chargeable_weight: '',
-    package_weight_image:0,
-    package_length_image:0,
-    package_width_image:0,
-    package_height_image:0,
-    product_detail_video:0,
-    training_guidance_video:0,
+    package_weight_image: 0,
+    package_length_image: 0,
+    package_width_image: 0,
+    package_height_image: 0,
+    product_detail_video: 0,
+    training_guidance_video: 0,
     hsn_code: '',
     tax_rate: '',
+    isVisibleToAll: true,
+    supplierIds: '',
+    status: true,
   });
 
   const fetchCategory = useCallback(async () => {
@@ -72,7 +75,7 @@ const ProductProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/category', {
+      const response = await fetch('http://localhost:3001/api/admin/category', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +121,7 @@ const ProductProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/brand', {
+      const response = await fetch('http://localhost:3001/api/admin/brand', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +150,7 @@ const ProductProvider = ({ children }) => {
       console.error('Error fetching brands:', error);
     }
   }, [router]);
-  
+
   const fileFields = [
     { label: 'Package Weight Image', key: 'package_weight_image' },
     { label: 'Package Length Image', key: 'package_length_image' },
@@ -159,7 +162,7 @@ const ProductProvider = ({ children }) => {
   const fetchCountry = useCallback(async () => {
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
 
-   
+
 
     const admintoken = adminData?.security?.token;
     if (!admintoken) {
@@ -169,7 +172,7 @@ const ProductProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/location/country', {
+      const response = await fetch('http://localhost:3001/api/location/country', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -240,57 +243,72 @@ const ProductProvider = ({ children }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const validateFields = () => {
-    const requiredFields = [
-      'category',
-      'name',
-      'main_sku',
-      'description',
-      'brand',
-      'tags',
-      'origin_country',
-      'shipping_country',
-      'list_as',
-    ];
+ const validateFields = () => {
+  const requiredFields = [
+    'category',
+    'name',
+    'main_sku',
+    'description',
+    'brand',
+    'tags',
+    'origin_country',
+    'shipping_country',
+    'list_as',
+    'isVisibleToAll',
+  ];
 
-    const newErrors = {};
-    requiredFields.forEach((field) => {
-      if (!formData[field] || formData[field].toString().trim() === '') {
-        newErrors[field] = `${fieldLabels[field]} is required.`;
-      }
-    });
+  // ✅ Push to requiredFields, not validateFields
+  if (!formData.isVisibleToAll) {
+    requiredFields.push('supplierIds');
+  }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const newErrors = {};
+  requiredFields.forEach((field) => {
+    const value = formData[field];
+
+    // Check for undefined, null, empty string, or empty array
+    if (
+      value === undefined ||
+      value === null ||
+      (typeof value === 'string' && value.trim() === '') ||
+      (Array.isArray(value) && value.length === 0)
+    ) {
+      newErrors[field] = `${fieldLabels[field]} is required.`;
+    }
+  });
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
 
   return (
     <ProductContext.Provider
-    value={{
-      formData,
-      setFormData,
-      fileFields,
-      categoryData,
-      setCategoryData,
-      brandData,
-      setBrandData,
-      countryData,
-      setCountryData,
-      isEdit,
-      validateForm2,
-      setIsEdit,
-      fetchCategory,
-      fetchBrand,
-      fetchCountry,
-      loading,
-      activeTab,  errors, setErrors,shippingErrors, setShippingErrors,
-      validateFields,     // ✅ Added
-      setActiveTab,    // ✅ Added
-    }}
-  >
-    {children}
-  </ProductContext.Provider>
-  
+      value={{
+        formData,
+        setFormData,
+        fileFields,
+        categoryData,
+        setCategoryData,
+        brandData,
+        setBrandData,
+        countryData,
+        setCountryData,
+        isEdit,
+        validateForm2,
+        setIsEdit,
+        fetchCategory,
+        fetchBrand,
+        fetchCountry,
+        loading,
+        activeTab, errors, setErrors, shippingErrors, setShippingErrors,
+        validateFields,     // ✅ Added
+        setActiveTab,    // ✅ Added
+      }}
+    >
+      {children}
+    </ProductContext.Provider>
+
   );
 };
 

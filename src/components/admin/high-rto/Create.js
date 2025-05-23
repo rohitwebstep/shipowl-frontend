@@ -55,7 +55,7 @@ export default function Create() {
 
     try {
       setCityLoading(true);
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+      const res = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -85,7 +85,7 @@ export default function Create() {
 
     try {
       setStateLoading(true);
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`, {
+      const res = await fetch(`http://localhost:3001/api/location/country/${id}/states`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -115,7 +115,7 @@ export default function Create() {
 
     try {
       setLoading(true);
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country`, {
+      const res = await fetch(`http://localhost:3001/api/location/country`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -146,11 +146,16 @@ export default function Create() {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+  try {
+    // Safely parse localStorage data
+    const dropshipperDataRaw = localStorage.getItem("shippingData");
+    if (!dropshipperDataRaw) throw new Error("Session expired. Please log in again.");
+
+    const dropshipperData = JSON.parse(dropshipperDataRaw);
     const token = dropshipperData?.security?.token;
 
     if (dropshipperData?.project?.active_panel !== "admin" || !token) {
@@ -159,41 +164,50 @@ export default function Create() {
       return;
     }
 
+    // Validate form inputs
     const newErrors = validate();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      setLoading(false);
       return;
     }
 
-    try {
-      Swal.fire({ title: "Creating High Rto...", allowOutsideClick: false, didOpen: Swal.showLoading });
-      const formdata = new FormData();
-      formdata.append("city", formData.city);
-      formdata.append("country", formData.country);
-      formdata.append("state", formData.state);
-      formdata.append("pincode", formData.pincode);
+    Swal.fire({ title: "Creating High RTO...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/high-rto", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formdata,
-      });
+    // Prepare FormData
+    const formdata = new FormData();
+    formdata.append("city", formData.city);
+    formdata.append("country", formData.country);
+    formdata.append("state", formData.state);
+    formdata.append("pincode", formData.pincode);
 
-      const result = await res.json();
+    const res = await fetch("http://localhost:3001/api/high-rto", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+        // Do NOT set 'Content-Type' when sending FormData
+      },
+      body: formdata,
+    });
 
-      if (!res.ok) throw new Error(result.message || result.error || "Creation failed");
+    const result = await res.json();
 
-      Swal.fire("High RTO Created", " High RTO has been created successfully!", "success").then(() => {
-        setFormData({state: "", country: "", city: "", pincode: "" });
-        router.push("/admin/high-rto/list");
-      });
-    } catch (err) {
-      Swal.fire("Error", err.message || err.error || "Something went wrong.", "error");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error(result.message || result.error || "Creation failed");
     }
-  };
+
+    // Success
+    await Swal.fire("High RTO Created", "High RTO has been created successfully!", "success");
+
+    // Reset and redirect
+    setFormData({ state: "", country: "", city: "", pincode: "" });
+    router.push("/admin/high-rto/list");
+  } catch (err) {
+    Swal.fire("Error", err.message || "Something went wrong.", "error");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const countryOptions = countryData.map((item) => ({ value: item.id || item._id, label: item.name }));
   const stateOptions = stateData.map((item) => ({ value: item.id || item._id, label: item.name }));

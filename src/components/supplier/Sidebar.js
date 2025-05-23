@@ -29,7 +29,8 @@ export default function Sidebar() {
 
     const menuItems = [
         { name: "Dashboard", icon: Home, href: "/supplier" },
-        { name: "Product", icon: ShoppingCart, href: "/supplier/product" },
+        { name: "Inventory", icon: ShoppingCart, href: "/supplier/inventory" },
+        { name: "Products", icon: Package, href: "/supplier/product/create" },
         { name: "New Product Request", icon: Package, href: "/supplier/product/request" },
         { name: "Orders", icon: ClipboardList, href: "/supplier/orders" },
         { name: "Warehouse", icon: Warehouse, href: "/supplier/warehouse" },

@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
@@ -7,20 +7,19 @@ import { FaCheck } from "react-icons/fa";
 import { AiOutlineDelete } from "react-icons/ai";
 import HashLoader from "react-spinners/HashLoader";
 import { useRouter } from "next/navigation";
-import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
+import { useAdminActions } from "@/components/commonfunctions/MainContext";
 
 export default function List() {
     const [isTrashed, setIsTrashed] = useState(false);
     const [selected, setSelected] = useState([]);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
-    const [stateData, setStateData] = useState([]);
-    const [countryData, setCountryData] = useState([]);
     const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
+    const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("courier-company", "courierCompanies");
 
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
@@ -28,119 +27,31 @@ export default function List() {
         );
     };
 
-
-    const fetchCompany = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-    
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-    
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-    
-            const result = await response.json();
-    
-            if (!response.ok) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: result.message || result.error || "Your session has expired. Please log in again.",
-                });
-                throw new Error(result.message || result.error || "Something Wrong!");
-            }
-    
-            setData(result?.courierCompanies || []);
-        } catch (error) {
-            console.error("Error fetching cities:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router]);
-    
-    const trashedComany = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/trashed`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
-                });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Something Wrong!"
-                );
-            }
-
-            const result = await response.json();
-            if (result) {
-                setData(result?.courierCompanies || []);
-            }
-        } catch (error) {
-            console.error("Error fetching trashed courier-company:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, setData]);
-
+    // Initial Auth + fetch
     useEffect(() => {
-        const fetchData = async () => {
-            setIsTrashed(false);
-            setLoading(true);
+        const fetchInitialData = async () => {
             await verifyAdminAuth();
-            await fetchCompany();
-            setLoading(false);
-        };
-        fetchData();
-    }, [fetchCompany, verifyAdminAuth]);
+            await fetchAll(setData, setLoading);
 
+
+        };
+
+        fetchInitialData();
+    }, [fetchAll]);
+
+
+    const handleToggleTrash = async () => {
+        setIsTrashed(prev => !prev);
+        if (!isTrashed) {
+            await fetchTrashed(setData, setLoading);
+        } else {
+            await fetchAll(setData, setLoading);
+        }
+    };
+
+    const handleSoftDelete = (id) => softDelete(id, () => fetchAll(setData, setLoading));
+    const handleRestore = (id) => restore(id, () => fetchTrashed(setData, setLoading));
+    const handleDestroy = (id) => destroy(id, () => fetchTrashed(setData, setLoading));
     useEffect(() => {
         if (typeof window !== 'undefined' && data.length > 0 && !loading) {
             let table = null;
@@ -175,240 +86,14 @@ export default function List() {
         }
     }, [data, loading]);
 
-    const handleEditItem = (item) => {
-        router.push(`/admin/courier/update?id=${item.id}`);
-    };
 
-
-    const handleDelete = async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        try {
-            Swal.fire({
-                title: "Deleting...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
-            setLoading(true);
-
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${item.id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            Swal.close();
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                });
-                setLoading(false);
-                return;
-            }
-
-            const result = await response.json();
-
-            Swal.fire({
-                icon: "success",
-                title: "Trash!",
-                text: result.message || `${item.name} has been Trashed successfully.`,
-            });
-
-            await fetchCompany();
-        } catch (error) {
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-    const handleRestore = useCallback(async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${item?.id}/restore`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
-                });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Something Wrong!"
-                );
-            }
-
-            const result = await response.json();
-            if (result.status) {
-                Swal.fire({
-                    icon: "success",
-                    text: `${item.name} Has Been Restored Successfully !`,
-                });
-                await trashedComany();
-            }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, trashedComany]);
-
-    const handlePermanentDelete = async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        try {
-            Swal.fire({
-                title: "Deleting...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
-            setLoading(true);
-
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/courier-company/${item.id}/destroy`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            Swal.close();
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                });
-                setLoading(false);
-                return;
-            }
-
-            const result = await response.json();
-
-            Swal.fire({
-                icon: "success",
-                title: "Deleted!",
-                text: result.message || `${item.name} has been deleted successfully.`,
-            });
-
-            await trashedComany();
-        } catch (error) {
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-  if (loading) {
-          return (
-              <div className="flex items-center justify-center h-[80vh]">
-                  <HashLoader size={60} color="#F97316" loading={true} />
-              </div>
-          );
-      }
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
+    }
     return (
         <>
 
@@ -416,6 +101,16 @@ export default function List() {
                 <div className="flex flex-wrap justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-[#2B3674]">Courier Company List</h2>
                     <div className="flex gap-3  flex-wrap items-center">
+
+                        <div className="flex justify-start gap-5 items-end">
+                            <button
+                                className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                onClick={handleToggleTrash}
+                            >
+                                {isTrashed ? "Company Listing (Simple)" : "Trashed Company"}
+                            </button>
+                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/courier/create">Add New</Link></button>
+                        </div>
                         <button
                             onClick={() => setIsPopupOpen((prev) => !prev)}
                             className="bg-[#F4F7FE] p-2 rounded-lg relative"
@@ -431,100 +126,83 @@ export default function List() {
                                 </div>
                             )}
                         </button>
-                        <div className="flex justify-start gap-5 items-end">
-                        <button
-                                    className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-                                    onClick={async () => {
-                                        if (isTrashed) {
-                                            setIsTrashed(false);
-                                            await fetchCompany();
-                                        } else {
-                                            setIsTrashed(true);
-                                            await trashedComany();
-                                        }
-                                    }}
-                                >
-                                    {isTrashed ? "courier-company Listing (Simple)" : "Trashed courier-company"}
-                                </button>
-                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/courier/create">Add New</Link></button>
-                        </div>
                     </div>
                 </div>
-              {data.length > 0 ?(
-                  <div className="overflow-x-auto relative main-outer-wrapper w-full">
+                {data.length > 0 ? (
+                    <div className="overflow-x-auto relative main-outer-wrapper w-full">
                         <table className="md:w-full w-auto display main-tables" id="courier-companytable">
-                      <thead>
-                          <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Name</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Code</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Website</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Email</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Number</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase"> RTO Charges</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase"> Flat Shipping Rate</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {data.map((item) => (
-                              <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                  <td className="p-2 whitespace-nowrap px-5">
-                                      <div className="flex items-center">
-                                          <label className="flex items-center cursor-pointer me-2">
-                                              <input
-                                                  type="checkbox"
-                                                  checked={selected.includes(item.id)}
-                                                  onChange={() => handleCheckboxChange(item.id)}
-                                                  className="peer hidden"
-                                              />
-                                              <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                            <thead>
+                                <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Name</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Courier Code</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Website</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Email</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Contact Number</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase"> RTO Charges</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase"> Flat Shipping Rate</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Status</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.map((item) => (
+                                    <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                        <td className="p-2 whitespace-nowrap px-5">
+                                            <div className="flex items-center">
+                                                <label className="flex items-center cursor-pointer me-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selected.includes(item.id)}
+                                                        onChange={() => handleCheckboxChange(item.id)}
+                                                        className="peer hidden"
+                                                    />
+                                                    <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
                                                                          peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                                  <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                              </div>
-                                          </label>
-                                          {item.name}
-                                      </div>
+                                                        <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                                    </div>
+                                                </label>
+                                                {item.name}
+                                            </div>
 
-                                  </td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.code || 'NIL'}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.website || 'NIL'}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.email || 'NIL'}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.phoneNumber || 'NIL'}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.rtoCharges || 'NIL'}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.flatShippingRate || 'NIL'}</td>
-                                  <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
-                                                {item.status ? (
-                                                    <span className="bg-green-100 text-green-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
-                                                ) : (
-                                                    <span className="bg-red-100 text-red-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
-                                                )}
-                                            </td>   
-                                  <td className="p-2 px-5 text-[#8F9BBA] text-center">
+                                        </td>
+                                        <td className="p-2 whitespace-nowrap px-5">{item.code || 'NIL'}</td>
+                                        <td className="p-2 whitespace-nowrap px-5">{item.website || 'NIL'}</td>
+                                        <td className="p-2 whitespace-nowrap px-5">{item.email || 'NIL'}</td>
+                                        <td className="p-2 whitespace-nowrap px-5">{item.phoneNumber || 'NIL'}</td>
+                                        <td className="p-2 whitespace-nowrap px-5">{item.rtoCharges || 'NIL'}</td>
+                                        <td className="p-2 whitespace-nowrap px-5">{item.flatShippingRate || 'NIL'}</td>
+                                        <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
+                                            {item.status ? (
+                                                <span className="bg-green-100 text-green-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
+                                            ) : (
+                                                <span className="bg-red-100 text-red-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
+                                            )}
+                                        </td>
+                                        <td className="p-2 px-5 text-[#8F9BBA] text-center">
 
-                                    <div className="flex gap-2">{isTrashed ? (
-                                        <>
-                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
-                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
-                                        </>
-                                    )}</div>
+                                            <div className="flex gap-2"> {isTrashed ? (
+                                                <>
+                                                    <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />
+                                                    <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <MdModeEdit onClick={() => router.push(`/admin/courier/update?id=${item.id}`)} className="cursor-pointer text-3xl" />
+                                                    <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                </>
+                                            )}</div>
 
-                                  </td>
-                              </tr>
-                          ))}
-                      </tbody>
-                  </table>
-              </div>
-              ):(
-                <p className="text-center">No Company Found</p>
-              )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p className="text-center">No Company Found</p>
+                )}
 
-               
+
             </div>
 
 

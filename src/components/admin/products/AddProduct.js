@@ -12,7 +12,7 @@ import { ProductContextEdit } from "./ProductContextEdit";
 const AddProduct = () => {
 
   const [loading, setLoading] = useState(false);
-  const { activeTab, setActiveTab, setFormData, validateFields, validateForm2 } = useContext(ProductContextEdit);
+  const { activeTab, setActiveTab, setFormData,formData, validateFields, validateForm2 } = useContext(ProductContextEdit);
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -48,7 +48,7 @@ const AddProduct = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/product/${id}`, {
+      const response = await fetch(`http://localhost:3001/api/admin/product/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -103,6 +103,7 @@ const AddProduct = () => {
         })),
         shipping_time: products.shipping_time || '',
         weight: products.weight || '',
+        status: products.status || '',
         package_length: products.package_length || '',
         package_width: products.package_width || '',
         package_height: products.package_height || '',
@@ -115,6 +116,8 @@ const AddProduct = () => {
         training_guidance_video: products.training_guidance_video || '',
         hsn_code: products.hsnCode || '',
         tax_rate: products.taxRate || '',
+        isVisibleToAll: products.isVisibleToAll,
+        supplierIds: products.supplierVisibility.map(item => item.supplierId).join(',') || '',
       });
 
     } catch (error) {
@@ -124,6 +127,7 @@ const AddProduct = () => {
     }
   }, [router, id, setFormData]);
 
+  console.log(`FormData - `, formData.supplierIds);
 
 
   const tabs = [
@@ -155,8 +159,8 @@ const AddProduct = () => {
               type="button"
               onClick={() => handleTabClick(tab.id)}
               className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${activeTab === tab.id
-                  ? 'border-b-3 border-orange-500 text-orange-500'
-                  : 'text-[#718EBF]'
+                ? 'border-b-3 border-orange-500 text-orange-500'
+                : 'text-[#718EBF]'
                 }`}
             >
               {tab.label}

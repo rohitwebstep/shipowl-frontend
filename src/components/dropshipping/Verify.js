@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 
 export default function Verify() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function Verify() {
       redirect: "follow",
     };
 
-    fetch("https://sleeping-owl-we0m.onrender.com/api/dropshipper/auth/registration/verify", requestOptions)
+    fetch("http://localhost:3001/api/dropshipper/auth/registration/verify", requestOptions)
       .then(async (response) => {
         const text = await response.text();
         setLoading(false);

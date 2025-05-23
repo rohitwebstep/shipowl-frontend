@@ -16,7 +16,7 @@ const SupplierList = () => {
     const { verifyAdminAuth } = useAdmin();
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
  
       
     const fetchSupplier = useCallback(async () => {
@@ -36,7 +36,7 @@ const SupplierList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/supplier`, {
+            const response = await fetch(`http://localhost:3001/api/admin/supplier`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const SupplierList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/supplier/trashed`, {
+            const response = await fetch(`http://localhost:3001/api/admin/supplier/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -193,7 +193,7 @@ const SupplierList = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${item.id}`,
+                `http://localhost:3001/api/admin/supplier/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -275,7 +275,7 @@ const SupplierList = () => {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${item.id}/destroy`,
+                `http://localhost:3001/api/admin/supplier/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -337,7 +337,7 @@ const SupplierList = () => {
             try {
                 setLoading(true);
                 const response = await fetch(
-                    `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${item?.id}/restore`,
+                    `http://localhost:3001/api/admin/supplier/${item?.id}/restore`,
                     {
                         method: "PATCH",
                         headers: {

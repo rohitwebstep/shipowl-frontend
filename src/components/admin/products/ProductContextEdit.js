@@ -36,10 +36,10 @@ const ProductProviderEdit = ({ children }) => {
         sku: '',
         qty: 1,
         currency: '',
-        suggested_price:"",
-        shipowl_price:"",
-        rto_suggested_price:"",
-        rto_price:""
+        suggested_price: "",
+        shipowl_price: "",
+        rto_suggested_price: "",
+        rto_price: ""
       },
     ],
     shipping_time: '24 Hours',
@@ -48,14 +48,17 @@ const ProductProviderEdit = ({ children }) => {
     package_width: '',
     package_height: '',
     chargeable_weight: '',
-    package_weight_image:0,
-    package_length_image:0,
-    package_width_image:0,
-    package_height_image:0,
-    product_detail_video:0,
-    training_guidance_video:0,
+    package_weight_image: 0,
+    package_length_image: 0,
+    package_width_image: 0,
+    package_height_image: 0,
+    product_detail_video: 0,
+    training_guidance_video: 0,
     hsn_code: '',
     tax_rate: '',
+    isVisibleToAll: '',
+    supplierIds: '',
+    status: '',
   });
 
   const fetchCategory = useCallback(async () => {
@@ -74,7 +77,7 @@ const ProductProviderEdit = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/category', {
+      const response = await fetch('http://localhost:3001/api/admin/category', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +123,7 @@ const ProductProviderEdit = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/brand', {
+      const response = await fetch('http://localhost:3001/api/admin/brand', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -149,7 +152,7 @@ const ProductProviderEdit = ({ children }) => {
       console.error('Error fetching brands:', error);
     }
   }, [router]);
-  
+
   const fileFields = [
     { label: 'Package Weight Image', key: 'package_weight_image' },
     { label: 'Package Length Image', key: 'package_length_image' },
@@ -161,7 +164,7 @@ const ProductProviderEdit = ({ children }) => {
   const fetchCountry = useCallback(async () => {
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
 
-   
+
 
     const admintoken = adminData?.security?.token;
     if (!admintoken) {
@@ -171,7 +174,7 @@ const ProductProviderEdit = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/location/country', {
+      const response = await fetch('http://localhost:3001/api/location/country', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -215,50 +218,33 @@ const ProductProviderEdit = ({ children }) => {
     video: 'Product Video URL',
     list_as: 'List As',
   };
-const validateForm2 = () => {
-  const newErrors = {};
+  const validateForm2 = () => {
+    const newErrors = {};
 
-  const requiredFields = [
-    'shipping_time',
-    'weight',
-    'package_length',
-    'package_width',
-    'package_height',
-    'chargable_weight',
-  ];
+    const requiredFields = [
+      'shipping_time',
+      'weight',
+      'package_length',
+      'package_width',
+      'package_height',
+      'chargable_weight',
+    ];
 
-  // Validate simple fields
-  requiredFields.forEach((field) => {
-    if (!formData[field]) {
-      newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
-    }
-  });
+    // Validate simple fields
+    requiredFields.forEach((field) => {
+      if (!formData[field]) {
+        newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
+      }
+    });
 
-  // Validate image/file uploads
-  fileFields.forEach(({ key }) => {
-    const uploadedFiles = files[key];
-    const existingFiles = formData[key];
+   
 
-    const hasNewUpload =
-      Array.isArray(uploadedFiles) &&
-      uploadedFiles.length > 0 &&
-      uploadedFiles.some((file) => file instanceof File || file.name);
-
-    const hasExistingUpload =
-      typeof existingFiles === 'string' &&
-      existingFiles.split(',').map((f) => f.trim()).filter(Boolean).length > 0;
-
-    if (!hasNewUpload && !hasExistingUpload) {
-      newErrors[key] = `Please upload a file for ${key.replace(/_/g, ' ')}`;
-    }
-  });
-
-  setShippingErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    setShippingErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
 
-  console.log('files',files)
+  console.log('files', files)
 
   const validateFields = () => {
     const requiredFields = [
@@ -271,11 +257,25 @@ const validateForm2 = () => {
       'origin_country',
       'shipping_country',
       'list_as',
+      'isVisibleToAll',
     ];
+
+    // ✅ Push to requiredFields, not validateFields
+    if (!formData.isVisibleToAll) {
+      requiredFields.push('supplierIds');
+    }
 
     const newErrors = {};
     requiredFields.forEach((field) => {
-      if (!formData[field] || formData[field].toString().trim() === '') {
+      const value = formData[field];
+
+      // Check for undefined, null, empty string, or empty array
+      if (
+        value === undefined ||
+        value === null ||
+        (typeof value === 'string' && value.trim() === '') ||
+        (Array.isArray(value) && value.length === 0)
+      ) {
         newErrors[field] = `${fieldLabels[field]} is required.`;
       }
     });
@@ -286,32 +286,32 @@ const validateForm2 = () => {
 
   return (
     <ProductContextEdit.Provider
-    value={{
-      formData,
-      setFormData,
-      fileFields,
-      categoryData,
-      setCategoryData,
-      brandData,
-      setBrandData,
-      countryData,
-      setCountryData,
-      isEdit,
-      validateForm2,
-      setIsEdit,
-      fetchCategory,
-      fetchBrand,
-      fetchCountry,
-      loading,
-      activeTab,  errors, setErrors,shippingErrors, setShippingErrors,
-      validateFields,     // ✅ Added
-      setActiveTab,  
-      files, setFiles  // ✅ Added
-    }}
-  >
-    {children}
-  </ProductContextEdit.Provider>
-  
+      value={{
+        formData,
+        setFormData,
+        fileFields,
+        categoryData,
+        setCategoryData,
+        brandData,
+        setBrandData,
+        countryData,
+        setCountryData,
+        isEdit,
+        validateForm2,
+        setIsEdit,
+        fetchCategory,
+        fetchBrand,
+        fetchCountry,
+        loading,
+        activeTab, errors, setErrors, shippingErrors, setShippingErrors,
+        validateFields,     // ✅ Added
+        setActiveTab,
+        files, setFiles  // ✅ Added
+      }}
+    >
+      {children}
+    </ProductContextEdit.Provider>
+
   );
 };
 

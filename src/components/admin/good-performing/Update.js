@@ -1,5 +1,5 @@
 "use client";
-import { useRouter ,useSearchParams} from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import { HashLoader } from "react-spinners";
@@ -14,7 +14,7 @@ export default function Update() {
   const [formData, setFormData] = useState({
     pincode: "",
   });
- const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const [errors, setErrors] = useState({});
 
@@ -26,7 +26,7 @@ export default function Update() {
       [name]: value,
     }));
 
-    
+
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -38,55 +38,55 @@ export default function Update() {
     const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
     if (adminData?.project?.active_panel !== "admin") {
-        localStorage.removeItem("shippingData");
-        router.push("/admin/auth/login");
-        return;
+      localStorage.removeItem("shippingData");
+      router.push("/admin/auth/login");
+      return;
     }
 
     const admintoken = adminData?.security?.token;
     if (!admintoken) {
-        router.push("/admin/auth/login");
-        return;
+      router.push("/admin/auth/login");
+      return;
     }
 
     try {
-        setLoading(true);
-        const response = await fetch(
-            `https://sleeping-owl-we0m.onrender.com/api/good-pincode/${id}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${admintoken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            const errorMessage = await response.json();
-            Swal.fire({
-                icon: "error",
-                title: "Something Wrong!",
-                text: errorMessage.message || "Your session has expired. Please log in again.",
-            });
-            throw new Error(errorMessage.message);
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:3001/api/good-pincode/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${admintoken}`,
+          },
         }
+      );
 
-        const result = await response.json();
-        const pinCode = result?.goodPincode || {};
-      
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Something Wrong!",
+          text: errorMessage.message || "Your session has expired. Please log in again.",
+        });
+        throw new Error(errorMessage.message);
+      }
 
-        setFormData({
-          pincode: pinCode?.pincode|| "",
-          });
+      const result = await response.json();
+      const pinCode = result?.goodPincode || {};
+
+
+      setFormData({
+        pincode: pinCode?.pincode || "",
+      });
     } catch (error) {
-        console.error("Error fetching Company:", error);
+      console.error("Error fetching Company:", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-}, [router, id]);
+  }, [router, id]);
 
- 
+
   useEffect(() => {
     fetchPincodes();
   }, [fetchPincodes]);
@@ -122,7 +122,7 @@ export default function Update() {
       const formdata = new FormData();
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/good-pincode/${id}`, {
+      const res = await fetch(`http://localhost:3001/api/good-pincode/${id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,
@@ -133,7 +133,7 @@ export default function Update() {
       if (!res.ok) throw new Error(result.message || result.error || "Creation failed");
 
       Swal.fire("Updating...", "Good Pincode Has been Updated successfully!", "success").then(() => {
-        setFormData({state: "", country: "", city: "", pincode: "" });
+        setFormData({ state: "", country: "", city: "", pincode: "" });
         router.push("/admin/good-pincodes/list");
       });
     } catch (err) {
@@ -153,15 +153,15 @@ export default function Update() {
     }
   };
 
-  
-     
-    if (loading) {
-            return (
-                <div className="flex items-center justify-center h-[80vh]">
-                    <HashLoader size={60} color="#F97316" loading={true} />
-                </div>
-            );
-        }
+
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <HashLoader size={60} color="#F97316" loading={true} />
+      </div>
+    );
+  }
 
   return (
     <div className="md:w-10/12 p-6 bg-white shadow-md rounded-lg mt-6">
@@ -171,7 +171,7 @@ export default function Update() {
           <div>
             <label className="font-bold block text-[#232323]">Pincode<span className="text-red-500">*</span></label>
             <input
-              type="text"
+              type="number"
               name="pincode"
               value={formData.pincode || ''}
               onChange={handleChange}

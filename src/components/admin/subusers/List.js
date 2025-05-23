@@ -13,7 +13,7 @@ import { useAdmin } from "../middleware/AdminMiddleWareContext";
 export default function List() {
     const [isTrashed, setIsTrashed] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
@@ -35,7 +35,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin`,
+                `http://localhost:3001/api/admin`,
                 {
                     method: "GET",
                     headers: {
@@ -82,7 +82,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/trashed`,
+                `http://localhost:3001/api/admin/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -208,7 +208,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/${item.id}`,
+                `http://localhost:3001/api/admin/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -269,7 +269,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/${item?.id}/restore`,
+                `http://localhost:3001/api/admin/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -348,7 +348,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/${item.id}/destroy`,
+                `http://localhost:3001/api/admin/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

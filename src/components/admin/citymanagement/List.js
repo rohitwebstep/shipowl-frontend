@@ -15,7 +15,7 @@ import { useAdmin } from "../middleware/AdminMiddleWareContext";
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState([]);
     const [cityData, setCityData] = useState([]);
     const [stateData, setStateData] = useState([]);
@@ -48,7 +48,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
+                `http://localhost:3001/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -97,7 +97,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city/trashed`,
+                `http://localhost:3001/api/location/city/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -222,7 +222,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city/${item.id}`,
+                `http://localhost:3001/api/location/city/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -283,7 +283,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city/${item?.id}/restore`,
+                `http://localhost:3001/api/location/city/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -362,7 +362,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city/${item.id}/destroy`,
+                `http://localhost:3001/api/location/city/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -433,7 +433,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/location/city/${id}`, {
+                    fetch(`http://localhost:3001/api/location/city/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",

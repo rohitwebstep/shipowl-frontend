@@ -69,7 +69,7 @@ const BusinessInfo = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+        `http://localhost:3001/api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -114,7 +114,7 @@ const BusinessInfo = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+      const response = await fetch(`http://localhost:3001/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -171,7 +171,7 @@ const BusinessInfo = () => {
         }
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `http://localhost:3001/api/admin/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -245,7 +245,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${id}`;
+      const url = `http://localhost:3001/api/admin/supplier/${id}`;
       const form = new FormData();
 
       for (const key in formData) {

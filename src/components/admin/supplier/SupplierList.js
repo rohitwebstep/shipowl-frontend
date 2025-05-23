@@ -3,25 +3,52 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect,useContext  } from "react";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
+import { useAdminActions } from '@/components/commonfunctions/MainContext';
+import { ProfileContext } from './ProfileContext';
 
 const SupplierList = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
     const { verifyAdminAuth } = useAdmin();
-    const [cityData, setCityData] = useState([]);
-    const [stateData, setStateData] = useState([]);
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [expandedItem, setExpandedItem] = useState(null);
     const [currentTab, setCurrentTab] = useState('active');
+    const [selected, setSelected] = useState([]);
+  const {  setActiveSubTab} = useContext(ProfileContext);
+
+    const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/supplier", "suppliers");
+
+    const handleCheckboxChange = (id) => {
+        setSelected((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+    };
+
+    const handleToggleTrash = async () => {
+        setIsTrashed(prev => !prev);
+        if (!isTrashed) {
+            await fetchTrashed(setSuppliers, setLoading);
+        } else {
+            await fetchAll(setSuppliers, setLoading);
+        }
+    };
+
+
+
+    const handleSoftDelete = (id) => softDelete(id, () => fetchAll(setSuppliers, setLoading));
+    const handleRestore = (id) => restore(id, () => fetchTrashed(setSuppliers, setLoading));
+    const handleDestroy = (id) => destroy(id, () => fetchTrashed(setSuppliers, setLoading));
+
+
     const filteredSuppliers = suppliers.filter((supplier) => {
         const status = supplier.status?.toLowerCase?.().trim?.() || '';
         return (
@@ -30,51 +57,7 @@ const SupplierList = () => {
         );
     });
 
-    const fetchSupplier = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/supplier`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${admintoken}`,
-                },
-            });
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
-                });
-                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
-            }
-
-            const result = await response.json();
-            if (result) {
-                setSuppliers(result?.suppliers || []);
-            }
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, setSuppliers]);
     const fetchSupplierStatus = useCallback(async (id, item) => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -92,7 +75,7 @@ const SupplierList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${id}/status?status=${item}`, {
+            const response = await fetch(`http://localhost:3001/api/admin/supplier/${id}/status?status=${item}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -111,7 +94,8 @@ const SupplierList = () => {
             }
 
             const result = await response.json();
-            fetchSupplier();
+            await fetchAll(setSuppliers, setLoading);
+
 
         } catch (error) {
             console.error("Error fetching categories:", error);
@@ -120,166 +104,19 @@ const SupplierList = () => {
         }
     }, [router]);
 
-    const fetchCity = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+ 
 
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: result.message || result.error || "Your session has expired. Please log in again.",
-                });
-                throw new Error(result.message || result.error || "Something Wrong!");
-            }
-
-            setCityData(result?.cities || []);
-        } catch (error) {
-            console.error("Error fetching cities:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router]);
-
-    const fetchState = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
-                });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Something Wrong!"
-                );
-            }
-
-            const result = await response.json();
-            if (result) {
-                setStateData(result?.states || []);
-            }
-        } catch (error) {
-            console.error("Error fetching state:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, setStateData]);
-
-
-    const trashSupplier = useCallback(async () => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/supplier/trashed`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${admintoken}`,
-                },
-            });
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
-                });
-                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
-            }
-
-            const result = await response.json();
-            if (result) {
-                setSuppliers(result?.suppliers || []);
-            }
-        } catch (error) {
-            console.error("Error fetching trashed categories:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, setSuppliers]);
 
     useEffect(() => {
         const fetchData = async () => {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
-            await fetchSupplier();
-            await fetchCity();
-            await fetchState();
+            await fetchAll(setSuppliers, setLoading);
             setLoading(false);
         };
         fetchData();
-    }, [fetchSupplier, verifyAdminAuth]);
+    }, [, verifyAdminAuth]);
     useEffect(() => {
         if (typeof window !== "undefined" && suppliers.length > 0 && !loading) {
             let table = null;
@@ -313,240 +150,6 @@ const SupplierList = () => {
         }
     }, [loading]);
 
-
-
-    const handleDelete = async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        try {
-            Swal.fire({
-                title: "Deleting...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
-            setLoading(true);
-
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${item.id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            Swal.close();
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                });
-                setLoading(false);
-                return;
-            }
-
-            const result = await response.json();
-
-            Swal.fire({
-                icon: "success",
-                title: "Trash!",
-                text: result.message || `${item.name} has been Trashed successfully.`,
-            });
-
-            await fetchSupplier();
-        } catch (error) {
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-    const handlePermanentDelete = async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        try {
-            Swal.fire({
-                title: "Deleting...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
-            setLoading(true);
-
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${item.id}/destroy`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            Swal.close();
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                });
-                setLoading(false);
-                return;
-            }
-
-            const result = await response.json();
-
-            Swal.fire({
-                icon: "success",
-                title: "Deleted!",
-                text: result.message || `${item.name} has been deleted successfully.`,
-            });
-
-            await trashSupplier();
-        } catch (error) {
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleRestore = useCallback(async (item) => {
-        const adminData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (adminData?.project?.active_panel !== "admin") {
-            localStorage.removeItem("shippingData");
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        const admintoken = adminData?.security?.token;
-        if (!admintoken) {
-            router.push("/admin/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${item?.id}/restore`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
-                });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Something Wrong!"
-                );
-            }
-
-            const result = await response.json();
-            if (result.status) {
-                Swal.fire({
-                    icon: "success",
-                    text: `${item.name} Has Been Restored Successfully !`,
-                });
-                await trashSupplier();
-            }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, trashSupplier]);
-
-    const [selected, setSelected] = useState([]);
-
-    const handleCheckboxChange = (id) => {
-        setSelected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
-    };
-
-    const handleEdit = (id) => {
-        router.push(`/admin/supplier/update?id=${id}`);
-    }
 
     if (loading) {
         return (
@@ -583,16 +186,8 @@ const SupplierList = () => {
                         </button>
 
                         <button
-                            className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-                            onClick={async () => {
-                                if (isTrashed) {
-                                    await fetchSupplier(); // Fetch the suppliers when in 'trashed' state
-                                    setIsTrashed(false); // Switch to the simple listing view
-                                } else {
-                                    await trashSupplier(); // Trash the supplier
-                                    setIsTrashed(true); // Switch to the trashed supplier view
-                                }
-                            }}
+                            className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                            onClick={handleToggleTrash}
                         >
                             {isTrashed ? "Supplier Listing (Simple)" : "Trashed Supplier"}
                         </button>
@@ -633,6 +228,7 @@ const SupplierList = () => {
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Email</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Current Address</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Permanent Address</th>
+                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Country</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">State</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">City</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Postal Code</th>
@@ -668,10 +264,13 @@ const SupplierList = () => {
                                             <td className="p-3 px-4 text-left whitespace-nowrap">{item.currentAddress || 'N/A'}</td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">{item.permanentAddress || 'N/A'}</td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                {stateData.find(state => state.id === item.permanentStateId)?.name || 'N/A'}
+                                                {item.permanentCountry?.name || 'N/A'}
                                             </td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                {cityData.find(city => city.id === item.permanentCityId)?.name || 'N/A'}
+                                                {item.permanentState?.name || 'N/A'}
+                                            </td>
+                                            <td className="p-3 px-4 text-left whitespace-nowrap">
+                                                {item.permanentCity?.name || 'N/A'}
                                             </td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">{item.permanentPostalCode || 'N/A'}</td>
                                             <td className="p-3 px-4 text-center whitespace-nowrap">
@@ -708,31 +307,21 @@ const SupplierList = () => {
 
 
                                             <td className="p-3 px-4 text-center">
-                                                <div className="flex justify-center gap-3">
-                                                    {isTrashed ? (
-                                                        <>
-                                                            <MdRestoreFromTrash
-                                                                onClick={() => handleRestore(item)}
-                                                                className="cursor-pointer text-3xl text-green-500"
-                                                            />
-                                                            <AiOutlineDelete
-                                                                onClick={() => handlePermanentDelete(item)}
-                                                                className="cursor-pointer text-3xl text-gray-500"
-                                                            />
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <MdModeEdit
-                                                                onClick={() => handleEdit(item.id)}
-                                                                className="cursor-pointer text-3xl text-gray-500"
-                                                            />
-                                                            <AiOutlineDelete
-                                                                onClick={() => handleDelete(item)}
-                                                                className="cursor-pointer text-3xl text-gray-500"
-                                                            />
-                                                        </>
-                                                    )}
-                                                </div>
+                                                <div className="flex gap-2"> {isTrashed ? (
+                                                    <>
+                                                        <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />
+                                                        <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <MdModeEdit onClick={() => {
+                                                            router.push(`/admin/supplier/update?id=${item.id}`);
+                                                            setActiveSubTab('product-details');
+                                                        }
+                                                        } className="cursor-pointer text-3xl" />
+                                                        <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                    </>
+                                                )}</div>
                                             </td>
 
 

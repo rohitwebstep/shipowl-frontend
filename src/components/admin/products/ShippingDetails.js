@@ -58,7 +58,7 @@ export default function ShippingDetails() {
         }
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/product/${id}/image/${index}?type=${type}`;
+      const url = `http://localhost:3001/api/product/${id}/image/${index}?type=${type}`;
 
       const response = await fetch(url, {
         method: "DELETE",
@@ -173,7 +173,7 @@ export default function ShippingDetails() {
           {fileFields.map(({ label, key }) => (
             <div key={key} className="flex flex-col space-y-2 w-full md:w-[250px]">
               <label className="text-[#232323] font-bold block mb-1">
-                {label} <span className="text-red-500">*</span>
+                {label} 
               </label>
 
               <div className="relative border-2 border-dashed border-red-300 rounded-xl p-4 w-full h-36 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition">
@@ -251,9 +251,7 @@ export default function ShippingDetails() {
                 </div>
               )}
 
-              {shippingErrors[key] && (
-                <p className="text-red-500 text-sm">{shippingErrors[key]}</p>
-              )}
+            
             </div>
           ))}
 

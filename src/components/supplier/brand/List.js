@@ -20,7 +20,7 @@ import 'swiper/css/navigation';
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState([]);
     const { verifySupplierAuth } = useSupplier();
     const { brandData, setBrandData, setFormData, setIsEdit } = useContext(BrandContext);
@@ -50,7 +50,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand`,
+                `http://localhost:3001/api/brand`,
                 {
                     method: "GET",
                     headers: {
@@ -104,7 +104,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/trashed`,
+                `http://localhost:3001/api/brand/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -230,7 +230,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/${item.id}`,
+                `http://localhost:3001/api/brand/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -301,7 +301,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/brand/${id}`, {
+                    fetch(`http://localhost:3001/api/brand/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -346,7 +346,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/${item?.id}/restore`,
+                `http://localhost:3001/api/brand/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -425,7 +425,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/${item.id}/destroy`,
+                `http://localhost:3001/api/brand/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

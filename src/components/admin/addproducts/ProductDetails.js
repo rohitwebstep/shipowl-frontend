@@ -5,6 +5,10 @@ import { ProductContext } from './ProductContext';
 import "@pathofdev/react-tag-input/build/index.css"; // Required styles
 import ReactTagInput from "@pathofdev/react-tag-input";
 import { HashLoader } from 'react-spinners';
+import { useAdmin } from '../middleware/AdminMiddleWareContext';
+import dynamic from 'next/dynamic';
+
+const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function ProductDetails() {
   const {
     fetchCountry,
@@ -20,16 +24,20 @@ export default function ProductDetails() {
     errors, setErrors, loading
   } = useContext(ProductContext);
 
+  const { fetchSupplier, suppliers } = useAdmin();
 
   useEffect(() => {
     fetchCategory();
     fetchBrand();
     fetchCountry();
+    fetchSupplier();
   }, [fetchCategory, fetchBrand, fetchCountry]);
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, type, value, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
     setErrors({ ...errors, [name]: '' });
   };
   const handleChangeTags = (newTags) => {
@@ -228,8 +236,107 @@ export default function ProductDetails() {
           </div>
           {errors.list_as && <p className="text-red-500 text-sm mt-1">{errors.list_as}</p>}
         </div>
-      </div>
+        <div>
 
+          <label className="flex mt-2 items-center cursor-pointer">
+            <input
+              type="checkbox"
+              name='isVisibleToAll'
+              className="sr-only"
+              checked={formData.isVisibleToAll || ''}
+              onChange={handleChange}
+            />
+            <div
+              className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${formData.isVisibleToAll ? "bg-orange-500" : ""
+                }`}
+            >
+              <div
+                className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${formData.isVisibleToAll ? "translate-x-5" : ""
+                  }`}
+              ></div>
+            </div>
+            <span className="ms-2 text-sm text-gray-600">
+              is Visible To All
+            </span>
+          </label>
+          {errors.isVisibleToAll && (
+            <p className="text-red-500 text-sm mt-1">{errors.isVisibleToAll}</p>
+          )}
+        </div>
+        <div>
+
+          <label className="flex mt-2 items-center cursor-pointer">
+            <input
+              type="checkbox"
+              name='status'
+              className="sr-only"
+              checked={formData.status || ''}
+              onChange={handleChange}
+            />
+            <div
+              className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${formData.status ? "bg-orange-500" : ""
+                }`}
+            >
+              <div
+                className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${formData.status ? "translate-x-5" : ""
+                  }`}
+              ></div>
+            </div>
+            <span className="ms-2 text-sm text-gray-600">
+              Status
+            </span>
+          </label>
+          {errors.status && (
+            <p className="text-red-500 text-sm mt-1">{errors.status}</p>
+          )}
+        </div>
+      </div>
+      {!formData.isVisibleToAll && (
+        <div className='mt-3'>
+          <label className="block text-[#232323] font-semibold">
+            Select Suppliers <span className="text-red-500">*</span>
+          </label>
+
+          <Select
+            isMulti
+            name="supplierIds"
+            options={suppliers.map((item) => ({
+              value: item.id,
+              label: item.name,
+            }))}
+            className="mt-2"
+            classNamePrefix="react-select"
+            onChange={(selectedOptions) => {
+              const selectedValues = selectedOptions
+                ? selectedOptions.map((option) => option.value).join(',') // comma-separated string
+                : '';
+
+              handleChange({
+                target: {
+                  name: 'supplierIds',
+                  value: selectedValues,
+                },
+              });
+            }}
+            value={
+              typeof formData.supplierIds === 'string'
+                ? suppliers
+                  .filter((s) =>
+                    formData.supplierIds.split(',').includes(s.id.toString())
+                  )
+                  .map((s) => ({
+                    value: s.id,
+                    label: s.name,
+                  }))
+                : []
+            }
+          />
+
+          {errors.supplierIds && (
+            <p className="text-red-500 text-sm mt-1">{errors.supplierIds}</p>
+          )}
+        </div>
+      )}
       <div className="flex flex-wrap gap-4 mt-6">
         <button
           onClick={handleSubmit}

@@ -3,9 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import Select from "react-select";
+// import Select from "react-select";
 import { HashLoader } from "react-spinners";
+import dynamic from 'next/dynamic';
 
+const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function Register() {
   const router = useRouter();
   const [imagePreview, setImagePreview] = useState(null);
@@ -144,7 +146,7 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/registration`, {
+      const res = await fetch(`http://localhost:3001/api/supplier/auth/registration`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -217,7 +219,7 @@ export default function Register() {
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "https://sleeping-owl-we0m.onrender.com/api/location/country",
+      "http://localhost:3001/api/location/country",
       setCountryData,
       "countries",             // ✅ make sure backend response uses this key
       setLoadingCountries
@@ -226,7 +228,7 @@ export default function Register() {
 
   const fetchState = useCallback((countryId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+      `http://localhost:3001/api/location/country/${countryId}/states`,
       setStates,
       "states",         // ⚠️ verify that your API returns a `billingstates` key
       setBillingStateLoading
@@ -235,7 +237,7 @@ export default function Register() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+      `http://localhost:3001/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -244,7 +246,7 @@ export default function Register() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+      `http://localhost:3001/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities
@@ -253,7 +255,7 @@ export default function Register() {
 
   const fetchCity2 = useCallback((stateId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+      `http://localhost:3001/api/location/state/${stateId}/cities`,
       setCity,
       "cities",               // ⚠️ This key must match your API response structure
       setBillingCityLoading
@@ -261,7 +263,7 @@ export default function Register() {
   }, [fetchProtected]);
   const fetchContry2 = useCallback(() => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/country`,
+      `http://localhost:3001/api/location/country`,
       setCountry,
       "countries",               // ⚠️ This key must match your API response structure
       setBillingCountryLoading
@@ -291,11 +293,12 @@ export default function Register() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="md:w-8/12 mx-auto p-8 bg-white rounded-xl shadow-lg space-y-8 border border-gray-100"
+      className="md:w-8/12 mx-auto p-8 bg-white rounded-xl space-y-8 border border-gray-100"
     >
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Create an Account</h2>
+      {/* <h2 className="text-2xl font-bold text-gray-800 mb-4">Create an Account</h2> */}
       <div className="">
-        <h3 className="text-lg font-semibold text-gray-700  pb-2">Profile Photo</h3>
+        <h3 className="block text-[#232323] font-bold mb-1" htmlFor="name">
+              Profile Photo <span className="text-red-600">*</span></h3>
 
         <div className="w-full space-y-3">
           <label
@@ -325,16 +328,16 @@ export default function Register() {
           )}
         </div>
       </div>
-      <div className="grid grid-cols-2 md:flex-row gap-8">
+      <div className="  gap-8">
         {/* Left: Profile Picture */}
 
 
         {/* Basic Info */}
-        <div className="  grid grid-cols-1 md:grid-cols-2 gap-2">
-          <h3 className="text-lg md:col-span-2 font-semibold text-gray-700  pb-2">Basic Info</h3>
+        <h3 className="text-sm text-orange-500 font-bold mb-3">Basic Info</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
 
           <div>
-            <label className="block text-sm mb-1" htmlFor="name">
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="name">
               Name <span className="text-red-600">*</span>
             </label>
             <input
@@ -343,14 +346,14 @@ export default function Register() {
               name="name"
               value={formData.name || ''}
               onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 ${errors.name ? "border-red-600" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg font-bold ${errors.name ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
                 }`}
             />
             {errors.name && <p className="text-red-600 text-sm">{errors.name}</p>}
           </div>
 
           <div>
-            <label className="block text-sm mb-1" htmlFor="username">
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="username">
               Username <span className="text-red-600">*</span>
             </label>
             <input
@@ -359,14 +362,14 @@ export default function Register() {
               name="username"
               value={formData.username || ''}
               onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 ${errors.username ? "border-red-600" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg font-bold ${errors.username ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
                 }`}
             />
             {errors.username && <p className="text-red-600 text-sm">{errors.username}</p>}
           </div>
 
           <div>
-            <label className="block text-sm mb-1" htmlFor="email">
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="email">
               Email <span className="text-red-600">*</span>
             </label>
             <input
@@ -375,14 +378,14 @@ export default function Register() {
               name="email"
               value={formData.email || ''}
               onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 ${errors.email ? "border-red-600" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg font-bold ${errors.email ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
                 }`}
             />
             {errors.email && <p className="text-red-600 text-sm">{errors.email}</p>}
           </div>
 
-          <div>
-            <label className="block text-sm mb-1" htmlFor="password">
+          <div className="md:col-span-3">
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="password">
               Password <span className="text-red-600">*</span>
             </label>
             <input
@@ -391,14 +394,14 @@ export default function Register() {
               name="password"
               value={formData.password || ''}
               onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 ${errors.password ? "border-red-600" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg font-bold ${errors.password ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
                 }`}
             />
             {errors.password && <p className="text-red-600 text-sm">{errors.password}</p>}
           </div>
 
-          <div className="md:col-span-2">
-            <label className="block text-sm mb-1" htmlFor="dateOfBirth">
+          <div className="md:col-span-3">
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="dateOfBirth">
               Date of Birth <span className="text-red-600">*</span>
             </label>
             <input
@@ -407,14 +410,14 @@ export default function Register() {
               name="dateOfBirth"
               value={formData.dateOfBirth || ''}
               onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 ${errors.dateOfBirth ? "border-red-600" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg font-bold ${errors.dateOfBirth ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
                 }`}
             />
             {errors.dateOfBirth && <p className="text-red-600 text-sm">{errors.dateOfBirth}</p>}
           </div>
 
-          <div className="md:col-span-2">
-            <label className="block text-sm mb-1" htmlFor="currentAddress">
+          <div className="md:col-span-3">
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="currentAddress">
               Current Address <span className="text-red-600">*</span>
             </label>
             <textarea
@@ -423,7 +426,7 @@ export default function Register() {
               value={formData.currentAddress || ''}
               onChange={handleChange}
               rows={2}
-              className={`w-full border rounded px-3 py-2 ${errors.currentAddress ? "border-red-600" : "border-gray-300"
+              className={`w-full p-3 border rounded-lg font-bold ${errors.currentAddress ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
                 }`}
             />
             {errors.currentAddress && (
@@ -434,12 +437,12 @@ export default function Register() {
 
         {/* Permanent Address */}
         <div className=" ">
-          <h3 className="text-lg font-semibold text-gray-700  pb-2">Permanent Address</h3>
+          <h3 className="text-sm text-orange-500 font-bold mb-3">Permanent Address</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div className="">
               <label
-                className="block text-sm mb-1"
+                className="block text-[#232323] font-bold mb-1"
                 htmlFor="permanentAddress"
               >
                 Address <span className="text-red-600">*</span>
@@ -450,7 +453,7 @@ export default function Register() {
                 value={formData.permanentAddress || ''}
                 onChange={handleChange}
                 rows={1}
-                className={`w-full border rounded px-3 py-2 ${errors.permanentAddress ? "border-red-600" : "border-gray-300"
+                className={`w-full p-3 border rounded-lg font-bold ${errors.permanentAddress ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
                   }`}
               />
               {errors.permanentAddress && (
@@ -461,7 +464,7 @@ export default function Register() {
             <div className="">
               <label
                 htmlFor="permanentPostalCode"
-                className="block text-sm mb-1"
+                className="block text-[#232323] font-bold mb-1"
               >
                 Postal Code <span className="text-red-600">*</span>
               </label>
@@ -471,7 +474,7 @@ export default function Register() {
                 name="permanentPostalCode"
                 value={formData.permanentPostalCode || ''}
                 onChange={handleChange}
-                className={`w-full border rounded px-3 py-2 ${errors.permanentPostalCode ? "border-red-600" : "border-gray-300"
+                className={`w-full p-3 border rounded-lg font-bold ${errors.permanentPostalCode ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
                   }`}
               />
               {errors.permanentPostalCode && (
@@ -481,7 +484,7 @@ export default function Register() {
 
 
           </div>
-          <div className="grid grid-cols-1  gap-3">
+          <div className="grid lg:grid-cols-3  gap-3">
             {['permanentCountry', 'permanentState', 'permanentCity'].map((field) => {
               const loading =
                 (field === 'permanentCountry' && loadingCountries) ||
@@ -498,7 +501,7 @@ export default function Register() {
 
               return (
                 <div key={field} className="relative">
-                  <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
+                  <label className="block text-[#232323] font-bold mb-1">
                     {field.replace('permanent', '')} <span className="text-red-500">*</span>
                   </label>
                   <Select
@@ -530,169 +533,174 @@ export default function Register() {
           </div>
         </div>
 
-        {/* Company & Brand Info */}
-      
-
-        {/* Billing Address */}
-        
-
 
       </div>
-        <div className=" ">
-          <h3 className="text-lg font-semibold text-gray-700  pb-2">Company & Brand Information</h3>
+      <div>
+        <h3 className="text-sm mb-3 font-bold text-orange-500">Company & Brand Information</h3>
 
-          <div className="grid md:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-sm mb-1" htmlFor="companyName">
-                Company Name <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                id="companyName"
-                name="companyName"
-                value={formData.companyName || ''}
-                onChange={handleChange}
-                className={`w-full border rounded px-3 py-2 ${errors.companyName ? "border-red-600" : "border-gray-300"
-                  }`}
-              />
-              {errors.companyName && (
-                <p className="text-red-600 text-sm">{errors.companyName}</p>
-              )}
-            </div>
+        <div className="grid md:grid-cols-3 gap-3">
+          <div>
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="companyName">
+              Company Name <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="companyName"
+              name="companyName"
+              value={formData.companyName || ''}
+              onChange={handleChange}
+              className={`w-full p-3 border rounded-lg font-bold ${errors.companyName ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+                }`}
+            />
+            {errors.companyName && (
+              <p className="text-red-600 text-sm">{errors.companyName}</p>
+            )}
+          </div>
 
-            <div>
-              <label className="block text-sm mb-1" htmlFor="brandName">
-                Brand Name <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                id="brandName"
-                name="brandName"
-                value={formData.brandName || ''}
-                onChange={handleChange}
-                className={`w-full border rounded px-3 py-2 ${errors.brandName ? "border-red-600" : "border-gray-300"
-                  }`}
-              />
-              {errors.brandName && (
-                <p className="text-red-600 text-sm">{errors.brandName}</p>
-              )}
-            </div>
+          <div>
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="brandName">
+              Brand Name <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="brandName"
+              name="brandName"
+              value={formData.brandName || ''}
+              onChange={handleChange}
+              className={`w-full p-3 border rounded-lg font-bold ${errors.brandName ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+                }`}
+            />
+            {errors.brandName && (
+              <p className="text-red-600 text-sm">{errors.brandName}</p>
+            )}
+          </div>
 
-            <div>
-              <label className="block text-sm mb-1" htmlFor="brandShortName">
-                Brand Short Name <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                id="brandShortName"
-                name="brandShortName"
-                value={formData.brandShortName || ''}
-                onChange={handleChange}
-                className={`w-full border rounded px-3 py-2 ${errors.brandShortName ? "border-red-600" : "border-gray-300"
-                  }`}
-              />
-              {errors.brandShortName && (
-                <p className="text-red-600 text-sm">{errors.brandShortName}</p>
-              )}
-            </div>
+          <div>
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="brandShortName">
+              Brand Short Name <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="brandShortName"
+              name="brandShortName"
+              value={formData.brandShortName || ''}
+              onChange={handleChange}
+              className={`w-full p-3 border rounded-lg font-bold ${errors.brandShortName ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+                }`}
+            />
+            {errors.brandShortName && (
+              <p className="text-red-600 text-sm">{errors.brandShortName}</p>
+            )}
           </div>
         </div>
+      </div>
       <div className=" ">
-          <h3 className="text-lg font-semibold text-gray-700  pb-2">Billing Address</h3>
+        <h3 className="text-sm mb-3 font-bold text-orange-500">Billing Address</h3>
 
-          <div className=" gap-2">
-            <div className="md:col-span-2">
-              <label className="block text-sm mb-1" htmlFor="billingAddress">
-                Address <span className="text-red-600">*</span>
-              </label>
-              <textarea
-                id="billingAddress"
-                name="billingAddress"
-                value={formData.billingAddress || ''}
-                onChange={handleChange}
-                rows={2}
-                className={`w-full border rounded px-3 py-2 ${errors.billingAddress ? "border-red-600" : "border-gray-300"
-                  }`}
-              />
-              {errors.billingAddress && (
-                <p className="text-red-600 text-sm">{errors.billingAddress}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm mb-1" htmlFor="billingPincode">
-                Pincode <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                id="billingPincode"
-                name="billingPincode"
-                value={formData.billingPincode || ''}
-                onChange={handleChange}
-                className={`w-full border rounded px-3 py-2 ${errors.billingPincode ? "border-red-600" : "border-gray-300"
-                  }`}
-              />
-              {errors.billingPincode && (
-                <p className="text-red-600 text-sm">{errors.billingPincode}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {['billingCountry', 'billingState', 'billingCity'].map((field) => {
-                const loading =
-                  (field === 'billingCountry' && billingCountryLoading) ||
-                  (field === 'billingState' && billingStateLoading) ||
-                  (field === 'billingCity' && billingCityLoading);
-                const options = selectOptions(
-                  field === 'billingCountry'
-                    ? country
-                    : field === 'billingState'
-                      ? states
-                      : city
-                );
-
-                return (
-                  <div key={field} className="relative">
-                    <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
-                      {field.replace('billing', '')} <span className="text-red-500">*</span>
-                    </label>
-                    <Select
-                      isDisabled={loading}
-                      name={field}
-                      value={options.find((item) => item.value === formData[field]) || ''}
-                      onChange={(selectedOption) => {
-                        const value = selectedOption ? selectedOption.value : '';
-                        setFormData((prev) => ({ ...prev, [field]: value }));
-
-                        if (field === 'billingCountry') fetchState(value);
-                        if (field === 'billingState') fetchCity2(value);
-                      }}
-                      options={options}
-                      classNamePrefix="react-select"
-                    />
-                    {loading && (
-                      <div className="absolute inset-y-0 right-3 flex items-center">
-                        <div className="loader -transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
-                      </div>
-                    )}
-                    {errors[field] && (
-                      <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-
+        <div className=" gap-2">
+          <div className="md:col-span-2">
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="billingAddress">
+              Address <span className="text-red-600">*</span>
+            </label>
+            <textarea
+              id="billingAddress"
+              name="billingAddress"
+              value={formData.billingAddress || ''}
+              onChange={handleChange}
+              rows={2}
+              className={`w-full p-3 border rounded-lg font-bold ${errors.billingAddress ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+                }`}
+            />
+            {errors.billingAddress && (
+              <p className="text-red-600 text-sm">{errors.billingAddress}</p>
+            )}
           </div>
 
+          <div>
+            <label className="block text-[#232323] font-bold mb-1" htmlFor="billingPincode">
+              Pincode <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="billingPincode"
+              name="billingPincode"
+              value={formData.billingPincode || ''}
+              onChange={handleChange}
+              className={`w-full p-3 border rounded-lg font-bold ${errors.billingPincode ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+                }`}
+            />
+            {errors.billingPincode && (
+              <p className="text-red-600 text-sm">{errors.billingPincode}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 mt-3 sm:grid-cols-3 gap-6">
+            {['billingCountry', 'billingState', 'billingCity'].map((field) => {
+              const loading =
+                (field === 'billingCountry' && billingCountryLoading) ||
+                (field === 'billingState' && billingStateLoading) ||
+                (field === 'billingCity' && billingCityLoading);
+              const options = selectOptions(
+                field === 'billingCountry'
+                  ? country
+                  : field === 'billingState'
+                    ? states
+                    : city
+              );
+
+              return (
+                <div key={field} className="relative">
+                  <label className="block text-[#232323] font-bold mb-1">
+                    {field.replace('billing', '')} <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    isDisabled={loading}
+                    name={field}
+                    value={options.find((item) => item.value === formData[field]) || ''}
+                    onChange={(selectedOption) => {
+                      const value = selectedOption ? selectedOption.value : '';
+                      setFormData((prev) => ({ ...prev, [field]: value }));
+
+                      if (field === 'billingCountry') fetchState(value);
+                      if (field === 'billingState') fetchCity2(value);
+                    }}
+                    options={options}
+                    classNamePrefix="react-select"
+                  />
+                  {loading && (
+                    <div className="absolute inset-y-0 right-3 flex items-center">
+                      <div className="loader -transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                  {errors[field] && (
+                    <p className="text-red-500 text-sm mt-1">{errors[field]}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+
         </div>
-      <button
-        type="submit"
-        className="w-auto px-10 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded"
-      >
-        Register
-      </button>
+
+      </div>
+         <div className="flex space-x-4 mt-6">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="px-4 py-2 bg-orange-500 text-white rounded-lg"
+          disabled={loading}
+        >
+          {loading ? 'Saving...' : 'Save'}
+        </button>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   )
 }
