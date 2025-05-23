@@ -124,7 +124,7 @@ const [activeTab,setActiveTab] = useState("product-details");
     }
 
     try {
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/brand', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/admin/brand', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -50,7 +50,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/brand`,
                 {
                     method: "GET",
                     headers: {
@@ -104,7 +104,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/trashed`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/brand/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -230,7 +230,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/brand/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -301,7 +301,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/brand/${id}`, {
+                    fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/brand/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -346,7 +346,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/brand/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -425,7 +425,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/brand/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/brand/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
