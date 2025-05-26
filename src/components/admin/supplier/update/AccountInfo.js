@@ -73,7 +73,7 @@ const AccountInfo = () => {
         }
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${formData.id}/bank-account/${id}/image/${index}?type=${type}`;
+      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${formData.id}/company/${id}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {

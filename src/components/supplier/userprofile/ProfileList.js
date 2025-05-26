@@ -3,7 +3,7 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
-import React, { useState, useCallback, useEffect,useContext } from "react";
+import React, { useState, useCallback, useEffect, useContext } from "react";
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import { ProfileContext } from './ProfileContext';
 const ProfileList = () => {
@@ -15,7 +15,7 @@ const ProfileList = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
-  const {setActiveTab} = useContext(ProfileContext);
+    const { setActiveTab } = useContext(ProfileContext);
 
     const fetchSupplier = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -259,7 +259,10 @@ const ProfileList = () => {
                         <p className="text-[#A3AED0]">No bank account details available.</p>
                     )}
                     <div className="mt-4 text-right">
-                        <button onClick={() => handleEditBank(suppliers.id)} className='bg-orange-500 text-white p-3 rounded-md'>Update Bank Details</button>
+                        {!suppliers.bankAccount ? (<button onClick={() => handleEditBank(suppliers.id)} className='bg-orange-500 text-white p-3 rounded-md'> Bank  Account Add Request</button>) : (
+                            <button onClick={() => handleEditBank(suppliers.id)} className='bg-orange-500 text-white p-3 rounded-md'> Bank  AccountUpdate Request</button>
+                        )
+                        }
                     </div>
                 </div>
 
