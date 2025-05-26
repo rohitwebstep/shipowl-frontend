@@ -139,7 +139,6 @@ export default function Register() {
       if (key === 'dateOfBirth' && formData[key]) {
         const formattedDate = new Date(formData[key]).toLocaleDateString('en-GB');
         data.append(key, formattedDate);
-        console.log(typeof formattedDate); // Should be string
       } else if (formData[key] !== null && formData[key] !== '') {
         data.append(key, formData[key]);
       }

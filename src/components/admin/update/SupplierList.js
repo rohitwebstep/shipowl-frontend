@@ -389,7 +389,6 @@ const SupplierList = () => {
     const handleEdit=(id)=>{
         router.push(`/admin/supplier/update?id=${id}`);
     }
-console.log('suppliers',suppliers)
 return (
     loading ? (
         <div className="flex justify-center items-center h-96">

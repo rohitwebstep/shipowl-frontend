@@ -244,7 +244,6 @@ const ProductProviderEdit = ({ children }) => {
   };
 
 
-  console.log('files', files)
 
   const validateFields = () => {
     const requiredFields = [

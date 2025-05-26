@@ -165,10 +165,8 @@ const AccountInfo = () => {
 
         const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${id}`; // Ensure the URL is correct
         const form = new FormData();
-        console.log('files', files)
         for (const key in files) {
           const value = files[key];
-          console.log('key', key)
 
           // Skip null, undefined, or empty values
           if (value === null || value === undefined || value === '') continue;

@@ -182,7 +182,6 @@ const ProductTable = () => {
 
             if (!response.ok) {
                 const errorMessage = await response.json();
-                console.log('errorMessage', errorMessage)
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
@@ -523,7 +522,7 @@ const ProductTable = () => {
                 productId: items.productId || "",
                 id: id, // or items.product?.id if you prefer
                 variant: (items.variants || []).map((v) => ({
-                    variantId: v.productVariantId,
+                    variantId: v.id || v.variantId,
                     stock: v.stock,
                     price: v.price,
                     status: v.status,
@@ -545,7 +544,6 @@ const ProductTable = () => {
 
     }
 
-    console.log(inventoryData)
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -979,7 +977,7 @@ const ProductTable = () => {
                                                                 className="w-full border rounded p-2"
                                                                 value={variant.stock || ''}
                                                                 onChange={(e) =>
-                                                                    handleVariantChange(variant.id, "stock", e.target.value)
+                                                                    handleVariantChange(variant.variantId, "stock", e.target.value)
                                                                 }
                                                             />
                                                         </td>
@@ -991,7 +989,7 @@ const ProductTable = () => {
                                                                 className="w-full border rounded p-2"
                                                                 value={variant.price || ''}
                                                                 onChange={(e) =>
-                                                                    handleVariantChange(variant.id, "price", e.target.value)
+                                                                    handleVariantChange(variant.variantId, "price", e.target.value)
                                                                 }
                                                             />
                                                         </td>
@@ -1003,7 +1001,7 @@ const ProductTable = () => {
                                                                     className="sr-only"
                                                                     checked={variant.status || false}
                                                                     onChange={(e) =>
-                                                                        handleVariantChange(variant.id, "status", e.target.checked)
+                                                                        handleVariantChange(variant.variantId, "status", e.target.checked)
                                                                     }
                                                                 />
                                                                 <div
@@ -1063,7 +1061,7 @@ const ProductTable = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {selectedProduct.variants?.map((v,index) => {
+                                                {selectedProduct.variants?.map((v, index) => {
                                                     const imageUrls = v.image
                                                         ? v.image.split(',').map((img) => img.trim()).filter(Boolean)
                                                         : [];

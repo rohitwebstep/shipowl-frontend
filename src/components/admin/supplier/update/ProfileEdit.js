@@ -57,7 +57,6 @@ const ProfileEdit = () => {
     }, [router]);
 
     const fetchState = useCallback(async (id) => {
-      console.log('errors',errors)
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
         
         if (adminData?.project?.active_panel !== "admin") {

@@ -334,7 +334,6 @@ const Update = () => {
         }
     }, [router]);
 
-    console.log('formData', formData)
 
     useEffect(() => {
         fetchCategory();

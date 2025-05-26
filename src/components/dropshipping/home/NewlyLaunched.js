@@ -219,22 +219,37 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
     id: '',
     variant: []
   });
-  const handleVariantChange = (id, field, value) => {
-    setInventoryData((prevData) => ({
+const handleVariantChange = (id, field, value) => {
+ 
+
+  setInventoryData((prevData) => {
+
+    const updatedVariants = prevData.variant.map((v) => {
+      const isTarget = v.variantId === id;
+      if (isTarget) {
+
+        const updatedVariant = {
+          ...v,
+          [field]: field === 'dropStock' || field === 'dropPrice'
+            ? Number(value)
+            : value,
+        };
+
+        return updatedVariant;
+      }
+      return v;
+    });
+
+    const updatedData = {
       ...prevData,
-      variant: prevData.variant.map((v) =>
-        v.id === id
-          ? {
-            ...v,
-            [field]:
-              field === 'dropStock' || field === 'dropPrice'
-                ? Number(value)
-                : value,
-          }
-          : v
-      ),
-    }));
-  };
+      variant: updatedVariants,
+    };
+
+
+    return updatedData;
+  });
+};
+
 
 
   const [isEdit, setIsEdit] = useState(false);
@@ -285,7 +300,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
         supplierProductId: items.productId || "",
         id: id, // or items.product?.id if you prefer
         variant: (items.variants || []).map((v) => ({
-          variantId: v.productVariantId,
+          variantId: v.id,
           dropStock: v.stock,
           dropPrice: v.price,
           Dropstatus: v.status,
@@ -303,7 +318,6 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
 
   }
 
-  console.log(inventoryData)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -763,7 +777,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                                   className="w-full border rounded p-2"
                                   value={variant.dropStock || ''}
                                   onChange={(e) =>
-                                    handleVariantChange(variant.id, "dropStock", e.target.value)
+                                    handleVariantChange(variant.variantId, "dropStock", e.target.value)
                                   }
                                 />
                               </td>
@@ -775,7 +789,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                                   className="w-full border rounded p-2"
                                   value={variant.dropPrice || ''}
                                   onChange={(e) =>
-                                    handleVariantChange(variant.id, "dropPrice", e.target.value)
+                                    handleVariantChange(variant.variantId, "dropPrice", e.target.value)
                                   }
                                 />
                               </td>
@@ -787,7 +801,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                                     className="sr-only"
                                     checked={variant.Dropstatus || false}
                                     onChange={(e) =>
-                                      handleVariantChange(variant.id, "Dropstatus", e.target.checked)
+                                      handleVariantChange(variant.variantId, "Dropstatus", e.target.checked)
                                     }
                                   />
                                   <div

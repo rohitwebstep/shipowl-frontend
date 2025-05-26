@@ -352,7 +352,6 @@ export default function Update() {
       </div>
     );
   }
-  console.log('formData', formData)
   return (
     <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3  rounded-2xl">
       {/* <h2 className="text-xl font-semibold">Create Subuser</h2> */}

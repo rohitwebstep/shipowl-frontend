@@ -84,14 +84,18 @@ export default function MyProducts() {
         };
         fetchData();
     }, []);
-    const handleVariantChange = (id, field, value) => {
+    const handleVariantChange = (variantId, field, value) => {
         setInventoryData((prevData) => ({
             ...prevData,
-            variant: prevData.variant.map((v) =>
-                v.id === id ? { ...v, [field]: field === 'qty' || field === 'shipowl_price' ? Number(value) : value } : v
+            variant: prevData.variant.map((variant) =>
+                variant.variantId === variantId
+                    ? { ...variant, [field]: value }
+                    : variant
             ),
         }));
     };
+
+
     const trashProducts = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -504,7 +508,7 @@ export default function MyProducts() {
                 supplierProductId: items.productId || "",
                 id: id, // or items.product?.id if you prefer
                 variant: (items.variants || []).map((v) => ({
-                    variantId: v.productVariantId,
+                    variantId: v.id || v.variantId,
                     dropStock: v.stock,
                     dropPrice: v.price,
                     Dropstatus: v.status,
@@ -519,7 +523,7 @@ export default function MyProducts() {
             setLoading(false);
         }
 
-        console.log('item', item)
+      
     }
 
     if (loading) {
@@ -529,6 +533,7 @@ export default function MyProducts() {
             </div>
         );
     }
+  
 
 
     return (
@@ -660,7 +665,7 @@ export default function MyProducts() {
                                                                             className="w-full border rounded p-2"
                                                                             value={variant.dropStock || ''}
                                                                             onChange={(e) =>
-                                                                                handleVariantChange(variant.id, "dropStock", e.target.value)
+                                                                                handleVariantChange(variant.variantId, "dropStock", e.target.value)
                                                                             }
                                                                         />
                                                                     </td>
@@ -672,7 +677,7 @@ export default function MyProducts() {
                                                                             className="w-full border rounded p-2"
                                                                             value={variant.dropPrice || ''}
                                                                             onChange={(e) =>
-                                                                                handleVariantChange(variant.id, "dropPrice", e.target.value)
+                                                                                handleVariantChange(variant.variantId, "dropPrice", e.target.value)
                                                                             }
                                                                         />
                                                                     </td>
@@ -684,7 +689,7 @@ export default function MyProducts() {
                                                                                 className="sr-only"
                                                                                 checked={variant.Dropstatus || false}
                                                                                 onChange={(e) =>
-                                                                                    handleVariantChange(variant.id, "Dropstatus", e.target.checked)
+                                                                                    handleVariantChange(variant.variantId, "Dropstatus", e.target.checked)
                                                                                 }
                                                                             />
                                                                             <div

@@ -265,8 +265,6 @@ export default function ProductList() {
     const filteredItems = productsRequest.filter((i, index) => data === i.id);
 
 
-    console.log('')
-    console.log(filteredItems);
 
     const handleEditItem = (item) => {
         router.push(`/admin/dropshipper/product/source/update?id=${item.id}`);

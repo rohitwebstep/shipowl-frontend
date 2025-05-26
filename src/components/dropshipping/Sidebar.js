@@ -126,7 +126,6 @@ const Sidebar = () => {
                   .filter((item) => item.section === section)
                   .map((item) => {
                     const isActiveParent = pathname === item.href.concat('/');
-                    console.log('isActiveParent', isActiveParent)
                     const isActiveChild = item.subMenu?.some((sub) => pathname === sub.href.concat('/'));
                     const isActive = isActiveParent || isActiveChild;
 

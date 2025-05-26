@@ -46,7 +46,6 @@ export default function ProductDetails() {
     });
   };
 
-  console.log(`FormData (Change)`, formData.supplierIds);
 
 
   const handleSubmit = () => {
@@ -56,7 +55,6 @@ export default function ProductDetails() {
   };
 
 
-  console.log('formData.supplierIds', formData.supplierIds)
   return (
     <div className="mt-4 lg:p-6 p-3 rounded-2xl bg-white">
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-4">

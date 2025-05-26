@@ -333,7 +333,6 @@ const fetchProducts = useCallback(async () => {
         }
     }, [router]);
 
-    console.log('formData',formData)
 
     useEffect(() => {
         fetchCategory();

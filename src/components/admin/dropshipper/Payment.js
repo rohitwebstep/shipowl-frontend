@@ -35,7 +35,6 @@ const handleChange = (e) => {
   };
 
 
-  console.log('formData',formData)
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;

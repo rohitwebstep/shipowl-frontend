@@ -127,7 +127,6 @@ const AddProduct = () => {
     }
   }, [router, id, setFormData]);
 
-  console.log(`FormData - `, formData.supplierIds);
 
 
   const tabs = [

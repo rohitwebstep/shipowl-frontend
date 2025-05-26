@@ -67,7 +67,6 @@ export default function Orders() {
   };
 
   const handleApply = () => {
-    console.log(filters);
   };
 
   const handleReset = () => {

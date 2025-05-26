@@ -305,7 +305,7 @@ export default function Allroducts() {
                                                                             className="w-full border rounded p-2"
                                                                             value={variant.dropStock || ''}
                                                                             onChange={(e) =>
-                                                                                handleVariantChange(variant.id, "dropStock", e.target.value)
+                                                                                handleVariantChange(variant.variantId, "dropStock", e.target.value)
                                                                             }
                                                                         />
                                                                     </td>
@@ -317,7 +317,7 @@ export default function Allroducts() {
                                                                             className="w-full border rounded p-2"
                                                                             value={variant.dropPrice || ''}
                                                                             onChange={(e) =>
-                                                                                handleVariantChange(variant.id, "dropPrice", e.target.value)
+                                                                                handleVariantChange(variant.variantId, "dropPrice", e.target.value)
                                                                             }
                                                                         />
                                                                     </td>
@@ -329,7 +329,7 @@ export default function Allroducts() {
                                                                                 className="sr-only"
                                                                                 checked={variant.Dropstatus || false}
                                                                                 onChange={(e) =>
-                                                                                    handleVariantChange(variant.id, "Dropstatus", e.target.checked)
+                                                                                    handleVariantChange(variant.variantId, "Dropstatus", e.target.checked)
                                                                                 }
                                                                             />
                                                                             <div

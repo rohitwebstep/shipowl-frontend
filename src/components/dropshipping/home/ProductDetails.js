@@ -33,7 +33,6 @@ const ProductDetails = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
-  console.log('searchParams', searchParams)
 
   // Dynamic images setup
   const images = [productimg, product1img, product2img, productimg];
@@ -62,7 +61,7 @@ const ProductDetails = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/${id}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +79,7 @@ const ProductDetails = () => {
         throw new Error(result.message || result.error || "Something went wrong!");
       }
 
-      setProductDetails(result?.product || {});
+      setProductDetails(result?.dropshipperProduct || {});
       const data = result?.product;
       if (data) {
         fetchRelatedProducts(data?.categoryId)
@@ -182,7 +181,7 @@ const ProductDetails = () => {
         {/* Product Info */}
         <div className="w-full md:w-8/12 bg-white rounded-lg border border-[#E0E2E7] p-6">
           <h2 className="text-2xl font-bold text-[#2C3454] pb-4">
-            {productDetails?.name}
+            {productDetails?.product?.name}
           </h2>
 
           <p className="text-gray-600">
@@ -265,12 +264,20 @@ const ProductDetails = () => {
           <div className="mt-4 border-t border-[#E0E2E7] pt-0">
             <h3 className="text-[#858D9D] text-[16px] pt-5">Color Variant</h3>
             <div className="flex flex-wrap gap-3 mt-2">
-              {productDetails?.variants.map((variant) => (
-                <button key={variant.id} className="flex gap-2 items-center border rounded-md p-3 py-2">
-                  <span className="w-6 h-6 rounded-full" style={{ backgroundColor: variant.color.toLowerCase() }}></span>
-                  {variant.color}
-                </button>
-              ))}
+              {productDetails?.variants
+                ?.filter((variant) => variant.color)
+                .map((variant) => (
+                  <button
+                    key={variant.id}
+                    className="flex gap-2 items-center border rounded-md p-3 py-2"
+                  >
+                    <span
+                      className="w-6 h-6 rounded-full"
+                      style={{ backgroundColor: variant.color.toLowerCase() }}
+                    ></span>
+                    {variant.color}
+                  </button>
+                ))}
             </div>
           </div>
 

@@ -311,7 +311,6 @@ export default function Update() {
     };
 
 
-    console.log('formData', formData)
     return (
         <>
             {loading ? (
