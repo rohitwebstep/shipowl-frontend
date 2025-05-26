@@ -26,15 +26,14 @@ const Payment = () => {
       </div>
     );
   }
-  console.log('formData', formData)
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
+  const handleChange = (name, e) => {
+    const { value, files } = e.target;
 
     if (['panCardImage', 'aadharCardImage', 'gstDocument'].includes(name)) {
       if (files && files.length > 0) {
         setFiles((prev) => ({
           ...prev,
-          [name]: Array.from(files), // Store all selected files
+          [name]: Array.from(files),
         }));
       }
     } else if (formData.bankAccounts && name in formData.bankAccounts) {
@@ -52,6 +51,7 @@ const Payment = () => {
       }));
     }
   };
+
 
 
 
@@ -89,6 +89,8 @@ const Payment = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
+
 
       if (!response.ok) {
         Swal.close();
@@ -176,7 +178,6 @@ const Payment = () => {
       // Append uploaded files
       for (const key in files) {
         const value = files[key];
-
         if (!value) continue;
 
         if (['panCardImage', 'gstDocument', 'aadharCardImage', 'profilePicture'].includes(key)) {
@@ -189,6 +190,7 @@ const Payment = () => {
           }
         }
       }
+
 
       // Append non-file form fields
       for (const key in formData) {
@@ -271,7 +273,7 @@ const Payment = () => {
                 type="text"
                 name={name}
                 value={formData[name]}
-                onChange={(e) => handleChange(null, e)}
+                onChange={(e) => handleChange(name, e)}
                 className={`w-full p-3 border rounded-lg font-bold ${errors[name] ? 'border-red-500' : 'border-[#DFEAF2]'
                   } text-[#718EBF]`}
               />

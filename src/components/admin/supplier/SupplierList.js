@@ -3,7 +3,7 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
-import React, { useState, useCallback, useEffect,useContext  } from "react";
+import React, { useState, useCallback, useEffect, useContext } from "react";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
@@ -23,7 +23,7 @@ const SupplierList = () => {
     const [expandedItem, setExpandedItem] = useState(null);
     const [currentTab, setCurrentTab] = useState('active');
     const [selected, setSelected] = useState([]);
-  const {  setActiveSubTab} = useContext(ProfileContext);
+    const { setActiveSubTab } = useContext(ProfileContext);
 
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/supplier", "suppliers");
 
@@ -104,7 +104,7 @@ const SupplierList = () => {
         }
     }, [router]);
 
- 
+
 
 
     useEffect(() => {
@@ -158,7 +158,14 @@ const SupplierList = () => {
             </div>
         );
     }
+ 
 
+const inactiveSuppliers = suppliers.filter((supplier) => {
+  const status = supplier.status?.toLowerCase?.().trim?.() || '';
+  return status === 'inactive';
+});
+
+const isDisabled = !inactiveSuppliers || inactiveSuppliers.length === 0;
     return (
 
         <div className="bg-white rounded-3xl p-5">
@@ -196,6 +203,7 @@ const SupplierList = () => {
                 </div>
             </div>
             <div className="flex space-x-4 border-b border-gray-200 mb-6">
+
                 <button
                     onClick={() => setCurrentTab('active')}
                     className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
@@ -206,16 +214,32 @@ const SupplierList = () => {
                 >
                     Active Suppliers
                 </button>
-                <button
-                    onClick={() => setCurrentTab('inactive')}
-                    className={`px-4 py-2 font-medium border-b-2 transition-all duration-200
-            ${currentTab === 'inactive'
-                            ? "border-orange-500 text-orange-600"
-                            : "border-transparent text-gray-500 hover:text-orange-600"
-                        }`}
-                >
-                    Inactive Suppliers
-                </button>
+
+
+                <div className="relative group inline-block">
+                    <button
+                        disabled={isDisabled}
+                        onClick={() => setCurrentTab('inactive')}
+                        className={`px-4 py-2 font-medium border-b-2 transition-all duration-200 relative
+      ${currentTab === 'inactive'
+                                ? "border-orange-500 text-orange-600"
+                                : "border-transparent text-gray-500 hover:text-orange-600"
+                            }
+      ${isDisabled ? 'cursor-not-allowed' : ''}
+    `}
+                    >
+                        Inactive Suppliers
+                    </button>
+
+                    {isDisabled && (
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10 whitespace-nowrap">
+                            No inactive supplier available
+                            <div className="absolute bottom-[-4px] left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45"></div>
+                        </div>
+                    )}
+                </div>
+
+
             </div>
 
             {filteredSuppliers.length > 0 ? (

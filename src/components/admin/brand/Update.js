@@ -179,7 +179,7 @@ export default function Update() {
             form.append('status', formData.status);
             if (files.length > 0) {
                 files.forEach((file) => {
-                    form.append('images', file); // Adjust based on backend requirements
+                    form.append('image', file); // Adjust based on backend requirements
                 });
             }
 

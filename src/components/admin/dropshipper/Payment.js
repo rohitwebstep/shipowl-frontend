@@ -11,17 +11,17 @@ const Payment = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleChange = (index = null, e) => {
-    const { name, value, files } = e.target;
+const handleChange = (e) => {
+  const { name, value, files } = e.target;
 
-    if (['panCardImage', 'aadharCardImage', 'gstDocument'].includes(name)) {
-      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+  if (['panCardImage', 'aadharCardImage', 'gstDocument'].includes(name)) {
+    // Store array of files
+    setFormData((prev) => ({ ...prev, [name]: files ? Array.from(files) : [] }));
+  } else if (name) {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
+};
 
-    }
-    if (name) {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
 
   const validate = () => {
     const newErrors = {};
@@ -34,6 +34,8 @@ const Payment = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+
+  console.log('formData',formData)
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -65,21 +67,29 @@ const Payment = () => {
       const form = new FormData();
 
       // Append formData
-      for (const key in formData) {
-        const value = formData[key];
+     for (const key in formData) {
+  const value = formData[key];
 
-        if (value === null || value === undefined || value === '') continue;
+  if (value === null || value === undefined || value === '') continue;
 
-        if (['panCardImage', 'gstDocument', 'aadharCardImage', 'profilePicture'].includes(key)) {
-          if (value instanceof File) {
-            form.append(key, value, value.name);
-          }
-        } else if (typeof value === 'object' && !Array.isArray(value)) {
-          form.append(key, JSON.stringify(value));
-        } else {
-          form.append(key, value);
+  if (['panCardImage', 'gstDocument', 'aadharCardImage', 'profilePicture'].includes(key)) {
+    if (Array.isArray(value)) {
+      // Append each file separately with same key
+      value.forEach((file) => {
+        if (file instanceof File) {
+          form.append(key, file, file.name);
         }
-      }
+      });
+    } else if (value instanceof File) {
+      form.append(key, value, value.name);
+    }
+  } else if (typeof value === 'object' && !Array.isArray(value)) {
+    form.append(key, JSON.stringify(value));
+  } else {
+    form.append(key, value);
+  }
+}
+
 
       const response = await fetch(url, {
         method: 'POST',
@@ -147,7 +157,7 @@ const Payment = () => {
                 type="text"
                 name={name}
                 value={formData[name] || ''}
-                onChange={(e) => handleChange(null, e)}
+                onChange={(e) => handleChange( e)}
                 className={`w-full p-3 border rounded-lg font-bold ${errors[name] ? 'border-red-500' : 'border-[#DFEAF2]'
                   } text-[#718EBF]`}
               />
@@ -165,7 +175,7 @@ const Payment = () => {
                 type="file"
                 name={name}
                 multiple
-                onChange={(e) => handleChange(null, e)}
+                onChange={(e) => handleChange( e)}
                 className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
               />
             </div>

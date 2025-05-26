@@ -30,9 +30,10 @@ export default function List() {
     // Initial Auth + fetch
     useEffect(() => {
         const fetchInitialData = async () => {
+            setLoading(true)
             await verifyAdminAuth();
             await fetchAll(setData, setLoading);
-
+            setLoading(false);
 
         };
 

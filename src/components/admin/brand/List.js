@@ -34,8 +34,10 @@ export default function List() {
 
     useEffect(() => {
         const fetchInitialData = async () => {
+            setLoading(true)
             await verifyAdminAuth();
             await fetchAll(setBrandData, setLoading);
+            setLoading(false)
 
         };
 

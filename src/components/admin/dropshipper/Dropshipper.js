@@ -21,7 +21,6 @@ const SupplierList = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [expandedItem, setExpandedItem] = useState(null);
-    const [currentTab, setCurrentTab] = useState('active');
     const [selected, setSelected] = useState([]);
     const { setActiveTab} = useContext(DropshipperProfileContext);
 
@@ -128,7 +127,7 @@ const SupplierList = () => {
                         )}
                     </button>
                     <div className="flex justify-end gap-2">
-                        <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
+                        <button onClick={setActiveTab('account_details')} className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
                             <Link href="/admin/dropshipper/create">Add New</Link>
                         </button>
 

@@ -12,10 +12,12 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { ProductContextEdit } from './ProductContextEdit';
 import { useAdminActions } from '@/components/commonfunctions/MainContext';
+import Image from 'next/image';
 
 const ProductTable = () => {
     const { setActiveTab } = useContext(ProductContextEdit);
-
+    const [showVariantPopup, setShowVariantPopup] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [showRtoLiveCount, setShowRtoLiveCount] = useState(false);
     const [selectedModel, setSelectedModel] = useState('');
@@ -287,29 +289,17 @@ const ProductTable = () => {
                                         <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
                                             SKU
                                         </th>
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-red-500">
-                                            Suggested Price
-                                        </th>
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            Shipwoll Cost Price
-                                        </th>
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            Quantity
-                                        </th>
+
                                         {showRtoLiveCount && (
                                             <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">
                                                 Live RTO Stock
                                             </th>
                                         )}
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            Order Auto Accept
-                                        </th>
+
                                         <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
                                             Status
                                         </th>
-                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                            Admin Status
-                                        </th>
+
                                         {!showRtoLiveCount && (
                                             <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
                                                 Model
@@ -320,6 +310,9 @@ const ProductTable = () => {
                                                 RTO Status
                                             </th>
                                         )}
+                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                            View Variant
+                                        </th>
 
                                         <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
                                             Action
@@ -346,47 +339,16 @@ const ProductTable = () => {
                                             </td>
                                             <td className="p-2 px-5 capitalize  text-left whitespace-nowrap">{item.description || 'NIL'}</td>
                                             <td className="p-2 px-5 capitalize  text-left whitespace-nowrap">{item.main_sku || 'NIL'}</td>
-                                            <td className="p-2 px-5 capitalize  text-left whitespace-nowrap text-red-500">{item.lowestOtherSupplierPrice || 'NIL'}</td>
-                                            {(() => {
-                                                const variant = item.variants[0] || {};
-                                                return (
-                                                    <>
-                                                        <td className="p-2 px-5 capitalize  text-left whitespace-nowrap">{variant.shipowl_price || 'NIL'}</td>
-                                                        <td className="p-2 px-5 capitalize  text-left whitespace-nowrap">{variant.qty || 'NIL'}</td>
-                                                    </>
-                                                );
-                                            })()}
-
-
                                             {showRtoLiveCount && <td className="p-2 px-5 capitalize  text-left whitespace-nowrap text-blue-500">{item.liveRtoStock || 'NIL'}</td>}
-                                            <td className="p-2 px-5 capitalize  text-left whitespace-nowrap">
-                                                <div className="flex items-center mb-4">
-                                                    <label className="flex items-center cursor-pointer">
-                                                        <input type="checkbox" className="sr-only" checked={item.autoAccept} readOnly />
-                                                        <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.autoAccept ? "bg-orange-500" : ""}`}>
-                                                            <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.autoAccept ? "translate-x-5" : ""}`}></div>
-                                                        </div>
-                                                    </label>
-                                                </div>
+
+                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
+                                                {item.status ? (
+                                                    <span className="bg-green-100 text-green-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
+                                                ) : (
+                                                    <span className="bg-red-100 text-red-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
+                                                )}
                                             </td>
-                                            <td className="p-2 px-5 capitalize  text-left whitespace-nowrap">
-                                                <div className="flex items-center mb-4">
-                                                    <label className="flex items-center cursor-pointer">
-                                                        <input type="checkbox" className="sr-only" checked={item.status} readOnly />
-                                                        <div className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${item.status ? "bg-orange-500" : ""}`}>
-                                                            <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${item.status ? "translate-x-5" : ""}`}></div>
-                                                        </div>
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td className="p-2 px-5 capitalize  text-left whitespace-nowrap">
-                                                <button
-                                                    className={` py-2 text-white rounded-md text-sm p-3 uppercase  min-w-[95px]
-            ${item.adminStatus === "Done" ? "bg-green-500" : item.adminStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
-                                                >
-                                                    {item.adminStatus || 'NIL'}
-                                                </button>
-                                            </td>
+
                                             {!showRtoLiveCount && (
                                                 <td className="p-2 px-5  text-left uppercase whitespace-nowrap">
                                                     <button
@@ -408,6 +370,17 @@ const ProductTable = () => {
                                                     </button>
                                                 </td>
                                             )}
+                                            <td className="p-2 px-5 text-left capitalize whitespace-nowrap">
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedProduct(item); // `item` is your current product row
+                                                        setShowVariantPopup(true);
+                                                    }}
+                                                    className="py-2 px-4 text-white rounded-md text-sm bg-[#3965FF]"
+                                                >
+                                                    View Variants
+                                                </button>
+                                            </td>
                                             <td className="p-2 px-5 capitalize  text-left whitespace-nowrap  text-[#8F9BBA]">
                                                 <div className="flex gap-2"> {isTrashed ? (
                                                     <>
@@ -429,6 +402,75 @@ const ProductTable = () => {
                                     ))}
                                 </tbody>
                             </table>
+                            {showVariantPopup && selectedProduct && (
+                                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                                    <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
+                                        <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+
+                                        <table className="min-w-full table-auto border border-gray-200">
+                                            <thead>
+                                                <tr className="bg-gray-100">
+                                                    <th className="border px-4 py-2">Image</th>
+                                                    <th className="border px-4 py-2">SKU</th>
+                                                    <th className="border px-4 py-2">Color</th>
+                                                    <th className="border px-4 py-2">Qty</th>
+                                                    <th className="border px-4 py-2">ShipOwl Price</th>
+                                                    <th className="border px-4 py-2">RTO Price</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {selectedProduct.variants?.map((variant) => {
+                                                    const imageUrls = variant.image
+                                                        ? variant.image.split(',').map((img) => img.trim()).filter(Boolean)
+                                                        : [];
+
+                                                    return (
+                                                        <tr key={variant.id}>
+                                                            <td className="border px-4 py-2">
+                                                                <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
+                                                                    {imageUrls.length > 0 ? (
+                                                                        imageUrls.map((url, idx) => (
+                                                                            <Image
+                                                                                key={idx}
+                                                                                height={40}
+                                                                                width={40}
+                                                                                src={url}
+                                                                                alt={variant.name || 'NIL'}
+                                                                                className="shrink-0 rounded"
+                                                                            />
+                                                                        ))
+                                                                    ) : (
+                                                                        <Image
+                                                                            height={40}
+                                                                            width={40}
+                                                                            src="https://placehold.co/400"
+                                                                            alt="Placeholder"
+                                                                            className="shrink-0 rounded"
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                            <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
+                                                            <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
+                                                            <td className="border px-4 py-2">{variant.qty ?? 'NIL'}</td>
+                                                            <td className="border px-4 py-2">{variant.shipowl_price ?? 'NIL'}</td>
+                                                            <td className="border px-4 py-2">{variant.rto_price ?? 'NIL'}</td>
+                                                        </tr>
+                                                    );
+                                                })}
+
+                                            </tbody>
+                                        </table>
+
+                                        <button
+                                            onClick={() => setShowVariantPopup(false)}
+                                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         // Render when no admins

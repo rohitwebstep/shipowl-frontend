@@ -113,26 +113,45 @@ export const useAdminActions = (baseEndpoint, resultKey = "data") => {
     }
   }, [baseEndpoint, getAuthToken]);
 
-  const restore = useCallback(async (id, refetchFn) => {
-    const token = getAuthToken();
-    if (!token) return;
+ const restore = useCallback(async (id, refetchFn) => {
+  const token = getAuthToken();
+  if (!token) return;
 
-    try {
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/${baseEndpoint}/${id}/restore`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message || result.error);
-      Swal.fire("Restored!", "Item restored successfully.", "success");
-      if (refetchFn) await refetchFn();
-    } catch (error) {
-      Swal.fire("Error", error.message, "error");
-    }
-  }, [baseEndpoint, getAuthToken]);
+  try {
+    // Show loading alert
+    Swal.fire({
+      title: "Restoring...",
+      text: "Please wait while the item is being restored.",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/${baseEndpoint}/${id}/restore`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.message || result.error);
+
+    Swal.close(); // Close the loading alert
+
+    // Show success message
+    Swal.fire("Restored!", "Item restored successfully.", "success");
+
+    if (refetchFn) await refetchFn();
+
+  } catch (error) {
+    Swal.close(); // Ensure loading is closed on error
+    Swal.fire("Error", error.message, "error");
+  }
+}, [baseEndpoint, getAuthToken]);
 
   const destroy = useCallback(async (id, refetchFn) => {
     const token = getAuthToken();
