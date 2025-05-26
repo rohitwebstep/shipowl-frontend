@@ -32,12 +32,10 @@ const ProductProvider = ({ children }) => {
       {
         color: '',
         sku: '',
-        qty: 1,
-        currency: '',
-        suggested_price: "",
-        shipowl_price: "",
-        rto_suggested_price: "",
-        rto_price: ""
+        product_link: '',
+        variantName: '',
+        suggestedPrice: '',
+        image: null,
       },
     ],
     shipping_time: '24 Hours',
@@ -55,6 +53,7 @@ const ProductProvider = ({ children }) => {
     hsn_code: '',
     tax_rate: '',
     isVisibleToAll: true,
+    isVarientExists: '',
     supplierIds: '',
     status: true,
   });
@@ -243,43 +242,43 @@ const ProductProvider = ({ children }) => {
     return Object.keys(newErrors).length === 0;
   };
 
- const validateFields = () => {
-  const requiredFields = [
-    'category',
-    'name',
-    'main_sku',
-    'description',
-    'brand',
-    'tags',
-    'origin_country',
-    'shipping_country',
-    'list_as',
-    'isVisibleToAll',
-  ];
+  const validateFields = () => {
+    const requiredFields = [
+      'category',
+      'name',
+      'main_sku',
+      'description',
+      'brand',
+      'tags',
+      'origin_country',
+      'shipping_country',
+      'list_as',
+      'isVisibleToAll',
+    ];
 
-  // ✅ Push to requiredFields, not validateFields
-  if (!formData.isVisibleToAll) {
-    requiredFields.push('supplierIds');
-  }
-
-  const newErrors = {};
-  requiredFields.forEach((field) => {
-    const value = formData[field];
-
-    // Check for undefined, null, empty string, or empty array
-    if (
-      value === undefined ||
-      value === null ||
-      (typeof value === 'string' && value.trim() === '') ||
-      (Array.isArray(value) && value.length === 0)
-    ) {
-      newErrors[field] = `${fieldLabels[field]} is required.`;
+    // ✅ Push to requiredFields, not validateFields
+    if (!formData.isVisibleToAll) {
+      requiredFields.push('supplierIds');
     }
-  });
 
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    const newErrors = {};
+    requiredFields.forEach((field) => {
+      const value = formData[field];
+
+      // Check for undefined, null, empty string, or empty array
+      if (
+        value === undefined ||
+        value === null ||
+        (typeof value === 'string' && value.trim() === '') ||
+        (Array.isArray(value) && value.length === 0)
+      ) {
+        newErrors[field] = `${fieldLabels[field]} is required.`;
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
 
   return (

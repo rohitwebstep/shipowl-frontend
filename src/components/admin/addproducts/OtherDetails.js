@@ -3,7 +3,7 @@
 import { useContext, useState } from 'react';
 import { ProductContext } from './ProductContext';
 import Swal from 'sweetalert2';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function OtherDetails() {
   const { formData, setFormData, setActiveTab, setErrors } = useContext(ProductContext);
@@ -44,9 +44,7 @@ export default function OtherDetails() {
       'shipping_country',
       'list_as',
     ];
-
     const businessFields = Object.keys(requiredFields);
-
     const shippingDetails = [
       'shipping_time',
       'weight',
@@ -96,7 +94,12 @@ export default function OtherDetails() {
       const form = new FormData();
 
       for (const key in formData) {
-        const value = formData[key];
+        let value = formData[key];
+
+        // ✅ Convert 'isVarientExists' to boolean
+        if (key === "isVarientExists") {
+          value = value === "yes"; // true if 'yes', false otherwise
+        }
 
         if (value === null || value === undefined || value === '') continue;
 
@@ -110,16 +113,17 @@ export default function OtherDetails() {
           form.append(key, value);
         }
 
-        // ✅ Handle variants, tags, and other arrays or objects
+        // ✅ Handle arrays or objects (e.g., variants, tags)
         else if (Array.isArray(value) || typeof value === 'object') {
           form.append(key, JSON.stringify(value));
         }
 
-        // ✅ Handle primitive values (strings, numbers)
+        // ✅ Handle primitive values (string, number, boolean)
         else {
           form.append(key, value);
         }
       }
+
 
       const response = await fetch(url, {
         method: "POST",
@@ -196,7 +200,7 @@ export default function OtherDetails() {
     <form onSubmit={handleSubmit}>
       <div className="xl:w-11/12 mt-4 p-6 rounded-2xl bg-white">
         <div className="grid md:grid-cols-2 gap-4 mb-4">
-        
+
           <div>
             <label htmlFor="hsn_code" className="font-bold block uppercase">
               HSN Code
@@ -209,7 +213,7 @@ export default function OtherDetails() {
               className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full"
             />
           </div>
-           <div>
+          <div>
             <label htmlFor="tax_rate" className="font-bold block">
               Tax Rate (GST) <span className="text-red-500">*</span>
             </label>
