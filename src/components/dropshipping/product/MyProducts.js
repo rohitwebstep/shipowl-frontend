@@ -18,10 +18,11 @@ export default function MyProducts() {
     const [showPopup, setShowPopup] = useState(false);
     const [inventoryData, setInventoryData] = useState({
         supplierProductId: "",
-        variant: []
-      });
+        variant: [],
+        id: ''
+    });
     const [showVariantPopup, setShowVariantPopup] = useState(false);
-      const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const [isTrashed, setIsTrashed] = useState(false);
     const fetchProducts = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
@@ -85,12 +86,12 @@ export default function MyProducts() {
     }, []);
     const handleVariantChange = (id, field, value) => {
         setInventoryData((prevData) => ({
-          ...prevData,
-          variant: prevData.variant.map((v) =>
-            v.id === id ? { ...v, [field]: field === 'qty' || field === 'shipowl_price' ? Number(value) : value } : v
-          ),
+            ...prevData,
+            variant: prevData.variant.map((v) =>
+                v.id === id ? { ...v, [field]: field === 'qty' || field === 'shipowl_price' ? Number(value) : value } : v
+            ),
         }));
-      };
+    };
     const trashProducts = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -137,7 +138,7 @@ export default function MyProducts() {
         }
     }, [router, setProducts]);
 
-    const handleSubmit = async (e, id) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
@@ -170,13 +171,13 @@ export default function MyProducts() {
                 stock: v.dropStock,
                 price: v.dropPrice,
                 status: v.Dropstatus
-              }));
-        
-              form.append('supplierProductId', inventoryData.supplierProductId);
-              form.append('variants', JSON.stringify(simplifiedVariants));
-        
+            }));
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}`;
+            form.append('supplierProductId', inventoryData.supplierProductId);
+            form.append('variants', JSON.stringify(simplifiedVariants));
+
+
+            const url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${inventoryData.id}`;
 
             const response = await fetch(url, {
                 method: 'PUT',
@@ -212,6 +213,7 @@ export default function MyProducts() {
                         stock: "",
                         price: "",
                         status: "",
+                        id: '',
                     });
                     setShowPopup(false);
                     fetchProducts();
@@ -456,7 +458,7 @@ export default function MyProducts() {
     }, [router, trashProducts]);
 
 
-    const handleEdit = async (item) => {
+    const handleEdit = async (item, id) => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
         if (dropshipperData?.project?.active_panel !== "dropshipper") {
@@ -497,17 +499,18 @@ export default function MyProducts() {
             const result = await response.json();
             const items = result?.dropshipperProduct || {};
 
-         
-      setInventoryData({
-        productId: items.productId || "", // or items.product?.id if you prefer
-        variant: (items.variants || []).map((v) => ({
-          variantId: v.productVariantId,
-          dropStock: v.stock,
-          dropPrice: v.price,
-          Dropstatus: v.status,
-          image: v.variant?.image || '',
-        }))
-      });
+
+            setInventoryData({
+                productId: items.productId || "",
+                id: id, // or items.product?.id if you prefer
+                variant: (items.variants || []).map((v) => ({
+                    variantId: v.productVariantId,
+                    dropStock: v.stock,
+                    dropPrice: v.price,
+                    Dropstatus: v.status,
+                    image: v.variant?.image || '',
+                }))
+            });
             setShowPopup(true);
 
         } catch (error) {
@@ -554,24 +557,24 @@ export default function MyProducts() {
 
                 </div>
                 <div className="products-grid  grid xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
-                {products.map((product, index) => {
-                    const variant = product?.product?.variants?.[0];
-                    const imageUrl = variant?.image?.split(",")?.[0]?.trim() || "/default-image.png";
-                    const productName = product?.product?.name || "NIL";
-                    const price = variant?.shipowl_price ?? "N/A";
+                    {products.map((product, index) => {
+                        const variant = product?.product?.variants?.[0];
+                        const imageUrl = variant?.image?.split(",")?.[0]?.trim() || "/default-image.png";
+                        const productName = product?.product?.name || "NIL";
+                        const price = variant?.shipowl_price ?? "N/A";
 
-                    return (
-                        <div
-                            key={index}
-                            className="bg-white rounded-xl cursor-pointer shadow-sm relative"
-                        >
-                            <Image
-                                src={productimg || imageUrl}
-                                alt={productName}
-                                width={300}
-                                height={200}
-                                className="w-full h-48 object-cover rounded-lg mb-2"
-                            />
+                        return (
+                            <div
+                                key={index}
+                                className="bg-white rounded-xl cursor-pointer shadow-sm relative"
+                            >
+                                <Image
+                                    src={productimg || imageUrl}
+                                    alt={productName}
+                                    width={300}
+                                    height={200}
+                                    className="w-full h-48 object-cover rounded-lg mb-2"
+                                />
 
                                 <div className="absolute top-2 right-2 flex gap-2 z-10">
                                     {isTrashed ? (
@@ -581,195 +584,195 @@ export default function MyProducts() {
                                         </>
                                     ) : (
                                         <>
-                                            <button onClick={() => handleEdit(product)} className="bg-yellow-500 text-white px-3 py-1 text-sm rounded">Edit</button>
+                                            <button onClick={() => handleEdit(product, product.id)} className="bg-yellow-500 text-white px-3 py-1 text-sm rounded">Edit</button>
                                             <button onClick={() => handleDelete(product)} className="bg-red-500 text-white px-3 py-1 text-sm rounded">Trash</button>
                                         </>
                                     )}
                                 </div>
 
 
-                            <div className="p-3 mb:pb-0">
-                                <div className="flex justify-between">
-                                    <p className="text-lg font-extrabold font-lato">₹{price}</p>
-                                    <div className="coupen-box flex gap-2 items-center">
-                                        <Image src={coupen} className="w-5" alt="Coupon" />
-                                        <span className="text-[#249B3E] font-lato font-bold text-[12px]">WELCOME10</span>
+                                <div className="p-3 mb:pb-0">
+                                    <div className="flex justify-between">
+                                        <p className="text-lg font-extrabold font-lato">₹{price}</p>
+                                        <div className="coupen-box flex gap-2 items-center">
+                                            <Image src={coupen} className="w-5" alt="Coupon" />
+                                            <span className="text-[#249B3E] font-lato font-bold text-[12px]">WELCOME10</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">{productName}</p>
+                                    <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">{productName}</p>
 
-                                <div className="flex items-center border-t pt-2 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
-                                    <div className="flex items-center gap-1">
-                                        <Image src={gift} className="w-5" alt="Gift" />
-                                        <span className="font-lato text-[#2C3454] font-bold">100-10k</span>
+                                    <div className="flex items-center border-t pt-2 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
+                                        <div className="flex items-center gap-1">
+                                            <Image src={gift} className="w-5" alt="Gift" />
+                                            <span className="font-lato text-[#2C3454] font-bold">100-10k</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Image src={ship} className="w-5" alt="Shipping" />
+                                            <span className="font-lato text-[#2C3454] font-bold">4.5</span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <Image src={ship} className="w-5" alt="Shipping" />
-                                        <span className="font-lato text-[#2C3454] font-bold">4.5</span>
-                                    </div>
-                                </div>
 
-                               
-                                <button
-                                    onClick={() => {
-                                        setSelectedProduct(product); // `item` is your current product row
-                                        setShowVariantPopup(true);
-                                    }}
-                                    className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
-                                >
-                                    View Variants
-                                </button>
 
-                                {showPopup && (
-                                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                                        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-                                            <h2 className="text-xl font-semibold mb-4">Add to Inventory</h2>
-                                            <table className="min-w-full table-auto border border-gray-200">
-                                                <thead>
-                                                    <tr className="bg-gray-100">
-                                                        <th className="border px-4 py-2">Image</th>
-                                                        <th className="border px-4 py-2">Stock</th>
-                                                        <th className="border px-4 py-2">Price</th>
-                                                        <th className="border px-4 py-2">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {inventoryData.variant?.map((variant) => (
-                                                        <tr key={variant.id}>
-                                                            <td className="border px-4 py-2">
-                                                                <Image
-                                                                    height={40}
-                                                                    width={40}
-                                                                    src={variant.image || "/placeholder.png"}
-                                                                    alt={variant.color || "NIL"}
-                                                                />
-                                                            </td>
-                                                            <td className="border px-4 py-2">
-                                                                <input
-                                                                    type="number"
-                                                                    placeholder="Stock"
-                                                                    name="dropStock"
-                                                                    className="w-full border rounded p-2"
-                                                                    value={variant.dropStock}
-                                                                    onChange={(e) =>
-                                                                        handleVariantChange(variant.id, "dropStock", e.target.value)
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="border px-4 py-2">
-                                                                <input
-                                                                    type="number"
-                                                                    name="dropPrice"
-                                                                    placeholder="Price"
-                                                                    className="w-full border rounded p-2"
-                                                                    value={variant.dropPrice}
-                                                                    onChange={(e) =>
-                                                                        handleVariantChange(variant.id, "dropPrice", e.target.value)
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="border px-4 py-2">
-                                                                <label className="flex mt-2 items-center cursor-pointer">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedProduct(product); // `item` is your current product row
+                                            setShowVariantPopup(true);
+                                        }}
+                                        className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
+                                    >
+                                        View Variants
+                                    </button>
+
+                                    {showPopup && (
+                                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                                            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+                                                <h2 className="text-xl font-semibold mb-4">Add to Inventory</h2>
+                                                <table className="min-w-full table-auto border border-gray-200">
+                                                    <thead>
+                                                        <tr className="bg-gray-100">
+                                                            <th className="border px-4 py-2">Image</th>
+                                                            <th className="border px-4 py-2">Stock</th>
+                                                            <th className="border px-4 py-2">Price</th>
+                                                            <th className="border px-4 py-2">Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {inventoryData.variant?.map((variant) => (
+                                                            <tr key={variant.id}>
+                                                                <td className="border px-4 py-2">
+                                                                    <Image
+                                                                        height={40}
+                                                                        width={40}
+                                                                        src={variant.image || "/placeholder.png"}
+                                                                        alt={variant.color || "NIL"}
+                                                                    />
+                                                                </td>
+                                                                <td className="border px-4 py-2">
                                                                     <input
-                                                                        type="checkbox"
-                                                                        name="Dropstatus"
-                                                                        className="sr-only"
-                                                                        checked={variant.Dropstatus || false}
+                                                                        type="number"
+                                                                        placeholder="Stock"
+                                                                        name="dropStock"
+                                                                        className="w-full border rounded p-2"
+                                                                        value={variant.dropStock}
                                                                         onChange={(e) =>
-                                                                            handleVariantChange(variant.id, "Dropstatus", e.target.checked)
+                                                                            handleVariantChange(variant.id, "dropStock", e.target.value)
                                                                         }
                                                                     />
-                                                                    <div
-                                                                        className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variant.Dropstatus ? "bg-orange-500" : ""
-                                                                            }`}
-                                                                    >
+                                                                </td>
+                                                                <td className="border px-4 py-2">
+                                                                    <input
+                                                                        type="number"
+                                                                        name="dropPrice"
+                                                                        placeholder="Price"
+                                                                        className="w-full border rounded p-2"
+                                                                        value={variant.dropPrice}
+                                                                        onChange={(e) =>
+                                                                            handleVariantChange(variant.id, "dropPrice", e.target.value)
+                                                                        }
+                                                                    />
+                                                                </td>
+                                                                <td className="border px-4 py-2">
+                                                                    <label className="flex mt-2 items-center cursor-pointer">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            name="Dropstatus"
+                                                                            className="sr-only"
+                                                                            checked={variant.Dropstatus || false}
+                                                                            onChange={(e) =>
+                                                                                handleVariantChange(variant.id, "Dropstatus", e.target.checked)
+                                                                            }
+                                                                        />
                                                                         <div
-                                                                            className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variant.Dropstatus ? "translate-x-5" : ""
+                                                                            className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variant.Dropstatus ? "bg-orange-500" : ""
                                                                                 }`}
-                                                                        ></div>
-                                                                    </div>
-                                                                    <span className="ms-2 text-sm text-gray-600">Status</span>
-                                                                </label>
-                                                            </td>
+                                                                        >
+                                                                            <div
+                                                                                className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variant.Dropstatus ? "translate-x-5" : ""
+                                                                                    }`}
+                                                                            ></div>
+                                                                        </div>
+                                                                        <span className="ms-2 text-sm text-gray-600">Status</span>
+                                                                    </label>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+
+
+
+
+                                                <div className="flex justify-end space-x-3 mt-6">
+                                                    <button
+                                                        onClick={() => {
+                                                            setShowPopup(false);
+                                                            setIsEdit(false);
+                                                        }}
+                                                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => handleSubmit(e)}
+                                                        className="px-4 py-2 bg-green-600 text-white rounded"
+                                                    >
+                                                        Submit
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {showVariantPopup && selectedProduct && (
+                                        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                                            <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
+                                                <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+
+                                                <table className="min-w-full table-auto border border-gray-200">
+                                                    <thead>
+                                                        <tr className="bg-gray-100">
+                                                            <th className="border px-4 py-2">Image</th>
+                                                            <th className="border px-4 py-2">SKU</th>
+                                                            <th className="border px-4 py-2">Color</th>
+                                                            <th className="border px-4 py-2">Qty</th>
+                                                            <th className="border px-4 py-2">ShipOwl Price</th>
+                                                            <th className="border px-4 py-2">RTO Price</th>
                                                         </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        {selectedProduct.variants?.map((variant) => (
+                                                            <tr key={variant.id}>
+                                                                <td className="border px-4 py-2">
+                                                                    <Image
+                                                                        height={40}
+                                                                        width={40}
+                                                                        src={variant?.variant?.image || variant?.image}
+                                                                        alt={variant.variant.sku || variant.sku || 'NIL'}
+                                                                    />
+                                                                </td>
+                                                                <td className="border px-4 py-2">{variant.variant.sku || variant.sku || 'NIL'}</td>
+                                                                <td className="border px-4 py-2">{variant.variant.color || variant.color || 'NIL'}</td>
+                                                                <td className="border px-4 py-2">{variant.variant.qty || variant.qty || 'NIL'}</td>
+                                                                <td className="border px-4 py-2">{variant.variant.shipowl_price || variant.shipowl_price || 'NIL'}</td>
+                                                                <td className="border px-4 py-2">{variant.variant.rto_price || variant.rto_price || 'NIL'}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
 
+                                                </table>
 
-
-
-                                            <div className="flex justify-end space-x-3 mt-6">
                                                 <button
-                                                    onClick={() => {
-                                                        setShowPopup(false);
-                                                        setIsEdit(false);
-                                                    }}
-                                                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                                                    onClick={() => setShowVariantPopup(false)}
+                                                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
                                                 >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleSubmit(e, product.id)}
-                                                    className="px-4 py-2 bg-green-600 text-white rounded"
-                                                >
-                                                    Submit
+                                                    ×
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
-                                {showVariantPopup && selectedProduct && (
-                                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                                        <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
-                                            <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
-
-                                            <table className="min-w-full table-auto border border-gray-200">
-                                                <thead>
-                                                    <tr className="bg-gray-100">
-                                                        <th className="border px-4 py-2">Image</th>
-                                                        <th className="border px-4 py-2">SKU</th>
-                                                        <th className="border px-4 py-2">Color</th>
-                                                        <th className="border px-4 py-2">Qty</th>
-                                                        <th className="border px-4 py-2">ShipOwl Price</th>
-                                                        <th className="border px-4 py-2">RTO Price</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {selectedProduct.variants?.map((variant) => (
-                                                        <tr key={variant.id}>
-                                                            <td className="border px-4 py-2">
-                                                                <Image
-                                                                    height={40}
-                                                                    width={40}
-                                                                    src={variant?.variant?.image ||variant?.image}
-                                                                    alt={variant.variant.sku || variant.sku || 'NIL'}
-                                                                />
-                                                            </td>
-                                                            <td className="border px-4 py-2">{variant.variant.sku ||variant.sku || 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.variant.color ||variant.color || 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.variant.qty || variant.qty || 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.variant.shipowl_price ||variant.shipowl_price || 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.variant.rto_price ||variant.rto_price || 'NIL'}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-
-                                            </table>
-
-                                            <button
-                                                onClick={() => setShowVariantPopup(false)}
-                                                className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
                 </div>
             </div>
         </>

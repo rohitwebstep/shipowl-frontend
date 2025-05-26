@@ -360,7 +360,7 @@ export default function Allroducts() {
                                                     Cancel
                                                 </button>
                                                 <button
-                                                    onClick={(e) => handleSubmit(e, product.id)}
+                                                    onClick={(e) => handleSubmit(e)}
                                                     className="px-4 py-2 bg-green-600 text-white rounded"
                                                 >
                                                     Submit

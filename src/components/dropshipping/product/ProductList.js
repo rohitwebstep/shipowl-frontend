@@ -11,7 +11,6 @@ import Swal from 'sweetalert2';
 
 export default function ProductList() {
     const [isTrashed, setIsTrashed] = useState(false);
-
     const { verifyDropShipperAuth } = useDropshipper();
     const [productsRequest, setProductsRequest] = useState([]);
     const [loading, setLoading] = useState(null);

@@ -214,6 +214,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
   const router = useRouter();
   const [inventoryData, setInventoryData] = useState({
     supplierProductId: "",
+    id: '',
     variant: []
   });
   const handleVariantChange = (id, field, value) => {
@@ -236,7 +237,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
 
   const [isEdit, setIsEdit] = useState(false);
 
-  const handleEdit = async (item) => {
+  const handleEdit = async (item,id) => {
     setIsEdit(true);
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -279,7 +280,8 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       const items = result?.dropshipperProduct || {};
 
       setInventoryData({
-        productId: items.productId || "", // or items.product?.id if you prefer
+        productId: items.productId || "",
+        id:id, // or items.product?.id if you prefer
         variant: (items.variants || []).map((v) => ({
           variantId: v.productVariantId,
           dropStock: v.stock,
@@ -300,7 +302,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
   }
 
   console.log(inventoryData)
-  const handleSubmit = async (e, id) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -341,7 +343,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
 
 
 
-      const url = isEdit ? `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}` : "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = isEdit ? `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${inventoryData.id}` : "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: isEdit ? 'PUT' : "POST",
@@ -377,6 +379,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
           setInventoryData({
             productId: "",
             variant: [],
+            id:'',
           });
           setShowPopup(false);
           fetchProduct('my');
@@ -671,7 +674,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                     </>
                   ) : (
                     <>
-                      <button onClick={() => handleEdit(product)} className="bg-yellow-500 text-white px-3 py-1 text-sm rounded">Edit</button>
+                      <button onClick={() => handleEdit(product,product.id)} className="bg-yellow-500 text-white px-3 py-1 text-sm rounded">Edit</button>
                       <button onClick={() => handleDelete(product)} className="bg-red-500 text-white px-3 py-1 text-sm rounded">Trash</button>
                     </>
                   )}
@@ -706,6 +709,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                       setShowPopup(true);
                       setInventoryData({
                         supplierProductId: product.id,
+                        id: product.id,
                         variant: product.variants
                       });
                     }}
@@ -816,7 +820,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                           Cancel
                         </button>
                         <button
-                          onClick={(e) => handleSubmit(e, product.id)}
+                          onClick={(e) => handleSubmit(e)}
                           className="px-4 py-2 bg-green-600 text-white rounded"
                         >
                           Submit
