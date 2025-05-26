@@ -48,7 +48,7 @@ const ProductTable = () => {
     const [inventoryData, setInventoryData] = useState({
         productId: "",
         variant: [],
-        id:''
+        id: ''
     });
     const handleVariantChange = (id, field, value) => {
         setInventoryData((prevData) => ({
@@ -477,7 +477,7 @@ const ProductTable = () => {
                 });
         }
     }, [products, loading]);
-    const handleEdit = async (item,id) => {
+    const handleEdit = async (item, id) => {
         setIsEdit(true);
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -521,7 +521,7 @@ const ProductTable = () => {
 
             setInventoryData({
                 productId: items.productId || "",
-                   id:id, // or items.product?.id if you prefer
+                id: id, // or items.product?.id if you prefer
                 variant: (items.variants || []).map((v) => ({
                     variantId: v.productVariantId,
                     stock: v.stock,
@@ -530,8 +530,8 @@ const ProductTable = () => {
                     color: v.variant?.color || '',
                     sku: v.variant?.sku || '',
                     image: v.variant?.image || '',
-                 
-                    
+
+
                 }))
             });
 
@@ -622,7 +622,7 @@ const ProductTable = () => {
                     setInventoryData({
                         productId: "",
                         variant: [],
-                        id:'',
+                        id: '',
                     });
                     setShowPopup(false);
                     fetchProduct('my');
@@ -803,11 +803,9 @@ const ProductTable = () => {
                                                 Add to List
                                             </th>
                                         )}
-                                        {activeTab === "notmy" && (
-                                            <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
-                                                View Variant
-                                            </th>
-                                        )}
+                                        <th className="p-2 px-5 whitespace-nowrap text-left uppercase">
+                                            View Variant
+                                        </th>
                                         {showRtoLiveCount && (
                                             <th className="p-2 px-5 whitespace-nowrap text-left uppercase text-blue-500">
                                                 Live RTO Stock
@@ -878,19 +876,17 @@ const ProductTable = () => {
                                                 </td>
                                             )}
 
-                                            {activeTab === "notmy" && (
-                                                <td className="p-2 px-5 text-left capitalize whitespace-nowrap">
-                                                    <button
-                                                        onClick={() => {
-                                                            setSelectedProduct(item); // `item` is your current product row
-                                                            setShowVariantPopup(true);
-                                                        }}
-                                                        className="py-2 px-4 text-white rounded-md text-sm bg-[#3965FF]"
-                                                    >
-                                                        View Variants
-                                                    </button>
-                                                </td>
-                                            )}
+                                            <td className="p-2 px-5 text-left capitalize whitespace-nowrap">
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedProduct(item); // `item` is your current product row
+                                                        setShowVariantPopup(true);
+                                                    }}
+                                                    className="py-2 px-4 text-white rounded-md text-sm bg-[#3965FF]"
+                                                >
+                                                    View Variants
+                                                </button>
+                                            </td>
 
 
 
@@ -905,7 +901,7 @@ const ProductTable = () => {
                                             </td>
 
                                             {!showRtoLiveCount && (
-                                                <td className="p-2 px-5  text-left uppercase whitespace-nowrap">
+                                                <td className="p-2 px-5  text-center uppercase whitespace-nowrap">
                                                     <button
                                                         className={`py-2 text-white rounded-md text-sm p-3 uppercase min-w-[95px] 
     ${item.list_as?.toLowerCase() === "shipowl" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
@@ -935,7 +931,7 @@ const ProductTable = () => {
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <MdModeEdit onClick={() => handleEdit(item,item.id)} className="cursor-pointer text-3xl" />
+                                                                <MdModeEdit onClick={() => handleEdit(item, item.id)} className="cursor-pointer text-3xl" />
                                                                 <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
                                                             </>
                                                         )}
@@ -964,7 +960,7 @@ const ProductTable = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {inventoryData.variant?.map((variant,index) => (
+                                                {inventoryData.variant?.map((variant, index) => (
                                                     <tr key={index}>
                                                         <td className="border px-4 py-2">
                                                             <Image
@@ -1067,13 +1063,13 @@ const ProductTable = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {selectedProduct.variants?.map((variant) => {
-                                                    const imageUrls = variant.image
-                                                        ? variant.image.split(',').map((img) => img.trim()).filter(Boolean)
+                                                {selectedProduct.variants?.map((v,index) => {
+                                                    const imageUrls = v.image
+                                                        ? v.image.split(',').map((img) => img.trim()).filter(Boolean)
                                                         : [];
-
+                                                    const variant = v.variant || v;
                                                     return (
-                                                        <tr key={variant.id}>
+                                                        <tr key={index}>
                                                             <td className="border px-4 py-2">
                                                                 <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
                                                                     {imageUrls.length > 0 ? (

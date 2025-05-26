@@ -118,8 +118,8 @@ const NewlyLaunched = () => {
     }
   }, [router, setProducts]);
 
-  const viewProduct = (item) => {
-    router.push(`/dropshipping/product/?id=${item.id}`);
+  const viewProduct = (id) => {
+    router.push(`/dropshipping/product/?id=${id}`);
   };
 
 
@@ -178,7 +178,7 @@ const NewlyLaunched = () => {
             <Section
               title="Newly Launched"
               products={products}
-              // viewProduct={viewProduct}
+              viewProduct={viewProduct}
               activeTab={activeTab}
               trashProducts={trashProducts}
               fetchProduct={fetchProduct}
@@ -190,7 +190,7 @@ const NewlyLaunched = () => {
             <Section
               title="Potential Heros"
               products={products}
-              // viewProduct={viewProduct}
+             viewProduct={viewProduct}
               activeTab={activeTab}
               trashProducts={trashProducts}
               fetchProduct={fetchProduct}
@@ -210,7 +210,9 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
   const [loading, setLoading] = useState(false);
   const [showVariantPopup, setShowVariantPopup] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
+ const viewProduct = (id) => {
+    router.push(`/dropshipping/product/?id=${id}`);
+  };
   const router = useRouter();
   const [inventoryData, setInventoryData] = useState({
     supplierProductId: "",
@@ -223,21 +225,21 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       variant: prevData.variant.map((v) =>
         v.id === id
           ? {
-              ...v,
-              [field]:
-                field === 'dropStock' || field === 'dropPrice'
-                  ? Number(value)
-                  : value,
-            }
+            ...v,
+            [field]:
+              field === 'dropStock' || field === 'dropPrice'
+                ? Number(value)
+                : value,
+          }
           : v
       ),
     }));
   };
-  
+
 
   const [isEdit, setIsEdit] = useState(false);
 
-  const handleEdit = async (item,id) => {
+  const handleEdit = async (item, id) => {
     setIsEdit(true);
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -280,8 +282,8 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
       const items = result?.dropshipperProduct || {};
 
       setInventoryData({
-        productId: items.productId || "",
-        id:id, // or items.product?.id if you prefer
+        supplierProductId: items.productId || "",
+        id: id, // or items.product?.id if you prefer
         variant: (items.variants || []).map((v) => ({
           variantId: v.productVariantId,
           dropStock: v.stock,
@@ -379,7 +381,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
           setInventoryData({
             productId: "",
             variant: [],
-            id:'',
+            id: '',
           });
           setShowPopup(false);
           fetchProduct('my');
@@ -660,6 +662,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
               <Image
                 src={productimg || imageUrl}
                 alt={productName}
+                onClick={()=>viewProduct (product.id)}
                 width={300}
                 height={200}
                 className="w-full h-48 object-cover rounded-lg mb-2"
@@ -674,7 +677,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                     </>
                   ) : (
                     <>
-                      <button onClick={() => handleEdit(product,product.id)} className="bg-yellow-500 text-white px-3 py-1 text-sm rounded">Edit</button>
+                      <button onClick={() => handleEdit(product, product.id)} className="bg-yellow-500 text-white px-3 py-1 text-sm rounded">Edit</button>
                       <button onClick={() => handleDelete(product)} className="bg-red-500 text-white px-3 py-1 text-sm rounded">Trash</button>
                     </>
                   )}
@@ -718,17 +721,15 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                     Add To Inventory
                   </button>
                 )}
-                {activeTab === "notmy" && (
-                  <button
-                    onClick={() => {
-                      setSelectedProduct(product); // `item` is your current product row
-                      setShowVariantPopup(true);
-                    }}
-                    className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
-                  >
-                    View Variants
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    setSelectedProduct(product); // `item` is your current product row
+                    setShowVariantPopup(true);
+                  }}
+                  className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
+                >
+                  View Variants
+                </button>
 
                 {showPopup && (
                   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -744,13 +745,13 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                           </tr>
                         </thead>
                         <tbody>
-                          {inventoryData.variant?.map((variant) => (
-                            <tr key={variant.id}>
+                          {inventoryData.variant?.map((variant, index) => (
+                            <tr key={index}>
                               <td className="border px-4 py-2">
                                 <Image
                                   height={40}
                                   width={40}
-                                  src={variant.image || "/placeholder.png"}
+                                  src={"https://placehold.co/400" || variant.image}
                                   alt={variant.color || "NIL"}
                                 />
                               </td>
@@ -760,7 +761,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                                   placeholder="Stock"
                                   name="dropStock"
                                   className="w-full border rounded p-2"
-                                  value={variant.dropStock}
+                                  value={variant.dropStock || ''}
                                   onChange={(e) =>
                                     handleVariantChange(variant.id, "dropStock", e.target.value)
                                   }
@@ -772,7 +773,7 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                                   name="dropPrice"
                                   placeholder="Price"
                                   className="w-full border rounded p-2"
-                                  value={variant.dropPrice}
+                                  value={variant.dropPrice || ''}
                                   onChange={(e) =>
                                     handleVariantChange(variant.id, "dropPrice", e.target.value)
                                   }
@@ -846,23 +847,46 @@ const Section = ({ title, products, isTrashed, setActiveTab, trashProducts, fetc
                           </tr>
                         </thead>
                         <tbody>
-                          {selectedProduct.variants?.map((variant) => (
-                            <tr key={variant.id}>
-                              <td className="border px-4 py-2">
-                                <Image
-                                  height={40}
-                                  width={40}
-                                  src={variant.variant.image}
-                                  alt={variant.variant.sku || 'NIL'}
-                                />
-                              </td>
-                              <td className="border px-4 py-2">{variant.variant.sku || 'NIL'}</td>
-                              <td className="border px-4 py-2">{variant.variant.color || 'NIL'}</td>
-                              <td className="border px-4 py-2">{variant.variant.qty ?? 'NIL'}</td>
-                              <td className="border px-4 py-2">{variant.variant.shipowl_price ?? 'NIL'}</td>
-                              <td className="border px-4 py-2">{variant.variant.rto_price ?? 'NIL'}</td>
-                            </tr>
-                          ))}
+                          {selectedProduct.variants?.map((v) => {
+                            const imageUrls = v.image
+                              ? v.image.split(',').map((img) => img.trim()).filter(Boolean)
+                              : [];
+                            const variant = v.variant || v;
+                            return (
+                              <tr key={variant.id}>
+                                <td className="border px-4 py-2">
+                                  <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
+                                    {imageUrls.length > 0 ? (
+                                      imageUrls.map((url, idx) => (
+                                        <Image
+                                          key={idx}
+                                          height={40}
+                                          width={40}
+                                          src={url}
+                                          alt={variant.name || 'NIL'}
+                                          className="shrink-0 rounded"
+                                        />
+                                      ))
+                                    ) : (
+                                      <Image
+                                        height={40}
+                                        width={40}
+                                        src="https://placehold.co/400"
+                                        alt="Placeholder"
+                                        className="shrink-0 rounded"
+                                      />
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
+                                <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
+                                <td className="border px-4 py-2">{variant.qty ?? 'NIL'}</td>
+                                <td className="border px-4 py-2">{variant.shipowl_price ?? 'NIL'}</td>
+                                <td className="border px-4 py-2">{variant.rto_price ?? 'NIL'}</td>
+                              </tr>
+                            );
+                          })}
+
                         </tbody>
 
                       </table>

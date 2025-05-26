@@ -19,17 +19,17 @@ export default function Allroducts() {
     const [inventoryData, setInventoryData] = useState({
         supplierProductId: "",
         variant: []
-      });
+    });
     const [showVariantPopup, setShowVariantPopup] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const handleVariantChange = (id, field, value) => {
         setInventoryData((prevData) => ({
-          ...prevData,
-          variant: prevData.variant.map((v) =>
-            v.id === id ? { ...v, [field]: field === 'qty' || field === 'shipowl_price' ? Number(value) : value } : v
-          ),
+            ...prevData,
+            variant: prevData.variant.map((v) =>
+                v.id === id ? { ...v, [field]: field === 'qty' || field === 'shipowl_price' ? Number(value) : value } : v
+            ),
         }));
-      };
+    };
 
     const fetchProducts = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
@@ -49,7 +49,7 @@ export default function Allroducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=my`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=all`,
                 {
                     method: "GET",
                     headers: {
@@ -126,11 +126,11 @@ export default function Allroducts() {
                 stock: v.dropStock,
                 price: v.dropPrice,
                 status: v.Dropstatus
-              }));
-        
-              form.append('supplierProductId', inventoryData.supplierProductId);
-              form.append('variants', JSON.stringify(simplifiedVariants));
-        
+            }));
+
+            form.append('supplierProductId', inventoryData.supplierProductId);
+            form.append('variants', JSON.stringify(simplifiedVariants));
+
 
             const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
@@ -157,10 +157,8 @@ export default function Allroducts() {
 
             Swal.fire({
                 icon: "success",
-                title: isEdit ? "Product Updated" : "Product Created",
-                text: isEdit
-                    ? result.message || "The Product has been updated successfully!"
-                    : result.message || "The Product has been created successfully!",
+                title: "Product Created",
+                text: result.message || "The Product has been created successfully!",
                 showConfirmButton: true,
             }).then((res) => {
                 if (res.isConfirmed) {
@@ -206,221 +204,249 @@ export default function Allroducts() {
                     <button className="bg-[#05CD99] text-white lg:px-8 p-4 py-2 rounded-md">Export</button>
                     <button className="bg-[#3965FF] text-white lg:px-8 p-4 py-2 rounded-md">Import</button>
                 </div>
-                <div className="products-grid  grid xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
-                {products.map((product, index) => {
-                    const variant = product?.product?.variants?.[0];
-                    const imageUrl = variant?.image?.split(",")?.[0]?.trim() || "/default-image.png";
-                    const productName = product?.product?.name || "NIL";
-                    const price = variant?.shipowl_price ?? "N/A";
+                {products.length === 0 ? (
+                    <div className="flex justify-center items-center h-64 text-gray-500 text-lg font-semibold">
+                        No products found
+                    </div>
+                ) : (
+                    <div className="products-grid  grid xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
+                        {products.map((product, index) => {
+                            const variant = product?.product?.variants?.[0];
+                            const imageUrl = variant?.image?.split(",")?.[0]?.trim() || "/default-image.png";
+                            const productName = product?.product?.name || "NIL";
+                            const price = variant?.shipowl_price ?? "N/A";
 
-                    return (
-                        <div
-                            key={index}
-                            className="bg-white rounded-xl cursor-pointer shadow-sm relative"
-                        >
-                            <Image
-                                src={productimg || imageUrl}
-                                alt={productName}
-                                width={300}
-                                height={200}
-                                className="w-full h-48 object-cover rounded-lg mb-2"
-                            />
-
-
-                            <div className="p-3 mb:pb-0">
-                                <div className="flex justify-between">
-                                    <p className="text-lg font-extrabold font-lato">₹{price}</p>
-                                    <div className="coupen-box flex gap-2 items-center">
-                                        <Image src={coupen} className="w-5" alt="Coupon" />
-                                        <span className="text-[#249B3E] font-lato font-bold text-[12px]">WELCOME10</span>
-                                    </div>
-                                </div>
-                                <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">{productName}</p>
-
-                                <div className="flex items-center border-t pt-2 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
-                                    <div className="flex items-center gap-1">
-                                        <Image src={gift} className="w-5" alt="Gift" />
-                                        <span className="font-lato text-[#2C3454] font-bold">100-10k</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Image src={ship} className="w-5" alt="Shipping" />
-                                        <span className="font-lato text-[#2C3454] font-bold">4.5</span>
-                                    </div>
-                                </div>
-
-                                <button
-                                    onClick={() => {
-                                        setShowPopup(true);
-                                        setInventoryData({
-                                            supplierProductId: product.id,
-                                            variant: product.variants
-                                        });
-                                    }}
-                                    className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#2B3674]"
+                            return (
+                                <div
+                                    key={index}
+                                    className="bg-white rounded-xl cursor-pointer shadow-sm relative"
                                 >
-                                    Add To Inventory
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setSelectedProduct(product); // `item` is your current product row
-                                        setShowVariantPopup(true);
-                                    }}
-                                    className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
-                                >
-                                    View Variants
-                                </button>
-
-                                {showPopup && (
-                                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                                        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-                                            <h2 className="text-xl font-semibold mb-4">Add to Inventory</h2>
-                                            <table className="min-w-full table-auto border border-gray-200">
-                                                <thead>
-                                                    <tr className="bg-gray-100">
-                                                        <th className="border px-4 py-2">Image</th>
-                                                        <th className="border px-4 py-2">Stock</th>
-                                                        <th className="border px-4 py-2">Price</th>
-                                                        <th className="border px-4 py-2">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {inventoryData.variant?.map((variant) => (
-                                                        <tr key={variant.id}>
-                                                            <td className="border px-4 py-2">
-                                                                <Image
-                                                                    height={40}
-                                                                    width={40}
-                                                                    src={variant.image || "/placeholder.png"}
-                                                                    alt={variant.color || "NIL"}
-                                                                />
-                                                            </td>
-                                                            <td className="border px-4 py-2">
-                                                                <input
-                                                                    type="number"
-                                                                    placeholder="Stock"
-                                                                    name="dropStock"
-                                                                    className="w-full border rounded p-2"
-                                                                    value={variant.dropStock}
-                                                                    onChange={(e) =>
-                                                                        handleVariantChange(variant.id, "dropStock", e.target.value)
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="border px-4 py-2">
-                                                                <input
-                                                                    type="number"
-                                                                    name="dropPrice"
-                                                                    placeholder="Price"
-                                                                    className="w-full border rounded p-2"
-                                                                    value={variant.dropPrice}
-                                                                    onChange={(e) =>
-                                                                        handleVariantChange(variant.id, "dropPrice", e.target.value)
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="border px-4 py-2">
-                                                                <label className="flex mt-2 items-center cursor-pointer">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        name="Dropstatus"
-                                                                        className="sr-only"
-                                                                        checked={variant.Dropstatus || false}
-                                                                        onChange={(e) =>
-                                                                            handleVariantChange(variant.id, "Dropstatus", e.target.checked)
-                                                                        }
-                                                                    />
-                                                                    <div
-                                                                        className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variant.Dropstatus ? "bg-orange-500" : ""
-                                                                            }`}
-                                                                    >
-                                                                        <div
-                                                                            className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variant.Dropstatus ? "translate-x-5" : ""
-                                                                                }`}
-                                                                        ></div>
-                                                                    </div>
-                                                                    <span className="ms-2 text-sm text-gray-600">Status</span>
-                                                                </label>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                    <Image
+                                        src={productimg || imageUrl}
+                                        alt={productName}
+                                        width={300}
+                                        height={200}
+                                        className="w-full h-48 object-cover rounded-lg mb-2"
+                                    />
 
 
-
-
-                                            <div className="flex justify-end space-x-3 mt-6">
-                                                <button
-                                                    onClick={() => {
-                                                        setShowPopup(false);
-                                                        setIsEdit(false);
-                                                    }}
-                                                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleSubmit(e)}
-                                                    className="px-4 py-2 bg-green-600 text-white rounded"
-                                                >
-                                                    Submit
-                                                </button>
+                                    <div className="p-3 mb:pb-0">
+                                        <div className="flex justify-between">
+                                            <p className="text-lg font-extrabold font-lato">₹{price}</p>
+                                            <div className="coupen-box flex gap-2 items-center">
+                                                <Image src={coupen} className="w-5" alt="Coupon" />
+                                                <span className="text-[#249B3E] font-lato font-bold text-[12px]">WELCOME10</span>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
-                                {showVariantPopup && selectedProduct && (
-                                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                                        <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
-                                            <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+                                        <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">{productName}</p>
 
-                                            <table className="min-w-full table-auto border border-gray-200">
-                                                <thead>
-                                                    <tr className="bg-gray-100">
-                                                        <th className="border px-4 py-2">Image</th>
-                                                        <th className="border px-4 py-2">SKU</th>
-                                                        <th className="border px-4 py-2">Color</th>
-                                                        <th className="border px-4 py-2">Qty</th>
-                                                        <th className="border px-4 py-2">ShipOwl Price</th>
-                                                        <th className="border px-4 py-2">RTO Price</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {selectedProduct.variants?.map((variant) => (
-                                                        <tr key={variant.id}>
-                                                            <td className="border px-4 py-2">
-                                                                <Image
-                                                                    height={40}
-                                                                    width={40}
-                                                                    src={variant?.variant?.image}
-                                                                    alt={variant.variant.sku || 'NIL'}
-                                                                />
-                                                            </td>
-                                                            <td className="border px-4 py-2">{variant.variant.sku || 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.variant.color || 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.variant.qty ?? 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.variant.shipowl_price ?? 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.variant.rto_price ?? 'NIL'}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-
-                                            </table>
-
-                                            <button
-                                                onClick={() => setShowVariantPopup(false)}
-                                                className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-                                            >
-                                                ×
-                                            </button>
+                                        <div className="flex items-center border-t pt-2 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
+                                            <div className="flex items-center gap-1">
+                                                <Image src={gift} className="w-5" alt="Gift" />
+                                                <span className="font-lato text-[#2C3454] font-bold">100-10k</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Image src={ship} className="w-5" alt="Shipping" />
+                                                <span className="font-lato text-[#2C3454] font-bold">4.5</span>
+                                            </div>
                                         </div>
+
+                                        <button
+                                            onClick={() => {
+                                                setShowPopup(true);
+                                                setInventoryData({
+                                                    supplierProductId: product.id,
+                                                    variant: product.variants
+                                                });
+                                            }}
+                                            className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#2B3674]"
+                                        >
+                                            Add To Inventory
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setSelectedProduct(product); // `item` is your current product row
+                                                setShowVariantPopup(true);
+                                            }}
+                                            className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
+                                        >
+                                            View Variants
+                                        </button>
+
+                                        {showPopup && (
+                                            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                                                <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+                                                    <h2 className="text-xl font-semibold mb-4">Add to Inventory</h2>
+                                                    <table className="min-w-full table-auto border border-gray-200">
+                                                        <thead>
+                                                            <tr className="bg-gray-100">
+                                                                <th className="border px-4 py-2">Image</th>
+                                                                <th className="border px-4 py-2">Stock</th>
+                                                                <th className="border px-4 py-2">Price</th>
+                                                                <th className="border px-4 py-2">Status</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {inventoryData.variant?.map((variant, index) => (
+                                                                <tr key={index}>
+                                                                    <td className="border px-4 py-2">
+                                                                        <Image
+                                                                            height={40}
+                                                                            width={40}
+                                                                            src={"https://placehold.co/400" || variant.image}
+                                                                            alt={variant.color || "NIL"}
+                                                                        />
+                                                                    </td>
+                                                                    <td className="border px-4 py-2">
+                                                                        <input
+                                                                            type="number"
+                                                                            placeholder="Stock"
+                                                                            name="dropStock"
+                                                                            className="w-full border rounded p-2"
+                                                                            value={variant.dropStock || ''}
+                                                                            onChange={(e) =>
+                                                                                handleVariantChange(variant.id, "dropStock", e.target.value)
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                    <td className="border px-4 py-2">
+                                                                        <input
+                                                                            type="number"
+                                                                            name="dropPrice"
+                                                                            placeholder="Price"
+                                                                            className="w-full border rounded p-2"
+                                                                            value={variant.dropPrice || ''}
+                                                                            onChange={(e) =>
+                                                                                handleVariantChange(variant.id, "dropPrice", e.target.value)
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                    <td className="border px-4 py-2">
+                                                                        <label className="flex mt-2 items-center cursor-pointer">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="Dropstatus"
+                                                                                className="sr-only"
+                                                                                checked={variant.Dropstatus || false}
+                                                                                onChange={(e) =>
+                                                                                    handleVariantChange(variant.id, "Dropstatus", e.target.checked)
+                                                                                }
+                                                                            />
+                                                                            <div
+                                                                                className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variant.Dropstatus ? "bg-orange-500" : ""
+                                                                                    }`}
+                                                                            >
+                                                                                <div
+                                                                                    className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variant.Dropstatus ? "translate-x-5" : ""
+                                                                                        }`}
+                                                                                ></div>
+                                                                            </div>
+                                                                            <span className="ms-2 text-sm text-gray-600">Status</span>
+                                                                        </label>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+
+
+
+
+                                                    <div className="flex justify-end space-x-3 mt-6">
+                                                        <button
+                                                            onClick={() => {
+                                                                setShowPopup(false);
+                                                            }}
+                                                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => handleSubmit(e)}
+                                                            className="px-4 py-2 bg-green-600 text-white rounded"
+                                                        >
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {showVariantPopup && selectedProduct && (
+                                            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                                                <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
+                                                    <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+
+                                                    <table className="min-w-full table-auto border border-gray-200">
+                                                        <thead>
+                                                            <tr className="bg-gray-100">
+                                                                <th className="border px-4 py-2">Image</th>
+                                                                <th className="border px-4 py-2">SKU</th>
+                                                                <th className="border px-4 py-2">Color</th>
+                                                                <th className="border px-4 py-2">Qty</th>
+                                                                <th className="border px-4 py-2">ShipOwl Price</th>
+                                                                <th className="border px-4 py-2">RTO Price</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {selectedProduct.variants?.map((v) => {
+                                                                const imageUrls = v.image
+                                                                    ? v.image.split(',').map((img) => img.trim()).filter(Boolean)
+                                                                    : [];
+                                                                const variant = v.variant || v;
+                                                                return (
+                                                                    <tr key={variant.id}>
+                                                                        <td className="border px-4 py-2">
+                                                                            <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
+                                                                                {imageUrls.length > 0 ? (
+                                                                                    imageUrls.map((url, idx) => (
+                                                                                        <Image
+                                                                                            key={idx}
+                                                                                            height={40}
+                                                                                            width={40}
+                                                                                            src={url}
+                                                                                            alt={variant.name || 'NIL'}
+                                                                                            className="shrink-0 rounded"
+                                                                                        />
+                                                                                    ))
+                                                                                ) : (
+                                                                                    <Image
+                                                                                        height={40}
+                                                                                        width={40}
+                                                                                        src="https://placehold.co/400"
+                                                                                        alt="Placeholder"
+                                                                                        className="shrink-0 rounded"
+                                                                                    />
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.qty ?? 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.shipowl_price ?? 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.rto_price ?? 'NIL'}</td>
+                                                                    </tr>
+                                                                );
+                                                            })}
+
+                                                        </tbody>
+
+                                                    </table>
+
+                                                    <button
+                                                        onClick={() => setShowVariantPopup(false)}
+                                                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
-                </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </>
 
