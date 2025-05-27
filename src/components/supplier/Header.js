@@ -16,7 +16,7 @@ export default function Header() {
   const pageTitles = {
     "/supplier": "Dashboard",
     "/supplier/product/": "Product",
-    "/supplier/new-product-request/": "New Product Request",
+    "/supplier/product/request/": "New Product Request",
     "/supplier/orders/": "Orders",
     "/supplier/warehouse/": "Warehouse",
     "/supplier/rto-orders/": "RTO Orders",
@@ -33,6 +33,9 @@ export default function Header() {
     "/supplier/category/create/": "Add Category",
     "/supplier/category/update/": "Update Category",
     "/supplier/category/list/": "Category List",
+    "/supplier/product/not-my/": "Other Products",
+    "/supplier/product/my/": "My Products",
+    "/supplier/product/request/": "My Inventory",
   };
 
   const currentPage = pageTitles[pathname] || "Dashboard";

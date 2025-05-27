@@ -88,7 +88,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/category`,
+                `http://localhost:3001/api/admin/category`,
                 {
                     method: "GET",
                     headers: {
@@ -407,60 +407,75 @@ const ProductTable = () => {
                                     <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
                                         <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
 
-                                        <table className="min-w-full table-auto border border-gray-200">
-                                            <thead>
-                                                <tr className="bg-gray-100">
-                                                    <th className="border px-4 py-2">Image</th>
-                                                    <th className="border px-4 py-2">SKU</th>
-                                                    <th className="border px-4 py-2">Color</th>
-                                                    <th className="border px-4 py-2">Qty</th>
-                                                    <th className="border px-4 py-2">ShipOwl Price</th>
-                                                    <th className="border px-4 py-2">RTO Price</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {selectedProduct.variants?.map((variant) => {
-                                                    const imageUrls = variant.image
-                                                        ? variant.image.split(',').map((img) => img.trim()).filter(Boolean)
-                                                        : [];
-
-                                                    return (
-                                                        <tr key={variant.id}>
-                                                            <td className="border px-4 py-2">
-                                                                <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
-                                                                    {imageUrls.length > 0 ? (
-                                                                        imageUrls.map((url, idx) => (
-                                                                            <Image
-                                                                                key={idx}
-                                                                                height={40}
-                                                                                width={40}
-                                                                                src={url}
-                                                                                alt={variant.name || 'NIL'}
-                                                                                className="shrink-0 rounded"
-                                                                            />
-                                                                        ))
-                                                                    ) : (
-                                                                        <Image
-                                                                            height={40}
-                                                                            width={40}
-                                                                            src="https://placehold.co/400"
-                                                                            alt="Placeholder"
-                                                                            className="shrink-0 rounded"
-                                                                        />
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                            <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.qty ?? 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.shipowl_price ?? 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.rto_price ?? 'NIL'}</td>
+                                        {(() => {
+                                            const varinatExists = selectedProduct?.isVarientExists ? 'yes' : 'no';
+                                            const isExists = varinatExists === "yes";
+                                            return (
+                                                <table className="min-w-full table-auto border border-gray-200">
+                                                    <thead>
+                                                        <tr className="bg-gray-100">
+                                                            <th className="border px-4 py-2">Image</th>
+                                                            <th className="border px-4 py-2">Modal</th>
+                                                            <th className="border px-4 py-2">Product Link</th>
+                                                            <th className="border px-4 py-2">Suggested Price</th>
+                                                            {isExists && (
+                                                                <>
+                                                                    <th className="border px-4 py-2">Name</th>
+                                                                    <th className="border px-4 py-2">SKU</th>
+                                                                    <th className="border px-4 py-2">Color</th>
+                                                                </>
+                                                            )}
                                                         </tr>
-                                                    );
-                                                })}
+                                                    </thead>
+                                                    <tbody>
+                                                        {selectedProduct.variants?.map((variant, idx) => {
+                                                            const imageUrls = variant.image
+                                                                ? variant.image.split(',').map((img) => img.trim()).filter(Boolean)
+                                                                : [];
 
-                                            </tbody>
-                                        </table>
+                                                            return (
+                                                                <tr key={variant.id || idx}>
+                                                                    <td className="border px-4 py-2">
+                                                                        <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
+                                                                            {imageUrls.length > 0 ? (
+                                                                                imageUrls.map((url, i) => (
+                                                                                    <Image
+                                                                                        key={i}
+                                                                                        height={40}
+                                                                                        width={40}
+                                                                                        src={url}
+                                                                                        alt={variant.name || 'NIL'}
+                                                                                        className="shrink-0 rounded"
+                                                                                    />
+                                                                                ))
+                                                                            ) : (
+                                                                                <Image
+                                                                                    height={40}
+                                                                                    width={40}
+                                                                                    src="https://placehold.co/400"
+                                                                                    alt="Placeholder"
+                                                                                    className="shrink-0 rounded"
+                                                                                />
+                                                                            )}
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="border px-4 py-2">{variant.modal || 'NIL'}</td>
+                                                                    <td className="border px-4 py-2">{variant.product_link || 'NIL'}</td>
+                                                                    <td className="border px-4 py-2">{variant.suggested_price ?? 'NIL'}</td>
+                                                                    {isExists && (
+                                                                        <>
+                                                                            <td className="border px-4 py-2">{variant.name || 'NIL'}</td>
+                                                                            <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
+                                                                            <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
+                                                                        </>
+                                                                    )}
+                                                                </tr>
+                                                            );
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            );
+                                        })()}
 
                                         <button
                                             onClick={() => setShowVariantPopup(false)}
@@ -471,6 +486,7 @@ const ProductTable = () => {
                                     </div>
                                 </div>
                             )}
+
                         </div>
                     ) : (
                         // Render when no admins

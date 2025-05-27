@@ -2,14 +2,13 @@
 
 import Image from 'next/image';
 import productImage from '@/app/images/product-img.png';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import { useEffect, useState, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import { HashLoader } from 'react-spinners';
 
-export default function NewProducts() {
+export default function NotMy() {
   const { verifySupplierAuth } = useSupplier();
   const [productsRequest, setProductsRequest] = useState([]);
   const [loading, setLoading] = useState(null);
@@ -197,16 +196,6 @@ export default function NewProducts() {
   return (
     <>
       <div>
-        <div className="bg-white rounded-md p-4 flex flex-wrap md:justify-end justify-center gap-3 mb-6">
-          <button className="bg-[#05CD99] text-white lg:px-8 p-4 py-2 rounded-md">Export</button>
-          <button className="bg-[#3965FF] text-white lg:px-8 p-4 py-2 rounded-md">Import</button>
-          <Link href="http://localhost:3000/dropshipping/product/source/create">
-            <button className="bg-[#F98F5C] text-white lg:px-8 p-4 py-2 rounded-md">
-              Add New
-            </button>
-          </Link>
-        </div>
-
         {productsRequest.length > 0 ? (
           <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
             {productsRequest.map((product) => (
@@ -394,7 +383,7 @@ export default function NewProducts() {
             })()}
 
             <button
-              onClick={() => setShowVariantPopup(false)}
+              onClick={() => setShowPopup(false)}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
             >
               ×

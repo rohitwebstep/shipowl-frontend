@@ -34,12 +34,11 @@ const ProductProviderEdit = ({ children }) => {
       {
         color: '',
         sku: '',
-        qty: 1,
-        currency: '',
-        suggested_price: "",
-        shipowl_price: "",
-        rto_suggested_price: "",
-        rto_price: ""
+        product_link: '',
+        name: '',
+        modal: '',
+        suggested_price: 0,
+        image: null,
       },
     ],
     shipping_time: '24 Hours',
@@ -56,9 +55,10 @@ const ProductProviderEdit = ({ children }) => {
     training_guidance_video: 0,
     hsn_code: '',
     tax_rate: '',
-    isVisibleToAll: '',
+    isVisibleToAll: true,
+    isVarientExists: '',
     supplierIds: '',
-    status: '',
+    status: true,
   });
 
   const fetchCategory = useCallback(async () => {
@@ -77,7 +77,7 @@ const ProductProviderEdit = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/admin/category', {
+      const response = await fetch('http://localhost:3001/api/admin/category', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +123,7 @@ const ProductProviderEdit = ({ children }) => {
     }
 
     try {
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/admin/brand', {
+      const response = await fetch('http://localhost:3001/api/admin/brand', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ const ProductProviderEdit = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/location/country', {
+      const response = await fetch('http://localhost:3001/api/location/country', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -237,7 +237,7 @@ const ProductProviderEdit = ({ children }) => {
       }
     });
 
-   
+
 
     setShippingErrors(newErrors);
     return Object.keys(newErrors).length === 0;

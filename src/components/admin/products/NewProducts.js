@@ -31,7 +31,7 @@ export default function NewProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/product/request`,
+                `http://localhost:3001/api/admin/product/inventory?type=notmy`,
                 {
                     method: "GET",
                     headers: {
@@ -68,9 +68,11 @@ export default function NewProducts() {
     }, [router, setProductsRequest]);
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             await verifyAdminAuth();
             await fetchProducts();
             await fetchSupplier();
+              setLoading(false);
         };
         fetchData();
     }, []);

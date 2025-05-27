@@ -5,9 +5,9 @@ import { Plus, Minus, ImageIcon } from 'lucide-react';
 import { ProductContext } from './ProductContext';
 
 export default function VariantDetails() {
-  const { fetchCountry, formData, setFormData, setActiveTab } = useContext(ProductContext);
+  const { formData, setFormData, setActiveTab } = useContext(ProductContext);
   const [error, setError] = useState({});
-  const numericFields = ['qty'];
+  const numericFields = ['suggested_price'];
 
   const handleChange = (index, field, value) => {
     const updatedVariants = [...formData.variants];
@@ -27,14 +27,14 @@ export default function VariantDetails() {
         color: '',
         sku: '',
         product_link: '',
-        variantName: '', suggestedPrice: '',
+        name: '', suggested_price: '',
         image: null,
       };
 
       if (formData.list_as === 'both') {
         updatedVariants = [
           { ...newVariant, modal: 'Shipowl' },
-          { ...newVariant, modal: 'Sellship' },
+          { ...newVariant, modal: 'Selfship' },
         ];
       } else {
         updatedVariants = [{ ...newVariant, modal: formData.list_as }];
@@ -49,7 +49,7 @@ export default function VariantDetails() {
       if (formData.list_as === 'both') {
         updatedVariants = [
           { ...newVariant, modal: 'Shipowl' },
-          { ...newVariant, modal: 'Sellship' },
+          { ...newVariant, modal: 'Selfship' },
         ];
       } else {
         updatedVariants = [{ ...newVariant, modal: formData.list_as }];
@@ -82,14 +82,14 @@ export default function VariantDetails() {
       color: '',
       sku: '',
       product_link: '',
-      variantName: '',
-      suggestedPrice: '',
+      name: '',
+      suggested_price: '',
       image: null,
     };
 
     let updatedVariants = [...formData.variants];
     if (formData.list_as === 'both') {
-      updatedVariants = [...updatedVariants, { ...newVariant, modal: 'Shipowl' }, { ...newVariant, modal: 'Sellship' }];
+      updatedVariants = [...updatedVariants, { ...newVariant, modal: 'Shipowl' }, { ...newVariant, modal: 'Selfship' }];
     } else {
       updatedVariants = [...updatedVariants, { ...newVariant, modal: formData.list_as }];
     }
@@ -101,18 +101,18 @@ export default function VariantDetails() {
     const updatedVariants = formData.variants.filter((_, i) => i !== index);
     setFormData({ ...formData, variants: updatedVariants });
   };
-const validate = () => {
-  const errors = {};
-  if (!formData.isVarientExists) {
-    errors.isVarientExists = "This Field Is Required";
-  }
-  setError(errors);
-  return Object.keys(errors).length === 0; // ✅ returns true if no errors
-};
+  const validate = () => {
+    const errors = {};
+    if (!formData.isVarientExists) {
+      errors.isVarientExists = "This Field Is Required";
+    }
+    setError(errors);
+    return Object.keys(errors).length === 0; // ✅ returns true if no errors
+  };
 
 
   const handleSubmit = () => {
-    if(validate()){
+    if (validate()) {
       setActiveTab('shipping-details');
     }
   };
@@ -143,7 +143,7 @@ const validate = () => {
           <option value="yes">Yes</option>
           <option value="no">No</option>
         </select>
-        {error.isVarientExists &&  <span className='text-red-500'>{error.isVarientExists }  </span>}
+        {error.isVarientExists && <span className='text-red-500'>{error.isVarientExists}  </span>}
       </div>
 
       <>
@@ -194,7 +194,7 @@ const validate = () => {
                 >
                   {formData.isVarientExists && (
                     <div>
-                      <h3>{variant.modal}</h3>
+                      <input type="text" value={variant.modal} name="modal" id="modal" readOnly />
                     </div>
                   )}
 
@@ -204,10 +204,10 @@ const validate = () => {
                         <span className="text-orange-500 font-semibold lg:hidden block">Variant Name</span>
                         <input
                           type="text"
-                          placeholder="variantName"
+                          placeholder="name"
                           className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2] mb-2"
-                          value={variant.variantName}
-                          onChange={(e) => handleChange(index, 'variantName', e.target.value)}
+                          value={variant.name}
+                          onChange={(e) => handleChange(index, 'name', e.target.value)}
                         />
                       </div>
 
@@ -244,10 +244,10 @@ const validate = () => {
                         <span className="text-orange-500 font-semibold lg:hidden block">Suggested Price</span>
                         <input
                           type="number"
-                          placeholder="suggestedPrice"
+                          placeholder="suggested_price"
                           className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2] mb-2"
-                          value={variant.suggestedPrice}
-                          onChange={(e) => handleChange(index, 'suggestedPrice', e.target.value)}
+                          value={variant.suggested_price}
+                          onChange={(e) => handleChange(index, 'suggested_price', e.target.value)}
                         />
                       </div>
                       <div>

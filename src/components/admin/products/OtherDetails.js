@@ -21,98 +21,108 @@ export default function OtherDetails() {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    const adminData = JSON.parse(localStorage.getItem('shippingData'));
-    if (adminData?.project?.active_panel !== 'admin') {
-      localStorage.clear();
-      router.push('/admin/auth/login');
-      return;
+  const adminData = JSON.parse(localStorage.getItem('shippingData'));
+  if (adminData?.project?.active_panel !== 'admin') {
+    localStorage.clear();
+    router.push('/admin/auth/login');
+    return;
+  }
+
+  const token = adminData?.security?.token;
+  if (!token) {
+    router.push('/admin/auth/login');
+    return;
+  }
+
+  try {
+    Swal.fire({
+      title: 'Updating Product...',
+      text: 'Please wait while we update your product.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const url = `http://localhost:3001/api/admin/product/${id}`;
+    const form = new FormData();
+
+    const combinedData = { ...formData, ...files };
+
+    for (const key in combinedData) {
+      let value = combinedData[key];
+
+      if (value === null || value === undefined || value === '') continue;
+
+      if (key === "isVarientExists") {
+        // Convert "yes"/"no" to boolean
+        value = value === "yes";
+        form.append(key, value);
+      } else if (Array.isArray(value) && value[0] instanceof File) {
+        // For array of files
+        value.forEach((file) => form.append(key, file));
+      } else if (value instanceof File) {
+        form.append(key, value);
+      } else if (Array.isArray(value) || typeof value === 'object') {
+        // Objects and arrays (non-files)
+        form.append(key, JSON.stringify(value));
+      } else {
+        form.append(key, value);
+      }
     }
 
-    const token = adminData?.security?.token;
-    if (!token) {
-      router.push('/admin/auth/login');
-      return;
-    }
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: form,
+    });
 
-    try {
-      Swal.fire({
-        title: 'Updating Product...',
-        text: 'Please wait while we update your product.',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
+    const result = await response.json();
+    Swal.close();
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/admin/product/${id}`;
-      const form = new FormData();
-
-      // Combine formData and files for unified processing
-      const combinedData = { ...formData, ...files };
-
-      for (const key in combinedData) {
-        const value = combinedData[key];
-
-        if (value === null || value === undefined || value === '') continue;
-
-        if (Array.isArray(value) && value[0] instanceof File) {
-          value.forEach((file) => form.append(key, file));
-        } else if (value instanceof File) {
-          form.append(key, value);
-        } else if (Array.isArray(value) || typeof value === 'object') {
-          form.append(key, JSON.stringify(value));
-        } else {
-          form.append(key, value);
-        }
-      }
-
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: form,
-      });
-
-      const result = await response.json();
-      Swal.close();
-
-      if (!response.ok) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Update Failed',
-          text: result.message || result.error || 'An error occurred',
-        });
-        throw new Error(result.message || result.error || 'Update failed');
-      }
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Product Updated',
-        text: 'The product has been updated successfully!',
-        showConfirmButton: true,
-      }).then((res) => {
-        if (res.isConfirmed) {
-          setFormData({});
-          router.push('/admin/products/list');
-        }
-      });
-    } catch (err) {
-      console.error('Submission Error:', err);
-      Swal.close();
+    if (!response.ok) {
       Swal.fire({
         icon: 'error',
-        title: 'Submission Error',
-        text: err.message || 'Something went wrong. Please try again.',
+        title: 'Update Failed',
+        text: result.message || result.error || 'An error occurred',
       });
-    } finally {
-      setLoading(false);
+     Swal.close();
+
+      throw new Error(result.message || result.error || 'Update failed');
+    Swal.close();
+
     }
-  };
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Product Updated',
+      text: 'The product has been updated successfully!',
+      showConfirmButton: true,
+    }).then((res) => {
+      if (res.isConfirmed) {
+        setFormData({});
+        router.push('/admin/products/list');
+      }
+    });
+  } catch (err) {
+    console.error('Submission Error:', err);
+    Swal.close();
+    Swal.fire({
+      icon: 'error',
+      title: 'Submission Error',
+      text: err.message || 'Something went wrong. Please try again.',
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
 
   return (

@@ -12,7 +12,7 @@ import { ProductContextEdit } from "./ProductContextEdit";
 const AddProduct = () => {
 
   const [loading, setLoading] = useState(false);
-  const { activeTab, setActiveTab, setFormData,formData, validateFields, validateForm2 } = useContext(ProductContextEdit);
+  const { activeTab, setActiveTab, setFormData, formData, validateFields, validateForm2 } = useContext(ProductContextEdit);
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -48,7 +48,7 @@ const AddProduct = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/product/${id}`, {
+      const response = await fetch(`http://localhost:3001/api/admin/product/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -91,15 +91,13 @@ const AddProduct = () => {
         variants: (products.variants || []).map((variant) => ({
           id: variant.id || '',
           color: variant.color || '',
+          modal: variant.modal || '',
           sku: variant.sku || '',
-          qty: variant.qty || 1,
+          name: variant.name || '',
+          suggested_price: variant.suggested_price || 0,
           variant_images: variant.image || '',
-          currency: variant.currency || '',
           product_link: variant.product_link || '',
-          suggested_price: variant.suggested_price || '',
-          shipowl_price: variant.shipowl_price || '',
-          rto_suggested_price: variant.rto_suggested_price || '',
-          rto_price: variant.rto_price || '',
+
         })),
         shipping_time: products.shipping_time || '',
         weight: products.weight || '',
@@ -117,6 +115,7 @@ const AddProduct = () => {
         hsn_code: products.hsnCode || '',
         tax_rate: products.taxRate || '',
         isVisibleToAll: products.isVisibleToAll,
+        isVarientExists: products.isVarientExists ? "yes" : "no",
         supplierIds: products.supplierVisibility.map(item => item.supplierId).join(',') || '',
       });
 
@@ -127,7 +126,7 @@ const AddProduct = () => {
     }
   }, [router, id, setFormData]);
 
-
+  console.log('formData', formData)
 
   const tabs = [
     { id: "product-details", label: "Product Details" },
