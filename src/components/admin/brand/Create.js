@@ -102,7 +102,7 @@ export default function Create() {
                 });
             }
 
-            const url = "http://localhost:3001/api/admin/brand";
+            const url = "https://sleeping-owl-we0m.onrender.com/api/admin/brand";
 
             const response = await fetch(url, {
                 method: "POST",
@@ -144,6 +144,7 @@ export default function Create() {
                 }
             } else {
                 Swal.close();
+                
                 Swal.fire({
                     icon: "success",
                     title: "Brand Created",

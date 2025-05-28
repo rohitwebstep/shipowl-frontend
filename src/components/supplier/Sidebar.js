@@ -29,6 +29,7 @@ export default function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
 
+  
   const menuItems = [
     { name: "Dashboard", icon: Home, href: "/supplier" },
     { name: "Inventory", icon: ShoppingCart, href: "/supplier/inventory" },
@@ -37,8 +38,8 @@ export default function Sidebar() {
       icon: Package,
       href: "#",
       subMenu: [
-        { name: "My Products", href: "/supplier/product/my" },
-        { name: "Not My Products", href: "/supplier/product/not-my" },
+        { name: "Listed", href: "/supplier/product/my" },
+        { name: "Not Listed", href: "/supplier/product/not-my" },
       ],
     },
     { name: "New Product Request", icon: Package, href: "/supplier/product/request" },

@@ -14,6 +14,7 @@ const Tabs = () => {
       const isValid = await validateFields();
       if (!isValid) return;
     }
+    
 
     if (activeTab === 'shipping-details') {
       const isValid = await validateForm2();

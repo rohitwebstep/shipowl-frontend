@@ -34,7 +34,7 @@ const BrandProvider = ({ children }) => {
 
         try {
             const response = await fetch(
-                `http://localhost:3001/api/admin/brand`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/brand`,
                 {
                     method: "GET",
                     headers: {

@@ -43,6 +43,7 @@ export default function VariantDetails() {
         }
       value === 'no' && {
         product_link: '',
+        sku: '',
         suggested_price: 0,
         image: null,
       };
@@ -133,7 +134,7 @@ export default function VariantDetails() {
     try {
 
 
-      const url = `http://localhost:3001/api/product/${variantId}/image/${index}?type=${type}`;
+      const url = `https://sleeping-owl-we0m.onrender.com/api/product/${variantId}/image/${index}?type=${type}`;
 
       const response = await fetch(url, {
         method: "DELETE",
@@ -225,7 +226,7 @@ export default function VariantDetails() {
         )}
 
 
-        <div className={`mt-5 lg:grid  hidden overflow-auto grid-cols-1 gap-6 items-center justify-between border-b border-[#E9EDF7] pb-2 mb-4 text-gray-600 font-semibold ${!showAddButton ? 'lg:grid-cols-4' : 'lg:grid-cols-8'}`}>
+        <div className={`mt-5 lg:grid  hidden overflow-auto grid-cols-1 gap-6 items-center justify-between border-b border-[#E9EDF7] pb-2 mb-4 text-gray-600 font-semibold ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}>
           {formData.isVarientExists && (
             <span className="text-[#A3AED0] whitespace-nowrap">Modal</span>
 
@@ -235,10 +236,11 @@ export default function VariantDetails() {
             <>
               <span className="text-[#A3AED0] whitespace-nowrap">Variant Name</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Color</span>
-              <span className="text-[#A3AED0] whitespace-nowrap">SKU</span></>
+            </>
           )}
           {formData.isVarientExists && (
             <>
+              <span className="text-[#A3AED0] whitespace-nowrap">SKU</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Suggested Price</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Product Link</span>
               <span className="text-[#A3AED0] whitespace-nowrap text-right">Images</span>
@@ -259,7 +261,7 @@ export default function VariantDetails() {
               formData.variants.map((variant, index) => (
                 <div
                   key={index}
-                  className={`md:grid p-3 rounded-md border border-gray-400 mt-5 border-dotted overflow-auto md:grid-cols-2 gap-6 justify-between mb-4 border-b border-[#E9EDF7] pb-4  ${!showAddButton ? 'lg:grid-cols-4' : 'lg:grid-cols-8'}`}
+                  className={`md:grid p-3 rounded-md border border-gray-400 mt-5 border-dotted overflow-auto md:grid-cols-2 gap-6 justify-between mb-4 border-b border-[#E9EDF7] pb-4  ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}
                 >
                   {formData.isVarientExists && (
                     <div>
@@ -294,6 +296,12 @@ export default function VariantDetails() {
                         </select>
                       </div>
 
+
+                    </>
+                  )}
+
+                  {formData.isVarientExists && (
+                    <>
                       <div>
                         <span className="text-orange-500 font-semibold lg:hidden block">SKU</span>
                         <input
@@ -304,11 +312,6 @@ export default function VariantDetails() {
                           onChange={(e) => handleChange(index, 'sku', e.target.value)}
                         />
                       </div>
-                    </>
-                  )}
-
-                  {formData.isVarientExists && (
-                    <>
                       <div>
                         <span className="text-orange-500 font-semibold lg:hidden block">Suggested Price</span>
                         <input

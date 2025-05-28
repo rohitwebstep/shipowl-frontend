@@ -46,7 +46,7 @@ export default function NewProducts() {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/supplier/product/inventory?type=notmy`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory?type=notmy`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -137,7 +137,7 @@ export default function NewProducts() {
 
 
 
-      const url = "http://localhost:3001/api/supplier/product/my-inventory";
+      const url = "https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -210,6 +210,7 @@ export default function NewProducts() {
         {productsRequest.length > 0 ? (
           <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
             {productsRequest.map((product) => (
+
               <div
                 key={product.id}
                 className="bg-white rounded-2xl overflow-hidden border border-[#B9B9B9]"
@@ -227,8 +228,12 @@ export default function NewProducts() {
                       <h2 className="text-lg font-semibold nunito">{product.name}</h2>
                     </div>
                     <div className="text-right">
-                      <p className="text-black font-bold nunito">₹ {product.expectedPrice || 0}</p>
-                      <p className="text-sm text-[#202224] nunito">Exp. Orders: {product.expectedDailyOrders || 0}</p>
+                      {product.variants.length === 1 && (
+                        <p className="text-black font-bold nunito">
+                          ₹ {product.variants[0]?.suggested_price || 0}
+                        </p>
+                      )}
+                      {/* <p className="text-sm text-[#202224] nunito">Exp. Orders: {product.expectedDailyOrders || 0}</p> */}
                     </div>
                   </div>
                   <button

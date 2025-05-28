@@ -73,7 +73,7 @@ const AccountInfo = () => {
         }
       });
 
-      const url = `http://localhost:3001/api/supplier/${formData.id}/company/${id}/image/${index}?type=${type}`;
+      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${formData.id}/company/${id}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -163,7 +163,7 @@ const AccountInfo = () => {
           }
         });
 
-        const url = `http://localhost:3001/api/supplier/${id}`; // Ensure the URL is correct
+        const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${id}`; // Ensure the URL is correct
         const form = new FormData();
         for (const key in files) {
           const value = files[key];

@@ -88,7 +88,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/admin/category`,
+                `https://sleeping-owl-we0m.onrender.com/api/admin/category`,
                 {
                     method: "GET",
                     headers: {
@@ -418,10 +418,10 @@ const ProductTable = () => {
                                                             <th className="border px-4 py-2">Modal</th>
                                                             <th className="border px-4 py-2">Product Link</th>
                                                             <th className="border px-4 py-2">Suggested Price</th>
+                                                            <th className="border px-4 py-2">SKU</th>
                                                             {isExists && (
                                                                 <>
                                                                     <th className="border px-4 py-2">Name</th>
-                                                                    <th className="border px-4 py-2">SKU</th>
                                                                     <th className="border px-4 py-2">Color</th>
                                                                 </>
                                                             )}
@@ -462,10 +462,10 @@ const ProductTable = () => {
                                                                     <td className="border px-4 py-2">{variant.modal || 'NIL'}</td>
                                                                     <td className="border px-4 py-2">{variant.product_link || 'NIL'}</td>
                                                                     <td className="border px-4 py-2">{variant.suggested_price ?? 'NIL'}</td>
+                                                                    <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
                                                                     {isExists && (
                                                                         <>
-                                                                            <td className="border px-4 py-2">{variant.name || 'NIL'}</td>
-                                                                            <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.name || 'NIL'}</td>
                                                                             <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
                                                                         </>
                                                                     )}
