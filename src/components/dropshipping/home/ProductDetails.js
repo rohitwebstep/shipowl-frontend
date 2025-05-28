@@ -383,14 +383,14 @@ const ProductDetails = () => {
             <div className="grid md:grid-cols-2 gap-4 mt-4 text-gray-700 text-sm">
               <div className="flex items-center">
                 <BsBoxSeam className="mr-2 text-green-600" /> Units Sold:
-                <strong className="ml-1">''</strong>
+                <strong className="ml-1"></strong>
               </div>
               <div className="flex items-center">
                 <BsTruck className="mr-2 text-blue-600" /> Delivery Rate: --
               </div>
               <div className="flex items-center">
                 <MdInventory className="mr-2 text-green-600" /> Inventory:
-                <strong className="ml-1">''</strong>
+                <strong className="ml-1"></strong>
               </div>
               <div className="flex items-center">
                 <GiWeight className="mr-2 text-brown-600" /> Weight:
