@@ -19,7 +19,7 @@ export default function ProductDetails() {
     categoryData,
     brandData,
     fetchBrand,
-    setActiveTab,
+    setActiveTabs,
     validateFields,
     errors, setErrors, loading
   } = useContext(ProductContext);
@@ -52,7 +52,7 @@ export default function ProductDetails() {
 
   const handleSubmit = () => {
     if (validateFields()) {
-      setActiveTab('variants-details')
+      setActiveTabs('variants-details')
     }
   };
   if (loading) {

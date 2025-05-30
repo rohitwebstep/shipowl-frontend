@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 
 export default function OtherDetails() {
-  const { formData, setFormData, setActiveTab, setErrors } = useContext(ProductContext);
+  const { formData, setFormData, setActiveTabs, setErrors } = useContext(ProductContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({});
   const router = useRouter();
@@ -54,7 +54,6 @@ export default function OtherDetails() {
       'chargable_weight',
     ];
 
-
     if (ProductDetails.includes(fieldName)) return 'product-details';
     if (shippingDetails.includes(fieldName)) return 'shipping-details';
     if (businessFields.includes(fieldName)) return 'other-details';
@@ -63,29 +62,28 @@ export default function OtherDetails() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
 
     if (!validateForm()) return;
-
     setLoading(true);
 
-    const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    if (!adminData?.project?.active_panel === "admin") {
-      localStorage.clear("shippingData");
-      router.push("/admin/auth/login");
+    const adminData = JSON.parse(localStorage.getItem('shippingData'));
+    if (adminData?.project?.active_panel !== 'admin') {
+      localStorage.clear();
+      router.push('/admin/auth/login');
       return;
     }
 
     const token = adminData?.security?.token;
     if (!token) {
-      router.push("/admin/auth/login");
+      router.push('/admin/auth/login');
       return;
     }
 
     try {
       Swal.fire({
-        title: 'Creating Product...',
-        text: 'Please wait while we save your Product.',
+        title: "Creating Product...",
+        text: "Please wait while we save your Product.",
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -96,67 +94,52 @@ export default function OtherDetails() {
       for (const key in formData) {
         let value = formData[key];
 
-        // ✅ Convert 'isVarientExists' to boolean
         if (key === "isVarientExists") {
-          value = value === "yes"; // true if 'yes', false otherwise
+          value = value === "yes"; // Convert to boolean
         }
 
-        if (value === null || value === undefined || value === '') continue;
+        if (value === null || value === undefined || value === "") continue;
 
-        // ✅ Handle arrays of File objects (multiple image upload)
         if (Array.isArray(value) && value[0] instanceof File) {
           value.forEach((file) => form.append(key, file));
-        }
-
-        // ✅ Handle single File
-        else if (value instanceof File) {
+        } else if (value instanceof File) {
           form.append(key, value);
-        }
-
-        // ✅ Handle arrays or objects (e.g., variants, tags)
-        else if (Array.isArray(value) || typeof value === 'object') {
+        } else if (Array.isArray(value) || typeof value === "object") {
           form.append(key, JSON.stringify(value));
-        }
-
-        // ✅ Handle primitive values (string, number, boolean)
-        else {
+        } else {
           form.append(key, value);
         }
       }
 
-
       const response = await fetch(url, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
+          // ⚠️ Do not manually set Content-Type when using FormData
         },
         body: form,
       });
 
       const result = await response.json();
+      Swal.close();
 
       if (!response.ok) {
-        Swal.close();
-
         Swal.fire({
           icon: "error",
           title: "Creation Failed",
           text: result.message || result.error || "An error occurred",
         });
 
-        if (result.error && typeof result.error === 'object') {
+        if (result.error && typeof result.error === "object") {
           const entries = Object.entries(result.error);
           let focused = false;
 
           entries.forEach(([key, message]) => {
-            setErrors((prev) => ({
-              ...prev,
-              [key]: message,
-            }));
+            setErrors((prev) => ({ ...prev, [key]: message }));
 
             if (!focused) {
               const tab = getTabByFieldName(key);
-              if (tab) setActiveTab(tab);
+              if (tab) setActiveTabs(tab);
 
               setTimeout(() => {
                 const input = document.querySelector(`[name="${key}"]`);
@@ -188,11 +171,11 @@ export default function OtherDetails() {
         title: "Submission Error",
         text: error.message || "Something went wrong. Please try again.",
       });
-      setError(error.message || "Submission failed.");
     } finally {
       setLoading(false);
     }
   };
+
 
 
 

@@ -40,7 +40,8 @@ const menuItems = [
     section: "MENU",
     subMenu: [
       { name: "All Products", href: "/dropshipping/product/all" },
-      { name: "My Products", href: "/dropshipping/product/my" }
+      { name: "My Products", href: "/dropshipping/product/my" },
+      { name: "RTO", href: "/dropshipping/product/rto" },
     ]
   },
   { name: "Manage Products (In progress)", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },

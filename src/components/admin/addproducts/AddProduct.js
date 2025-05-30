@@ -8,20 +8,20 @@ import ShippingDetails from "./ShippingDetails";
 import OtherDetails from "./OtherDetails";
 
 const Tabs = () => {
-  const { activeTab, setActiveTab,validateForm2,validateFields } = useContext(ProductContext); // use context instead of local state
+  const { activeTabs, setActiveTabs,validateForm2,validateFields } = useContext(ProductContext); // use context instead of local state
   const handleTabClick = async (tabId) => {
-    if (activeTab === 'product-details') {
+    if (activeTabs === 'product-details') {
       const isValid = await validateFields();
       if (!isValid) return;
     }
     
 
-    if (activeTab === 'shipping-details') {
+    if (activeTabs === 'shipping-details') {
       const isValid = await validateForm2();
       if (!isValid) return;
     }
 
-    setActiveTab(tabId);
+    setActiveTabs(tabId);
   };
   const tabs = [
     { id: "product-details", label: "Product Details" },
@@ -41,7 +41,7 @@ const Tabs = () => {
             type="button"
             onClick={() => handleTabClick(tab.id)}
             className={`px-4 py-2 text-lg whitespace-nowrap font-medium ${
-              activeTab === tab.id
+              activeTabs === tab.id
                 ? 'border-b-3 border-orange-500 text-orange-500'
                 : 'text-[#718EBF]'
             }`}
@@ -53,10 +53,10 @@ const Tabs = () => {
       </div>
 
       <div className="">
-        {activeTab === "product-details" && <ProductDetails />}
-        {activeTab === "variants-details" && <VariantsDetails />}
-        {activeTab === "shipping-details" && <ShippingDetails />}
-        {activeTab === "other-details" && <OtherDetails />}
+        {activeTabs === "product-details" && <ProductDetails />}
+        {activeTabs === "variants-details" && <VariantsDetails />}
+        {activeTabs === "shipping-details" && <ShippingDetails />}
+        {activeTabs === "other-details" && <OtherDetails />}
       </div>
     </div>
   );

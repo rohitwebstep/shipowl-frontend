@@ -13,9 +13,11 @@ import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { ProductContextEdit } from './ProductContextEdit';
 import { useAdminActions } from '@/components/commonfunctions/MainContext';
 import Image from 'next/image';
+import { ProductContext } from '../addproducts/ProductContext';
 
 const ProductTable = () => {
     const { setActiveTab } = useContext(ProductContextEdit);
+    const {setActiveTabs} = useContext(ProductContext)
     const [showVariantPopup, setShowVariantPopup] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -170,7 +172,10 @@ const ProductTable = () => {
                 <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">Import Inventory</button>
                 <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
                 <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>
-                <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() => setActiveTab('product-details')}>
+                <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() =>{
+                     setActiveTab('product-details');
+                      setActiveTabs('product-details')
+                }}>
                     <Link href="/admin/products/create">Add New</Link>
                 </button>
                 <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">Filters</button>
@@ -404,7 +409,7 @@ const ProductTable = () => {
                             </table>
                             {showVariantPopup && selectedProduct && (
                                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                                    <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
+                                    <div className="bg-white p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
                                         <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
 
                                         {(() => {

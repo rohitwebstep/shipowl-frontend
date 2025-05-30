@@ -5,7 +5,7 @@ import { UploadCloud } from 'lucide-react';
 import { ProductContext } from './ProductContext';
 
 export default function ShippingDetails() {
-  const { formData, validateForm2, setFormData, shippingErrors, fileFields, setActiveTab } = useContext(ProductContext);
+  const { formData, validateForm2, setFormData, shippingErrors, fileFields, setActiveTabs } = useContext(ProductContext);
 
 
 
@@ -35,7 +35,7 @@ export default function ShippingDetails() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm2()) {
-      setActiveTab('other-details');
+      setActiveTabs('other-details');
     }
   };
 

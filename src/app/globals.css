@@ -268,3 +268,6 @@ th:hover {
 .css-hlgwow {
   padding: 8px !important;
 }
+a,button,li,img{
+  cursor: pointer;
+}

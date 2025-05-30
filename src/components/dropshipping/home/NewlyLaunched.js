@@ -11,8 +11,8 @@ import productimg from '@/app/assets/product1.png';
 import gift from '@/app/assets/gift.png';
 import ship from '@/app/assets/delivery.png';
 const tabs = [
-  { key: "my", label: "Listed" },
-  { key: "notmy", label: "Not Listed" },
+  { key: "my", label: "Pushed to Shopify" },
+  { key: "notmy", label: "Not Pushed to Shopify" },
 ];
 
 const NewlyLaunched = () => {
@@ -144,7 +144,7 @@ const NewlyLaunched = () => {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-6 py-2 font-medium border-b-2 transition-all duration-200
+              className={`px-6 py-2 font-medium text-xl border-b-2 transition-all duration-200
                 ${activeTab === tab.key
                   ? "border-orange-500 text-orange-600"
                   : "border-transparent text-gray-500 hover:text-orange-600"
@@ -154,25 +154,7 @@ const NewlyLaunched = () => {
             </button>
           ))}
         </div>
-        {activeTab === "my" && (
-          <div className="flex justify-end gap-2">
-            <button
-              className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-              onClick={async () => {
-                if (isTrashed) {
-                  setIsTrashed(false);
-                  await fetchProduct('my');
-                } else {
-                  setIsTrashed(true);
-                  await trashProducts();
-                }
-              }}
-            >
-              {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
-            </button>
 
-          </div>
-        )}
 
         {/* Show No Data Found once if no products */}
         {!loading && products.length === 0 ? (
@@ -232,7 +214,6 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
     variant: [],
     isVarientExists: '',
   });
-  console.log('inventoryData', inventoryData)
   const handleVariantChange = (id, field, value) => {
     setInventoryData((prevData) => ({
       ...prevData,
@@ -248,10 +229,6 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
       ),
     }));
   };
-
-
-
-
 
   const [isEdit, setIsEdit] = useState(false);
 
@@ -296,7 +273,6 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
 
       const result = await response.json();
       const items = result?.dropshipperProduct || {};
-      console.log("item", items)
       setInventoryData({
         supplierProductId: items.productId || "",
         isVarientExists: items.product?.isVarientExists || "",
@@ -310,7 +286,6 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
           name: v.supplierProductVariant?.variant?.name || '',
           modal: v.supplierProductVariant?.variant?.modal || '',
           color: v.supplierProductVariant?.variant?.color || '',
-          suggested_price: v.supplierProductVariant?.variant?.suggested_price || 0,
           status: v.supplierProductVariant?.variant?.status ?? v.status,
         }))
       });
@@ -425,88 +400,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
     }
   };
 
-  const handleDelete = async (item) => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.removeItem("shippingData");
-      router.push("/dropshipping/auth/login");
-      return;
-    }
 
-    const dropshippertoken = dropshipperData?.security?.token;
-    if (!dropshippertoken) {
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    const confirmResult = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
-    });
-
-    if (!confirmResult.isConfirmed) return;
-
-    try {
-      Swal.fire({
-        title: "Deleting...",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
-      setLoading(true);
-
-      const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${dropshippertoken}`,
-          },
-        }
-      );
-
-      Swal.close();
-
-      if (!response.ok) {
-        const errorMessage = await response.json();
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: errorMessage.error || errorMessage.message || "Failed to delete.",
-        });
-        setLoading(false);
-        return;
-      }
-
-      const result = await response.json();
-
-      Swal.fire({
-        icon: "success",
-        title: "Trash!",
-        text: result.message || `${item.name} has been Trashed successfully.`,
-      });
-
-      await fetchProduct('my');
-    } catch (error) {
-      Swal.close();
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Something went wrong. Please try again.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
   const handlePermanentDelete = async (item) => {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
     if (dropshipperData?.project?.active_panel !== "dropshipper") {
@@ -546,7 +440,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
       setLoading(true);
 
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}/destroy`,
+        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item}/destroy`,
         {
           method: "DELETE",
           headers: {
@@ -577,7 +471,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
         text: result.message || `${item.name} has been deleted successfully.`,
       });
 
-      await trashProducts();
+      await fetchProduct('my');
     } catch (error) {
       Swal.close();
       Swal.fire({
@@ -590,63 +484,6 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
     }
   };
 
-  const handleRestore = useCallback(async (item) => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.removeItem("shippingData");
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    const dropshippertoken = dropshipperData?.security?.token;
-    if (!dropshippertoken) {
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item?.id}/restore`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${dropshippertoken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorMessage = await response.json();
-        Swal.fire({
-          icon: "error",
-          title: "Something Wrong!",
-          text:
-            errorMessage.error ||
-            errorMessage.message ||
-            "Your session has expired. Please log in again.",
-        });
-        throw new Error(
-          errorMessage.message || errorMessage.error || "Something Wrong!"
-        );
-      }
-
-      const result = await response.json();
-      if (result.status) {
-        Swal.fire({
-          icon: "success",
-          text: `product Has Been Restored Successfully !`,
-        });
-        await trashProducts();
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [router, trashProducts]);
 
   return (
     <>
@@ -674,51 +511,55 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
           const imageUrl = variant?.image?.split(",")?.[0]?.trim() || "/default-image.png";
           const productName = product?.product?.name || "NIL";
 
-
-
-
           return (
             <div
               key={index}
-              className="bg-white rounded-xl cursor-pointer shadow-sm relative"
+              className="bg-white rounded-xl cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02]"
             >
-              <Image
-                src={productimg || imageUrl}
-                alt={productName}
-                onClick={() => viewProduct(product.id, type)}
-                width={300}
-                height={200}
-                className="w-full h-48 object-cover rounded-lg mb-2"
-              />
+              <div className="overflow-hidden rounded-t-xl">
+                <Image
+                  src={productimg || imageUrl}
+                  alt={productName}
+                  onClick={() => viewProduct(product.id, type)}
+                  width={300}
+                  height={200}
+                  className="w-full h-48 object-cover rounded-lg transform transition-transform duration-300 hover:scale-105"
+                />
+              </div>
 
               {activeTab === "my" && (
                 <div className="absolute top-2 right-2 flex gap-2 z-10">
-                  {isTrashed ? (
-                    <>
-                      <button onClick={() => handleRestore(product)} className="bg-green-500 text-white px-3 py-1 text-sm rounded">Restore</button>
-                      <button onClick={() => handlePermanentDelete(product)} className="bg-red-500 text-white px-3 py-1 text-sm rounded">Permanent Delete</button>
-                    </>
-                  ) : (
-                    <>
-                      <button onClick={() => handleEdit(product, product.id)} className="bg-yellow-500 text-white px-3 py-1 text-sm rounded">Edit</button>
-                      <button onClick={() => handleDelete(product)} className="bg-red-500 text-white px-3 py-1 text-sm rounded">Trash</button>
-                    </>
-                  )}
+                  <button
+                    onClick={() => handleEdit(product, product.id)}
+                    className="bg-yellow-500 text-white px-3 py-1 text-sm rounded hover:bg-yellow-600 transition-colors duration-200"
+                  >
+                    Edit
+                  </button>
                 </div>
               )}
 
-
-              <div className="p-3 mb:pb-0">
+              <div className="p-3">
                 <div className="flex justify-between">
-                  {product.variants.length === 1 && (
-                    <p className="text-black font-bold nunito">
-                      ₹ {product?.variants?.[0].variant?.suggested_price || product.variants[0].supplierProductVariant.variant.suggested_price
-                        || 0}
-                    </p>
-                  )}
+                  <p className="text-black font-bold nunito">
+                    ₹
+                    {product.variants.length === 1
+                      ? product.variants[0]?.price ||
+                      product.variants[0]?.supplierProductVariant?.price ||
+                      0
+                      : Math.min(
+                        ...product.variants.map(
+                          (v) =>
+                            v?.price ??
+                            v?.supplierProductVariant?.price ??
+                            Infinity
+                        )
+                      )}
+                  </p>
 
                 </div>
-                <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">{productName}</p>
+                <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">
+                  {productName}
+                </p>
 
                 <div className="flex items-center border-t pt-2 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
                   <div className="flex items-center gap-1">
@@ -739,279 +580,282 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                         supplierProductId: product.id,
                         id: product.id,
                         variant: product.variants,
-                        isVarientExists: product?.product?.isVarientExists
+                        isVarientExists: product?.product?.isVarientExists,
                       });
                     }}
-                    className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#2B3674]"
+                    className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
                   >
-                    Add To Inventory
+                    Push To Shopify
                   </button>
                 )}
+
                 <button
                   onClick={() => {
-                    setSelectedProduct(product); // `item` is your current product row
+                    setSelectedProduct(product);
                     setShowVariantPopup(true);
                   }}
-                  className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
+                  className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
                 >
                   View Variants
                 </button>
-
-                {showPopup && (
-                  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg w-full max-w-4xl shadow-xl relative">
-                      <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
-
-                      {(() => {
-                        const varinatExists = inventoryData?.isVarientExists ? 'yes' : 'no';
-                        const isExists = varinatExists === "yes";
-                        return (
-                          <>
-                            <table className="min-w-full table-auto border border-gray-200">
-                              <thead>
-                                <tr className="bg-gray-100">
-                                  <th className="border px-4 py-2">Image</th>
-                                  <th className="border px-4 py-2">Modal</th>
-                                  {isExists && (
-                                    <>
-                                      <th className="border px-4 py-2">Name</th>
-                                      <th className="border px-4 py-2">SKU</th>
-                                      <th className="border px-4 py-2">Color</th>
-                                    </>
-                                  )}
-                                  <th className="border px-4 py-2">Stock</th>
-                                  <th className="border px-4 py-2">Price</th>
-                                  <th className="border px-4 py-2">Status</th>
-                                  <th className="border px-4 py-2 whitespace-nowrap">Suggested Price</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {inventoryData.variant?.map((v, idx) => {
-                                  const variantInfo = {
-                                    ...(v.variant || {}), // nested variant data (name, sku, image, etc.)
-                                    ...v, // direct data (dropStock, dropPrice, Dropstatus, etc.)
-                                  };
-
-                                  const imageUrls = variantInfo.image
-                                    ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
-                                    : [];
-
-                                  return (
-                                    <tr key={variantInfo.id || idx}>
-                                      <td className="border px-4 py-2">
-                                        <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
-                                          {imageUrls.length > 0 ? (
-                                            imageUrls.map((url, i) => (
-                                              <Image
-                                                key={i}
-                                                height={40}
-                                                width={40}
-                                                src={url}
-                                                alt={variantInfo.name || 'NIL'}
-                                                className="shrink-0 rounded"
-                                              />
-                                            ))
-                                          ) : (
-                                            <Image
-                                              height={40}
-                                              width={40}
-                                              src="https://placehold.co/400"
-                                              alt="Placeholder"
-                                              className="shrink-0 rounded"
-                                            />
-                                          )}
-                                        </div>
-                                      </td>
-
-                                      <td className="border px-4 py-2">{variantInfo.modal || 'NIL'}</td>
-
-                                      {isExists && (
-                                        <>
-                                          <td className="border px-4 py-2">{variantInfo.name || 'NIL'}</td>
-                                          <td className="border px-4 py-2">{variantInfo.sku || 'NIL'}</td>
-                                          <td className="border px-4 py-2">{variantInfo.color || 'NIL'}</td>
-                                        </>
-                                      )}
-
-                                      <td className="border px-4 py-2">
-                                        <input
-                                          type="number"
-                                          placeholder="dropStock"
-                                          name="dropStock"
-                                          className="w-full border rounded p-2"
-                                          value={variantInfo.dropStock || ''}
-                                          onChange={(e) => handleVariantChange(variantInfo.id, 'dropStock', e.target.value)}
-                                        />
-                                      </td>
-
-                                      <td className="border px-4 py-2">
-                                        <input
-                                          type="number"
-                                          name="dropPrice"
-                                          placeholder="dropPrice"
-                                          className="w-full border rounded p-2"
-                                          value={variantInfo.dropPrice || ''}
-                                          onChange={(e) => handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)}
-                                        />
-                                      </td>
-
-                                      <td className="border px-4 py-2">
-                                        <label className="flex mt-2 items-center cursor-pointer">
-                                          <input
-                                            type="checkbox"
-                                            name="Dropstatus"
-                                            className="sr-only"
-                                            checked={variantInfo.Dropstatus || false}
-                                            onChange={(e) => handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)}
-                                          />
-                                          <div
-                                            className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : ''
-                                              }`}
-                                          >
-                                            <div
-                                              className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
-                                                }`}
-                                            ></div>
-                                          </div>
-                                        </label>
-                                      </td>
-
-                                      <td className="border px-4 py-2">
-                                        {variantInfo.lowestOtherSupplierSuggestedPrice ?? variantInfo.suggested_price ?? 'NIL'}
-                                      </td>
-                                    </tr>
-                                  );
-                                })}
-
-                              </tbody>
-                            </table>
-                            <div className="flex justify-end space-x-3 mt-6">
-                              <button
-                                onClick={() => {
-                                  setShowPopup(false);
-                                  setIsEdit(false);
-                                }}
-                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                onClick={(e) => handleSubmit(e)}
-                                className="px-4 py-2 bg-green-600 text-white rounded"
-                              >
-                                Submit
-                              </button>
-                            </div>
-                          </>
-                        );
-                      })()}
-
-                      <button
-                        onClick={() => setShowPopup(false)}
-                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
+                {activeTab === "my" && (
+                  <button
+                    onClick={() => handlePermanentDelete(product.id)}
+                    className="py-2 px-4 mt-2 text-white rounded-md text-sm w-full  bg-black transition-colors duration-200"
+                  >
+                    Remove From Shopify
+                  </button>
                 )}
-                {showVariantPopup && selectedProduct && (
-                  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
-                      <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
-
-                      {(() => {
-                        const isExists = selectedProduct?.product?.isVarientExists;
-
-                        return (
-                          <table className="min-w-full table-auto border border-gray-200">
-                            <thead>
-                              <tr className="bg-gray-100">
-                                <th className="border px-4 py-2">Image</th>
-                                <th className="border px-4 py-2">Modal</th>
-                                <th className="border px-4 py-2">Product Link</th>
-                                <th className="border px-4 py-2">Suggested Price</th>
-                                {isExists && (
-                                  <>
-                                    <th className="border px-4 py-2">Name</th>
-                                    <th className="border px-4 py-2">SKU</th>
-                                    <th className="border px-4 py-2">Color</th>
-                                  </>
-                                )}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {selectedProduct.variants?.map((v, idx) => {
-                                let variant = {};
-
-                                if (activeTab === "notmy") {
-                                  variant = { ...(v.variant || {}), ...v };
-                                }
-                                if (activeTab === "my") {
-                                  const supplierProductVariant = v?.supplierProductVariant || {};
-
-                                  variant = {
-                                    ...(supplierProductVariant.variant || {}),
-                                    ...v
-                                  };
-                                }
-                                console.log('variant', variant)
-                                const imageUrls = variant.image
-                                  ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-                                  : [];
-
-                                return (
-                                  <tr key={variant.id || idx}>
-                                    <td className="border px-4 py-2">
-                                      <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
-                                        {imageUrls.length > 0 ? (
-                                          imageUrls.map((imgUrl, imgIdx) => (
-                                            <img
-                                              key={imgIdx}
-                                              src={imgUrl}
-                                              alt={`variant-img-${imgIdx}`}
-                                              className="w-16 h-16 object-cover rounded"
-                                            />
-                                          ))
-                                        ) : (
-                                          <span className="text-gray-400">No Image</span>
-                                        )}
-                                      </div>
-                                    </td>
-                                    <td className="border px-4 py-2">{variant.modal || "—"}</td>
-                                    <td className="border px-4 py-2">{variant.product_link || "—"}</td>
-                                    <td className="border px-4 py-2">{variant.suggested_price || "—"}</td>
-                                    {isExists && (
-                                      <>
-                                        <td className="border px-4 py-2">{variant.name || "—"}</td>
-                                        <td className="border px-4 py-2">{variant.sku || "—"}</td>
-                                        <td className="border px-4 py-2">{variant.color || "—"}</td>
-                                      </>
-                                    )}
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
-                        );
-                      })()}
-                      <button
-                        onClick={() => setShowVariantPopup(false)}
-                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-
               </div>
             </div>
           );
         })}
 
+
       </div>
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
+            <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+
+            {(() => {
+              const varinatExists = inventoryData?.isVarientExists ? 'yes' : 'no';
+              const isExists = varinatExists === "yes";
+              return (
+                <>
+                  <table className="min-w-full table-auto border border-gray-200">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border px-4 py-2">Image</th>
+                        <th className="border px-4 py-2">Modal</th>
+                        {isExists && (
+                          <>
+                            <th className="border px-4 py-2">Name</th>
+                            <th className="border px-4 py-2">SKU</th>
+                            <th className="border px-4 py-2">Color</th>
+                          </>
+                        )}
+                        <th className="border px-4 py-2">Stock</th>
+                        <th className="border px-4 py-2">Price</th>
+                        <th className="border px-4 py-2">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inventoryData.variant?.map((v, idx) => {
+                        const variantInfo = {
+                          ...(v.variant || {}), // nested variant data (name, sku, image, etc.)
+                          ...v, // direct data (dropStock, dropPrice, Dropstatus, etc.)
+                        };
+                        const variantInfos = v;
+
+                        const imageUrls = variantInfo.image
+                          ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
+                          : [];
+
+                        return (
+                          <tr key={variantInfo.id || idx}>
+                            <td className="border px-4 py-2">
+                              <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
+                                {imageUrls.length > 0 ? (
+                                  imageUrls.map((url, i) => (
+                                    <Image
+                                      key={i}
+                                      height={40}
+                                      width={40}
+                                      src={`https://placehold.co/600x400?text=${idx + 1}`}
+                                      alt={variantInfo.name || 'NIL'}
+                                      className="shrink-0 rounded"
+                                    />
+                                  ))
+                                ) : (
+                                  <Image
+                                    height={40}
+                                    width={40}
+                                    src='https://placehold.co/600x400'
+                                    alt="Placeholder"
+                                    className="shrink-0 rounded"
+                                  />
+                                )}
+                              </div>
+                            </td>
+
+                            <td className="border px-4 py-2">{variantInfo.modal || 'NIL'}</td>
+
+                            {isExists && (
+                              <>
+                                <td className="border px-4 py-2">{variantInfo.name || 'NIL'}</td>
+                                <td className="border px-4 py-2">{variantInfo.sku || 'NIL'}</td>
+                                <td className="border px-4 py-2">{variantInfo.color || 'NIL'}</td>
+                              </>
+                            )}
+
+                            <td className="border px-4 py-2">
+                              <input
+                                type="number"
+                                placeholder="dropStock"
+                                name="dropStock"
+                                className="w-full border rounded p-2"
+                                value={variantInfo.dropStock || ''}
+                                onChange={(e) => handleVariantChange(variantInfo.id, 'dropStock', e.target.value)}
+                              />
+                            </td>
+
+                            <td className="border px-4 py-2">
+                              <input
+                                type="number"
+                                name="dropPrice"
+                                placeholder="dropPrice"
+                                className="w-full border rounded p-2"
+                                value={variantInfo.dropPrice || ''}
+                                onChange={(e) => handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)}
+                              />
+                            </td>
+
+                            <td className="border px-4 py-2">
+                              <label className="flex mt-2 items-center cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  name="Dropstatus"
+                                  className="sr-only"
+                                  checked={variantInfo.Dropstatus || false}
+                                  onChange={(e) => handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)}
+                                />
+                                <div
+                                  className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : ''
+                                    }`}
+                                >
+                                  <div
+                                    className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
+                                      }`}
+                                  ></div>
+                                </div>
+                              </label>
+                            </td>
+                          </tr>
+                        );
+                      })}
+
+                    </tbody>
+                  </table>
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                      onClick={() => {
+                        setShowPopup(false);
+                        setIsEdit(false);
+                      }}
+                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={(e) => handleSubmit(e)}
+                      className="px-4 py-2 bg-green-600 text-white rounded"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
+
+            <button
+              onClick={() => setShowPopup(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+      {showVariantPopup && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
+            <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+
+            {(() => {
+              const isExists = selectedProduct?.product?.isVarientExists;
+
+              return (
+                <table className="min-w-full table-auto border border-gray-200">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border px-4 py-2">Image</th>
+                      <th className="border px-4 py-2">Modal</th>
+                      <th className="border px-4 py-2">Product Link</th>
+                      <th className="border px-4 py-2">Suggested Price</th>
+                      {isExists && (
+                        <>
+                          <th className="border px-4 py-2">Name</th>
+                          <th className="border px-4 py-2">SKU</th>
+                          <th className="border px-4 py-2">Color</th>
+                        </>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedProduct.variants?.map((v, idx) => {
+                      let variant = {};
+                      
+                      console.log('selectedProduct',selectedProduct)
+                      if (activeTab === "notmy") {
+                        variant = { ...(v.variant || {}), ...v };
+                      }
+                      if (activeTab === "my") {
+                        const supplierProductVariant = v?.supplierProductVariant || {};
+
+                        variant = {
+                          ...(supplierProductVariant.variant || {}),
+                          ...v
+                        };
+                      }
+                      const imageUrls = variant.image
+                        ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
+                        : [];
+
+                      return (
+                        <tr key={variant.id || idx}>
+                          <td className="border px-4 py-2">
+                            <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
+                              {imageUrls.length > 0 ? (
+                                imageUrls.map((imgUrl, imgIdx) => (
+                                  <img
+                                    key={imgIdx}
+                                    src={`https://placehold.co/600x400?text= ${idx + 1}`}
+                                     alt={`variant-img-${imgIdx}`}
+                                    className="w-16 h-16 object-cover rounded"
+                                  />
+                                ))
+                              ) : (
+                                <span className="text-gray-400">No Image</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="border px-4 py-2">{variant.modal || "—"}</td>
+                          <td className="border px-4 py-2">{variant.product_link || "—"}</td>
+                          <td className="border px-4 py-2">{  v.price ||v?.supplierProductVariant?.price || "—"}</td>
+                          {isExists && (
+                            <>
+                              <td className="border px-4 py-2">{variant.name || "—"}</td>
+                              <td className="border px-4 py-2">{variant.sku || "—"}</td>
+                              <td className="border px-4 py-2">{variant.color || "—"}</td>
+                            </>
+                          )}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              );
+            })()}
+            <button
+              onClick={() => setShowVariantPopup(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

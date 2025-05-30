@@ -8,7 +8,7 @@ export const ProductContext = createContext();
 
 const ProductProvider = ({ children }) => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("product-details");
+  const [activeTabs, setActiveTabs] = useState("product-details");
   const [errors, setErrors] = useState({});
   const [shippingErrors, setShippingErrors] = useState({});
   const [categoryData, setCategoryData] = useState([]);
@@ -301,9 +301,9 @@ const ProductProvider = ({ children }) => {
         fetchBrand,
         fetchCountry,
         loading,
-        activeTab, errors, setErrors, shippingErrors, setShippingErrors,
+        activeTabs, errors, setErrors, shippingErrors, setShippingErrors,
         validateFields,     // ✅ Added
-        setActiveTab,    // ✅ Added
+        setActiveTabs,    // ✅ Added
       }}
     >
       {children}

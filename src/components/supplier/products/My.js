@@ -176,9 +176,8 @@ export default function My() {
                 price: v.price,
                 status: v.status
             }));
+            console.log('simplifiedVariants',simplifiedVariants)
 
-            console.log('inventoryData', inventoryData);
-            console.log('simplifiedVariants', simplifiedVariants);
             form.append('productId', inventoryData.productId);
             form.append('variants', JSON.stringify(simplifiedVariants));
 
@@ -518,7 +517,7 @@ export default function My() {
                     name: v.variant.name || v.name,
                     modal: v.variant.modal || v.modal,
                     color: v.variant.color || v.color,
-                    suggested_price: v.variant.suggested_price || v.suggested_price,
+                    suggested_price: v.price || v.price,
                     status: v.variant.status || v.status,
                     image: v.variant?.image || '',
                 }))
@@ -637,11 +636,20 @@ export default function My() {
                                                 </h2>
                                             </div>
                                             <div className="text-right">
-                                                {product.variants.length === 1 && (
+                                                {product.variants.length > 0 && (
                                                     <p className="text-black font-bold nunito">
-                                                        ₹ {product.variants[0]?.variant?.suggested_price || 0}
+                                                        ₹ {
+                                                            product.variants.length === 1
+                                                                ? product.variants[0]?.price || 0
+                                                                : Math.min(
+                                                                    ...product.variants.map(v =>
+                                                                        v?.price || 0
+                                                                    )
+                                                                )
+                                                        }
                                                     </p>
                                                 )}
+
 
                                                 {/* <p className="text-sm text-[#202224] nunito">
                                                         Exp. Orders: {product.expectedDailyOrders || 0}
@@ -777,7 +785,7 @@ export default function My() {
                                                                         </div>
                                                                     </label>
                                                                 </td>
-                                                                <td className="border px-4 py-2">{variant.lowestOtherSupplierSuggestedPrice ? variant.lowestOtherSupplierSuggestedPrice : variant.suggested_price ?? 'NIL'}</td>
+                                                                <td className="border px-4 py-2">{variant.lowestOtherSupplierSuggestedPrice ? variant.lowestOtherSupplierSuggestedPrice : variant.price ?? 'NIL'}</td>
 
                                                             </tr>
                                                         );
@@ -815,7 +823,7 @@ export default function My() {
                     )}
                     {showVariantPopup && selectedProduct && (
                         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                            <div className="bg-white p-6 rounded-lg w-full max-w-3xl shadow-xl relative">
+                            <div className="bg-white p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
                                 <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
 
                                 {(() => {
@@ -844,6 +852,7 @@ export default function My() {
                                                         ? v.image.split(',').map((img) => img.trim()).filter(Boolean)
                                                         : [];
                                                     const variant = v.variant || v;
+                                                    const variants =  v;
                                                     return (
                                                         <tr key={variant.id || idx}>
                                                             <td className="border px-4 py-2">
@@ -872,7 +881,7 @@ export default function My() {
                                                             </td>
                                                             <td className="border px-4 py-2">{variant.modal || 'NIL'}</td>
                                                             <td className="border px-4 py-2">{variant.product_link || 'NIL'}</td>
-                                                            <td className="border px-4 py-2">{variant.suggested_price ?? 'NIL'}</td>
+                                                            <td className="border px-4 py-2">{variants.price ?? 'NIL'}</td>
                                                             {isExists && (
                                                                 <>
                                                                     <td className="border px-4 py-2">{variant.name || 'NIL'}</td>

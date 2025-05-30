@@ -154,7 +154,7 @@ export default function NewProducts() {
       if (!response.ok) {
         Swal.fire({
           icon: "error",
-          title: isEdit ? "Updation Failed" : "Creation Failed",
+          title: "Creation Failed",
           text: result.message || result.error || "An error occurred",
         });
         Swal.close();
@@ -200,7 +200,7 @@ export default function NewProducts() {
         <div className="bg-white rounded-md p-4 flex flex-wrap md:justify-end justify-center gap-3 mb-6">
           <button className="bg-[#05CD99] text-white lg:px-8 p-4 py-2 rounded-md">Export</button>
           <button className="bg-[#3965FF] text-white lg:px-8 p-4 py-2 rounded-md">Import</button>
-          <Link href="http://localhost:3000/dropshipping/product/source/create">
+          <Link href="https://sleeping-owl-we0m.onrender.com/dropshipping/product/source/create">
             <button className="bg-[#F98F5C] text-white lg:px-8 p-4 py-2 rounded-md">
               Add New
             </button>
@@ -228,11 +228,17 @@ export default function NewProducts() {
                       <h2 className="text-lg font-semibold nunito">{product.name}</h2>
                     </div>
                     <div className="text-right">
-                      {product.variants.length === 1 && (
-                        <p className="text-black font-bold nunito">
-                          ₹ {product.variants[0]?.suggested_price || 0}
-                        </p>
-                      )}
+                      <p className="text-black font-bold nunito">
+                        ₹ {
+                          product.variants.length === 1
+                            ? product.variants[0]?.suggested_price || 0
+                            : Math.min(
+                              ...product.variants
+                                .map(v => v?.suggested_price || v?.variant?.suggested_price || v?.supplierProductVariant?.variant?.suggested_price || 0)
+                            )
+                        }
+                      </p>
+
                       {/* <p className="text-sm text-[#202224] nunito">Exp. Orders: {product.expectedDailyOrders || 0}</p> */}
                     </div>
                   </div>
@@ -289,7 +295,6 @@ export default function NewProducts() {
                         const imageUrls = variant.image
                           ? variant.image.split(',').map((img) => img.trim()).filter(Boolean)
                           : [];
-                        console.log('inventoryData', inventoryData)
                         return (
                           <tr key={variant.id || idx}>
                             <td className="border px-4 py-2">
@@ -381,7 +386,6 @@ export default function NewProducts() {
                     <button
                       onClick={() => {
                         setShowPopup(false);
-                        setIsEdit(false);
                       }}
                       className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
                     >
@@ -399,7 +403,7 @@ export default function NewProducts() {
             })()}
 
             <button
-              onClick={() => setShowVariantPopup(false)}
+              onClick={() => setShowPopup(false)}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
             >
               ×

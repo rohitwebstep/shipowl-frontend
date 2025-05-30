@@ -5,7 +5,7 @@ import { Plus, Minus, ImageIcon } from 'lucide-react';
 import { ProductContext } from './ProductContext';
 
 export default function VariantDetails() {
-  const { formData, setFormData, setActiveTab } = useContext(ProductContext);
+  const { formData, setFormData, setActiveTabs } = useContext(ProductContext);
   const [error, setError] = useState({});
   const numericFields = ['suggested_price'];
 
@@ -115,7 +115,7 @@ export default function VariantDetails() {
 
   const handleSubmit = () => {
     if (validate()) {
-      setActiveTab('shipping-details');
+      setActiveTabs('shipping-details');
     }
   };
 

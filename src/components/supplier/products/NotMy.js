@@ -216,11 +216,17 @@ export default function NotMy() {
                       <h2 className="text-lg font-semibold nunito">{product.name}</h2>
                     </div>
                     <div className="text-right">
-                      {product.variants.length === 1 && (
-                        <p className="text-black font-bold nunito">
-                          ₹ {product.variants[0]?.suggested_price || 0}
-                        </p>
-                      )}
+                      <p className="text-black font-bold nunito">
+                        ₹
+                        {product.variants.length === 1
+                          ? product.variants[0]?.suggested_price || 0
+                          : Math.min(
+                            ...product.variants.map(
+                              (v) => v?.suggested_price ?? Infinity
+                            )
+                          )}
+                      </p>
+
                       {/* <p className="text-sm text-[#202224] nunito">Exp. Orders: {product.expectedDailyOrders || 0}</p> */}
                     </div>
                   </div>
@@ -277,7 +283,6 @@ export default function NotMy() {
                         const imageUrls = variant.image
                           ? variant.image.split(',').map((img) => img.trim()).filter(Boolean)
                           : [];
-                        console.log('inventoryData', inventoryData)
                         return (
                           <tr key={variant.id || idx}>
                             <td className="border px-4 py-2">

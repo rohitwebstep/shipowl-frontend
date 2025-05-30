@@ -126,7 +126,6 @@ const AddProduct = () => {
     }
   }, [router, id, setFormData]);
 
-  console.log('formData', formData)
 
   const tabs = [
     { id: "product-details", label: "Product Details" },
