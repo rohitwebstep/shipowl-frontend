@@ -49,7 +49,7 @@ export default function Allroducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/product/inventory?type=all`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=all`,
                 {
                     method: "GET",
                     headers: {
@@ -132,7 +132,7 @@ export default function Allroducts() {
             form.append('variants', JSON.stringify(simplifiedVariants));
 
 
-            const url = "http://localhost:3001/api/dropshipper/product/my-inventory";
+            const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
             const response = await fetch(url, {
                 method: "POST",

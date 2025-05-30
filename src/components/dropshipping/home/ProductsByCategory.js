@@ -81,7 +81,7 @@ function ProductsByCategory() {
 
             form.append('supplierProductId', inventoryData.supplierProductId);
             form.append('variants', JSON.stringify(simplifiedVariants));
-            const url = "http://localhost:3001/api/dropshipper/product/my-inventory";
+            const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
             const response = await fetch(url, {
                 method: "POST",
@@ -175,7 +175,7 @@ function ProductsByCategory() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/product/my-inventory/${item}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -235,7 +235,7 @@ function ProductsByCategory() {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:3001/api/dropshipper/product/inventory?category=${id}&type=${tab}`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${id}&type=${tab}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
