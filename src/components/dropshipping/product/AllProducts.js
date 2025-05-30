@@ -49,7 +49,7 @@ export default function Allroducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=all`,
+                `http://localhost:3001/api/dropshipper/product/inventory?type=all`,
                 {
                     method: "GET",
                     headers: {
@@ -132,7 +132,7 @@ export default function Allroducts() {
             form.append('variants', JSON.stringify(simplifiedVariants));
 
 
-            const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+            const url = "http://localhost:3001/api/dropshipper/product/my-inventory";
 
             const response = await fetch(url, {
                 method: "POST",
@@ -273,7 +273,15 @@ export default function Allroducts() {
                                             View Variants
                                         </button>
 
-                                        {showPopup && (
+                                       
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+             {showPopup && (
                                             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                                                 <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
                                                     <h2 className="text-xl font-semibold mb-4">Add to Inventory</h2>
@@ -441,13 +449,6 @@ export default function Allroducts() {
                                                 </div>
                                             </div>
                                         )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
         </>
 
     );

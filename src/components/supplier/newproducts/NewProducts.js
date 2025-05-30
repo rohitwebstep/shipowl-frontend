@@ -46,7 +46,7 @@ export default function NewProducts() {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory?type=notmy`, {
+      const response = await fetch(`http://localhost:3001/api/supplier/product/inventory?type=notmy`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -137,7 +137,7 @@ export default function NewProducts() {
 
 
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory";
+      const url = "http://localhost:3001/api/supplier/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -200,7 +200,7 @@ export default function NewProducts() {
         <div className="bg-white rounded-md p-4 flex flex-wrap md:justify-end justify-center gap-3 mb-6">
           <button className="bg-[#05CD99] text-white lg:px-8 p-4 py-2 rounded-md">Export</button>
           <button className="bg-[#3965FF] text-white lg:px-8 p-4 py-2 rounded-md">Import</button>
-          <Link href="https://sleeping-owl-we0m.onrender.com/dropshipping/product/source/create">
+          <Link href="http://localhost:3001/dropshipping/product/source/create">
             <button className="bg-[#F98F5C] text-white lg:px-8 p-4 py-2 rounded-md">
               Add New
             </button>

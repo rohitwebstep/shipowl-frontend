@@ -52,7 +52,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/good-pincode/${id}`,
+        `http://localhost:3001/api/good-pincode/${id}`,
         {
           method: "GET",
           headers: {
@@ -122,7 +122,7 @@ export default function Update() {
       const formdata = new FormData();
       formdata.append("pincode", formData.pincode);
 
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/good-pincode/${id}`, {
+      const res = await fetch(`http://localhost:3001/api/good-pincode/${id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,

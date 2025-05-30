@@ -42,7 +42,7 @@ export default function MyProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=my`,
+                `http://localhost:3001/api/dropshipper/product/inventory?type=my`,
                 {
                     method: "GET",
                     headers: {
@@ -113,7 +113,7 @@ export default function MyProducts() {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/trashed`, {
+            const response = await fetch(`http://localhost:3001/api/dropshipper/product/my-inventory/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -181,7 +181,7 @@ export default function MyProducts() {
             form.append('variants', JSON.stringify(simplifiedVariants));
 
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${inventoryData.id}`;
+            const url = `http://localhost:3001/api/dropshipper/product/my-inventory/${inventoryData.id}`;
 
             const response = await fetch(url, {
                 method: 'PUT',
@@ -277,7 +277,7 @@ export default function MyProducts() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}`,
+                `http://localhost:3001/api/dropshipper/product/my-inventory/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -359,7 +359,7 @@ export default function MyProducts() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}/destroy`,
+                `http://localhost:3001/api/dropshipper/product/my-inventory/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -421,7 +421,7 @@ export default function MyProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item?.id}/restore`,
+                `http://localhost:3001/api/dropshipper/product/my-inventory/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -480,7 +480,7 @@ export default function MyProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}`,
+                `http://localhost:3001/api/dropshipper/product/my-inventory/${item.id}`,
                 {
                     method: "GET",
                     headers: {

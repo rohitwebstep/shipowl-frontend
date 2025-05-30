@@ -29,7 +29,7 @@ export default function Verify() {
       redirect: "follow",
     };
 
-    fetch("https://sleeping-owl-we0m.onrender.com/api/supplier/auth/registration/verify", requestOptions)
+    fetch("http://localhost:3001/api/supplier/auth/registration/verify", requestOptions)
       .then(async (response) => {
         const text = await response.text();
         setLoading(false);

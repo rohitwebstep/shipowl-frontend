@@ -62,7 +62,7 @@ const handleChange = (e) => {
         didOpen: () => Swal.showLoading(),
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/admin/dropshipper`;
+      const url = `http://localhost:3001/api/admin/dropshipper`;
       const form = new FormData();
 
       // Append formData

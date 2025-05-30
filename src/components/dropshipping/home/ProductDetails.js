@@ -39,7 +39,7 @@ const ProductDetails = () => {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [productDetails, setProductDetails] = useState([]);
   const [otherSuppliers, setOtherSuppliers] = useState([]);
-  const images = selectedVariant?.image?.split(",") || [];
+  const images = selectedVariant?.variant?.image?.split(",") || [];
 
   const [selectedImage, setSelectedImage] = useState(images[0] || "");
   const [categoryId, setCategoryId] = useState('');
@@ -73,9 +73,9 @@ const ProductDetails = () => {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory/${id}`;
+        url = `http://localhost:3001/api/dropshipper/product/inventory/${id}`;
       } else {
-        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}`;
+        url = `http://localhost:3001/api/dropshipper/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
@@ -103,7 +103,7 @@ const ProductDetails = () => {
         setProductDetails(ProductDataSup?.product || []);
         setOtherSuppliers(ProductDataOther || []);
         setVariantDetails(ProductDataSup.variants || []);
-        setSelectedVariant(ProductDataSup?.variants[0]?.variant)
+        setSelectedVariant(ProductDataSup?.variants[0])
         if (ProductDataSup) {
           setCategoryId(ProductDataSup?.product?.categoryId)
           fetchRelatedProducts(ProductDataSup?.product?.categoryId, activeTab)
@@ -166,7 +166,7 @@ const ProductDetails = () => {
       setLoading(true);
 
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item}/destroy`,
+        `http://localhost:3001/api/dropshipper/product/my-inventory/${item}/destroy`,
         {
           method: "DELETE",
           headers: {
@@ -227,7 +227,7 @@ const ProductDetails = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
+      const response = await fetch(`http://localhost:3001/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -305,7 +305,7 @@ const ProductDetails = () => {
 
       form.append('supplierProductId', inventoryData.supplierProductId);
       form.append('variants', JSON.stringify(simplifiedVariants));
-      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = "http://localhost:3001/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -435,7 +435,7 @@ const ProductDetails = () => {
 
               <p className="text-gray-600">
                 Sold: <span className="text-black">1,316 </span> | Rating: ⭐
-                <span className="text-black"> {selectedVariant?.stock} </span> | Stock:
+                <span className="text-black"> {selectedVariant?.variant?.stock} </span> | Stock:
                 <span className="text-black"> 25 </span> | Message:
                 <span className="text-black"> 140</span>
               </p>
@@ -453,7 +453,7 @@ const ProductDetails = () => {
                 <div>
                   <div className="md:flex gap-3 items-end">
                     <div>
-                      <h2 className="text-2xl font-bold">₹{selectedVariant?.suggested_price}</h2>
+                      <h2 className="text-2xl font-bold">₹{selectedVariant?.price}</h2>
                       <p className="text-gray-500 flex items-center text-sm">
                         <a href="#" className="underline text-sm">
                           Including GST & Shipping Charges
@@ -520,7 +520,7 @@ const ProductDetails = () => {
 
                   return (
                     <div
-                      onClick={() => handleVariantClick(variant)}
+                      onClick={() => handleVariantClick(item)}
                       key={index}
                       className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
                         ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
@@ -542,7 +542,7 @@ const ProductDetails = () => {
                         <div>Color: <span className="font-medium">{variant?.color || 'NIL'}</span></div>
                         <div>Modal: <span className="font-medium">{variant?.modal}</span></div>
                         <div className="text-green-600 font-semibold">
-                          Price: ₹{type === "notmy" ? item?.variant?.suggested_price:item.price}
+                          Price: ₹{type === "notmy" ? item?.price:item.price}
                         </div>
                       </div>
                     </div>
@@ -734,6 +734,7 @@ const ProductDetails = () => {
                 {relatedProducts.map((item, index) => {
                   const product = item.product || {};
                   const variants = item.variants || [];
+                  console.log('variants',variants)
 
                   const prices = variants.map(v => v.price).filter(p => typeof p === "number");
                   const lowestPrice = prices.length > 0 ? Math.min(...prices) : "N/A";
