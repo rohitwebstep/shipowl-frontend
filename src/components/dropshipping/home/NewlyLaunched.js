@@ -18,9 +18,9 @@ const tabs = [
 const NewlyLaunched = () => {
   const router = useRouter();
   const [products, setProducts] = useState([]);
+  const [shopifyStores, setShopifyStores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('my');
-  const [isTrashed, setIsTrashed] = useState(false);
   const [type, setType] = useState(false);
 
   const fetchProduct = useCallback(async (type) => {
@@ -59,6 +59,7 @@ const NewlyLaunched = () => {
       }
 
       setProducts(result?.products || []);
+      setShopifyStores(result?.shopifyStores || []);
       setType(result?.type || '');
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -166,11 +167,11 @@ const NewlyLaunched = () => {
               title="Newly Launched"
               products={products}
               type={type}
+              shopifyStores={shopifyStores}
               viewProduct={viewProduct}
               activeTab={activeTab}
               trashProducts={trashProducts}
               fetchProduct={fetchProduct}
-              isTrashed={isTrashed}
               setActiveTab={setActiveTab}
             />
 
@@ -181,9 +182,9 @@ const NewlyLaunched = () => {
               viewProduct={viewProduct}
               activeTab={activeTab}
               type={type}
+              shopifyStores={shopifyStores}
               trashProducts={trashProducts}
               fetchProduct={fetchProduct}
-              isTrashed={isTrashed}
               setActiveTab={setActiveTab}
 
             />
@@ -194,7 +195,7 @@ const NewlyLaunched = () => {
   );
 };
 
-const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts, fetchProduct, activeTab }) => {
+const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProduct, activeTab }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showVariantPopup, setShowVariantPopup] = useState(false);
@@ -213,15 +214,26 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
     id: '',
     variant: [],
     isVarientExists: '',
+    shopifyApp: '',
   });
   const handleVariantChange = (id, field, value) => {
+    // If field is global (e.g., shopifyApp), update it at root level
+    if (id == null) {
+      setInventoryData((prevData) => ({
+        ...prevData,
+        [field]: value,
+      }));
+      return;
+    }
+
+    // Otherwise, update specific variant
     setInventoryData((prevData) => ({
       ...prevData,
       variant: prevData.variant.map((v) =>
         v.id === id
           ? {
             ...v,
-            [field]: ['qty', 'shipowl_price', 'dropStock'].includes(field)
+            [field]: ['qty', 'shipowl_price', 'dropStock', 'dropPrice'].includes(field)
               ? Number(value)
               : value,
           }
@@ -230,75 +242,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
     }));
   };
 
-  const [isEdit, setIsEdit] = useState(false);
 
-  const handleEdit = async (item, id) => {
-    setIsEdit(true);
-    const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-
-    if (supplierData?.project?.active_panel !== "dropshipper") {
-      localStorage.removeItem("shippingData");
-      router.push("/dropshipper/auth/login");
-      return;
-    }
-
-    const suppliertoken = supplierData?.security?.token;
-    if (!suppliertoken) {
-      router.push("/dropshipper/auth/login");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${suppliertoken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorMessage = await response.json();
-        Swal.fire({
-          icon: "error",
-          title: "Something Wrong!",
-          text: errorMessage.message || "Your session has expired. Please log in again.",
-        });
-        throw new Error(errorMessage.message);
-      }
-
-      const result = await response.json();
-      const items = result?.dropshipperProduct || {};
-      setInventoryData({
-        supplierProductId: items.productId || "",
-        isVarientExists: items.product?.isVarientExists || "",
-        id: id, // or items.product?.id if you prefer
-        variant: (items.variants || []).map((v) => ({
-          variantId: v.id,
-          dropStock: v.stock,
-          dropPrice: v.price,
-          Dropstatus: v.status,
-          image: v.supplierProductVariant?.variant?.image || '',
-          name: v.supplierProductVariant?.variant?.name || '',
-          modal: v.supplierProductVariant?.variant?.modal || '',
-          color: v.supplierProductVariant?.variant?.color || '',
-          status: v.supplierProductVariant?.variant?.status ?? v.status,
-        }))
-      });
-
-      setShowPopup(true);
-
-    } catch (error) {
-      console.error("Error fetching category:", error);
-    } finally {
-      setLoading(false);
-    }
-
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -337,14 +281,15 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
       }));
 
       form.append('supplierProductId', inventoryData.supplierProductId);
+      form.append('shopifyApp', inventoryData.shopifyApp);
       form.append('variants', JSON.stringify(simplifiedVariants));
 
 
 
-      const url = isEdit ? `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${inventoryData.id}` : "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
-        method: isEdit ? 'PUT' : "POST",
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -358,7 +303,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
       if (!response.ok) {
         Swal.fire({
           icon: "error",
-          title: isEdit ? "Updation Failed" : "Creation Failed",
+          title: "Creation Failed",
           text: result.message || result.error || "An error occurred",
         });
         return;
@@ -367,10 +312,8 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
       // On success
       Swal.fire({
         icon: "success",
-        title: isEdit ? "Product Updated" : "Product Created",
-        text: isEdit
-          ? result.message || "The Product has been updated successfully!"
-          : result.message || "The Product has been created successfully!",
+        title: "Product Created",
+        text: result.message || "The Product has been created successfully!",
         showConfirmButton: true,
       }).then((res) => {
         if (res.isConfirmed) {
@@ -378,11 +321,11 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
             productId: "",
             variant: [],
             id: '',
+            shopifyApp: ''
           });
           setShowPopup(false);
           fetchProduct('my');
           setActiveTab('my');
-          setIsEdit(false);
         }
       });
 
@@ -401,87 +344,8 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
   };
 
 
-  const handlePermanentDelete = async (item) => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.removeItem("shippingData");
-      router.push("/dropshipping/auth/login");
-      return;
-    }
+  const handleEdit = async (item) => {
 
-    const dropshippertoken = dropshipperData?.security?.token;
-    if (!dropshippertoken) {
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    const confirmResult = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
-    });
-
-    if (!confirmResult.isConfirmed) return;
-
-    try {
-      Swal.fire({
-        title: "Deleting...",
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
-      setLoading(true);
-
-      const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item}/destroy`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${dropshippertoken}`,
-          },
-        }
-      );
-
-      Swal.close();
-
-      if (!response.ok) {
-        const errorMessage = await response.json();
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: errorMessage.error || errorMessage.message || "Failed to delete.",
-        });
-        setLoading(false);
-        return;
-      }
-
-      const result = await response.json();
-
-      Swal.fire({
-        icon: "success",
-        title: "Deleted!",
-        text: result.message || `${item.name} has been deleted successfully.`,
-      });
-
-      await fetchProduct('my');
-    } catch (error) {
-      Swal.close();
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Something went wrong. Please try again.",
-      });
-    } finally {
-      setLoading(false);
-    }
   };
 
 
@@ -527,7 +391,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                 />
               </div>
 
-              {activeTab === "my" && (
+              {/* {activeTab === "my" && (
                 <div className="absolute top-2 right-2 flex gap-2 z-10">
                   <button
                     onClick={() => handleEdit(product, product.id)}
@@ -536,7 +400,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                     Edit
                   </button>
                 </div>
-              )}
+              )} */}
 
               <div className="p-3">
                 <div className="flex justify-between">
@@ -581,6 +445,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                         id: product.id,
                         variant: product.variants,
                         isVarientExists: product?.product?.isVarientExists,
+                        shopifyApp: '',
                       });
                     }}
                     className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
@@ -600,10 +465,10 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                 </button>
                 {activeTab === "my" && (
                   <button
-                    onClick={() => handlePermanentDelete(product.id)}
+                    onClick={() => handleEdit(product.id)}
                     className="py-2 px-4 mt-2 text-white rounded-md text-sm w-full  bg-black transition-colors duration-200"
                   >
-                    Remove From Shopify
+                    Edit From Shopify
                   </button>
                 )}
               </div>
@@ -643,10 +508,9 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                     <tbody>
                       {inventoryData.variant?.map((v, idx) => {
                         const variantInfo = {
-                          ...(v.variant || {}), // nested variant data (name, sku, image, etc.)
-                          ...v, // direct data (dropStock, dropPrice, Dropstatus, etc.)
+                          ...(v.variant || {}),
+                          ...v,
                         };
-                        const variantInfos = v;
 
                         const imageUrls = variantInfo.image
                           ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
@@ -662,7 +526,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                                       key={i}
                                       height={40}
                                       width={40}
-                                      src={`https://placehold.co/600x400?text=${idx + 1}`}
+                                      src={url || `https://placehold.co/600x400?text=${idx + 1}`}
                                       alt={variantInfo.name || 'NIL'}
                                       className="shrink-0 rounded"
                                     />
@@ -671,7 +535,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                                   <Image
                                     height={40}
                                     width={40}
-                                    src='https://placehold.co/600x400'
+                                    src="https://placehold.co/600x400"
                                     alt="Placeholder"
                                     className="shrink-0 rounded"
                                   />
@@ -692,11 +556,13 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                             <td className="border px-4 py-2">
                               <input
                                 type="number"
-                                placeholder="dropStock"
+                                placeholder="Stock"
                                 name="dropStock"
                                 className="w-full border rounded p-2"
                                 value={variantInfo.dropStock || ''}
-                                onChange={(e) => handleVariantChange(variantInfo.id, 'dropStock', e.target.value)}
+                                onChange={(e) =>
+                                  handleVariantChange(variantInfo.id, 'dropStock', e.target.value)
+                                }
                               />
                             </td>
 
@@ -704,10 +570,12 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                               <input
                                 type="number"
                                 name="dropPrice"
-                                placeholder="dropPrice"
+                                placeholder="Price"
                                 className="w-full border rounded p-2"
                                 value={variantInfo.dropPrice || ''}
-                                onChange={(e) => handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)}
+                                onChange={(e) =>
+                                  handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)
+                                }
                               />
                             </td>
 
@@ -717,15 +585,17 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                                   type="checkbox"
                                   name="Dropstatus"
                                   className="sr-only"
-                                  checked={variantInfo.Dropstatus || false}
-                                  onChange={(e) => handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)}
+                                  checked={!!variantInfo.Dropstatus}
+                                  onChange={(e) =>
+                                    handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)
+                                  }
                                 />
                                 <div
-                                  className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : ''
+                                  className={`relative w-10 h-5 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : 'bg-gray-300'
                                     }`}
                                 >
                                   <div
-                                    className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
+                                    className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
                                       }`}
                                   ></div>
                                 </div>
@@ -734,21 +604,40 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                           </tr>
                         );
                       })}
-
                     </tbody>
                   </table>
+
+                  <div className="mt-4">
+                    <label className="block font-semibold">Select Shopify Store</label>
+                    <select
+                      className="w-full mt-2 border p-2 rounded-md"
+                      name="shopifyApp"
+                      id="shopifyApp"
+                      onChange={(e) =>
+                        handleVariantChange(null, 'shopifyApp', e.target.value)
+                      }
+                      value={inventoryData.shopifyApp || ''}
+                    >
+                      <option value="">Select Store</option>
+                      {shopifyStores.map((item, index) => (
+                        <option value={item.id} key={index}>
+                          {item.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div className="flex justify-end space-x-3 mt-6">
                     <button
                       onClick={() => {
                         setShowPopup(false);
-                        setIsEdit(false);
                       }}
                       className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
                     >
                       Cancel
                     </button>
                     <button
-                      onClick={(e) => handleSubmit(e)}
+                      onClick={handleSubmit}
                       className="px-4 py-2 bg-green-600 text-white rounded"
                     >
                       Submit
@@ -756,6 +645,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                   </div>
                 </>
               );
+
             })()}
 
             <button
@@ -795,8 +685,8 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                   <tbody>
                     {selectedProduct.variants?.map((v, idx) => {
                       let variant = {};
-                      
-                      console.log('selectedProduct',selectedProduct)
+
+                      console.log('selectedProduct', selectedProduct)
                       if (activeTab === "notmy") {
                         variant = { ...(v.variant || {}), ...v };
                       }
@@ -821,7 +711,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                                   <img
                                     key={imgIdx}
                                     src={`https://placehold.co/600x400?text= ${idx + 1}`}
-                                     alt={`variant-img-${imgIdx}`}
+                                    alt={`variant-img-${imgIdx}`}
                                     className="w-16 h-16 object-cover rounded"
                                   />
                                 ))
@@ -832,7 +722,7 @@ const Section = ({ title, products, type, isTrashed, setActiveTab, trashProducts
                           </td>
                           <td className="border px-4 py-2">{variant.modal || "—"}</td>
                           <td className="border px-4 py-2">{variant.product_link || "—"}</td>
-                          <td className="border px-4 py-2">{  v.price ||v?.supplierProductVariant?.price || "—"}</td>
+                          <td className="border px-4 py-2">{v.price || v?.supplierProductVariant?.price || "—"}</td>
                           {isExists && (
                             <>
                               <td className="border px-4 py-2">{variant.name || "—"}</td>

@@ -6,13 +6,14 @@ import Image from "next/image";
 import {
   Menu, X, Home, ShoppingCart, Package, Gift, BarChart, CreditCard,
   FileText, Settings, Volume2, MapPin, User, Warehouse, ClipboardList,
-  BadgeDollarSign, ShieldCheck, LayoutDashboard,
+  BadgeDollarSign, ShieldCheck,
 } from "lucide-react";
 import logo from "@/app/images/Shipowllogo.png";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { SiGoogletagmanager } from "react-icons/si";
 import { useAdmin } from "./middleware/AdminMiddleWareContext";
-
+import { FaUserLock, FaRegUser } from "react-icons/fa";
+import { CiBank } from "react-icons/ci";
 export default function Sidebar() {
   const { openSubMenus, setOpenSubMenus } = useAdmin();
   const pathname = usePathname();
@@ -30,6 +31,18 @@ export default function Sidebar() {
     { title: "Category Management", icon: SiGoogletagmanager, href: "/admin/category/list" },
     { title: "Brand Management", icon: SiGoogletagmanager, href: "/admin/brand/list" },
     { title: "Product Management", icon: Package, href: "/admin/products/list" },
+    {
+      children: [
+        {
+          name: "Permissions",
+          icon: FaUserLock,
+          subMenu: [
+            { icon: FaUserLock, name: "Global Permission ", href: "/admin/permission" },
+            { name: "Order Permission", icon: FaUserLock, href: "/admin/permission/order" }
+          ],
+        },
+      ],
+    },
 
     {
       children: [
@@ -85,13 +98,13 @@ export default function Sidebar() {
       ],
     },
 
-    { title: "Subuser Listing", icon: SiGoogletagmanager, href: "/admin/sub-user/list" },
+    { title: "Subuser Listing", icon: FaRegUser, href: "/admin/sub-user/list" },
     { title: "Country Management", icon: SiGoogletagmanager, href: "/admin/country/list" },
     { title: "State Management", icon: ShieldCheck, href: "/admin/state/list" },
     { title: "City Management", icon: ShieldCheck, href: "/admin/city/list" },
     { title: "Settings(In progress)", icon: Settings, href: "/admin/setting" },
     { title: "Profile(In progress)", icon: User, href: "/admin/profile" },
-    { title: "Bank Details Update Requests", icon: User, href: "/admin/bankaccount-update-requests" },
+    { title: "Bank Details Update Requests", icon: CiBank, href: "/admin/bankaccount-update-requests" },
     { title: "Terms & Condition(In progress)", icon: ShieldCheck, href: "/admin/terms" },
   ];
 

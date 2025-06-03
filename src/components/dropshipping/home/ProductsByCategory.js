@@ -21,22 +21,34 @@ function ProductsByCategory() {
     const id = searchParams.get('id');
     const [showPopup, setShowPopup] = useState(false);
     const [activeTab, setActiveTab] = useState('my');
+    const [shopifyStores, setShopifyStores] = useState([]);
 
     const [inventoryData, setInventoryData] = useState({
         supplierProductId: "",
         id: '',
         variant: [],
         isVarientExists: '',
+        shopifyApp: '',
     });
 
     const handleVariantChange = (id, field, value) => {
+        // If field is global (e.g., shopifyApp), update it at root level
+        if (id == null) {
+            setInventoryData((prevData) => ({
+                ...prevData,
+                [field]: value,
+            }));
+            return;
+        }
+
+        // Otherwise, update specific variant
         setInventoryData((prevData) => ({
             ...prevData,
             variant: prevData.variant.map((v) =>
                 v.id === id
                     ? {
                         ...v,
-                        [field]: ['qty', 'shipowl_price', 'dropStock'].includes(field)
+                        [field]: ['qty', 'shipowl_price', 'dropStock', 'dropPrice'].includes(field)
                             ? Number(value)
                             : value,
                     }
@@ -71,6 +83,7 @@ function ProductsByCategory() {
                 }
             });
 
+
             const form = new FormData();
             const simplifiedVariants = inventoryData.variant.map((v) => ({
                 variantId: v.id || v.variantId,
@@ -80,7 +93,11 @@ function ProductsByCategory() {
             }));
 
             form.append('supplierProductId', inventoryData.supplierProductId);
+            form.append('shopifyApp', inventoryData.shopifyApp);
             form.append('variants', JSON.stringify(simplifiedVariants));
+
+
+
             const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
             const response = await fetch(url, {
@@ -116,9 +133,11 @@ function ProductsByCategory() {
                         productId: "",
                         variant: [],
                         id: '',
+                        shopifyApp: ''
                     });
                     setShowPopup(false);
                     fetchProduct('my');
+                    setActiveTab('my');
                 }
             });
 
@@ -136,88 +155,10 @@ function ProductsByCategory() {
         }
     };
 
-    const handlePermanentDelete = async (item) => {
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.removeItem("shippingData");
-            router.push("/dropshipping/auth/login");
-            return;
-        }
+    const handleEdit = async (item) => {
 
-        const dropshippertoken = dropshipperData?.security?.token;
-        if (!dropshippertoken) {
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        try {
-            Swal.fire({
-                title: "Deleting...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
-            setLoading(true);
-
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item}/destroy`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${dropshippertoken}`,
-                    },
-                }
-            );
-
-            Swal.close();
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                });
-                setLoading(false);
-                return;
-            }
-
-            const result = await response.json();
-
-            Swal.fire({
-                icon: "success",
-                title: "Deleted!",
-                text: result.message || `${item.name} has been deleted successfully.`,
-            });
-
-            await fetchProduct('my');
-        } catch (error) {
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
-            setLoading(false);
-        }
     };
+
     const fetchProduct = useCallback(async (tab) => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -254,6 +195,7 @@ function ProductsByCategory() {
             }
 
             setProducts(result?.products || []);
+            setShopifyStores(result?.shopifyStores || []);
             if (result?.products.length > 0) {
                 setCategory(result?.products[0].product?.category?.name || '');
                 setType(result?.type || '');
@@ -366,6 +308,7 @@ function ProductsByCategory() {
                                                         id: product.id,
                                                         variant: product.variants,
                                                         isVarientExists: product?.product?.isVarientExists,
+                                                        shopifyApp: '',
                                                     });
                                                 }}
                                                 className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
@@ -375,10 +318,10 @@ function ProductsByCategory() {
                                         )}
                                         {activeTab === "my" && (
                                             <button
-                                                onClick={() => handlePermanentDelete(product.id)}
+                                                onClick={() => handleEdit(product.id)}
                                                 className="py-2 px-4 mt-2 text-white rounded-md text-sm w-full  bg-black transition-colors duration-200"
                                             >
-                                                Remove From Shopify
+                                                Edit From Shopify
                                             </button>
                                         )}
 
@@ -520,6 +463,25 @@ function ProductsByCategory() {
 
                                                 </tbody>
                                             </table>
+                                            <div className="mt-4">
+                                                <label className="block font-semibold">Select Shopify Store</label>
+                                                <select
+                                                    className="w-full mt-2 border p-2 rounded-md"
+                                                    name="shopifyApp"
+                                                    id="shopifyApp"
+                                                    onChange={(e) =>
+                                                        handleVariantChange(null, 'shopifyApp', e.target.value)
+                                                    }
+                                                    value={inventoryData.shopifyApp || ''}
+                                                >
+                                                    <option value="">Select Store</option>
+                                                    {shopifyStores.map((item, index) => (
+                                                        <option value={item.id} key={index}>
+                                                            {item.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                             <div className="flex justify-end space-x-3 mt-6">
                                                 <button
                                                     onClick={() => {

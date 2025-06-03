@@ -20,19 +20,11 @@ import {
 import Image from "next/image";
 import Logo from "@/app/assets/Shipowl-logo1.png";
 import { HiBars3CenterLeft } from "react-icons/hi2";
+import { FaShopify } from "react-icons/fa";
 
 const menuItems = [
   { name: "Home", icon: Home, href: "/dropshipping", section: "MENU" },
-  {
-    name: "Manage Orders",
-    icon: ShoppingCart,
-    href: "#",
-    section: "MENU",
-    subMenu: [
-      { name: "All Orders (In progress)", href: "/dropshipping/manage-orders" },
-      { name: "Pending Orders (In progress)", href: "/dropshipping/pending-orders" }
-    ]
-  },
+
   {
     name: "Inventory",
     icon: ShoppingCart,
@@ -44,6 +36,17 @@ const menuItems = [
       { name: "RTO", href: "/dropshipping/product/rto" },
     ]
   },
+    {
+    name: "Manage Orders",
+    icon: ShoppingCart,
+    href: "#",
+    section: "MENU",
+    subMenu: [
+      { name: "All Orders (In progress)", href: "/dropshipping/manage-orders" },
+      { name: "Pending Orders (In progress)", href: "/dropshipping/pending-orders" }
+    ]
+  },
+  { name: "Link Shopify Store", icon: FaShopify, href: "/dropshipping/store/link", section: "MENU" },
   { name: "Manage Products (In progress)", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },
   { name: "Subuser Listing", icon: Package, href: "/dropshipping/sub-user/list", section: "MENU" },
   { name: "Profile", icon: Package, href: "/dropshipping/profile", section: "MENU" },

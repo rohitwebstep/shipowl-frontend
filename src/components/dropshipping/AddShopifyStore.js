@@ -1,0 +1,256 @@
+"use client"
+
+import { useEffect, useState, useCallback } from 'react'
+import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
+import { useDropshipper } from './middleware/DropshipperMiddleWareContext'
+
+export default function AddShopifyStore() {
+    const router = useRouter();
+    const [validationErrors, setValidationErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [shopifyStores, setShopifyStores] = useState([]);
+    const { verifyDropShipperAuth } = useDropshipper();
+    const [formData, setFormData] = useState({
+        shop: '',
+    })
+    const fetchStores = useCallback(async () => {
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (dropshipperData?.project?.active_panel !== "dropshipper") {
+            localStorage.removeItem("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const dropshippertoken = dropshipperData?.security?.token;
+        if (!dropshippertoken) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/shopify`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${dropshippertoken}`,
+                },
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: result.error || result.message || "Your session has expired. Please log in again.",
+                });
+                throw new Error(result.message || result.error || "Something Wrong!");
+            }
+
+            setShopifyStores(result?.shopifyStores || []);
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router]);
+    useEffect(() => {
+        setLoading(true);
+        verifyDropShipperAuth();
+        fetchStores()
+        setLoading(false);
+
+    }, [verifyDropShipperAuth]);
+
+    const handleChange = (e) => {
+        const { name, type, value, checked } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: type === 'checkbox' ? (checked ? true : false) : value
+        }));
+    };
+
+    const validate = () => {
+        const errors = {};
+
+        if (!formData.shop || formData.shop.trim() === '') {
+            errors.shop = 'Shop is required.';
+        }
+
+
+        return errors;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+        if (dropshipperData?.project?.active_panel !== "dropshipper") {
+            localStorage.clear("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const token = dropshipperData?.security?.token;
+        if (!token) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const errors = validate();
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            setLoading(false);
+            return;
+        }
+
+        setValidationErrors({});
+
+        try {
+            Swal.fire({
+                title: 'Creating Shoap...',
+                text: 'Please wait while we save your Shoap.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const form = new FormData();
+            form.append('shop', formData.shop);
+
+
+            const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/shopify/connect";
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: form,
+            });
+
+            const result = await response.json(); // Parse the result here
+
+            if (!response.ok) {
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Creation Failed",
+                    text: result.message || result.error || "An error occurred",
+                });
+
+
+                if (result.error && typeof result.error === 'object') {
+                    const entries = Object.entries(result.error);
+                    let focused = false;
+
+                    entries.forEach(([key, message]) => {
+                        setValidationErrors((prev) => ({
+                            ...prev,
+                            [key]: message,
+                        }));
+
+                        if (!focused) {
+                            setTimeout(() => {
+                                const input = document.querySelector(`[name="${key}"]`);
+                                if (input) input.focus();
+                            }, 300);
+
+                            focused = true;
+                        }
+                    });
+                }
+            } else {
+                Swal.close();
+                Swal.fire({
+                    icon: "success",
+                    title: "Shop Created",
+                    text: `The Shop has been created successfully!`,
+                    showConfirmButton: true,
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        setFormData({ name: '' });
+                        router.push(result.installUrl)
+
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Submission Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+            setError(error.message || "Submission failed.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <section className="">
+            <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white rounded-2xl p-5">
+                    <form onSubmit={handleSubmit}>
+                        <div className=" ">
+                            <div>
+                                <label htmlFor="name" className="font-bold block text-[#232323]">
+                                    Shop Name <span className='text-red-500 text-lg'>*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="shop"
+                                    value={formData?.shop || ''}
+                                    id="shop"
+                                    onChange={handleChange}
+                                    className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.name ? "border-red-500" : "border-[#E0E5F2]"
+                                        } `} />
+                                {validationErrors.shop && (
+                                    <p className="text-red-500 text-sm mt-1">{validationErrors.shop}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-3 mt-5">
+                            <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">
+                                {loading ? 'Connecting...' : 'Connect'}
+                            </button>
+                            <button type="button" className="bg-gray-500 text-white px-15 rounded-md p-3" onClick={() => router.back()}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div className="bg-white rounded-2xl p-5">
+                    <table className="w-full border border-[#E0E5F2]  text-sm">
+                        <thead className="border border-[#E0E5F2]">
+                            <tr>
+                                <th className=" border border-[#E0E5F2] text-left px-2 py-1">SR</th>
+                                <th className=" border border-[#E0E5F2] text-left px-2 py-1">Name</th>
+                                <th className=" border border-[#E0E5F2] px-2 py-1">Domain</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {shopifyStores.map((item, index) => (
+                                <tr key={item.id} className="border border-[#E0E5F2]">
+                                    <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{index + 1}</td>
+                                    <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{item.name}</td>
+                                    <td className=" border border-[#E0E5F2] px-2 py-1 text-center">{item.domain}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+
+
+                    </table>
+                </div>
+            </div>
+        </section>
+    );
+}
