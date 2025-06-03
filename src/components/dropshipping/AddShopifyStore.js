@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import { useDropshipper } from './middleware/DropshipperMiddleWareContext'
+import { HashLoader } from "react-spinners";
 
 export default function AddShopifyStore() {
     const router = useRouter();
@@ -193,7 +194,13 @@ export default function AddShopifyStore() {
             setLoading(false);
         }
     };
-
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
+    }
     return (
         <section className="">
             <div className="grid grid-cols-2 gap-3">
@@ -229,26 +236,29 @@ export default function AddShopifyStore() {
                     </form>
                 </div>
                 <div className="bg-white rounded-2xl p-5">
-                    <table className="w-full border border-[#E0E5F2]  text-sm">
-                        <thead className="border border-[#E0E5F2]">
-                            <tr>
-                                <th className=" border border-[#E0E5F2] text-left px-2 py-1">SR</th>
-                                <th className=" border border-[#E0E5F2] text-left px-2 py-1">Name</th>
-                                <th className=" border border-[#E0E5F2] px-2 py-1">Domain</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {shopifyStores.map((item, index) => (
-                                <tr key={item.id} className="border border-[#E0E5F2]">
-                                    <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{index + 1}</td>
-                                    <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{item.name}</td>
-                                    <td className=" border border-[#E0E5F2] px-2 py-1 text-center">{item.domain}</td>
+                    {shopifyStores.length > 0 ? (
+                        <table className="w-full border border-[#E0E5F2]  text-sm">
+                            <thead className="border border-[#E0E5F2]">
+                                <tr>
+                                    <th className=" border border-[#E0E5F2] text-left px-2 py-1">SR</th>
+                                    <th className=" border border-[#E0E5F2] text-left px-2 py-1">Name</th>
+                                    <th className=" border border-[#E0E5F2] px-2 py-1">Domain</th>
                                 </tr>
-                            ))}
-                        </tbody>
+                            </thead>
+                            <tbody>
+                                {shopifyStores.map((item, index) => (
+                                    <tr key={item.id} className="border border-[#E0E5F2]">
+                                        <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{index + 1}</td>
+                                        <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{item.name}</td>
+                                        <td className=" border border-[#E0E5F2] px-2 py-1 text-center">{item.domain}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
 
 
-                    </table>
+                        </table>
+                    ) : (<p className='text-center'>No Data Available</p>)
+                    }
                 </div>
             </div>
         </section>
