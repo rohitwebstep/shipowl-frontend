@@ -13,7 +13,7 @@ import { LuLayoutDashboard } from "react-icons/lu";
 import { SiGoogletagmanager } from "react-icons/si";
 import { useAdmin } from "./middleware/AdminMiddleWareContext";
 import { FaUserLock, FaRegUser } from "react-icons/fa";
-import { CiBank } from "react-icons/ci";
+import { CiBank,CiImageOn } from "react-icons/ci";
 export default function Sidebar() {
   const { openSubMenus, setOpenSubMenus } = useAdmin();
   const pathname = usePathname();
@@ -31,6 +31,7 @@ export default function Sidebar() {
     { title: "Category Management", icon: SiGoogletagmanager, href: "/admin/category/list" },
     { title: "Brand Management", icon: SiGoogletagmanager, href: "/admin/brand/list" },
     { title: "Product Management", icon: Package, href: "/admin/products/list" },
+    { title: "Dropshipper Banners", icon: CiImageOn, href: "/admin/dropshipper/banner" },
     {
       children: [
         {

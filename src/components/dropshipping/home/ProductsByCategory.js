@@ -12,6 +12,7 @@ const tabs = [
     { key: "my", label: "Pushed to Shopify" },
     { key: "notmy", label: "Not Pushed to Shopify" },
 ];
+import { X, Send } from "lucide-react"; // Lucide icons
 function ProductsByCategory() {
     const [products, setProducts] = useState([]);
     const [category, setCategory] = useState('');
@@ -336,181 +337,163 @@ function ProductsByCategory() {
 
                     </div>
                     {showPopup && (
-                        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                            <div className="bg-white p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
-                                <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
-
-                                {(() => {
-                                    const varinatExists = inventoryData?.isVarientExists ? 'yes' : 'no';
-                                    const isExists = varinatExists === "yes";
-                                    return (
-                                        <>
-                                            <table className="min-w-full table-auto border border-gray-200">
-                                                <thead>
-                                                    <tr className="bg-gray-100">
-                                                        <th className="border px-4 py-2">Image</th>
-                                                        <th className="border px-4 py-2">Modal</th>
-                                                        {isExists && (
-                                                            <>
-                                                                <th className="border px-4 py-2">Name</th>
-                                                                <th className="border px-4 py-2">SKU</th>
-                                                                <th className="border px-4 py-2">Color</th>
-                                                            </>
-                                                        )}
-                                                        <th className="border px-4 py-2">Stock</th>
-                                                        <th className="border px-4 py-2">Price</th>
-                                                        <th className="border px-4 py-2">Status</th>
-                                                        <th className="border px-4 py-2 whitespace-nowrap">Suggested Price</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {inventoryData.variant?.map((v, idx) => {
-                                                        const variantInfo = {
-                                                            ...(v.variant || {}), // nested variant data (name, sku, image, etc.)
-                                                            ...v, // direct data (dropStock, dropPrice, Dropstatus, etc.)
-                                                        };
-
-                                                        const imageUrls = variantInfo.image
-                                                            ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
-                                                            : [];
-
-                                                        return (
-                                                            <tr key={variantInfo.id || idx}>
-                                                                <td className="border px-4 py-2">
-                                                                    <div className="flex overflow-scroll space-x-2 overflow-x-auto max-w-[200px]">
-                                                                        {imageUrls.length > 0 ? (
-                                                                            imageUrls.map((url, i) => (
-                                                                                <Image
-                                                                                    key={i}
-                                                                                    height={40}
-                                                                                    width={40}
-                                                                                    src={url}
-                                                                                    alt={variantInfo.name || 'NIL'}
-                                                                                    className="shrink-0 rounded"
-                                                                                />
-                                                                            ))
-                                                                        ) : (
-                                                                            <Image
-                                                                                height={40}
-                                                                                width={40}
-                                                                                src="https://placehold.co/400"
-                                                                                alt="Placeholder"
-                                                                                className="shrink-0 rounded"
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                </td>
-
-                                                                <td className="border px-4 py-2">{variantInfo.modal || 'NIL'}</td>
-
-                                                                {isExists && (
-                                                                    <>
-                                                                        <td className="border px-4 py-2">{variantInfo.name || 'NIL'}</td>
-                                                                        <td className="border px-4 py-2">{variantInfo.sku || 'NIL'}</td>
-                                                                        <td className="border px-4 py-2">{variantInfo.color || 'NIL'}</td>
-                                                                    </>
-                                                                )}
-
-                                                                <td className="border px-4 py-2">
-                                                                    <input
-                                                                        type="number"
-                                                                        placeholder="dropStock"
-                                                                        name="dropStock"
-                                                                        className="w-full border rounded p-2"
-                                                                        value={variantInfo.dropStock || ''}
-                                                                        onChange={(e) => handleVariantChange(variantInfo.id, 'dropStock', e.target.value)}
-                                                                    />
-                                                                </td>
-
-                                                                <td className="border px-4 py-2">
-                                                                    <input
-                                                                        type="number"
-                                                                        name="dropPrice"
-                                                                        placeholder="dropPrice"
-                                                                        className="w-full border rounded p-2"
-                                                                        value={variantInfo.dropPrice || ''}
-                                                                        onChange={(e) => handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)}
-                                                                    />
-                                                                </td>
-
-                                                                <td className="border px-4 py-2">
-                                                                    <label className="flex mt-2 items-center cursor-pointer">
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="Dropstatus"
-                                                                            className="sr-only"
-                                                                            checked={variantInfo.Dropstatus || false}
-                                                                            onChange={(e) => handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)}
-                                                                        />
-                                                                        <div
-                                                                            className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : ''
-                                                                                }`}
-                                                                        >
-                                                                            <div
-                                                                                className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
-                                                                                    }`}
-                                                                            ></div>
-                                                                        </div>
-                                                                    </label>
-                                                                </td>
-
-                                                                <td className="border px-4 py-2">
-                                                                    {variantInfo.lowestOtherSupplierSuggestedPrice ?? variantInfo.suggested_price ?? 'NIL'}
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-
-                                                </tbody>
-                                            </table>
-                                            <div className="mt-4">
-                                                <label className="block font-semibold">Select Shopify Store</label>
-                                                <select
-                                                    className="w-full mt-2 border p-2 rounded-md"
-                                                    name="shopifyApp"
-                                                    id="shopifyApp"
-                                                    onChange={(e) =>
-                                                        handleVariantChange(null, 'shopifyApp', e.target.value)
-                                                    }
-                                                    value={inventoryData.shopifyApp || ''}
-                                                >
-                                                    <option value="">Select Store</option>
-                                                    {shopifyStores.map((item, index) => (
-                                                        <option value={item.id} key={index}>
-                                                            {item.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                          <div className="fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
+                            <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
+                              <h2 className="text-xl font-semibold mb-4">Push To Shopify</h2>
+                  
+                              {(() => {
+                                const varinatExists = inventoryData?.isVarientExists ? 'yes' : 'no';
+                                const isExists = varinatExists === "yes";
+                                return (
+                                  <>
+                                    <div className="mb-2">
+                                      <select
+                                        className="w-full mt-1 border border-[#E0E2E7] shadow p-2 rounded-md"
+                                        name="shopifyApp"
+                                        id="shopifyApp"
+                                        onChange={(e) =>
+                                          handleVariantChange(null, 'shopifyApp', e.target.value)
+                                        }
+                                        value={inventoryData.shopifyApp || ''}
+                                      >
+                                        <option value="">Select Store</option>
+                                        {shopifyStores.map((item, index) => (
+                                          <option value={item.id} key={index}>
+                                            {item.name}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                                      {inventoryData.variant?.map((v, idx) => {
+                                        const variantInfo = {
+                                          ...(v.variant || {}),
+                                          ...v,
+                                        };
+                  
+                                        const imageUrls = variantInfo.image
+                                          ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
+                                          : [];
+                  
+                                        return (
+                                          <div
+                                            key={variantInfo.id || idx}
+                                            className="relative bg-white border border-[#E0E2E7] shadow rounded-lg p-4  hover:shadow-lg transition group"
+                                          >
+                                            <div className="flex items-center gap-4 mb-4">
+                                              <div className="flex gap-2 overflow-x-auto max-w-[120px]">
+                                                {imageUrls.length > 0 ? (
+                                                  imageUrls.map((url, i) => (
+                                                    <Image
+                                                      key={i}
+                                                      height={100}
+                                                      width={100}
+                                                      src={`https://placehold.co/600x400?text=${idx + 1}`}
+                                                      alt={variantInfo.name || 'NIL'}
+                                                      className="shrink-0 border border-[#E0E2E7] shadow "
+                                                    />
+                                                  ))
+                                                ) : (
+                                                  <Image
+                                                    height={40}
+                                                    width={40}
+                                                    src="https://placehold.co/600x400"
+                                                    alt="Placeholder"
+                                                    className="rounded shrink-0"
+                                                  />
+                                                )}
+                                              </div>
+                                              <div>
+                                                <p className="font-semibold">Model: {variantInfo.modal || 'NIL'}</p>
+                                                {isExists && (
+                                                  <>
+                                                    <p>Name: {variantInfo.name || 'NIL'}</p>
+                                                    <p>SKU: {variantInfo.sku || 'NIL'}</p>
+                                                    <p>Color: {variantInfo.color || 'NIL'}</p>
+                                                  </>
+                                                )}
+                                              </div>
                                             </div>
-                                            <div className="flex justify-end space-x-3 mt-6">
-                                                <button
-                                                    onClick={() => {
-                                                        setShowPopup(false);
-                                                    }}
-                                                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                  
+                                            <div className="space-y-3">
+                                              <input
+                                                type="number"
+                                                placeholder="Stock"
+                                                name="dropStock"
+                                                className="w-full border border-[#E0E2E7] shadow rounded p-2"
+                                                value={variantInfo.dropStock || ''}
+                                                onChange={(e) => handleVariantChange(variantInfo.id, 'dropStock', e.target.value)}
+                                              />
+                                              <input
+                                                type="number"
+                                                placeholder="Price"
+                                                name="dropPrice"
+                                                className="w-full border border-[#E0E2E7] shadow rounded p-2"
+                                                value={variantInfo.dropPrice || ''}
+                                                onChange={(e) => handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)}
+                                              />
+                  
+                                              <label className="flex items-center cursor-pointer">
+                                                <input
+                                                  type="checkbox"
+                                                  name="Dropstatus"
+                                                  className="sr-only"
+                                                  checked={!!variantInfo.Dropstatus}
+                                                  onChange={(e) => handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)}
+                                                />
+                                                <div
+                                                  className={`relative w-10 h-5 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : 'bg-gray-300'}`}
                                                 >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleSubmit(e)}
-                                                    className="px-4 py-2 bg-green-600 text-white rounded"
-                                                >
-                                                    Submit
-                                                </button>
+                                                  <div
+                                                    className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
+                                                      }`}
+                                                  ></div>
+                                                </div>
+                                                <span className="ml-2 text-sm">{variantInfo.Dropstatus ? 'Active' : 'Inactive'}</span>
+                                              </label>
                                             </div>
-                                        </>
-                                    );
-                                })()}
-
-                                <button
-                                    onClick={() => setShowPopup(false)}
-                                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-                                >
-                                    ×
-                                </button>
+                  
+                  
+                  
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                  
+                  
+                  
+                  
+                                    <div className="flex justify-end space-x-3 mt-6">
+                                      <button
+                                        onClick={() => setShowPopup(false)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                                      >
+                                        <X size={16} />
+                                        Cancel
+                                      </button>
+                  
+                                      <button
+                                        onClick={handleSubmit}
+                                        className="flex items-center gap-2 px-4 py-2 bg-[#F98F5C] text-white rounded hover:bg-[#e97b45] transition-colors"
+                                      >
+                                        <Send size={16} />
+                                        Submit
+                                      </button>
+                                    </div>
+                                  </>
+                                );
+                  
+                              })()}
+                  
+                              <button
+                                onClick={() => setShowPopup(false)}
+                                className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
+                              >
+                                ×
+                              </button>
                             </div>
-                        </div>
-                    )}
+                          </div>
+                        )}
                 </>
             ) : (
                 <p className='text-center text-2xl'>No Product Found in This category</p>

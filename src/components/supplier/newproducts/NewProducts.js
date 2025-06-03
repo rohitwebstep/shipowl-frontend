@@ -262,152 +262,136 @@ export default function NewProducts() {
           <p className="text-center">No Products Found</p>
         )}
       </div>
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
-            <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+       {showPopup && (
+        <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+          <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
+            <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
 
             {(() => {
-              const varinatExists = inventoryData?.isVarientExists ? 'yes' : 'no';
+              const varinatExists = inventoryData?.isVarientExists ? "yes" : "no";
               const isExists = varinatExists === "yes";
+
               return (
                 <>
-                  <table className="min-w-full table-auto border border-gray-200">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border px-4 py-2">Image</th>
-                        <th className="border px-4 py-2">Modal</th>
-                        {isExists && (
-                          <>
-                            <th className="border px-4 py-2">Name</th>
-                            <th className="border px-4 py-2">SKU</th>
-                            <th className="border px-4 py-2">Color</th>
-                          </>
-                        )}
-                        <th className="border px-4 py-2">Stock</th>
-                        <th className="border px-4 py-2">Price</th>
-                        <th className="border px-4 py-2">Status</th>
-                        <th className="border px-4 py-2 whitespace-nowrap">Suggested Price</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {inventoryData.variant?.map((variant, idx) => {
-                        const imageUrls = variant.image
-                          ? variant.image.split(',').map((img) => img.trim()).filter(Boolean)
-                          : [];
-                        return (
-                          <tr key={variant.id || idx}>
-                            <td className="border px-4 py-2">
-                              <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
-                                {imageUrls.length > 0 ? (
-                                  imageUrls.map((url, i) => (
-                                    <Image
-                                      key={i}
-                                      height={40}
-                                      width={40}
-                                      src={url}
-                                      alt={variant.name || 'NIL'}
-                                      className="shrink-0 rounded"
-                                    />
-                                  ))
-                                ) : (
-                                  <Image
-                                    height={40}
-                                    width={40}
-                                    src="https://placehold.co/400"
-                                    alt="Placeholder"
-                                    className="shrink-0 rounded"
-                                  />
-                                )}
-                              </div>
-                            </td>
-                            <td className="border px-4 py-2">{variant.modal || 'NIL'}</td>
-                            {isExists && (
-                              <>
-                                <td className="border px-4 py-2">{variant.name || 'NIL'}</td>
-                                <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
-                                <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
-                              </>
-                            )}
-                            <td className="border px-4 py-2">
-                              <input
-                                type="number"
-                                placeholder="Stock"
-                                name="stock"
-                                className="w-full border rounded p-2"
-                                value={variant.stock || ''}
-                                onChange={(e) =>
-                                  handleVariantChange(variant.id, "stock", e.target.value)
-                                }
-                              />
-                            </td>
-                            <td className="border px-4 py-2">
-                              <input
-                                type="number"
-                                name="price"
-                                placeholder="Price"
-                                className="w-full border rounded p-2"
-                                value={variant.price || ''}
-                                onChange={(e) =>
-                                  handleVariantChange(variant.id, "price", e.target.value)
-                                }
-                              />
-                            </td>
-                            <td className="border px-4 py-2">
-                              <label className="flex mt-2 items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  name="status"
-                                  className="sr-only"
-                                  checked={variant.status || false}
-                                  onChange={(e) =>
-                                    handleVariantChange(variant.id, "status", e.target.checked)
-                                  }
-                                />
-                                <div
-                                  className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variant.status ? "bg-orange-500" : ""
-                                    }`}
-                                >
-                                  <div
-                                    className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variant.status ? "translate-x-5" : ""
-                                      }`}
-                                  ></div>
-                                </div>
-                              </label>
-                            </td>
-                            <td className="border px-4 py-2">{variant.lowestOtherSupplierSuggestedPrice ? variant.lowestOtherSupplierSuggestedPrice : variant.suggested_price ?? 'NIL'}</td>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
+                    {inventoryData.variant?.map((variant, idx) => {
+                      const imageUrls = variant.image
+                        ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
+                        : [];
 
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                      return (
+                        <div
+                          key={variant.id || idx}
+                          className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
+                        >
+                          <div className='flex gap-2'>
+                            {/* Image Preview */}
+                            <div className="md:min-w-4/12 h-20 rounded-lg flex items-center justify-center overflow-hidden">
+                              {imageUrls.length > 0 ? (
+                                <img
+                                  src={`https://placehold.co/600x400?text=${idx + 1}`}
+                                  alt={variant.name || "Variant Image"}
+                                  className="h-full object-cover"
+                                />
+                              ) : (
+                                <img
+                                  src="https://placehold.co/600x400"
+                                  alt="Placeholder"
+                                  className="h-full object-cover"
+                                />
+                              )}
+                            </div>
+
+                            <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
+                              <p><span className="font-semibold">Modal:</span> {variant.modal || "NIL"}</p>
+                              {isExists && (
+                                <>
+                                  <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
+                                  <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
+                                  <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
+                                </>
+                              )}
+                              <p><span className="font-semibold">Suggested Price:</span>{variant.lowestOtherSupplierSuggestedPrice ? variant.lowestOtherSupplierSuggestedPrice : variant.suggested_price ?? 'NIL'}</p>
+                            </div>
+                          </div>
+
+                          {/* Input Fields */}
+                          <div className="flex flex-col space-y-2">
+                            <input
+                              type="number"
+                              placeholder="Stock"
+                              name="stock"
+                              className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
+                              value={variant.stock || ""}
+                              onChange={(e) =>
+                                handleVariantChange(variant.id, "stock", e.target.value)
+                              }
+                            />
+                            <input
+                              type="number"
+                              placeholder="Price"
+                              name="price"
+                              className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
+                              value={variant.price || ""}
+                              onChange={(e) =>
+                                handleVariantChange(variant.id, "price", e.target.value)
+                              }
+                            />
+                          </div>
+
+                          {/* Status Switch */}
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="text-sm font-medium">Status:</span>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={variant.status || false}
+                                onChange={(e) =>
+                                  handleVariantChange(variant.id, "status", e.target.checked)
+                                }
+                                className="sr-only peer"
+                              />
+                              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-orange-500 transition-all"></div>
+                              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transform transition-all"></div>
+                            </label>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Footer Buttons */}
                   <div className="flex justify-end space-x-3 mt-6">
                     <button
-                      onClick={() => {
-                        setShowPopup(false);
-                      }}
-                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                      onClick={() => setShowPopup(false)}
+                      className="flex items-center gap-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded transition"
                     >
-                      Cancel
+                      <span>Cancel</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
                     <button
                       onClick={(e) => handleSubmit(e)}
-                      className="px-4 py-2 bg-green-600 text-white rounded"
+                      className="flex items-center gap-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
                     >
-                      Submit
+                      <span>Submit</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
                     </button>
                   </div>
+
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setShowPopup(false)}
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl"
+                  >
+                    ×
+                  </button>
                 </>
               );
             })()}
-
-            <button
-              onClick={() => setShowPopup(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-            >
-              ×
-            </button>
           </div>
         </div>
       )}

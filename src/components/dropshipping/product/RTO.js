@@ -97,15 +97,15 @@ export default function RTO() {
                                 </div>
                                 <div className="p-4  ">
                                     <p>
-                                        <span className="font-bold text-lg"> ₹ {orders?.price}</span>
+                                        <span className="font-bold text-lg"> ₹ {orders?.price || 'N/A'}</span>
                                     </p>
-                                    <h5 className="text-md font-semibold">{variant?.name}</h5>
+                                    <h5 className="text-md font-semibold">{variant?.name || 'N/A'}</h5>
                                     <div className="grid grid-cols-3 py-3 items-center border-t border-gray-400 justify-between text-gray-700 r">
                                         <p>
-                                            Qty: <span className="font-medium">{orders?.quantity}</span>
+                                            Qty: <span className="font-medium">{orders?.quantity || 'N/A'}</span>
                                         </p>
                                         <p>
-                                            Total: <span className="font-medium">{orders?.total}</span>
+                                            Total: <span className="font-medium">{orders?.total|| 'N/A'}</span>
                                         </p>
                                         <p className=" text-gray-600">Color: {variant?.color}</p>
 

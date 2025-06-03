@@ -10,6 +10,10 @@ import { HashLoader } from 'react-spinners';
 import productimg from '@/app/assets/product1.png';
 import gift from '@/app/assets/gift.png';
 import ship from '@/app/assets/delivery.png';
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Send } from "lucide-react"; // Lucide icons
+
+
 const tabs = [
   { key: "my", label: "Pushed to Shopify" },
   { key: "notmy", label: "Not Pushed to Shopify" },
@@ -376,34 +380,28 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
           const productName = product?.product?.name || "NIL";
 
           return (
-            <div
+
+            <motion.div
               key={index}
-              className="bg-white rounded-xl cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02]"
+              whileHover={{ y: -8 }} // Slide up on hover
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              className="group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-transform duration-300 overflow-hidden mb-6" // Add spacing between cards
             >
+              {/* Image */}
               <div className="overflow-hidden rounded-t-xl">
-                <Image
-                  src={productimg || imageUrl}
+                <motion.img
+                  src={productimg}
                   alt={productName}
                   onClick={() => viewProduct(product.id, type)}
                   width={300}
                   height={200}
-                  className="w-full h-48 object-cover rounded-lg transform transition-transform duration-300 hover:scale-105"
+                  className="w-full h-48 object-cover transform transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
 
-              {/* {activeTab === "my" && (
-                <div className="absolute top-2 right-2 flex gap-2 z-10">
-                  <button
-                    onClick={() => handleEdit(product, product.id)}
-                    className="bg-yellow-500 text-white px-3 py-1 text-sm rounded hover:bg-yellow-600 transition-colors duration-200"
-                  >
-                    Edit
-                  </button>
-                </div>
-              )} */}
-
-              <div className="p-3">
-                <div className="flex justify-between">
+              {/* Content */}
+              <div className="p-3 pb-24 mb-4 relative z-0 bg-white">
+                <div className="flex justify-between items-center">
                   <p className="text-black font-bold nunito">
                     ₹
                     {product.variants.length === 1
@@ -413,31 +411,36 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
                       : Math.min(
                         ...product.variants.map(
                           (v) =>
-                            v?.price ??
-                            v?.supplierProductVariant?.price ??
-                            Infinity
+                            v?.price ?? v?.supplierProductVariant?.price ?? Infinity
                         )
                       )}
                   </p>
-
                 </div>
-                <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">
-                  {productName}
-                </p>
+                <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">{productName}</p>
 
-                <div className="flex items-center border-t pt-2 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
+                {/* Info Footer */}
+                <div className="mt-3 pt-2 border-t border-[#EDEDED] flex items-center justify-between text-sm text-gray-600">
                   <div className="flex items-center gap-1">
-                    <Image src={gift} className="w-5" alt="Gift" />
+                    <Image src={gift || '/icons/gift.svg'} className="w-5 h-5" alt="Gift" />
                     <span className="font-lato text-[#2C3454] font-bold">100-10k</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Image src={ship} className="w-5" alt="Shipping" />
+                    <Image src={ship || '/icons/ship.svg'} className="w-5 h-5" alt="Shipping" />
                     <span className="font-lato text-[#2C3454] font-bold">4.5</span>
                   </div>
                 </div>
+              </div>
 
+              {/* Button Group: Slide In on Card Hover */}
+              <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="absolute bottom-0 left-0 w-full bg-white/95 backdrop-blur-md p-3 space-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto z-10 rounded-b-xl transition-all duration-300"
+              >
                 {activeTab === "notmy" && (
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
                     onClick={() => {
                       setShowPopup(true);
                       setInventoryData({
@@ -448,169 +451,53 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
                         shopifyApp: '',
                       });
                     }}
-                    className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
+                    className="w-full py-2 px-4 text-white rounded-md text-sm bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
                   >
                     Push To Shopify
-                  </button>
+                  </motion.button>
                 )}
 
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
                   onClick={() => {
                     setSelectedProduct(product);
                     setShowVariantPopup(true);
                   }}
-                  className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
+                  className="w-full py-2 px-4 text-white rounded-md text-sm bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
                 >
                   View Variants
-                </button>
+                </motion.button>
+
                 {activeTab === "my" && (
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
                     onClick={() => handleEdit(product.id)}
-                    className="py-2 px-4 mt-2 text-white rounded-md text-sm w-full  bg-black transition-colors duration-200"
+                    className="w-full py-2 px-4 text-white rounded-md text-sm bg-black hover:bg-gray-800 transition-colors duration-200"
                   >
                     Edit From Shopify
-                  </button>
+                  </motion.button>
                 )}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
+
           );
         })}
 
 
       </div>
       {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
-            <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+        <div className="fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
+            <h2 className="text-xl font-semibold mb-4">Push To Shopify</h2>
 
             {(() => {
               const varinatExists = inventoryData?.isVarientExists ? 'yes' : 'no';
               const isExists = varinatExists === "yes";
               return (
                 <>
-                  <table className="min-w-full table-auto border border-gray-200">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border px-4 py-2">Image</th>
-                        <th className="border px-4 py-2">Modal</th>
-                        {isExists && (
-                          <>
-                            <th className="border px-4 py-2">Name</th>
-                            <th className="border px-4 py-2">SKU</th>
-                            <th className="border px-4 py-2">Color</th>
-                          </>
-                        )}
-                        <th className="border px-4 py-2">Stock</th>
-                        <th className="border px-4 py-2">Price</th>
-                        <th className="border px-4 py-2">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {inventoryData.variant?.map((v, idx) => {
-                        const variantInfo = {
-                          ...(v.variant || {}),
-                          ...v,
-                        };
-
-                        const imageUrls = variantInfo.image
-                          ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
-                          : [];
-
-                        return (
-                          <tr key={variantInfo.id || idx}>
-                            <td className="border px-4 py-2">
-                              <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
-                                {imageUrls.length > 0 ? (
-                                  imageUrls.map((url, i) => (
-                                    <Image
-                                      key={i}
-                                      height={40}
-                                      width={40}
-                                      src={url || `https://placehold.co/600x400?text=${idx + 1}`}
-                                      alt={variantInfo.name || 'NIL'}
-                                      className="shrink-0 rounded"
-                                    />
-                                  ))
-                                ) : (
-                                  <Image
-                                    height={40}
-                                    width={40}
-                                    src="https://placehold.co/600x400"
-                                    alt="Placeholder"
-                                    className="shrink-0 rounded"
-                                  />
-                                )}
-                              </div>
-                            </td>
-
-                            <td className="border px-4 py-2">{variantInfo.modal || 'NIL'}</td>
-
-                            {isExists && (
-                              <>
-                                <td className="border px-4 py-2">{variantInfo.name || 'NIL'}</td>
-                                <td className="border px-4 py-2">{variantInfo.sku || 'NIL'}</td>
-                                <td className="border px-4 py-2">{variantInfo.color || 'NIL'}</td>
-                              </>
-                            )}
-
-                            <td className="border px-4 py-2">
-                              <input
-                                type="number"
-                                placeholder="Stock"
-                                name="dropStock"
-                                className="w-full border rounded p-2"
-                                value={variantInfo.dropStock || ''}
-                                onChange={(e) =>
-                                  handleVariantChange(variantInfo.id, 'dropStock', e.target.value)
-                                }
-                              />
-                            </td>
-
-                            <td className="border px-4 py-2">
-                              <input
-                                type="number"
-                                name="dropPrice"
-                                placeholder="Price"
-                                className="w-full border rounded p-2"
-                                value={variantInfo.dropPrice || ''}
-                                onChange={(e) =>
-                                  handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)
-                                }
-                              />
-                            </td>
-
-                            <td className="border px-4 py-2">
-                              <label className="flex mt-2 items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  name="Dropstatus"
-                                  className="sr-only"
-                                  checked={!!variantInfo.Dropstatus}
-                                  onChange={(e) =>
-                                    handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)
-                                  }
-                                />
-                                <div
-                                  className={`relative w-10 h-5 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : 'bg-gray-300'
-                                    }`}
-                                >
-                                  <div
-                                    className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
-                                      }`}
-                                  ></div>
-                                </div>
-                              </label>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-
-                  <div className="mt-4">
-                    <label className="block font-semibold">Select Shopify Store</label>
+                  <div className="mb-2">
                     <select
-                      className="w-full mt-2 border p-2 rounded-md"
+                      className="w-full mt-1 border border-[#E0E2E7] shadow p-2 rounded-md"
                       name="shopifyApp"
                       id="shopifyApp"
                       onChange={(e) =>
@@ -626,20 +513,119 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
                       ))}
                     </select>
                   </div>
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                    {inventoryData.variant?.map((v, idx) => {
+                      const variantInfo = {
+                        ...(v.variant || {}),
+                        ...v,
+                      };
+
+                      const imageUrls = variantInfo.image
+                        ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
+                        : [];
+
+                      return (
+                        <div
+                          key={variantInfo.id || idx}
+                          className="relative bg-white border border-[#E0E2E7] shadow rounded-lg p-4  hover:shadow-lg transition group"
+                        >
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="flex gap-2 overflow-x-auto max-w-[120px]">
+                              {imageUrls.length > 0 ? (
+                                imageUrls.map((url, i) => (
+                                  <Image
+                                    key={i}
+                                    height={100}
+                                    width={100}
+                                    src={`https://placehold.co/600x400?text=${idx + 1}`}
+                                    alt={variantInfo.name || 'NIL'}
+                                    className="shrink-0 border border-[#E0E2E7] shadow "
+                                  />
+                                ))
+                              ) : (
+                                <Image
+                                  height={40}
+                                  width={40}
+                                  src="https://placehold.co/600x400"
+                                  alt="Placeholder"
+                                  className="rounded shrink-0"
+                                />
+                              )}
+                            </div>
+                            <div>
+                              <p className="font-semibold">Model: {variantInfo.modal || 'NIL'}</p>
+                              {isExists && (
+                                <>
+                                  <p>Name: {variantInfo.name || 'NIL'}</p>
+                                  <p>SKU: {variantInfo.sku || 'NIL'}</p>
+                                  <p>Color: {variantInfo.color || 'NIL'}</p>
+                                </>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <input
+                              type="number"
+                              placeholder="Stock"
+                              name="dropStock"
+                              className="w-full border border-[#E0E2E7] shadow rounded p-2"
+                              value={variantInfo.dropStock || ''}
+                              onChange={(e) => handleVariantChange(variantInfo.id, 'dropStock', e.target.value)}
+                            />
+                            <input
+                              type="number"
+                              placeholder="Price"
+                              name="dropPrice"
+                              className="w-full border border-[#E0E2E7] shadow rounded p-2"
+                              value={variantInfo.dropPrice || ''}
+                              onChange={(e) => handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)}
+                            />
+
+                            <label className="flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                name="Dropstatus"
+                                className="sr-only"
+                                checked={!!variantInfo.Dropstatus}
+                                onChange={(e) => handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)}
+                              />
+                              <div
+                                className={`relative w-10 h-5 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : 'bg-gray-300'}`}
+                              >
+                                <div
+                                  className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
+                                    }`}
+                                ></div>
+                              </div>
+                              <span className="ml-2 text-sm">{variantInfo.Dropstatus ? 'Active' : 'Inactive'}</span>
+                            </label>
+                          </div>
+
+
+
+                        </div>
+                      );
+                    })}
+                  </div>
+
+
+
 
                   <div className="flex justify-end space-x-3 mt-6">
                     <button
-                      onClick={() => {
-                        setShowPopup(false);
-                      }}
-                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                      onClick={() => setShowPopup(false)}
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
                     >
+                      <X size={16} />
                       Cancel
                     </button>
+
                     <button
                       onClick={handleSubmit}
-                      className="px-4 py-2 bg-green-600 text-white rounded"
+                      className="flex items-center gap-2 px-4 py-2 bg-[#F98F5C] text-white rounded hover:bg-[#e97b45] transition-colors"
                     >
+                      <Send size={16} />
                       Submit
                     </button>
                   </div>
@@ -657,95 +643,83 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
           </div>
         </div>
       )}
+
+
       {showVariantPopup && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
-            <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
+        <div className="fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-4xl shadow-xl relative">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-800">Variant Details</h2>
+              <button
+                onClick={() => setShowVariantPopup(false)}
+                className="text-gray-500 hover:text-gray-800 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
 
-            {(() => {
-              const isExists = selectedProduct?.product?.isVarientExists;
+            {/* Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
+              {selectedProduct.variants?.map((v, idx) => {
+                let variant = {};
+                if (activeTab === "notmy") {
+                  variant = { ...(v.variant || {}), ...v };
+                }
+                if (activeTab === "my") {
+                  const supplierProductVariant = v?.supplierProductVariant || {};
+                  variant = {
+                    ...(supplierProductVariant.variant || {}),
+                    ...v
+                  };
+                }
 
-              return (
-                <table className="min-w-full table-auto border border-gray-200">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border px-4 py-2">Image</th>
-                      <th className="border px-4 py-2">Modal</th>
-                      <th className="border px-4 py-2">Product Link</th>
-                      <th className="border px-4 py-2">Suggested Price</th>
+                const imageUrls = variant.image
+                  ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
+                  : [];
+
+                const isExists = selectedProduct?.product?.isVarientExists;
+
+                return (
+                  <div
+                    key={variant.id || idx}
+                    className="bg-white hover:border-orange-500 p-4 rounded-2xl shadow-md hover:shadow-xl border border-gray-200 transition-all duration-300 flex flex-col"
+                  >
+                    {/* Image */}
+                    <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
+                      {imageUrls.length > 0 ? (
+                        <img
+                          src={`https://placehold.co/600x400?text=${idx + 1}`}
+                          alt={`variant-img-${idx}`}
+                          className="h-full w-full object-cover p-3 rounded-md"
+                        />
+                      ) : (
+                        <span className="text-gray-400  text-xl font-bold">{idx + 1}</span>
+                      )}
+                    </div>
+
+                    {/* Text Info */}
+                    <div className="text-sm text-gray-700 space-y-1">
+                      <p><span className="font-semibold">Modal:</span> {variant.modal || "—"}</p>
+                      <p><span className="font-semibold">Suggested Price:</span> {v.price || v?.supplierProductVariant?.price || "—"}</p>
+
                       {isExists && (
                         <>
-                          <th className="border px-4 py-2">Name</th>
-                          <th className="border px-4 py-2">SKU</th>
-                          <th className="border px-4 py-2">Color</th>
+                          <p><span className="font-semibold">Name:</span> {variant.name || "—"}</p>
+                          <p><span className="font-semibold">SKU:</span> {variant.sku || "—"}</p>
+                          <p><span className="font-semibold">Color:</span> {variant.color || "—"}</p>
                         </>
                       )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedProduct.variants?.map((v, idx) => {
-                      let variant = {};
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
 
-                      console.log('selectedProduct', selectedProduct)
-                      if (activeTab === "notmy") {
-                        variant = { ...(v.variant || {}), ...v };
-                      }
-                      if (activeTab === "my") {
-                        const supplierProductVariant = v?.supplierProductVariant || {};
-
-                        variant = {
-                          ...(supplierProductVariant.variant || {}),
-                          ...v
-                        };
-                      }
-                      const imageUrls = variant.image
-                        ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-                        : [];
-
-                      return (
-                        <tr key={variant.id || idx}>
-                          <td className="border px-4 py-2">
-                            <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
-                              {imageUrls.length > 0 ? (
-                                imageUrls.map((imgUrl, imgIdx) => (
-                                  <img
-                                    key={imgIdx}
-                                    src={`https://placehold.co/600x400?text= ${idx + 1}`}
-                                    alt={`variant-img-${imgIdx}`}
-                                    className="w-16 h-16 object-cover rounded"
-                                  />
-                                ))
-                              ) : (
-                                <span className="text-gray-400">No Image</span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="border px-4 py-2">{variant.modal || "—"}</td>
-                          <td className="border px-4 py-2">{variant.product_link || "—"}</td>
-                          <td className="border px-4 py-2">{v.price || v?.supplierProductVariant?.price || "—"}</td>
-                          {isExists && (
-                            <>
-                              <td className="border px-4 py-2">{variant.name || "—"}</td>
-                              <td className="border px-4 py-2">{variant.sku || "—"}</td>
-                              <td className="border px-4 py-2">{variant.color || "—"}</td>
-                            </>
-                          )}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              );
-            })()}
-            <button
-              onClick={() => setShowVariantPopup(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-            >
-              ×
-            </button>
           </div>
         </div>
       )}
+
     </>
   );
 };
