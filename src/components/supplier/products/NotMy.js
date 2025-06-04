@@ -198,7 +198,7 @@ export default function NotMy() {
     <>
       <div>
         {productsRequest.length > 0 ? (
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-6">
+          <div className="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 xl:grid-cols-5 gap-6">
             {productsRequest.map((product) => {
               const firstVariant = product.variants?.[0];
               const imageUrl = productImage || "/placeholder.png"; // Fallback

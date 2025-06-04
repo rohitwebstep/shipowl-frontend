@@ -21,6 +21,7 @@ import Image from "next/image";
 import Logo from "@/app/assets/Shipowl-logo1.png";
 import { HiBars3CenterLeft } from "react-icons/hi2";
 import { FaShopify } from "react-icons/fa";
+import { FileBarChart2 } from "lucide-react";
 
 const menuItems = [
   { name: "Home", icon: Home, href: "/dropshipping", section: "MENU" },
@@ -47,6 +48,7 @@ const menuItems = [
     ]
   },
   { name: "Link Shopify Store", icon: FaShopify, href: "/dropshipping/store/link", section: "MENU" },
+  { name: "Reporting", icon: FileBarChart2, href: "/dropshipping/reporting", section: "MENU" },
   { name: "Manage Products (In progress)", icon: Package, href: "/dropshipping/manage-products", section: "MENU" },
   { name: "Subuser Listing", icon: Package, href: "/dropshipping/sub-user/list", section: "MENU" },
   { name: "Profile", icon: Package, href: "/dropshipping/profile", section: "MENU" },

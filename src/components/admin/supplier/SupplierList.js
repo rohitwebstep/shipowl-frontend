@@ -158,14 +158,17 @@ const SupplierList = () => {
             </div>
         );
     }
- 
 
-const inactiveSuppliers = suppliers.filter((supplier) => {
-  const status = supplier.status?.toLowerCase?.().trim?.() || '';
-  return status === 'inactive';
-});
 
-const isDisabled = !inactiveSuppliers || inactiveSuppliers.length === 0;
+    const inactiveSuppliers = suppliers.filter((supplier) => {
+        const status = supplier.status?.toLowerCase?.().trim?.() || '';
+        return status === 'inactive';
+    });
+
+    const isDisabled = !inactiveSuppliers || inactiveSuppliers.length === 0;
+    const checkReporting = (id) => {
+        router.push(`/admin/supplier/reporting?id=${id}`);
+    }
     return (
 
         <div className="bg-white rounded-3xl p-5">
@@ -258,6 +261,7 @@ const isDisabled = !inactiveSuppliers || inactiveSuppliers.length === 0;
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Postal Code</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">View More</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Status</th>
+                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Check Reporting</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
@@ -313,12 +317,12 @@ const isDisabled = !inactiveSuppliers || inactiveSuppliers.length === 0;
                                             </td>
 
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                <span
+                                                <button
                                                     onClick={() =>
                                                         fetchSupplierStatus(item.id, item.status?.toLowerCase() === 'active' ? 'inactive' : 'active')
                                                     }
 
-                                                    className={`p-2 cursor-pointer capitalize rounded-md text-sm text-left whitespace-nowrap text-white ${item.status?.toLowerCase() === 'inactive'
+                                                    className={`p-2 cursor-pointer capitalize rounded-md px-3 text-left whitespace-nowrap text-white ${item.status?.toLowerCase() === 'inactive'
                                                         ? 'bg-green-500'
                                                         : item.status?.toLowerCase() === 'active'
                                                             ? 'bg-red-500'
@@ -326,7 +330,15 @@ const isDisabled = !inactiveSuppliers || inactiveSuppliers.length === 0;
                                                         }`}
                                                 >
                                                     {item.status?.toLowerCase() === 'active' ? 'inactive' : 'active' || 'N/A'}
-                                                </span>
+                                                </button>
+                                            </td>
+                                            <td className="p-3 px-4 text-left whitespace-nowrap">
+                                                <button
+                                                    className='bg-orange-500 rounded-md text-white p-3'
+                                                    onClick={()=>checkReporting(item.id)}
+                                                >
+                                                    View Reporting
+                                                </button>
                                             </td>
 
 

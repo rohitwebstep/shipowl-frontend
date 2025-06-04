@@ -576,7 +576,7 @@ export default function My() {
                 <>
 
 
-                    <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
+                    <div className="grid lg:grid-cols-4 xl:grid-cols-5 md:grid-cols-2 gap-6">
                         {products.map((product) => {
                             const variant = product?.product?.variants?.[0];
                             const imageUrl =

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { BiSolidCategory } from "react-icons/bi";
 import { TbBrandBinance } from "react-icons/tb";
+import { FileBarChart2} from "lucide-react";
 
 import logo from "@/app/images/Shipowllogo.png";
 
@@ -44,6 +45,7 @@ export default function Sidebar() {
     },
     { name: "New Product Request", icon: Package, href: "/supplier/product/request" },
     { name: "Orders", icon: ClipboardList, href: "/supplier/orders" },
+    { name: "Reporting", icon: FileBarChart2, href: "/supplier/reporting" },
     { name: "Warehouse", icon: Warehouse, href: "/supplier/warehouse" },
     { name: "Category Management", icon: BiSolidCategory, href: "/supplier/category/list" },
     { name: "Subuser Listing", icon: Package, href: "/supplier/sub-user/list" },

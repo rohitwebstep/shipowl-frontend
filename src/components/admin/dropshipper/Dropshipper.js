@@ -3,7 +3,7 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
-import React, { useState, useCallback, useEffect,useContext  } from "react";
+import React, { useState, useCallback, useEffect, useContext } from "react";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
@@ -13,7 +13,7 @@ import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { useAdminActions } from '@/components/commonfunctions/MainContext';
 import { DropshipperProfileContext } from './DropshipperProfileContext';
 
-const SupplierList = () => {
+const Dropshipper = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [dropshippers, setDropshippers] = useState([]);
     const { verifyAdminAuth } = useAdmin();
@@ -22,7 +22,7 @@ const SupplierList = () => {
     const [loading, setLoading] = useState(false);
     const [expandedItem, setExpandedItem] = useState(null);
     const [selected, setSelected] = useState([]);
-    const { setActiveTab} = useContext(DropshipperProfileContext);
+    const { setActiveTab } = useContext(DropshipperProfileContext);
 
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/dropshipper", "dropshippers");
 
@@ -40,17 +40,10 @@ const SupplierList = () => {
             await fetchAll(setDropshippers, setLoading);
         }
     };
-   
-
 
     const handleSoftDelete = (id) => softDelete(id, () => fetchAll(setDropshippers, setLoading));
     const handleRestore = (id) => restore(id, () => fetchTrashed(setDropshippers, setLoading));
     const handleDestroy = (id) => destroy(id, () => fetchTrashed(setDropshippers, setLoading));
-
-   
-
-
-
 
 
     useEffect(() => {
@@ -96,7 +89,9 @@ const SupplierList = () => {
         }
     }, [loading]);
 
-
+    const checkReporting = (id) => {
+        router.push(`/admin/dropshipper/reporting?id=${id}`);
+    }
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-[300px]">
@@ -141,7 +136,7 @@ const SupplierList = () => {
 
                 </div>
             </div>
-        
+
 
             {dropshippers.length > 0 ? (
                 <div className="overflow-x-auto w-full relative main-outer-wrapper">
@@ -157,6 +152,7 @@ const SupplierList = () => {
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">City</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Postal Code</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">View More</th>
+                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Check Reporting</th>
                                 <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
@@ -209,7 +205,15 @@ const SupplierList = () => {
                                                 </button>
                                             </td>
 
-                                           
+
+                                            <td className="p-3 px-4 text-left whitespace-nowrap">
+                                                <button
+                                                    className='bg-orange-500 rounded-md text-white p-3'
+                                                    onClick={() => checkReporting(item.id)}
+                                                >
+                                                    View Reporting
+                                                </button>
+                                            </td>
 
 
                                             <td className="p-3 px-4 text-center">
@@ -286,4 +290,4 @@ const SupplierList = () => {
 
 };
 
-export default SupplierList;
+export default Dropshipper;

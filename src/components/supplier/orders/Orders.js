@@ -34,6 +34,8 @@ export default function Orders() {
     model: 'Warehouse Model',
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [noteInput, setNoteInput] = useState("");
+  const [selectedNoteOrder, setSelectedNoteOrder] = useState(null);
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const today = new Date();
@@ -92,6 +94,17 @@ export default function Orders() {
         ? prev.filter(item => item !== id)
         : [...prev, id]
     );
+  };
+  const handleSaveNote = () => {
+    if (selectedNoteOrder) {
+      // Find the order and update its note - implement this based on your backend/API
+      console.log(`Saving note for order ${selectedNoteOrder}:`, noteInput);
+      // Example: call API to save note here
+
+      setIsNoteModalOpen(false);
+      setSelectedNoteOrder(null);
+      setNoteInput("");
+    }
   };
 
   const fetchOrders = useCallback(async () => {
@@ -515,7 +528,6 @@ export default function Orders() {
             </select>
           </div>
           <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md text-sm">All Orders ({orders.length})</button>
-          <InvoicePdf />
           <button className="bg-[#EE5D50] text-white font-medium px-4 py-2 rounded-md text-sm">Pending ({pendingCount})</button>
           <button className="bg-[#4C82FF] text-white font-medium px-4 py-2 rounded-md text-sm">Ready to Pickup (10)</button>
           <button className="bg-[#F98F5C] text-white font-medium px-4 py-2 rounded-md text-sm">In Transit (10)</button>
@@ -577,13 +589,14 @@ export default function Orders() {
                   <th className="p-2 px-5 text-left uppercase">Payment Info</th>
                   <th className="p-2 px-5 text-left uppercase">Shipment Details</th>
                   <th className="p-2 px-5 text-left uppercase">Order Status</th>
-                  <th className="p-2 px-5 text-left uppercase">Download Inovice</th>
+                  <th className="p-2 px-5 text-left uppercase">Download Invoice</th>
                   <th className="p-2 px-5 text-center uppercase">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredOrders.map((order) => (
                   <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
+                    {/* Order ID */}
                     <td className="p-2 whitespace-nowrap px-5">
                       <div className="flex items-start">
                         <label className="flex mt-2 items-center cursor-pointer me-2">
@@ -594,14 +607,14 @@ export default function Orders() {
                             className="peer hidden"
                           />
                           <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                     peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
                             <FaCheck className="peer-checked:block text-white w-3 h-3" />
                           </div>
                         </label>
                         <div>
-                          <b className="text-black truncate uppercase">{order.orderNumber}</b>
-                          <br />
-                          <span>
+                          <p><b>Order Number:</b><b className="text-black ms-2  truncate uppercase">{order.orderNumber}</b></p>
+                       
+                          <span><b>createdAt:</b>
                             {typeof order.createdAt === "string" && order.createdAt
                               ? new Date(order.createdAt).toLocaleString()
                               : "N/A"}
@@ -610,6 +623,7 @@ export default function Orders() {
                       </div>
                     </td>
 
+                    {/* Product Info */}
                     <td className="p-2 whitespace-nowrap px-5">
                       {order.items?.length > 0 ? (
                         order.items.map((item, index) => (
@@ -632,74 +646,40 @@ export default function Orders() {
                       )}
                     </td>
 
+                    {/* Payment Info */}
+                    <td className="p-2 whitespace-nowrap px-5">
+                      <span>Transaction Id: {order.payment?.transactionId}</span>
+                      <br />
+                      <span className="block">Amount: ₹{order.payment?.amount}</span><p>
+                        <b>Status:</b>
+                        <span
+                          className={`px-2 py-1 rounded ms-2 inline-block text-white text-sm capitalize ${order.payment?.status === "success"
+                            ? "bg-green-500"
+                            : order.payment?.status === "cancelled"
+                              ? "bg-red-500"
+                              : order.payment?.status === "pending"
+                                ? "bg-yellow-500 text-black"
+                                : "bg-gray-400"
+                            }`}
+                        >
+                          {order.payment?.status}
+                        </span>
+                      </p>
 
-                    <td className="p-2 whitespace-nowrap px-5">
-                      <span>Transaction Id: {order.payment.transactionId}</span>
-                      <br />
-                      <span className='block'>Amount: {order.payment.amount}</span>
-                      <span
-                        className={`px-2 py-1 rounded inline-block text-white text-sm capitalize ${order.payment.status === "success"
-                          ? "bg-green-500"
-                          : order.payment.status === "cancelled"
-                            ? "bg-red-500"
-                            : order.payment.status === "pending"
-                              ? "bg-yellow-500 text-black"
-                              : "bg-gray-400"
-                          }`}
-                      >
-                        {order.payment.status}
-                      </span>
-                    </td>
-                    <td className="p-2 whitespace-nowrap px-5">
-                      <span>{order.shippingName}</span>
-                      <br />
-                      <span className="text-[#05CD99]">{order.shippingPhone}</span>
-                      <br />
-                      <span>{order.shippingAddress}</span>
-                      <br />
-                      <span>{order.shippingZip}</span>
                     </td>
 
-                    {isNoteModalOpen && (
-                      <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
-                          <button
-                            onClick={() => setIsNoteModalOpen(false)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-black"
-                          >
-                            ✕
-                          </button>
-                          <h2 className="text-lg font-bold mb-4">Order Notes</h2>
-                          <textarea
-                            className="w-full border p-2 rounded-xl mb-4"
-                            rows={4}
-                            value={order?.orderNote}
-                            placeholder="Add your note here..."
-                          />
-                          <div className="flex justify-end gap-2">
-                            <button
-                              onClick={() => setIsNoteModalOpen(false)}
-                              className="bg-gray-200 px-4 py-2 rounded-md"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={() => {
-                                // Submit logic here
-                                setIsNoteModalOpen(false);
-                              }}
-                              className="bg-blue-600 text-white px-4 py-2 rounded-md"
-                            >
-                              Save
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                    {/* Shipment Info */}
+                    <td className="p-2 whitespace-nowrap px-5">
+                      <span><b>Shipping Name:</b> {order.shippingName}</span><br />
+                      <span><b>Phone:</b> <span className="text-[#05CD99]">{order.shippingPhone}</span></span><br />
+                      <span><b>Address:</b> {order.shippingAddress}</span><br />
+                      <span><b>Zip:</b> {order.shippingZip}</span>
+                    </td>
 
+                    {/* Order Status */}
                     <td className="p-2 whitespace-nowrap px-5">
                       <span
-                        className={`px-2 py-1 rounded w-max  inline-block text-white text-sm capitalize  ${order.status === "success"
+                        className={`px-2 py-1 rounded w-max inline-block text-white text-sm capitalize ${order.status === "success"
                           ? "bg-green-500"
                           : order.status === "cancelled"
                             ? "bg-red-500"
@@ -711,22 +691,35 @@ export default function Orders() {
                         {order.status}
                       </span>
                     </td>
-                    <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md text-sm">Generate Invoice</button>
 
+                    {/* Download Invoice */}
                     <td className="p-2 whitespace-nowrap px-5">
-                      <ul className="flex gap-6 justify-end ">
+                      <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md text-sm">
+                        Generate Invoice
+                      </button>
+                    </td>
+
+                    {/* Action */}
+                    <td className="p-2 whitespace-nowrap px-5">
+                      <ul className="flex gap-6 justify-end">
                         <li><RiFileEditFill className="text-black text-3xl" /></li>
                         <li><IoCloudDownloadOutline className="text-black text-3xl" /></li>
                         <li><RxCrossCircled className="text-black text-3xl" /></li>
                         <li><IoIosArrowDropdown className="text-black text-3xl" /></li>
                       </ul>
-                      <div className="flex gap-3 justify-end">
+
+                      <div className="flex gap-3 justify-end items-center mt-2">
                         <button
-                          onClick={() => setIsNoteModalOpen(true)}
-                          className="text-[#F98F5C] border rounded-md font-dm-sans p-2 w-auto mt-2 text-sm"
+                          onClick={() => {
+                            setNoteInput(order.orderNote || "");
+                            setSelectedNoteOrder(order.id);
+                            setIsNoteModalOpen(true);
+                          }}
+                          className="text-[#F98F5C] border rounded-md font-dm-sans p-2 w-auto  text-sm"
                         >
                           View / Add Notes
                         </button>
+
 
                         {!order.shippingApiResult?.data?.awb_number ? (
                           <button
@@ -735,10 +728,10 @@ export default function Orders() {
                           >
                             Shipping
                           </button>
-                        ) : order.shippingApiResult?.data?.awb_number ? (
+                        ) : (
                           <>
                             <button
-                              className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md text-sm mr-2"
+                              className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md text-sm"
                               onClick={() => handleTracking(order.id)}
                             >
                               Tracking
@@ -750,16 +743,48 @@ export default function Orders() {
                               Cancel
                             </button>
                           </>
-                        ) : null}
-
+                        )}
                       </div>
-
                     </td>
                   </tr>
                 ))}
               </tbody>
-
             </table>
+            {isNoteModalOpen && (
+              <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+                  <button
+                    onClick={() => setIsNoteModalOpen(false)}
+                    className="absolute top-2 right-2 text-gray-500 hover:text-black"
+                  >
+                    ✕
+                  </button>
+                  <h2 className="text-lg font-bold mb-4">Order Notes</h2>
+                  <textarea
+                    className="w-full border p-2 rounded-xl mb-4"
+                    rows={4}
+                    value={noteInput}
+                    onChange={(e) => setNoteInput(e.target.value)}
+                    placeholder="Add your note here..."
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => setIsNoteModalOpen(false)}
+                      className="bg-gray-200 px-4 py-2 rounded-md"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveNote}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
 
           </div>
         ) : (
