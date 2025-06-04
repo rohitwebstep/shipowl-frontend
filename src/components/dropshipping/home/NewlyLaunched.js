@@ -390,7 +390,7 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
               {/* Image */}
               <div className="overflow-hidden rounded-t-xl">
                 <motion.img
-                  src={productimg}
+                  src={productimg.src }
                   alt={productName}
                   onClick={() => viewProduct(product.id, type)}
                   width={300}

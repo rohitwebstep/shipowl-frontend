@@ -7,7 +7,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { HashLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
-import { X, Check, Link2 } from "lucide-react"; // Icons
+import { X, FileText, Tag, Truck } from "lucide-react"; // Icons
+import { FaEye } from "react-icons/fa";
 export default function My() {
     const { verifySupplierAuth } = useSupplier();
     const [products, setProducts] = useState([]);
@@ -573,109 +574,154 @@ export default function My() {
                 </div>
             ) : (
                 <>
+
+
                     <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
-                        {products.map((product, index) => {
+                        {products.map((product) => {
                             const variant = product?.product?.variants?.[0];
-                            const imageUrl = variant?.image?.split(",")?.[0]?.trim() || productimg;
+                            const imageUrl =
+                                variant?.image?.split(",")?.[0]?.trim() || productimg;
                             const productName = product?.product?.name || "NIL";
 
                             return (
                                 <div
                                     key={product.id}
-                                    className="bg-white rounded-2xl overflow-hidden   border border-[#B9B9B9]"
+                                    className="group bg-white rounded-2xl overflow-hidden border border-[#B9B9B9] shadow-sm hover:shadow-lg transition-all duration-300 relative"
                                 >
-                                    <div className='relative'>
-                                        <Image
-                                            src={imageUrl}
-                                            alt={productName}
-                                            height={300}
-                                            width={100}
-                                            className="w-full md:h-[300px]  object-cover"
-                                        />
-                                        <div className="absolute top-2 right-2 flex gap-2 z-10">
-                                            {isTrashed ? (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleRestore(product)}
-                                                        className="bg-orange-500 text-white px-3 py-1 text-sm rounded"
-                                                    >
-                                                        Restore
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handlePermanentDelete(product)}
-                                                        className="bg-red-500 text-white px-3 py-1 text-sm rounded"
-                                                    >
-                                                        Permanent Delete
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleEdit(product, product.id)}
-                                                        className="bg-yellow-500 text-white px-3 py-1 text-sm rounded"
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(product)}
-                                                        className="bg-red-500 text-white px-3 py-1 text-sm rounded"
-                                                    >
-                                                        Trash
-                                                    </button>
-                                                </>
-                                            )}
+                                    {/* FLIPPING IMAGE */}
+                                    <div className="relative h-[200px] perspective">
+                                        <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                                            {/* FRONT */}
+                                            <Image
+                                                src={imageUrl}
+                                                alt={productName}
+                                                height={200}
+                                                width={100}
+                                                className="w-full h-full object-cover backface-hidden"
+                                            />
+                                            {/* BACK (optional or just black layer) */}
+                                            <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
+                                                <span className="text-sm">Back View</span>
+                                            </div>
                                         </div>
                                     </div>
 
+                                    {/* CONTENT */}
+                                    <div className="p-3 relative ">
+                                        <div className="flex justify-between items-center">
+                                            <h2 className="text-lg font-semibold">{productName}</h2>
+                                            {product.variants.length > 0 && (
+                                                <p className="text-black font-bold">
+                                                    ₹
+                                                    {product.variants.length === 1
+                                                        ? product.variants[0]?.price || 0
+                                                        : Math.min(...product.variants.map((v) => v?.price || 0))}
+                                                </p>
+                                            )}
+                                        </div>
 
-
-                                    <div className="mt-3 p-3">
-                                        <div className="flex justify-between">
-                                            <div>
-                                                <h2 className="text-lg font-semibold nunito">
-                                                    {productName}
-                                                </h2>
+                                        <div className="mt-2 space-y-1 text-sm text-gray-700">
+                                            <div className="flex items-center gap-2">
+                                                <FileText size={16} />
+                                                <span>
+                                                    {product?.product?.description || "No description"}
+                                                </span>
                                             </div>
-                                            <div className="text-right">
-                                                {product.variants.length > 0 && (
-                                                    <p className="text-black font-bold nunito">
-                                                        ₹ {
-                                                            product.variants.length === 1
-                                                                ? product.variants[0]?.price || 0
-                                                                : Math.min(
-                                                                    ...product.variants.map(v =>
-                                                                        v?.price || 0
-                                                                    )
-                                                                )
-                                                        }
-                                                    </p>
-                                                )}
-
-
-                                                {/* <p className="text-sm text-[#202224] nunito">
-                                                        Exp. Orders: {product.expectedDailyOrders || 0}
-                                                    </p> */}
+                                            <div className="flex items-center gap-2">
+                                                <Tag size={16} />
+                                                <span>SKU: {product?.product?.main_sku || "N/A"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Truck size={16} />
+                                                <span>
+                                                    Shipping Time: {product?.product?.shipping_time || "N/A"}
+                                                </span>
                                             </div>
                                         </div>
 
                                         <button
-                                            onClick={() => {
+                                            onClick={(e) => {
+                                                e.stopPropagation();
                                                 setSelectedProduct(product);
                                                 setShowVariantPopup(true);
                                             }}
-                                            className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
+                                            className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF] transition hover:bg-blue-700"
                                         >
                                             View Variants
                                         </button>
+
+                                        {/* Sliding buttons on hover */}
+                                        <div
+                                            className="absolute bottom-0 shadow border border-gray-100 left-0 w-full p-3 bg-white z-10 opacity-0 translate-y-4
+                       group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
+                       pointer-events-none group-hover:pointer-events-auto"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                {isTrashed ? (
+                                                    <>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleRestore(product);
+                                                            }}
+                                                            className="bg-orange-500 text-white px-3 py-1 text-sm rounded hover:bg-orange-600"
+                                                        >
+                                                            Restore
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handlePermanentDelete(product);
+                                                            }}
+                                                            className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600"
+                                                        >
+                                                            Permanent Delete
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleEdit(product, product.id);
+                                                            }}
+                                                            className="bg-yellow-500 text-white px-3 py-1 text-sm rounded hover:bg-yellow-600"
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDelete(product);
+                                                            }}
+                                                            className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600"
+                                                        >
+                                                            Trash
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setSelectedProduct(product);
+                                                                setShowVariantPopup(true);
+                                                            }}
+                                                            className="py-2 px-2 text-white rounded-md text-sm  bg-[#3965FF] transition hover:bg-blue-700"
+                                                        >
+                                                            <FaEye />
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
 
+
                     {showPopup && (
                         <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
-                            <div className="bg-white p-6 rounded-lg border-orange-500 w-full border  max-w-5xl shadow-xl relative">
+                            <div className="bg-white p-6 rounded-lg border-orange-500 w-full border  max-w-4xl shadow-xl relative">
                                 <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
 
                                 {(() => {
@@ -722,7 +768,6 @@ export default function My() {
                                                                             <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
                                                                         </>
                                                                     )}
-                                                                    <p><span className="font-semibold">Suggested Price:</span> {variant.lowestOtherSupplierSuggestedPrice || variant.price || "NIL"}</p>
                                                                 </div>
                                                             </div>
 
@@ -808,8 +853,8 @@ export default function My() {
                     )}
 
                     {showVariantPopup && selectedProduct && (
-                           <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
-                            <div className="bg-white p-6 rounded-lg border-orange-500 border w-full max-w-5xl shadow-xl relative">
+                        <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+                            <div className="bg-white p-6 rounded-lg border-orange-500 border w-full max-w-4xl shadow-xl relative">
                                 <h2 className="text-2xl font-bold mb-6">Variant Details</h2>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -827,7 +872,7 @@ export default function My() {
                                                 key={variant.id || idx}
                                                 className="bg-white border hover:border-orange-500 border-gray-200 rounded-xl shadow hover:shadow-lg transition p-4 "
                                             >
-                                                <div className="flex  overflow-x-auto max-w-full pb-2">
+                                                <div className="overflow-x-auto max-w-full pb-2">
                                                     {imageUrls.length > 0 ? (
                                                         imageUrls.map((url, i) => (
                                                             <Image
@@ -836,23 +881,23 @@ export default function My() {
                                                                 width={100}
                                                                 src={url}
                                                                 alt={variant.name || 'Image'}
-                                                                className="rounded border w-14 h-14 object-cover"
+                                                                className="rounded border w-full  object-cover"
                                                             />
                                                         ))
                                                     ) : (
                                                         <Image
-                                                            height={100}
-                                                            width={100}
+                                                            height={80}
+                                                            width={80}
                                                             src="https://placehold.co/400"
                                                             alt="Placeholder"
-                                                            className="rounded border w-14 h-14 object-cover"
+                                                            className="rounded border h-[150px] w-full object-cover"
                                                         />
                                                     )}
                                                 </div>
 
                                                 <div>
                                                     <p><span className="font-semibold">Model:</span> {variant.modal || 'NIL'}</p>
-                                                    
+
                                                     <p><span className="font-semibold">Suggested Price:</span> ₹{variants.price ?? 'NIL'}</p>
                                                 </div>
 

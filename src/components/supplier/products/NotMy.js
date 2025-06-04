@@ -299,7 +299,6 @@ export default function NotMy() {
                                   <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
                                 </>
                               )}
-                              <p><span className="font-semibold">Suggested Price:</span>{variant.lowestOtherSupplierSuggestedPrice ? variant.lowestOtherSupplierSuggestedPrice : variant.suggested_price ?? 'NIL'}</p>
                             </div>
                           </div>
 
