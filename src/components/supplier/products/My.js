@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { HashLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
-import { X, FileText, Tag, Truck } from "lucide-react"; // Icons
+import { X, FileText, Tag, Truck,Pencil,RotateCcw , Trash2, Eye } from "lucide-react"; // Icons
 import { FaEye } from "react-icons/fa";
 export default function My() {
     const { verifySupplierAuth } = useSupplier();
@@ -666,7 +666,7 @@ export default function My() {
                                                             }}
                                                             className="bg-orange-500 text-white px-3 py-1 text-sm rounded hover:bg-orange-600"
                                                         >
-                                                            Restore
+                                                            <RotateCcw/>
                                                         </button>
                                                         <button
                                                             onClick={(e) => {
@@ -675,7 +675,7 @@ export default function My() {
                                                             }}
                                                             className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600"
                                                         >
-                                                            Permanent Delete
+                                                             <Trash2/>
                                                         </button>
                                                     </>
                                                 ) : (
@@ -687,7 +687,7 @@ export default function My() {
                                                             }}
                                                             className="bg-yellow-500 text-white px-3 py-1 text-sm rounded hover:bg-yellow-600"
                                                         >
-                                                            Edit
+                                                        <Pencil/>
                                                         </button>
                                                         <button
                                                             onClick={(e) => {
@@ -696,7 +696,7 @@ export default function My() {
                                                             }}
                                                             className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600"
                                                         >
-                                                            Trash
+                                                          <Trash2/>
                                                         </button>
                                                         <button
                                                             onClick={(e) => {

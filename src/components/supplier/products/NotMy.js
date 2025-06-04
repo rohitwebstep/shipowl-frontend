@@ -7,6 +7,7 @@ import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import { useEffect, useState, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import { HashLoader } from 'react-spinners';
+import { X, FileText, Tag, Truck } from "lucide-react"; // Icons
 
 export default function NotMy() {
   const { verifySupplierAuth } = useSupplier();
@@ -197,60 +198,107 @@ export default function NotMy() {
     <>
       <div>
         {productsRequest.length > 0 ? (
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
-            {productsRequest.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-2xl overflow-hidden border border-[#B9B9B9]"
-              >
-                <Image
-                  src={product.image || productImage}
-                  alt={product.name || "Product"}
-                  width={400}
-                  height={300}
-                  className="w-full object-cover"
-                />
-                <div className="mt-3 p-3">
-                  <div className="flex justify-between">
-                    <div>
-                      <h2 className="text-lg font-semibold nunito">{product.name}</h2>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-black font-bold nunito">
-                        ₹
-                        {product.variants.length === 1
-                          ? product.variants[0]?.suggested_price || 0
-                          : Math.min(
-                            ...product.variants.map(
-                              (v) => v?.suggested_price ?? Infinity
-                            )
-                          )}
-                      </p>
+          <div className="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-6">
+            {productsRequest.map((product) => {
+              const firstVariant = product.variants?.[0];
+              const imageUrl = productImage || "/placeholder.png"; // Fallback
+              const productName = product.name || "Unnamed Product";
 
-                      {/* <p className="text-sm text-[#202224] nunito">Exp. Orders: {product.expectedDailyOrders || 0}</p> */}
+              const price =
+                product.variants.length === 1
+                  ? firstVariant?.suggested_price || 0
+                  : Math.min(...product.variants.map(v => v?.suggested_price ?? Infinity));
+
+              return (
+                <div
+                  key={product.id}
+                  className="group bg-white rounded-2xl overflow-hidden border border-[#B9B9B9] shadow-sm hover:shadow-lg transition-all duration-300 relative"
+                >
+                  {/* Flip Image Section */}
+                  <div className="relative h-[200px] perspective">
+                    <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                      {/* FRONT */}
+                      <Image
+                        src={imageUrl}
+                        alt={productName}
+                        height={200}
+                        width={100}
+                        className="w-full h-full object-cover backface-hidden"
+                      />
+                      {/* BACK (optional or just black layer) */}
+                      <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
+                        <span className="text-sm">Back View</span>
+                      </div>
                     </div>
                   </div>
-                  <button
-                    onClick={() => {
-                      setShowPopup(true),
-                        setInventoryData({
-                          productId: product.id,
-                          variant: product.variants,
-                          id: product.id,
-                          isVarientExists: product.isVarientExists,
-                        })
-                    }} className="mt-2 w-full bg-blue-500 nunito text-white px-4 py-2 rounded font-semibold">
-                    Add to list
-                  </button>
+                  {/* Content */}
+                  <div className="p-3 relative">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-lg font-semibold nunito">{productName}</h2>
+                      <p className="text-black font-bold nunito">₹{price}</p>
+                    </div>
+
+                    <div className="mt-2 space-y-1 text-sm text-gray-700">
+                      <div className="flex items-center gap-2">
+                        <FileText size={16} />
+                        <span>
+                          {product?.description || "No description"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Tag size={16} />
+                        <span>SKU: {product?.main_sku || "N/A"}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Truck size={16} />
+                        <span>
+                          Shipping Time: {product?.shipping_time || "N/A"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                   
+                      className="mt-3 w-full bg-orange-500 text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition"
+                    >
+                      Add to List
+                    </button>
+
+                    {/* Hover Action Buttons */}
+                    <div
+                      className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 opacity-0 translate-y-4
+                      group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
+                      pointer-events-none group-hover:pointer-events-auto shadow border border-gray-100"
+                    >
+                      <div className="flex items-center gap-2">
+
+                        <button
+                          onClick={() => {
+                            setShowPopup(true);
+                            setInventoryData({
+                              productId: product.id,
+                              variant: product.variants,
+                              id: product.id,
+                              isVarientExists: product.isVarientExists,
+                            });
+                          }}
+                          className="mt-3 w-full bg-blue-500 text-white px-4 py-2 rounded font-semibold hover:bg-blue-600 transition"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
         ) : (
           <p className="text-center">No Products Found</p>
         )}
       </div>
-       {showPopup && (
+      {showPopup && (
         <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
             <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>

@@ -10,7 +10,6 @@ import { HashLoader } from 'react-spinners';
 import productimg from '@/app/assets/product1.png';
 import gift from '@/app/assets/gift.png';
 import ship from '@/app/assets/delivery.png';
-import { motion, AnimatePresence } from "framer-motion";
 import { X, Send } from "lucide-react"; // Lucide icons
 
 
@@ -367,7 +366,7 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
 
       <div className="products-grid  grid xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
         <div className="grid bg-[#212B36] rounded-xl shadow-xl overflow-hidden cursor-default">
-          <Image src={productimg} alt={`Best of ${title}`} className={`w-full  object-cover ${activeTab == "notmy" ? "max-h-[300px]" : "max-h-[270px]"}`} />
+          <Image src={productimg} alt={`Best of ${title}`} className={`w-full  object-cover ${activeTab == "notmy" ? "max-h-[250px]" : "max-h-[230px]"}`} />
           <div className="bg-[#212B36] bg-opacity-50 p-4 px-2 text-center text-white">
             <p className="text-[16px] font-semibold font-lato">Best of {title}</p>
             <p className="text-[15px] text-[#F98F5C] font-lato">{products.length} Products</p>
@@ -375,32 +374,34 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
         </div>
 
         {products.map((product, index) => {
-          const variant = product?.product?.variants?.[0];
-          const imageUrl = variant?.image?.split(",")?.[0]?.trim() || "/default-image.png";
+
           const productName = product?.product?.name || "NIL";
 
           return (
 
-            <motion.div
+            <div
               key={index}
-              whileHover={{ y: -8 }} // Slide up on hover
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="group relative bg-white rounded-xl shadow-sm hover:shadow-lg transition-transform duration-300 overflow-hidden mb-6" // Add spacing between cards
+              className="bg-white rounded-xl group  overflow-hidden  cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02]"
             >
-              {/* Image */}
-              <div className="overflow-hidden rounded-t-xl">
-                <motion.img
-                  src={productimg.src }
-                  alt={productName}
-                  onClick={() => viewProduct(product.id, type)}
-                  width={300}
-                  height={200}
-                  className="w-full h-48 object-cover transform transition-transform duration-300 group-hover:scale-105"
-                />
+              <div className="relative h-[200px] perspective">
+                <div className="relative  overflow-hidden  w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                  {/* FRONT */}
+                  <Image
+                    src={productimg}
+                    alt={productName}
+                    height={200}
+                    width={100}
+                    className="w-full h-full object-cover backface-hidden"
+                  />
+                  {/* BACK (optional or just black layer) */}
+                  <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
+                    <span className="text-sm">Back View</span>
+                  </div>
+                </div>
               </div>
 
               {/* Content */}
-              <div className="p-3 pb-24 mb-4 relative z-0 bg-white">
+              <div className="p-3 group-hover:pb-24 mb-4 relative z-0 bg-white">
                 <div className="flex justify-between items-center">
                   <p className="text-black font-bold nunito">
                     ₹
@@ -416,31 +417,32 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
                       )}
                   </p>
                 </div>
-                <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">{productName}</p>
+                <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">
+                  {productName}
+                </p>
 
                 {/* Info Footer */}
                 <div className="mt-3 pt-2 border-t border-[#EDEDED] flex items-center justify-between text-sm text-gray-600">
                   <div className="flex items-center gap-1">
-                    <Image src={gift || '/icons/gift.svg'} className="w-5 h-5" alt="Gift" />
+                    <Image src={gift || "/icons/gift.svg"} className="w-5 h-5" alt="Gift" />
                     <span className="font-lato text-[#2C3454] font-bold">100-10k</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Image src={ship || '/icons/ship.svg'} className="w-5 h-5" alt="Shipping" />
+                    <Image src={ship || "/icons/ship.svg"} className="w-5 h-5" alt="Shipping" />
                     <span className="font-lato text-[#2C3454] font-bold">4.5</span>
                   </div>
                 </div>
               </div>
 
-              {/* Button Group: Slide In on Card Hover */}
-              <motion.div
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="absolute bottom-0 left-0 w-full bg-white/95 backdrop-blur-md p-3 space-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto z-10 rounded-b-xl transition-all duration-300"
+              {/* Slide-in Button Group */}
+              <div
+                className="absolute  bottom-0 shadow border border-gray-100 left-0 w-full p-3 bg-white z-10 opacity-0 translate-y-4
+                       group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
+                       pointer-events-none group-hover:pointer-events-auto"
               >
                 {activeTab === "notmy" && (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
+                  <button
+                    
                     onClick={() => {
                       setShowPopup(true);
                       setInventoryData({
@@ -448,37 +450,37 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
                         id: product.id,
                         variant: product.variants,
                         isVarientExists: product?.product?.isVarientExists,
-                        shopifyApp: '',
+                        shopifyApp: "",
                       });
                     }}
-                    className="w-full py-2 px-4 text-white rounded-md text-sm bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
+                    className="w-full py-2 px-4 text-white rounded-md text-sm  bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
                   >
                     Push To Shopify
-                  </motion.button>
+                  </button>
                 )}
 
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
+                <button
+                  
                   onClick={() => {
                     setSelectedProduct(product);
                     setShowVariantPopup(true);
                   }}
-                  className="w-full py-2 px-4 text-white rounded-md text-sm bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
+                  className="w-full mt-2 py-2 px-4 text-white rounded-md text-sm bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
                 >
                   View Variants
-                </motion.button>
+                </button>
 
                 {activeTab === "my" && (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
+                  <button
+                    
                     onClick={() => handleEdit(product.id)}
-                    className="w-full py-2 px-4 text-white rounded-md text-sm bg-black hover:bg-gray-800 transition-colors duration-200"
+                    className="w-full py-2 px-4 mt-2 text-white rounded-md text-sm bg-black hover:bg-gray-800 transition-colors duration-200"
                   >
                     Edit From Shopify
-                  </motion.button>
+                  </button>
                 )}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
 
           );
         })}

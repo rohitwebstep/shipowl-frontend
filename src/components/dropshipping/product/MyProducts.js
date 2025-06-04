@@ -7,23 +7,20 @@ import { useDropshipper } from '../middleware/DropshipperMiddleWareContext';
 import { useEffect, useState, useCallback } from 'react';
 import { HashLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
-import coupen from '@/app/assets/coupen.png';
 import gift from '@/app/assets/gift.png';
 import ship from '@/app/assets/delivery.png';
-export default function MyProducts() {
+import { X, Send } from "lucide-react"; // Lucide icons
+export default function Allroducts() {
     const { verifyDropShipperAuth } = useDropshipper();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(null);
     const router = useRouter();
-    const [showPopup, setShowPopup] = useState(false);
-    const [inventoryData, setInventoryData] = useState({
-        supplierProductId: "",
-        variant: [],
-        id: ''
-    });
     const [showVariantPopup, setShowVariantPopup] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
-    const [isTrashed, setIsTrashed] = useState(false);
+    
+    
+
+
     const fetchProducts = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -41,79 +38,7 @@ export default function MyProducts() {
 
         try {
             setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=my`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${dropshippertoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
-                });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Something Wrong!"
-                );
-            }
-
-            const result = await response.json();
-            if (result) {
-                setProducts(result?.products || []);
-            }
-        } catch (error) {
-            console.error("Error fetching products:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, setProducts]);
-    useEffect(() => {
-        const fetchData = async () => {
-            await verifyDropShipperAuth();
-            await fetchProducts();
-        };
-        fetchData();
-    }, []);
-    const handleVariantChange = (variantId, field, value) => {
-        setInventoryData((prevData) => ({
-            ...prevData,
-            variant: prevData.variant.map((variant) =>
-                variant.variantId === variantId
-                    ? { ...variant, [field]: value }
-                    : variant
-            ),
-        }));
-    };
-
-
-    const trashProducts = useCallback(async () => {
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.removeItem("shippingData");
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const dropshippertoken = dropshipperData?.security?.token;
-        if (!dropshippertoken) {
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/trashed`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type='my'`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -121,410 +46,35 @@ export default function MyProducts() {
                 },
             });
 
+            const result = await response.json();
             if (!response.ok) {
-                const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
                     title: "Something Wrong!",
-                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
+                    text: result.error || result.message || "Your session has expired. Please log in again.",
                 });
-                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
+                throw new Error(result.message || result.error || "Something Wrong!");
             }
 
-            const result = await response.json();
-            if (result) {
-                setProducts(result?.products || []);
-            }
+            setProducts(result?.products || []);
         } catch (error) {
-            console.error("Error fetching trashed categories:", error);
+            console.error("Error fetching products:", error);
         } finally {
             setLoading(false);
         }
-    }, [router, setProducts]);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.clear("shippingData");
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const token = dropshipperData?.security?.token;
-        if (!token) {
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        try {
-            Swal.fire({
-                title: ' Product...',
-                text: 'Please wait while we save your Product.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const form = new FormData();
-            const simplifiedVariants = inventoryData.variant.map((v) => ({
-                variantId: v.id || v.variantId,
-                stock: v.dropStock,
-                price: v.dropPrice,
-                status: v.Dropstatus
-            }));
-
-            form.append('supplierProductId', inventoryData.supplierProductId);
-            form.append('variants', JSON.stringify(simplifiedVariants));
+    }, [router]);
 
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${inventoryData.id}`;
-
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: form,
-            });
-
-            const result = await response.json();
-
-            Swal.close();
-
-            if (!response.ok) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Updation Failed",
-                    text: result.message || result.error || "An error occurred",
-                });
-                return;
-            }
-
-            // On success
-            Swal.fire({
-                icon: "success",
-                title: "Product Updated",
-                text: result.message || `The Product has been Updated successfully!`,
-                showConfirmButton: true,
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    setInventoryData({
-                        supplierProductId: "",
-                        stock: "",
-                        price: "",
-                        status: "",
-                        id: '',
-                    });
-                    setShowPopup(false);
-                    fetchProducts();
-                }
-            });
-
-        } catch (error) {
-            console.error("Error:", error);
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Submission Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-    const handleDelete = async (item) => {
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.removeItem("shippingData");
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const dropshippertoken = dropshipperData?.security?.token;
-        if (!dropshippertoken) {
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        try {
-            Swal.fire({
-                title: "Deleting...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
+    useEffect(() => {
+        const fetchData = async () => {
             setLoading(true);
-
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${dropshippertoken}`,
-                    },
-                }
-            );
-
-            Swal.close();
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                });
-                setLoading(false);
-                return;
-            }
-
-            const result = await response.json();
-
-            Swal.fire({
-                icon: "success",
-                title: "Trash!",
-                text: result.message || `${item.name} has been Trashed successfully.`,
-            });
-
+            await verifyDropShipperAuth();
             await fetchProducts();
-        } catch (error) {
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
             setLoading(false);
-        }
-    };
-    const handlePermanentDelete = async (item) => {
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-        if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.removeItem("shippingData");
-            router.push("/dropshipping/auth/login");
-            return;
-        }
+        };
+        fetchData();
+    }, []);
 
-        const dropshippertoken = dropshipperData?.security?.token;
-        if (!dropshippertoken) {
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const confirmResult = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-            cancelButtonText: "Cancel",
-        });
-
-        if (!confirmResult.isConfirmed) return;
-
-        try {
-            Swal.fire({
-                title: "Deleting...",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
-            });
-
-            setLoading(true);
-
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}/destroy`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${dropshippertoken}`,
-                    },
-                }
-            );
-
-            Swal.close();
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: errorMessage.error || errorMessage.message || "Failed to delete.",
-                });
-                setLoading(false);
-                return;
-            }
-
-            const result = await response.json();
-
-            Swal.fire({
-                icon: "success",
-                title: "Deleted!",
-                text: result.message || `${item.name} has been deleted successfully.`,
-            });
-
-            await trashProducts();
-        } catch (error) {
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: error.message || "Something went wrong. Please try again.",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleRestore = useCallback(async (item) => {
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.removeItem("shippingData");
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const dropshippertoken = dropshipperData?.security?.token;
-        if (!dropshippertoken) {
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item?.id}/restore`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${dropshippertoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text:
-                        errorMessage.error ||
-                        errorMessage.message ||
-                        "Your session has expired. Please log in again.",
-                });
-                throw new Error(
-                    errorMessage.message || errorMessage.error || "Something Wrong!"
-                );
-            }
-
-            const result = await response.json();
-            if (result.status) {
-                Swal.fire({
-                    icon: "success",
-                    text: `product Has Been Restored Successfully !`,
-                });
-                await trashProducts();
-            }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setLoading(false);
-        }
-    }, [router, trashProducts]);
-
-
-    const handleEdit = async (item, id) => {
-        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-
-        if (dropshipperData?.project?.active_panel !== "dropshipper") {
-            localStorage.removeItem("shippingData");
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        const dropshippertoken = dropshipperData?.security?.token;
-        if (!dropshippertoken) {
-            router.push("/dropshipping/auth/login");
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${item.id}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${dropshippertoken}`,
-                    },
-                }
-            );
-
-            if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
-                    icon: "error",
-                    title: "Something Wrong!",
-                    text: errorMessage.message || "Your session has expired. Please log in again.",
-                });
-                throw new Error(errorMessage.message);
-            }
-
-            const result = await response.json();
-            const items = result?.dropshipperProduct || {};
-
-
-            setInventoryData({
-                supplierProductId: items.productId || "",
-                id: id, // or items.product?.id if you prefer
-                variant: (items.variants || []).map((v) => ({
-                    variantId: v.id || v.variantId,
-                    dropStock: v.stock,
-                    dropPrice: v.price,
-                    Dropstatus: v.status,
-                    image: v.variant?.image || '',
-                }))
-            });
-            setShowPopup(true);
-
-        } catch (error) {
-            console.error("Error fetching category:", error);
-        } finally {
-            setLoading(false);
-        }
-
-      
-    }
 
     if (loading) {
         return (
@@ -533,284 +83,190 @@ export default function MyProducts() {
             </div>
         );
     }
-  
-
 
     return (
+
         <>
             <div className="">
                 <div className="flex flex-wrap md:justify-end gap-3 justify-center mb-6">
                     <button className="bg-[#05CD99] text-white lg:px-8 p-4 py-2 rounded-md">Export</button>
                     <button className="bg-[#3965FF] text-white lg:px-8 p-4 py-2 rounded-md">Import</button>
-                    <div className="flex justify-end gap-2">
-                        <button
-                            className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-                            onClick={async () => {
-                                if (isTrashed) {
-                                    setIsTrashed(false);
-                                    await fetchProducts();
-                                } else {
-                                    setIsTrashed(true);
-                                    await trashProducts();
-                                }
-                            }}
-                        >
-                            {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
-                        </button>
-
-                    </div>
-
                 </div>
+
                 {products.length === 0 ? (
                     <div className="flex justify-center items-center h-64 text-gray-500 text-lg font-semibold">
                         No products found
                     </div>
                 ) : (
                     <div className="products-grid  grid xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
+
                         {products.map((product, index) => {
-                            const variant = product?.product?.variants?.[0];
-                            const imageUrl = variant?.image?.split(",")?.[0]?.trim() || "/default-image.png";
+
                             const productName = product?.product?.name || "NIL";
-                            const price = variant?.shipowl_price ?? "N/A";
 
                             return (
+
                                 <div
                                     key={index}
-                                    className="bg-white rounded-xl cursor-pointer shadow-sm relative"
+                                    className="bg-white rounded-xl group  overflow-hidden  cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02]"
                                 >
-                                    <Image
-                                        src={productimg || imageUrl}
-                                        alt={productName}
-                                        width={300}
-                                        height={200}
-                                        className="w-full h-48 object-cover rounded-lg mb-2"
-                                    />
-
-                                    <div className="absolute top-2 right-2 flex gap-2 z-10">
-                                        {isTrashed ? (
-                                            <>
-                                                <button onClick={() => handleRestore(product)} className="bg-green-500 text-white px-3 py-1 text-sm rounded">Restore</button>
-                                                <button onClick={() => handlePermanentDelete(product)} className="bg-red-500 text-white px-3 py-1 text-sm rounded">Permanent Delete</button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <button onClick={() => handleEdit(product, product.id)} className="bg-yellow-500 text-white px-3 py-1 text-sm rounded">Edit</button>
-                                                <button onClick={() => handleDelete(product)} className="bg-red-500 text-white px-3 py-1 text-sm rounded">Trash</button>
-                                            </>
-                                        )}
-                                    </div>
-
-
-                                    <div className="p-3 mb:pb-0">
-                                        <div className="flex justify-between">
-                                            <p className="text-lg font-extrabold font-lato">₹{price}</p>
-                                            <div className="coupen-box flex gap-2 items-center">
-                                                <Image src={coupen} className="w-5" alt="Coupon" />
-                                                <span className="text-[#249B3E] font-lato font-bold text-[12px]">WELCOME10</span>
+                                    <div className="relative h-[200px] perspective">
+                                        <div className="relative  overflow-hidden  w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                                            {/* FRONT */}
+                                            <Image
+                                                src={productimg}
+                                                alt={productName}
+                                                height={200}
+                                                width={100}
+                                                className="w-full h-full object-cover backface-hidden"
+                                            />
+                                            {/* BACK (optional or just black layer) */}
+                                            <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
+                                                <span className="text-sm">Back View</span>
                                             </div>
                                         </div>
-                                        <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">{productName}</p>
+                                    </div>
 
-                                        <div className="flex items-center border-t pt-2 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
+                                    {/* Content */}
+                                    <div className="p-3 group-hover:pb-24 mb-4 relative z-0 bg-white">
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-black font-bold nunito">
+                                                ₹
+                                                {product.variants.length === 1
+                                                    ? product.variants[0]?.price ||
+                                                    product.variants[0]?.supplierProductVariant?.price ||
+                                                    0
+                                                    : Math.min(
+                                                        ...product.variants.map(
+                                                            (v) =>
+                                                                v?.price ?? v?.supplierProductVariant?.price ?? Infinity
+                                                        )
+                                                    )}
+                                            </p>
+                                        </div>
+                                        <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">
+                                            {productName}
+                                        </p>
+
+                                        {/* Info Footer */}
+                                        <div className="mt-3 pt-2 border-t border-[#EDEDED] flex items-center justify-between text-sm text-gray-600">
                                             <div className="flex items-center gap-1">
-                                                <Image src={gift} className="w-5" alt="Gift" />
+                                                <Image src={gift || "/icons/gift.svg"} className="w-5 h-5" alt="Gift" />
                                                 <span className="font-lato text-[#2C3454] font-bold">100-10k</span>
                                             </div>
                                             <div className="flex items-center gap-1">
-                                                <Image src={ship} className="w-5" alt="Shipping" />
+                                                <Image src={ship || "/icons/ship.svg"} className="w-5 h-5" alt="Shipping" />
                                                 <span className="font-lato text-[#2C3454] font-bold">4.5</span>
                                             </div>
                                         </div>
+                                    </div>
 
+                                    {/* Slide-in Button Group */}
+                                    <div
+                                        className="absolute  bottom-0 shadow border border-gray-100 left-0 w-full p-3 bg-white z-10 opacity-0 translate-y-4
+                                         group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
+                                         pointer-events-none group-hover:pointer-events-auto"
+                                    >
 
                                         <button
+
+                                           
+                                            className="w-full py-2 px-4 text-white rounded-md text-sm  bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
+                                        >
+                                            Edit From Shopify
+                                        </button>
+                                        <button
+
                                             onClick={() => {
-                                                setSelectedProduct(product); // `item` is your current product row
+                                                setSelectedProduct(product);
                                                 setShowVariantPopup(true);
                                             }}
-                                            className="py-2 px-4 text-white rounded-md text-sm w-full mt-3 bg-[#3965FF]"
+                                            className="w-full mt-2 py-2 px-4 text-white rounded-md text-sm bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
                                         >
                                             View Variants
                                         </button>
 
-                                        {showPopup && (
-                                            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                                                <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-                                                    <h2 className="text-xl font-semibold mb-4">Add to Inventory</h2>
-                                                    <table className="min-w-full table-auto border border-gray-200">
-                                                        <thead>
-                                                            <tr className="bg-gray-100">
-                                                                <th className="border px-4 py-2">Image</th>
-                                                                <th className="border px-4 py-2">Stock</th>
-                                                                <th className="border px-4 py-2">Price</th>
-                                                                <th className="border px-4 py-2">Status</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {inventoryData.variant?.map((variant, index) => (
-                                                                <tr key={index}>
-                                                                    <td className="border px-4 py-2">
-                                                                        <Image
-                                                                            height={40}
-                                                                            width={40}
-                                                                            src={"https://placehold.co/400" || variant.image}
-                                                                            alt={variant.color || "NIL"}
-                                                                        />
-                                                                    </td>
-                                                                    <td className="border px-4 py-2">
-                                                                        <input
-                                                                            type="number"
-                                                                            placeholder="Stock"
-                                                                            name="dropStock"
-                                                                            className="w-full border rounded p-2"
-                                                                            value={variant.dropStock || ''}
-                                                                            onChange={(e) =>
-                                                                                handleVariantChange(variant.variantId, "dropStock", e.target.value)
-                                                                            }
-                                                                        />
-                                                                    </td>
-                                                                    <td className="border px-4 py-2">
-                                                                        <input
-                                                                            type="number"
-                                                                            name="dropPrice"
-                                                                            placeholder="Price"
-                                                                            className="w-full border rounded p-2"
-                                                                            value={variant.dropPrice || ''}
-                                                                            onChange={(e) =>
-                                                                                handleVariantChange(variant.variantId, "dropPrice", e.target.value)
-                                                                            }
-                                                                        />
-                                                                    </td>
-                                                                    <td className="border px-4 py-2">
-                                                                        <label className="flex mt-2 items-center cursor-pointer">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                name="Dropstatus"
-                                                                                className="sr-only"
-                                                                                checked={variant.Dropstatus || false}
-                                                                                onChange={(e) =>
-                                                                                    handleVariantChange(variant.variantId, "Dropstatus", e.target.checked)
-                                                                                }
-                                                                            />
-                                                                            <div
-                                                                                className={`relative w-10 h-5 bg-gray-300 rounded-full transition ${variant.Dropstatus ? "bg-orange-500" : ""
-                                                                                    }`}
-                                                                            >
-                                                                                <div
-                                                                                    className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition ${variant.Dropstatus ? "translate-x-5" : ""
-                                                                                        }`}
-                                                                                ></div>
-                                                                            </div>
-                                                                            <span className="ms-2 text-sm text-gray-600">Status</span>
-                                                                        </label>
-                                                                    </td>
-                                                                </tr>
-                                                            ))}
-                                                        </tbody>
-                                                    </table>
 
-
-
-
-                                                    <div className="flex justify-end space-x-3 mt-6">
-                                                        <button
-                                                            onClick={() => {
-                                                                setShowPopup(false);
-                                                            }}
-                                                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                        <button
-                                                            onClick={(e) => handleSubmit(e)}
-                                                            className="px-4 py-2 bg-green-600 text-white rounded"
-                                                        >
-                                                            Submit
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                        {showVariantPopup && selectedProduct && (
-                                            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                                                <div className="bg-white p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
-                                                    <h2 className="text-xl font-semibold mb-4">Variant Details</h2>
-
-                                                    <table className="min-w-full table-auto border border-gray-200">
-                                                        <thead>
-                                                            <tr className="bg-gray-100">
-                                                                <th className="border px-4 py-2">Image</th>
-                                                                <th className="border px-4 py-2">SKU</th>
-                                                                <th className="border px-4 py-2">Color</th>
-                                                                <th className="border px-4 py-2">Qty</th>
-                                                                <th className="border px-4 py-2">ShipOwl Price</th>
-                                                                <th className="border px-4 py-2">RTO Price</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {selectedProduct.variants?.map((v, index) => {
-                                                                const imageUrls = v.image
-                                                                    ? v.image.split(',').map((img) => img.trim()).filter(Boolean)
-                                                                    : [];
-                                                                const variant = v.variant || v;
-
-                                                                return (
-                                                                    <tr key={index}>
-                                                                        <td className="border px-4 py-2">
-                                                                            <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
-                                                                                {imageUrls.length > 0 ? (
-                                                                                    imageUrls.map((url, idx) => (
-                                                                                        <Image
-                                                                                            key={idx}
-                                                                                            height={40}
-                                                                                            width={40}
-                                                                                            src={url}
-                                                                                            alt={variant.name || 'NIL'}
-                                                                                            className="shrink-0 rounded"
-                                                                                        />
-                                                                                    ))
-                                                                                ) : (
-                                                                                    <Image
-                                                                                        height={40}
-                                                                                        width={40}
-                                                                                        src="https://placehold.co/400"
-                                                                                        alt="Placeholder"
-                                                                                        className="shrink-0 rounded"
-                                                                                    />
-                                                                                )}
-                                                                            </div>
-                                                                        </td>
-                                                                        <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
-                                                                        <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
-                                                                        <td className="border px-4 py-2">{variant.qty ?? 'NIL'}</td>
-                                                                        <td className="border px-4 py-2">{variant.shipowl_price ?? 'NIL'}</td>
-                                                                        <td className="border px-4 py-2">{variant.rto_price ?? 'NIL'}</td>
-                                                                    </tr>
-                                                                );
-                                                            })}
-
-                                                        </tbody>
-
-                                                    </table>
-
-                                                    <button
-                                                        onClick={() => setShowVariantPopup(false)}
-                                                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-                                                    >
-                                                        ×
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
+
                             );
                         })}
                     </div>
                 )}
             </div>
+          
+
+
+            {showVariantPopup && selectedProduct && (
+                <div className="fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
+                    <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-4xl shadow-xl relative">
+                        {/* Header */}
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-2xl font-bold text-gray-800">Variant Details</h2>
+                            <button
+                                onClick={() => setShowVariantPopup(false)}
+                                className="text-gray-500 hover:text-gray-800 transition-colors"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        {/* Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
+                            {selectedProduct.variants?.map((v, idx) => {
+                                let variant = {};
+                                variant = { ...(v.variant || {}), ...v };
+
+
+
+                                const imageUrls = variant.image
+                                    ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
+                                    : [];
+
+                                const isExists = selectedProduct?.product?.isVarientExists;
+
+                                return (
+                                    <div
+                                        key={variant.id || idx}
+                                        className="bg-white hover:border-orange-500 p-4 rounded-2xl shadow-md hover:shadow-xl border border-gray-200 transition-all duration-300 flex flex-col"
+                                    >
+                                        {/* Image */}
+                                        <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
+                                            {imageUrls.length > 0 ? (
+                                                <img
+                                                    src={`https://placehold.co/600x400?text=${idx + 1}`}
+                                                    alt={`variant-img-${idx}`}
+                                                    className="h-full w-full object-cover p-3 rounded-md"
+                                                />
+                                            ) : (
+                                                <span className="text-gray-400  text-xl font-bold">{idx + 1}</span>
+                                            )}
+                                        </div>
+
+                                        {/* Text Info */}
+                                        <div className="text-sm text-gray-700 space-y-1">
+                                            <p><span className="font-semibold">Modal:</span> {variant.modal || "—"}</p>
+                                            <p><span className="font-semibold">Suggested Price:</span> {v.price || v?.supplierProductVariant?.price || "—"}</p>
+
+                                            {isExists && (
+                                                <>
+                                                    <p><span className="font-semibold">Name:</span> {variant.name || "—"}</p>
+                                                    <p><span className="font-semibold">SKU:</span> {variant.sku || "—"}</p>
+                                                    <p><span className="font-semibold">Color:</span> {variant.color || "—"}</p>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                    </div>
+                </div>
+            )}
         </>
 
-
     );
+
 }

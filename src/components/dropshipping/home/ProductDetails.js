@@ -53,7 +53,7 @@ const ProductDetails = () => {
     isVarientExists: '',
     shopifyApp: '',
   });
-  console.log('inventoryData',inventoryData)
+  console.log('inventoryData', inventoryData)
   const fetchProductDetails = useCallback(async () => {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -469,26 +469,26 @@ const ProductDetails = () => {
                         : "border-gray-300 hover:shadow-lg bg-white"
                         }`}
                     >
-                     <div className='flex gap-3'>
-                       <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
-                        <Image
-                          src={productimg || variant?.image}
-                          alt={variant?.name || "Variant Image"}
-                          width={140}
-                          height={140}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
+                      <div className='flex gap-3'>
+                        <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
+                          <Image
+                            src={productimg || variant?.image}
+                            alt={variant?.name || "Variant Image"}
+                            width={140}
+                            height={140}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
 
-                      <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
-                        <div>Name: <span className="font-medium">{variant?.name || 'NIL'}</span></div>
-                        <div>Color: <span className="font-medium">{variant?.color || 'NIL'}</span></div>
-                        <div>Modal: <span className="font-medium">{variant?.modal}</span></div>
-                        <div className="text-green-600 font-semibold">
-                          Price: ₹{type === "notmy" ? item?.price : item.price}
+                        <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
+                          <div>Name: <span className="font-medium">{variant?.name || 'NIL'}</span></div>
+                          <div>Color: <span className="font-medium">{variant?.color || 'NIL'}</span></div>
+                          <div>Modal: <span className="font-medium">{variant?.modal}</span></div>
+                          <div className="text-green-600 font-semibold">
+                            Price: ₹{type === "notmy" ? item?.price : item.price}
+                          </div>
                         </div>
                       </div>
-                     </div>
                     </div>
                   );
                 })}
@@ -678,7 +678,7 @@ const ProductDetails = () => {
             {relatedProducts.length === 0 ? (
               <p className="text-center font-bold text-3xl mt-8">No Related Products Found</p>
             ) : (
-              <div className="grid xl:grid-cols-4 lg:grid-cols-4 gap-6 xl:gap-10">
+              <div className="grid xl:grid-cols-5 lg:grid-cols-4 gap-6 xl:gap-10">
                 {relatedProducts.map((item, index) => {
                   const product = item.product || {};
                   const variants = item.variants || [];
@@ -691,16 +691,25 @@ const ProductDetails = () => {
                   return (
                     <div
                       key={index}
-                      className="bg-white rounded-xl cursor-pointer shadow-md transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]"
+                      className="bg-white relative  overflow-hidden rounded-xl group cursor-pointer shadow-md transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]"
                     >
                       <div className="p-3">
-                        <Image
-                          src={productimg}
-                          alt={productName}
-                          width={300}
-                          height={200}
-                          className="w-full h-48 object-cover rounded-lg mb-3 transition-all duration-500 ease-in-out"
-                        />
+                        <div className="relative h-[200px] perspective">
+                          <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                            {/* FRONT */}
+                            <Image
+                              src={productimg}
+                              alt={productName}
+                              height={200}
+                              width={100}
+                              className="w-full h-full object-cover backface-hidden"
+                            />
+                            {/* BACK (optional or just black layer) */}
+                            <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
+                              <span className="text-sm">Back View</span>
+                            </div>
+                          </div>
+                        </div>
                         <div className="flex justify-between items-center">
                           <p className="text-lg font-extrabold font-lato text-[#2C3454]">
                             ₹{lowestPrice !== "N/A" ? lowestPrice : "N/A"}
@@ -709,7 +718,7 @@ const ProductDetails = () => {
                         <p className="text-[13px] text-[#7A7A7A] font-lato font-semibold mt-1 hover:text-black transition-colors duration-300">
                           {productName}
                         </p>
-                        <div className="flex items-center border-t pt-3 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
+                        <div className="flex items-center border-t pt-3 group-hover:pb-15  mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <Image src={gift} className="w-5" alt="Gift" />
                             <span className="font-lato text-[#2C3454] font-bold">MOQ: N/A</span>
@@ -719,32 +728,37 @@ const ProductDetails = () => {
                             <span className="font-lato text-[#2C3454] font-bold">Rating: N/A</span>
                           </div>
                         </div>
+                        <div
+                          className="absolute bottom-0  left-0 w-full p-3 bg-white z-10 opacity-0 translate-y-4
+                      group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
+                      pointer-events-none group-hover:pointer-events-auto shadow border overflow-hidden border-gray-100"
+                        >
+                          {activeTab === "notmy" && (
+                            <button
+                              onClick={() => {
+                                setShowPopup(true);
+                                setInventoryData({
+                                  supplierProductId: product.id,
+                                  id: product.id,
+                                  variant: item.variants,
+                                  isVarientExists: product?.isVarientExists,
+                                });
+                              }}
+                              className="py-2 px-4 text-white rounded-md text-sm w-full  bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out"
+                            >
+                              Push To Shopify
+                            </button>
+                          )}
 
-                        {activeTab === "notmy" && (
-                          <button
-                            onClick={() => {
-                              setShowPopup(true);
-                              setInventoryData({
-                                supplierProductId: product.id,
-                                id: product.id,
-                                variant: item.variants,
-                                isVarientExists: product?.isVarientExists,
-                              });
-                            }}
-                            className="py-2 px-4 text-white rounded-md text-sm w-full mt-4 bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out"
-                          >
-                            Push To Shopify
-                          </button>
-                        )}
-
-                        {activeTab === "my" && (
-                          <button
-                            onClick={() => handleEdit(product.id)}
-                            className="py-2 px-4 text-white rounded-md text-sm w-full mt-4 bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
-                          >
-                            Edit From Shopify
-                          </button>
-                        )}
+                          {activeTab === "my" && (
+                            <button
+                              onClick={() => handleEdit(product.id)}
+                              className="py-2 px-4 text-white rounded-md text-sm w-full  bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
+                            >
+                              Edit From Shopify
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );

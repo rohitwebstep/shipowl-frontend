@@ -80,20 +80,27 @@ export default function RTO() {
                     {products.map((item, index) => {
                         const orders = item?.orderItem;
                         const variant = item?.dropshipperProductVariant?.supplierProductVariant?.variant;
-                        const imageUrl = variant?.images?.[0]?.url || "/no-image.png";
 
                         return (
                             <div
                                 key={index}
-                                className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200"
+                                className="bg-white rounded-xl group shadow-md overflow-hidden border border-gray-200"
                             >
-                                <div className="relative h-56 w-full">
-                                    <Image
-                                        src={productimg}
-                                        alt={variant?.name || "Product Image"}
-                                        fill
-                                        className="object-cover p-3 rounded-2xl"
-                                    />
+                                <div className="relative h-[200px] perspective">
+                                    <div className="relative  overflow-hidden  w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                                        {/* FRONT */}
+                                        <Image
+                                            src={productimg}
+                                            alt={productName}
+                                            height={200}
+                                            width={100}
+                                            className="w-full h-full object-cover backface-hidden"
+                                        />
+                                        {/* BACK (optional or just black layer) */}
+                                        <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
+                                            <span className="text-sm">Back View</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="p-4  ">
                                     <p>
@@ -105,7 +112,7 @@ export default function RTO() {
                                             Qty: <span className="font-medium">{orders?.quantity || 'N/A'}</span>
                                         </p>
                                         <p>
-                                            Total: <span className="font-medium">{orders?.total|| 'N/A'}</span>
+                                            Total: <span className="font-medium">{orders?.total || 'N/A'}</span>
                                         </p>
                                         <p className=" text-gray-600">Color: {variant?.color}</p>
 
