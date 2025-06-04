@@ -205,6 +205,7 @@ export default function AddShopifyStore() {
         <section className="">
             <div className="grid grid-cols-2 gap-3">
                 <div className="bg-white rounded-2xl p-5">
+                       <h2 className='text-2xl font-bold pb-4'>Add New Store </h2>
                     <form onSubmit={handleSubmit}>
                         <div className=" ">
                             <div>
@@ -236,6 +237,7 @@ export default function AddShopifyStore() {
                     </form>
                 </div>
                 <div className="bg-white rounded-2xl p-5">
+                    <h2 className='text-2xl font-bold pb-4'>Store List</h2>
                     {shopifyStores.length > 0 ? (
                         <table className="w-full border border-[#E0E5F2]  text-sm">
                             <thead className="border border-[#E0E5F2]">
@@ -249,8 +251,8 @@ export default function AddShopifyStore() {
                                 {shopifyStores.map((item, index) => (
                                     <tr key={item.id} className="border border-[#E0E5F2]">
                                         <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{index + 1}</td>
-                                        <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{item.name}</td>
-                                        <td className=" border border-[#E0E5F2] px-2 py-1 text-center">{item.domain}</td>
+                                        <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{item.name || 'NIL'}</td>
+                                        <td className=" border border-[#E0E5F2] px-2 py-1 text-center">{item.domain || item.shop}</td>
                                     </tr>
                                 ))}
                             </tbody>

@@ -3,7 +3,7 @@
 
 import { useDropshipper } from '../middleware/DropshipperMiddleWareContext'
 import Banner from './Banner'
-import CategorySection from './CatogorySection'
+
 import NewlyLaunched from './NewlyLaunched'
 import React, { useEffect } from 'react'
 
@@ -15,7 +15,6 @@ const Home = () => {
     return (
         <>
             <Banner />
-            <CategorySection />
             <NewlyLaunched />
         </>
 

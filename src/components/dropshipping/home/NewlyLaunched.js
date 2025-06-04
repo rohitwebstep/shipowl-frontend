@@ -11,7 +11,7 @@ import productimg from '@/app/assets/product1.png';
 import gift from '@/app/assets/gift.png';
 import ship from '@/app/assets/delivery.png';
 import { X, Send } from "lucide-react"; // Lucide icons
-
+import CategorySection from './CatogorySection'
 
 const tabs = [
   { key: "my", label: "Pushed to Shopify" },
@@ -140,6 +140,8 @@ const NewlyLaunched = () => {
     );
   }
   return (
+    <>
+    <CategorySection />
     <section className="xl:p-6 pt-6">
       <div className="container">
         {/* Tabs shared for both sections */}
@@ -195,6 +197,7 @@ const NewlyLaunched = () => {
         )}
       </div>
     </section>
+    </>
   );
 };
 
@@ -354,6 +357,7 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
 
   return (
     <>
+     
       <div className="flex justify-between items-center mb-4 mt-6">
 
         <h2 className="md:text-[24px] text-lg text-[#F98F5C] font-lato font-bold">{title}</h2>
