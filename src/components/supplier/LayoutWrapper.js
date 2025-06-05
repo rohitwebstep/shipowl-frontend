@@ -11,7 +11,7 @@ import { ApiProvider } from "../ApiContext";
 import { BrandProvider } from "./brand/BrandContext";
 import { ProductProviderEdit } from "./products/ProductContextEdit";
 import { ProductProvider } from "./addproducts/ProductContext";
-
+import { HashLoader } from "react-spinners";
 function LayoutWrapperInner({ children }) {
   const pathname = usePathname();
   const isAuthPage =
@@ -27,19 +27,19 @@ function LayoutWrapperInner({ children }) {
   return (
     <div className="main">
       <div className="container">
-      <div className={`${!isAuthPage ? "lg:flex" : ""} `}>
-      {!isAuthPage && (
+        <div className={`${!isAuthPage ? "lg:flex" : ""} `}>
+          {!isAuthPage && (
             <div className="xl:w-[18.5%] lg:w-[23%] w-full p-2 leftbar">
               <Sidebar />
             </div>
           )}
           <SupplierMiddleWareProvider>
 
-          <div className={`px-3 mt-20 lg:mt-0  lg-px-0 ${isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[73%]"}`}>
-          {!isAuthPage && <Header />}
+            <div className={`px-3 mt-20 lg:mt-0  lg-px-0 ${isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[73%]"}`}>
+              {!isAuthPage && <Header />}
               <div className="xl:p-3 md:pt-4 md:px-0">
-                  <ProductProviderEdit>
-                    <ProductProvider>
+                <ProductProviderEdit>
+                  <ProductProvider>
                     <ApiProvider>
                       <CategoryProvider>
                         <BrandProvider>
@@ -47,8 +47,8 @@ function LayoutWrapperInner({ children }) {
                         </BrandProvider>
                       </CategoryProvider>
                     </ApiProvider>
-                    </ProductProvider>
-                  </ProductProviderEdit>
+                  </ProductProvider>
+                </ProductProviderEdit>
               </div>
             </div>
           </SupplierMiddleWareProvider>
@@ -61,7 +61,9 @@ function LayoutWrapperInner({ children }) {
 
 export default function LayoutWrapper({ children }) {
   return (
-    <Suspense fallback={<div>Loading layout...</div>}>
+    <Suspense fallback={<div className="flex justify-center items-center h-96">
+      <HashLoader color="orange" />
+    </div>}>
       <LayoutWrapperInner>{children}</LayoutWrapperInner>
     </Suspense>
   );

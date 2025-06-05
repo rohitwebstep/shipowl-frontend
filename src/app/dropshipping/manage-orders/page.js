@@ -1,10 +1,8 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import ManageOrders from "@/components/dropshipping/manageorders/ManageOrders";
 
-export default function Page() {
+export default function page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ManageOrders />
-    </Suspense>
+    <div><ManageOrders/></div>
   )
 }

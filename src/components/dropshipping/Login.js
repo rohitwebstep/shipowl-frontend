@@ -69,9 +69,9 @@ export default function Login() {
             }
     
             const result = await response.json();
-            const { token, dropshipper, admin } = result;
+            const { token, admin } = result;
 
-            if (!token || (!dropshipper && !admin)) {
+            if (!token || ( !admin)) {
             throw new Error("Invalid login response. Missing token or user data.");
             }
 
@@ -83,7 +83,7 @@ export default function Login() {
                     environment: "production",
                     active_panel: "dropshipper",
                 },
-                dropshipper,
+                admin,
                 session: {
                     is_authenticated: true,
                     last_active_at: new Date().toISOString(),

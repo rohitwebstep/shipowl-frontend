@@ -1,11 +1,8 @@
+import React from 'react'
 import Update from '@/components/supplier/warehouses/Update'
-import React, { Suspense } from 'react';
 
-export default function Page() {
+export default function page() {
   return (
- <Suspense fallback={<>Loading...</>}>
-      <Update />
-    </Suspense>
-
-)
+    <div><Update/></div>
+  )
 }

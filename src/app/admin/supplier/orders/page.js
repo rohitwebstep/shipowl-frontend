@@ -1,14 +1,8 @@
-'use client';
-
-import React, { Suspense } from 'react';
+import React from 'react'
 import Orders from '@/components/admin/orders/Order';
 
-function Page() {
+export default function page() {
   return (
-    <Suspense fallback={<div>Loading orders...</div>}>
-      <Orders />
-    </Suspense>
-  );
+    <div><Orders/></div>
+  )
 }
-
-export default Page;

@@ -1,12 +1,8 @@
-import React, { Suspense } from 'react';
+import React from 'react'
+import Dropshippers from '@/components/admin/dropshipper/Dropshipper';
 
-// Dynamically import the Dropshippers component
-const Dropshippers = React.lazy(() => import('@/components/admin/dropshipper/Dropshipper'));
-
-export default function Page() {
+export default function page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Dropshippers />
-    </Suspense>
-  );
+    <div><Dropshippers /></div>
+  )
 }

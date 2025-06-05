@@ -1,14 +1,8 @@
+import React from 'react'
 import Update from '@/components/dropshipping/product/Update';
-import React, { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
-
-function Page() {
+export default function page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Update />
-    </Suspense>
-  );
+    <div><Update/></div>
+  )
 }
-
-export default Page;

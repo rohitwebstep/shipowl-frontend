@@ -12,7 +12,7 @@ import { DropshipperProfileProvider } from "./dropshipper/DropshipperProfileCont
 import { ProductProvider } from "./addproducts/ProductContext";
 import { ProductProviderEdit } from "./products/ProductContextEdit";
 import { AdminActionProvider } from "../commonfunctions/MainContext";
-
+import { HashLoader } from "react-spinners";
 function LayoutWrapperInner({ children }) {
   const pathname = usePathname();
   const isAuthPage =
@@ -60,7 +60,9 @@ function LayoutWrapperInner({ children }) {
 
 export default function LayoutWrapper({ children }) {
   return (
-    <Suspense fallback={<div>Loading layout...</div>}>
+    <Suspense fallback={<div className="flex justify-center items-center h-96">
+      <HashLoader color="orange" />
+    </div>}>
       <LayoutWrapperInner>{children}</LayoutWrapperInner>
     </Suspense>
   );

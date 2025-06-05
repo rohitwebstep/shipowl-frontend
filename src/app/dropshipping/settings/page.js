@@ -1,9 +1,8 @@
+import React from 'react'
 import Settings from '@/components/dropshipping/setting/Setting'
-import React, { Suspense } from 'react';
-export default function Page() {
+
+export default function page() {
   return (
-   <Suspense fallback={<div>Loading...</div>}>
-         <Settings />
-   </Suspense>
+    <div><Settings/></div>
   )
 }

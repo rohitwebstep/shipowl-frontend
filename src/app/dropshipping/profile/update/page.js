@@ -1,16 +1,8 @@
-'use client';
-
-export const dynamic = 'force-dynamic';
-
+import React from 'react'
 import Profile from '@/components/dropshipping/dropshipper/update/Profile';
-import React, { Suspense } from 'react';
 
-function Page() {
+export default function page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Profile />
-    </Suspense>
-  );
+    <div><Profile/></div>
+  )
 }
-
-export default Page;

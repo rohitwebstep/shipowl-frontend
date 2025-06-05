@@ -7,7 +7,7 @@ import Header from "./Header";
 import DropshipperMiddleWareProvider from "./middleware/DropshipperMiddleWareContext";
 import { DropshipperProfileProvider } from "./dropshipper/update/DropshipperProfileContext";
 import { ProfileProvider } from "../admin/supplier/ProfileContext";
-
+import { HashLoader } from "react-spinners";
 function LayoutWrapperInner({ children }) {
     const pathname = usePathname();
     const isAuthPage = pathname === '/dropshipping/auth/login/' || pathname === '/dropshipping/auth/password/forget/' || pathname === '/dropshipping/auth/password/reset/' || pathname === '/dropshipping/auth/register/' || pathname === '/dropshipping/auth/register/verify/';
@@ -43,7 +43,9 @@ function LayoutWrapperInner({ children }) {
 
 export default function LayoutWrapper({ children }) {
     return (
-        <Suspense fallback={<div>Loading layout...</div>}>
+        <Suspense fallback={<div className="flex justify-center items-center h-96">
+            <HashLoader color="orange" />
+        </div>}>
             <LayoutWrapperInner>{children}</LayoutWrapperInner>
         </Suspense>
     );

@@ -16,6 +16,71 @@ th.text-left {
   text-align: left !important;
 }
 
+/* Target all scrollable containers */
+/* Applies to all elements with any overflow auto */
+.overflow-auto::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.overflow-auto::-webkit-scrollbar-track,
+.overflow-x-auto::-webkit-scrollbar-track,
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+  /* optional: add #f0f0f0 if needed */
+}
+
+.overflow-auto::-webkit-scrollbar-thumb,
+.overflow-x-auto::-webkit-scrollbar-thumb,
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #131a46;
+  border-radius: 4px;
+  border: 1 solid white;
+}
+
+/* Firefox support */
+.overflow-auto,
+.overflow-x-auto,
+.overflow-y-auto {
+  scrollbar-width: none;
+  scrollbar-color: #131a46 transparent;
+}
+
+/* Optional: Hover effect */
+.overflow-auto::-webkit-scrollbar-thumb:hover,
+.overflow-x-auto::-webkit-scrollbar-thumb:hover,
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color:  #131a46;
+}
+
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #131a46 transparent;
+}
+
+*::-webkit-scrollbar {
+  height: 2px;
+  width: 2px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #131a46;
+  border-radius: 4px;
+  border: 2px solid white;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #131a46;
+}
+
+
 td.text-left {
   text-align: left !important;
 }
@@ -29,8 +94,9 @@ body {
   width: 100%;
   max-width: 100% !important;
 }
+
 .react-select__control.css-13cymwt-control {
-    border: 1px solid #dfeaf2;
+  border: 1px solid #dfeaf2;
 }
 
 .dm {
@@ -268,6 +334,10 @@ th:hover {
 .css-hlgwow {
   padding: 8px !important;
 }
-a,button,li,img{
+
+a,
+button,
+li,
+img {
   cursor: pointer;
 }

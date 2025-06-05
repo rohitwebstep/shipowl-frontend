@@ -1,12 +1,8 @@
+import React from 'react'
 import AddProduct from '@/components/admin/addproducts/AddProduct';
-import React, { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
-
-export default function Page() {
+export default function page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <AddProduct />
-    </Suspense>
-  );
+    <div><AddProduct/></div>
+  )
 }

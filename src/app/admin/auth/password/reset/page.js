@@ -1,12 +1,8 @@
+import React from 'react'
 import ResetPassword from '@/components/admin/ResetPassword'
-import React, { Suspense } from 'react'
 
-export default function Page() {
+export default function page() {
   return (
-  <Suspense fallback={<div>Loading...</div>}>
-         <ResetPassword />
-   </Suspense>  )
+    <div><ResetPassword/></div>
+  )
 }
-
-
-
