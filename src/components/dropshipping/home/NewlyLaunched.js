@@ -150,7 +150,7 @@ const NewlyLaunched = () => {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-6 py-2 font-medium text-xl border-b-2 transition-all duration-200
+              className={`md:px-6 py-2 font-medium px-2  md:text-xl border-b-2 transition-all duration-200
                 ${activeTab === tab.key
                   ? "border-orange-500 text-orange-600"
                   : "border-transparent text-gray-500 hover:text-orange-600"
@@ -368,7 +368,7 @@ const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProd
       <div className="md:w-[293px] border-b-3 border-[#F98F5C] mt-1 mb-4"></div>
 
 
-      <div className="products-grid  grid xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
+      <div className="products-grid pb-5 md:pb-0  grid grid-cols-2 xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
         <div className="grid bg-[#212B36] rounded-xl shadow-xl overflow-hidden cursor-default">
           <Image src={productimg} alt={`Best of ${title}`} className={`w-full  object-cover ${activeTab == "notmy" ? "max-h-[250px]" : "max-h-[230px]"}`} />
           <div className="bg-[#212B36] bg-opacity-50 p-4 px-2 text-center text-white">
