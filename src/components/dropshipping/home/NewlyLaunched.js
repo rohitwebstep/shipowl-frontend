@@ -201,19 +201,12 @@ const NewlyLaunched = () => {
   );
 };
 
-const Section = ({ title, products, type, shopifyStores, setActiveTab, fetchProduct, activeTab }) => {
+const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, activeTab }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showVariantPopup, setShowVariantPopup] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const viewProduct = (id, type) => {
-    if (type == "notmy") {
-      router.push(`/dropshipping/product/?id=${id}&type=${type}`);
-    }
-    else {
-      router.push(`/dropshipping/product/?id=${id}`);
-    }
-  };
+ 
   const router = useRouter();
   const [inventoryData, setInventoryData] = useState({
     supplierProductId: "",
