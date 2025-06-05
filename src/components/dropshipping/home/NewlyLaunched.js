@@ -141,62 +141,62 @@ const NewlyLaunched = () => {
   }
   return (
     <>
-    <CategorySection />
-    <section className="xl:p-6 pt-6">
-      <div className="container">
-        {/* Tabs shared for both sections */}
-        <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm ">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`md:px-6 py-2 font-medium px-2  md:text-xl border-b-2 transition-all duration-200
+      <CategorySection />
+      <section className="xl:p-6 pt-6">
+        <div className="container">
+          {/* Tabs shared for both sections */}
+          <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm ">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`md:px-6 py-2 font-medium px-2  md:text-xl border-b-2 transition-all duration-200
                 ${activeTab === tab.key
-                  ? "border-orange-500 text-orange-600"
-                  : "border-transparent text-gray-500 hover:text-orange-600"
-                }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+                    ? "border-orange-500 text-orange-600"
+                    : "border-transparent text-gray-500 hover:text-orange-600"
+                  }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+
+          {/* Show No Data Found once if no products */}
+          {!loading && products.length === 0 ? (
+            <p className="text-center">No Data Found</p>
+          ) : (
+            <>
+              {/* Newly Launched Section */}
+              <Section
+                title="Newly Launched"
+                products={products}
+                type={type}
+                shopifyStores={shopifyStores}
+                viewProduct={viewProduct}
+                activeTab={activeTab}
+                trashProducts={trashProducts}
+                fetchProduct={fetchProduct}
+                setActiveTab={setActiveTab}
+              />
+
+              {/* Potential Heros Section */}
+              <Section
+                title="Potential Heros"
+                products={products}
+                viewProduct={viewProduct}
+                activeTab={activeTab}
+                type={type}
+                shopifyStores={shopifyStores}
+                trashProducts={trashProducts}
+                fetchProduct={fetchProduct}
+                setActiveTab={setActiveTab}
+
+              />
+            </>
+          )}
         </div>
-
-
-        {/* Show No Data Found once if no products */}
-        {!loading && products.length === 0 ? (
-          <p className="text-center">No Data Found</p>
-        ) : (
-          <>
-            {/* Newly Launched Section */}
-            <Section
-              title="Newly Launched"
-              products={products}
-              type={type}
-              shopifyStores={shopifyStores}
-              viewProduct={viewProduct}
-              activeTab={activeTab}
-              trashProducts={trashProducts}
-              fetchProduct={fetchProduct}
-              setActiveTab={setActiveTab}
-            />
-
-            {/* Potential Heros Section */}
-            <Section
-              title="Potential Heros"
-              products={products}
-              viewProduct={viewProduct}
-              activeTab={activeTab}
-              type={type}
-              shopifyStores={shopifyStores}
-              trashProducts={trashProducts}
-              fetchProduct={fetchProduct}
-              setActiveTab={setActiveTab}
-
-            />
-          </>
-        )}
-      </div>
-    </section>
+      </section>
     </>
   );
 };
@@ -357,7 +357,7 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
 
   return (
     <>
-     
+
       <div className="flex justify-between items-center mb-4 mt-6">
 
         <h2 className="md:text-[24px] text-lg text-[#F98F5C] font-lato font-bold">{title}</h2>
@@ -370,7 +370,7 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
 
       <div className="products-grid pb-5 md:pb-0  grid grid-cols-2 xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
         <div className="grid bg-[#212B36] rounded-xl shadow-xl overflow-hidden cursor-default">
-          <Image src={productimg} alt={`Best of ${title}`} className={`w-full  object-cover ${activeTab == "notmy" ? "max-h-[250px]" : "max-h-[230px]"}`} />
+          <Image src={productimg} alt={`Best of ${title}`} className={`w-full  object-cover ${activeTab == "notmy" ? "md:max-h-[250px] h-[150px]" : "md:max-h-[230px] h-[150px]"}`} />
           <div className="bg-[#212B36] bg-opacity-50 p-4 px-2 text-center text-white">
             <p className="text-[16px] font-semibold font-lato">Best of {title}</p>
             <p className="text-[15px] text-[#F98F5C] font-lato">{products.length} Products</p>
@@ -382,13 +382,14 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
           const productName = product?.product?.name || "NIL";
 
           return (
-
             <div
               key={index}
-              className="bg-white rounded-xl group  overflow-hidden  cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02]"
+              tabIndex={0} // Allows focus via tap on mobile
+              className="bg-white focus-within:z-10 rounded-xl group overflow-hidden cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02] outline-none"
             >
-              <div className="relative h-[200px] perspective">
-                <div className="relative  overflow-hidden  w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+              {/* FLIP CARD */}
+              <div  onClick={() => viewProduct(product.id)}  className="relative z-50  md:h-[200px] h-[150px] perspective">
+                <div className="relative overflow-hidden w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                   {/* FRONT */}
                   <Image
                     src={productimg}
@@ -396,16 +397,16 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
                     height={200}
                     width={100}
                     className="w-full h-full object-cover backface-hidden"
-                    onClick={()=>viewProduct(product.id)}
+                    
                   />
-                  {/* BACK (optional or just black layer) */}
+                  {/* BACK */}
                   <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
                     <span className="text-sm">Back View</span>
                   </div>
                 </div>
               </div>
 
-              {/* Content */}
+              {/* PRODUCT DETAILS */}
               <div className="p-3 group-hover:pb-24 mb-4 relative z-0 bg-white">
                 <div className="flex justify-between items-center">
                   <p className="text-black font-bold nunito">
@@ -417,7 +418,9 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
                       : Math.min(
                         ...product.variants.map(
                           (v) =>
-                            v?.price ?? v?.supplierProductVariant?.price ?? Infinity
+                            v?.price ??
+                            v?.supplierProductVariant?.price ??
+                            Infinity
                         )
                       )}
                   </p>
@@ -426,7 +429,7 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
                   {productName}
                 </p>
 
-                {/* Info Footer */}
+                {/* INFO FOOTER */}
                 <div className="mt-3 pt-2 border-t border-[#EDEDED] flex items-center justify-between text-sm text-gray-600">
                   <div className="flex items-center gap-1">
                     <Image src={gift || "/icons/gift.svg"} className="w-5 h-5" alt="Gift" />
@@ -439,15 +442,20 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
                 </div>
               </div>
 
-              {/* Slide-in Button Group */}
+              {/* INVISIBLE FOCUS HELPER (for mobile) */}
+              <button className="absolute top-0 left-0 w-full h-full opacity-0 z-0" tabIndex={-1} />
+
+              {/* SLIDE-IN ACTION PANEL */}
               <div
-                className="absolute  bottom-0 shadow border border-gray-100 left-0 w-full p-3 bg-white z-10 opacity-0 translate-y-4
-                       group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
-                       pointer-events-none group-hover:pointer-events-auto"
+                className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 border border-gray-100 shadow
+               opacity-0 translate-y-4 pointer-events-none
+               group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
+               focus-within:opacity-100 focus-within:translate-y-0 focus-within:pointer-events-auto
+               group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto
+               transition-all duration-300"
               >
                 {activeTab === "notmy" && (
                   <button
-                    
                     onClick={() => {
                       setShowPopup(true);
                       setInventoryData({
@@ -458,28 +466,26 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
                         shopifyApp: "",
                       });
                     }}
-                    className="w-full py-2 px-4 text-white rounded-md text-sm  bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
+                    className="w-full py-2 px-4 md:text-sm  text-xs text-white rounded-md  bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
                   >
                     Push To Shopify
                   </button>
                 )}
 
                 <button
-                  
                   onClick={() => {
                     setSelectedProduct(product);
                     setShowVariantPopup(true);
                   }}
-                  className="w-full mt-2 py-2 px-4 text-white rounded-md text-sm bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
+                  className="w-full mt-2 py-2 px-4 text-white rounded-md md:text-sm  text-xs bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
                 >
                   View Variants
                 </button>
 
                 {activeTab === "my" && (
                   <button
-                    
                     onClick={() => handleEdit(product.id)}
-                    className="w-full py-2 px-4 mt-2 text-white rounded-md text-sm bg-black hover:bg-gray-800 transition-colors duration-200"
+                    className="w-full py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition-colors duration-200"
                   >
                     Edit From Shopify
                   </button>
@@ -487,13 +493,14 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
               </div>
             </div>
 
+
           );
         })}
 
 
       </div>
       {showPopup && (
-        <div className="fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed px-6 md:px-0 inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
             <h2 className="text-xl font-semibold mb-4">Push To Shopify</h2>
 
@@ -653,7 +660,7 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
 
 
       {showVariantPopup && selectedProduct && (
-        <div className="fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed  px-6 md:px-0  inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-4xl shadow-xl relative">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">

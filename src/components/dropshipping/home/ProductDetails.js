@@ -662,7 +662,7 @@ const ProductDetails = () => {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`px-6 py-2 font-medium text-xl border-b-2 transition-all duration-300 ease-in-out
+                  className={`md:px-6 px-2 py-2 font-medium md:text-xl border-b-2 transition-all duration-300 ease-in-out
           ${activeTab === tab.key
                       ? "border-orange-500 text-orange-600"
                       : "border-transparent text-gray-500 hover:text-orange-600"
@@ -678,11 +678,10 @@ const ProductDetails = () => {
             {relatedProducts.length === 0 ? (
               <p className="text-center font-bold text-3xl mt-8">No Related Products Found</p>
             ) : (
-              <div className="grid xl:grid-cols-5 lg:grid-cols-4 gap-6 xl:gap-10">
+              <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 md:gap-6 gap-2 xl:gap-10">
                 {relatedProducts.map((item, index) => {
                   const product = item.product || {};
                   const variants = item.variants || [];
-                  console.log('variants', variants)
 
                   const prices = variants.map(v => v.price).filter(p => typeof p === "number");
                   const lowestPrice = prices.length > 0 ? Math.min(...prices) : "N/A";
@@ -691,10 +690,12 @@ const ProductDetails = () => {
                   return (
                     <div
                       key={index}
-                      className="bg-white relative  overflow-hidden rounded-xl group cursor-pointer shadow-md transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]"
+                      tabIndex={0} // Enables focus for mobile tap
+                      className="bg-white relative overflow-hidden rounded-xl group cursor-pointer shadow-md transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] outline-none"
                     >
                       <div className="p-3">
-                        <div className="relative h-[200px] perspective">
+                        {/* FLIP CARD */}
+                        <div className="relative md:h-[200px] h-[100px] perspective">
                           <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                             {/* FRONT */}
                             <Image
@@ -702,15 +703,17 @@ const ProductDetails = () => {
                               alt={productName}
                               height={200}
                               width={100}
-                              className="w-full h-full object-cover backface-hidden"
+                              className="w-full h-full  object-cover backface-hidden"
                             />
-                            {/* BACK (optional or just black layer) */}
+                            {/* BACK */}
                             <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
                               <span className="text-sm">Back View</span>
                             </div>
                           </div>
                         </div>
-                        <div className="flex justify-between items-center">
+
+                        {/* PRICE & NAME */}
+                        <div className="flex justify-between items-center mt-3">
                           <p className="text-lg font-extrabold font-lato text-[#2C3454]">
                             ₹{lowestPrice !== "N/A" ? lowestPrice : "N/A"}
                           </p>
@@ -718,7 +721,9 @@ const ProductDetails = () => {
                         <p className="text-[13px] text-[#7A7A7A] font-lato font-semibold mt-1 hover:text-black transition-colors duration-300">
                           {productName}
                         </p>
-                        <div className="flex items-center border-t pt-3 group-hover:pb-15  mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
+
+                        {/* FOOTER */}
+                        <div className="flex items-center border-t pt-3 group-hover:pb-16 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <Image src={gift} className="w-5" alt="Gift" />
                             <span className="font-lato text-[#2C3454] font-bold">MOQ: N/A</span>
@@ -728,10 +733,14 @@ const ProductDetails = () => {
                             <span className="font-lato text-[#2C3454] font-bold">Rating: N/A</span>
                           </div>
                         </div>
+
+                        {/* SLIDE-IN BUTTON PANEL */}
                         <div
-                          className="absolute bottom-0  left-0 w-full p-3 bg-white z-10 opacity-0 translate-y-4
-                      group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
-                      pointer-events-none group-hover:pointer-events-auto shadow border overflow-hidden border-gray-100"
+                          className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 border border-gray-100 shadow
+                       opacity-0 translate-y-4 pointer-events-none overflow-hidden
+                       group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
+                       group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto
+                       transition-all duration-300"
                         >
                           {activeTab === "notmy" && (
                             <button
@@ -744,7 +753,7 @@ const ProductDetails = () => {
                                   isVarientExists: product?.isVarientExists,
                                 });
                               }}
-                              className="py-2 px-4 text-white rounded-md text-sm w-full  bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out"
+                              className="py-2 px-4 text-white rounded-md md:text-sm  text-xs w-full bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out"
                             >
                               Push To Shopify
                             </button>
@@ -753,7 +762,7 @@ const ProductDetails = () => {
                           {activeTab === "my" && (
                             <button
                               onClick={() => handleEdit(product.id)}
-                              className="py-2 px-4 text-white rounded-md text-sm w-full  bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
+                              className="py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs w-full bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
                             >
                               Edit From Shopify
                             </button>
@@ -764,13 +773,14 @@ const ProductDetails = () => {
                   );
                 })}
               </div>
+
             )}
           </section>
 
 
 
           {showPopup && (
-            <div className="fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
+            <div className="px-6 md:px-0 fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
               <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
                 <h2 className="text-xl font-semibold mb-4">Push To Shopify</h2>
 
