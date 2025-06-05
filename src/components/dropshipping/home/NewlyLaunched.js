@@ -206,7 +206,14 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
   const [loading, setLoading] = useState(false);
   const [showVariantPopup, setShowVariantPopup] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
- 
+  const viewProduct = (id, type) => {
+    if (type == "notmy") {
+      router.push(`/dropshipping/product/?id=${id}&type=${type}`);
+    } else {
+
+      router.push(`/dropshipping/product/?id=${id}`);
+    }
+  };
   const router = useRouter();
   const [inventoryData, setInventoryData] = useState({
     supplierProductId: "",
@@ -389,6 +396,7 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
                     height={200}
                     width={100}
                     className="w-full h-full object-cover backface-hidden"
+                    onClick={()=>viewProduct(product.id)}
                   />
                   {/* BACK (optional or just black layer) */}
                   <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
