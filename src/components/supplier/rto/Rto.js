@@ -11,6 +11,7 @@ import {
   MdKeyboardArrowLeft,
   MdKeyboardArrowRight
 } from "react-icons/md";
+import useScanDetection from 'use-scan-detection';
 import { RiFileEditFill } from "react-icons/ri";
 import { IoCloudDownloadOutline } from "react-icons/io5";
 import { RxCrossCircled } from "react-icons/rx";
@@ -19,8 +20,9 @@ import { IoMdRefresh } from "react-icons/io";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FiDownloadCloud } from "react-icons/fi";
 import { MoreHorizontal } from "lucide-react";
-import { FaCheck } from 'react-icons/fa';
-
+import barcode from '@/app/assets/barcode.png'
+import Image from 'next/image';
+import { HashLoader } from 'react-spinners';
 export default function RTO() {
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -32,8 +34,18 @@ export default function RTO() {
   };
   const [selectedDisputeItem, setSelectedDisputeItem] = useState(null);
   const modalRefNew = useRef(null);
-
+  const [scannedCode, setScannedCode] = useState('');
+  const [message, setMessage] = useState('📷 Please scan a barcode...');
+  const [isClient, setIsClient] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isBarCodePopupOpen, setIsBarCodePopupOpen] = useState(false);
+  const openBarCodeModal = () => {
+    setIsBarCodePopupOpen(true);
+
+  }
+
+
+
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -47,6 +59,20 @@ export default function RTO() {
     setIsModalOpen(true);
     modalRef.current.showModal();
   };
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useScanDetection({
+    onComplete: (code) => {
+      const scanned = String(code);
+      setScannedCode(scanned);
+      barcodeScannerOrder();
+    },
+    minLength: 3,
+  });
+
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -68,7 +94,6 @@ export default function RTO() {
   };
 
 
-  console.log('files', files)
 
   const [fromDate, setFromDate] = useState(() => {
     const d = new Date();
@@ -136,6 +161,24 @@ export default function RTO() {
       setLoading(false);
     }
   }, [router, fromDate, toDate]);
+
+
+  const barcodeScannerOrder = useCallback(async () => {
+    try {
+      if (isBarCodePopupOpen && scannedCode) {
+        const filteredOrders = orders.filter((order) => {
+          return order.orderNumber === scannedCode;
+        });
+        setScannedCode('');
+        setOrders(filteredOrders);
+      }
+    } catch (error) {
+      console.error("Error fetching report:", error);
+    } finally {
+      setLoading(false);
+      setIsBarCodePopupOpen(false)
+    }
+  }, [orders, scannedCode]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(5);
@@ -275,38 +318,45 @@ export default function RTO() {
     fetchRto()
   }, [fetchRto])
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <HashLoader color="orange" />
+      </div>
+    )
+  }
 
   return (
     <div className='px-2 md:px-0'>
       <div className='bg-white rounded-md p-3 mb-4'>
+        <div className="grid justify-between grid-cols-2 items-center">
+          <div className="">
+            <div className="flex  items-end gap-4 mb-6">
+              <div>
+                <label className="text-sm font-medium text-gray-700 block mb-1">From Date</label>
+                <DatePicker
+                  selected={fromDate}
+                  onChange={(date) => setFromDate(date)}
+                  maxDate={new Date()}
+                  dateFormat="yyyy-MM-dd"
+                  className="border border-gray-200 rounded px-3 py-2 w-full"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 block mb-1">To Date</label>
+                <DatePicker
+                  selected={toDate}
+                  onChange={(date) => setToDate(date)}
+                  maxDate={new Date()}
+                  minDate={fromDate}
+                  dateFormat="yyyy-MM-dd"
+                  className="border border-gray-200 rounded px-3 py-2 w-full"
+                />
+              </div>
 
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-4 mb-4">
-          <div className="flex  items-end gap-4 mb-6">
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">From Date</label>
-              <DatePicker
-                selected={fromDate}
-                onChange={(date) => setFromDate(date)}
-                maxDate={new Date()}
-                dateFormat="yyyy-MM-dd"
-                className="border border-gray-200 rounded px-3 py-2 w-full"
-              />
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-1">To Date</label>
-              <DatePicker
-                selected={toDate}
-                onChange={(date) => setToDate(date)}
-                maxDate={new Date()}
-                minDate={fromDate}
-                dateFormat="yyyy-MM-dd"
-                className="border border-gray-200 rounded px-3 py-2 w-full"
-              />
-            </div>
 
-          </div>
-
-          <div> <label className='text-[#232323] font-medium block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
+            {/* <div> <label className='text-[#232323] font-medium block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
           <div> <label className='text-[#232323] font-medium block'>Product Name</label>  <input type="text" placeholder="Name" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
           <div> <label className='text-[#232323] font-medium block'>Product SKU</label>  <input type="text" placeholder="SKU" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
           <div> <label className='text-[#232323] font-medium block'>Tag:</label>  <input type="text" placeholder="ALL" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
@@ -315,10 +365,14 @@ export default function RTO() {
           <div className="flex gap-2 items-end">
             <button className="bg-blue-600 text-white px-6 py-2 rounded-md">Apply</button>
             <button className="bg-red-500 text-white px-6 py-2 rounded-md">Reset</button>
+          </div> */}
           </div>
-        </div>
+          <div className='flex justify-end' onClick={() => openBarCodeModal()}>
+            <Image src={barcode} height={70} width={70} alt="Barcode Image" />
+          </div>
 
-        <div className='lg:flex gap-4 mb-5 items-center justify-between'>
+        </div>
+        {/* <div className='lg:flex gap-4 mb-5 items-center justify-between'>
 
 
           <div className="grid md:grid-cols-3 gap-3 lg:w-8/12 grid-cols-1 items-end justify-between">
@@ -343,14 +397,15 @@ export default function RTO() {
             <button className="bg-[#4C82FF] text-white font-medium px-6 py-2 rounded-md text-sm">Filter</button>
             <button className="bg-[#F98F5C] text-white font-medium px-6 py-2 rounded-md text-sm">Export</button>
           </div>
-        </div>
+        </div> */}
+
       </div>
 
       <div className="bg-white p-4 rounded-2xl">
         <div className="flex flex-wrap justify-between items-center mb-4 lg:px-3">
           <h2 className="text-2xl font-bold  font-dm-sans">RTO Order Details</h2>
           <div className="flex gap-3  flex-wrap items-center">
-            <span className="font-bold   font-dm-sans">Clear Filters</span>
+            <span onClick={() => fetchRto()} className="font-bold   font-dm-sans">Clear Filters</span>
             <span><IoMdRefresh className="text-red-600 text-xl" /></span>
             <span><IoSettingsOutline className="text-xl" /></span>
             <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
@@ -393,6 +448,7 @@ export default function RTO() {
           <table className="table-auto w-full text-sm">
             <thead>
               <tr className="text-[#A3AED0] uppercase text-left  border-b border-[#E9EDF7]">
+                <th className="p-3 px-5 whitespace-nowrap">SR.</th>
                 <th className="p-3 px-5 whitespace-nowrap">Order #</th>
                 <th className="p-3 px-5 whitespace-nowrap">Customer</th>
                 <th className="p-3 px-5 whitespace-nowrap">Payment</th>
@@ -408,8 +464,12 @@ export default function RTO() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {orders.map((order, index) => (
                 <tr key={order.id} className="border-b capitalize align-top text-[#304174] font-semibold border-[#E9EDF7]">
+                  <td className="p-3 px-5 whitespace-nowrap">
+                    {index + 1}
+
+                  </td>
                   <td className="p-3 px-5 whitespace-nowrap">{order.orderNumber}
                     <span className='block'> {order.createdAt
                       ? new Date(order.createdAt).toLocaleDateString()
@@ -525,7 +585,7 @@ export default function RTO() {
                               .map((imgUrl, imgIdx) => (
                                 <img
                                   key={imgIdx}
-                                  src={imgUrl.trim()}
+                                  src={`https://placehold.co/400` || imgUrl.trim()}
                                   alt={`Variant ${idx}`}
                                   className="h-24 w-24 object-cover rounded border border-[#DFEAF2]"
                                 />
@@ -539,7 +599,7 @@ export default function RTO() {
 
                           {item?.supplierRTOResponse && Object.keys(item.supplierRTOResponse).length > 0 ? (
                             <button
-                              className="px-4 py-2 text-white bg-blue-600 rounded"
+                              className="px-4 mt-2 py-2 text-white bg-blue-600 rounded"
                               onClick={() => {
                                 setSelectedDisputeItem(item); // Save clicked dispute item to state
                                 modalRefNew.current?.showModal(); // Open dialog
@@ -706,7 +766,7 @@ export default function RTO() {
                   {selectedDisputeItem.packingGallery.replace(/"/g, '').split(',').map((img, index) => (
                     <img
                       key={index}
-                      src={img.trim()}
+                      src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
                       alt={`Packing ${index}`}
                       className="w-full h-32 object-cover rounded border"
                     />
@@ -723,7 +783,7 @@ export default function RTO() {
                   {selectedDisputeItem.unboxingGallery.replace(/"/g, '').split(',').map((img, index) => (
                     <img
                       key={index}
-                      src={img.trim()}
+                      src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
                       alt={`Unboxing ${index}`}
                       className="w-full h-32 object-cover rounded border"
                     />
@@ -734,7 +794,28 @@ export default function RTO() {
           </div>
         )}
       </dialog>
+      {isBarCodePopupOpen && (
+        <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+            <button
+              onClick={() => setIsBarCodePopupOpen(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black"
+            >
+              ✕
+            </button>
+            <h2 className="text-lg font-bold mb-4">Scan Barcode</h2>
+            <div>
+              <p style={scannedCode ? styles.msgSuccess : styles.msgDefault}>{message}</p>
+              <section style={styles.box}>
+                <label style={styles.label}>Scanned Code:</label>
+                <div style={styles.code}>{scannedCode || '___'}</div>
+              </section>
 
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {isNoteModalOpen && (
         <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
@@ -775,3 +856,46 @@ export default function RTO() {
     </div>
   );
 }
+const styles = {
+  container: {
+    maxWidth: 480,
+    margin: '4rem auto',
+    padding: '2rem',
+    borderRadius: 12,
+    background: '#fff',
+    boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+    textAlign: 'center',
+    fontFamily: "'Segoe UI', sans-serif",
+  },
+  title: {
+    fontSize: '2rem',
+    marginBottom: '1rem',
+    color: '#0070f3',
+  },
+  msgDefault: {
+    fontSize: '1rem',
+    marginBottom: '1.5rem',
+    color: '#555',
+  },
+  msgSuccess: {
+    fontSize: '1rem',
+    marginBottom: '1.5rem',
+    color: '#28a745',
+  },
+  box: {
+    border: '2px dashed #0070f3',
+    padding: '1.5rem',
+    borderRadius: '10px',
+    background: '#f0f8ff',
+  },
+  label: {
+    fontWeight: 'bold',
+    fontSize: '1rem',
+    color: '#0070f3',
+  },
+  code: {
+    marginTop: '10px',
+    fontSize: '1.5rem',
+    color: '#003a8c',
+  },
+};
