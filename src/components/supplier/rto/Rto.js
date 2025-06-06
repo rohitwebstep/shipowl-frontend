@@ -98,6 +98,7 @@ export default function RTO() {
 
   const formatDate = (date) => date.toISOString().split("T")[0];
 
+  
   const fetchRto = useCallback(async () => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
