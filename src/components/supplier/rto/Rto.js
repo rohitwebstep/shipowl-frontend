@@ -11,7 +11,7 @@ import {
   MdKeyboardArrowLeft,
   MdKeyboardArrowRight
 } from "react-icons/md";
-import useScanDetection from 'use-scan-detection';
+import useScannerDetection from '../useScannerDetection';
 // import { RiFileEditFill } from "react-icons/ri";
 // import { IoCloudDownloadOutline } from "react-icons/io5";
 // import { RxCrossCircled } from "react-icons/rx";
@@ -57,8 +57,7 @@ export default function RTO() {
     setIsModalOpen(true);
     modalRef.current.showModal();
   };
-
-  useScanDetection({
+  useScannerDetection({
     onComplete: (code) => {
       const scanned = String(code);
       setScannedCode(scanned);
@@ -98,7 +97,7 @@ export default function RTO() {
 
   const formatDate = (date) => date.toISOString().split("T")[0];
 
-  
+
   const fetchRto = useCallback(async () => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 

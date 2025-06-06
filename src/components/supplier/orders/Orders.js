@@ -20,8 +20,7 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 // import InvoicePdf from './InvoicePdf';
 import barcode from '@/app/assets/barcode.png'
 import Image from 'next/image';
-import useScanDetection from 'use-scan-detection';
-
+import useScannerDetection from '../useScannerDetection';
 export default function Orders() {
   const [filter, setFilter] = useState("Actual Ratio");
   const [tracking, setTracking] = useState([]);
@@ -71,7 +70,7 @@ export default function Orders() {
     }));
   };
 
-  useScanDetection({
+  useScannerDetection({
     onComplete: (code) => {
       const scanned = String(code);
       setScannedCode(scanned);
