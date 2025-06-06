@@ -39,6 +39,11 @@ th.text-left {
   border-radius: 4px;
   border: 1 solid white;
 }
+.blur-text {
+  filter: blur(3px);
+  opacity: 0.5;
+  user-select: none;
+}
 
 /* Firefox support */
 .overflow-auto,

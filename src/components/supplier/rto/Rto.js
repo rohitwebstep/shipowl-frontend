@@ -12,10 +12,10 @@ import {
   MdKeyboardArrowRight
 } from "react-icons/md";
 import useScanDetection from 'use-scan-detection';
-import { RiFileEditFill } from "react-icons/ri";
-import { IoCloudDownloadOutline } from "react-icons/io5";
-import { RxCrossCircled } from "react-icons/rx";
-import { IoIosArrowDropdown } from "react-icons/io";
+// import { RiFileEditFill } from "react-icons/ri";
+// import { IoCloudDownloadOutline } from "react-icons/io5";
+// import { RxCrossCircled } from "react-icons/rx";
+// import { IoIosArrowDropdown } from "react-icons/io";
 import { IoMdRefresh } from "react-icons/io";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FiDownloadCloud } from "react-icons/fi";
@@ -36,15 +36,12 @@ export default function RTO() {
   const modalRefNew = useRef(null);
   const [scannedCode, setScannedCode] = useState('');
   const [message, setMessage] = useState('📷 Please scan a barcode...');
-  const [isClient, setIsClient] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isBarCodePopupOpen, setIsBarCodePopupOpen] = useState(false);
   const openBarCodeModal = () => {
     setIsBarCodePopupOpen(true);
 
   }
-
-
 
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,16 +50,13 @@ export default function RTO() {
   const [status, setStatus] = useState('');
   const [packingGallery, setPackingGallery] = useState([]);
   const [unboxingGallery, setUnboxingGallery] = useState([]);
+  const [permission, setPermission] = useState([]);
   const modalRef = useRef();
   const [files, setFiles] = useState([]);
   const openModal = () => {
     setIsModalOpen(true);
     modalRef.current.showModal();
   };
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   useScanDetection({
     onComplete: (code) => {
@@ -72,7 +66,6 @@ export default function RTO() {
     },
     minLength: 3,
   });
-
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -155,6 +148,7 @@ export default function RTO() {
 
       const result = await response.json();
       setOrders(result?.orders || []);
+      setPermission(result?.permissions[0] || []);
     } catch (error) {
       console.error("Error fetching report:", error);
     } finally {
@@ -162,7 +156,39 @@ export default function RTO() {
     }
   }, [router, fromDate, toDate]);
 
+ useEffect(() => {
+    if (typeof window !== 'undefined' && orders.length > 0 && !loading) {
+      let table = null;
 
+      Promise.all([
+        import('jquery'),
+        import('datatables.net'),
+        import('datatables.net-dt'),
+        import('datatables.net-buttons'),
+        import('datatables.net-buttons-dt')
+      ]).then(([jQuery]) => {
+        window.jQuery = window.$ = jQuery.default;
+
+        // Destroy existing DataTable if it exists
+        if ($.fn.DataTable.isDataTable('#rtoOrderTable')) {
+          $('#rtoOrderTable').DataTable().destroy();
+          $('#rtoOrderTable').empty();
+        }
+
+        // Reinitialize DataTable with new data
+        table = $('#rtoOrderTable').DataTable();
+
+        return () => {
+          if (table) {
+            table.destroy();
+            $('#rtoOrderTable').empty();
+          }
+        };
+      }).catch((error) => {
+        console.error('Failed to load DataTables dependencies:', error);
+      });
+    }
+  }, [orders, loading]);
   const barcodeScannerOrder = useCallback(async () => {
     try {
       if (isBarCodePopupOpen && scannedCode) {
@@ -180,13 +206,6 @@ export default function RTO() {
     }
   }, [orders, scannedCode]);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(5);
-  const [filter, setFilter] = useState("Actual Ratio");
-  const totalPages = Math.ceil(orders.length / perPage);
-  const indexOfLast = currentPage * perPage;
-  const indexOfFirst = indexOfLast - perPage;
-  const currentData = orders.slice(indexOfFirst, indexOfLast);
 
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const today = new Date();
@@ -317,7 +336,14 @@ export default function RTO() {
   useEffect(() => {
     fetchRto()
   }, [fetchRto])
-
+  const PermissionField = ({ permissionKey, children }) => {
+    const isAllowed = permission[permissionKey];
+    return (
+      <span style={isAllowed ? {} : { filter: "blur(3px)", opacity: 0.5, userSelect: "none" }}>
+        {children || "N/A"}
+      </span>
+    );
+  };
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -325,6 +351,7 @@ export default function RTO() {
       </div>
     )
   }
+  console.log('PermissionField', PermissionField)
 
   return (
     <div className='px-2 md:px-0'>
@@ -409,13 +436,13 @@ export default function RTO() {
             <span><IoMdRefresh className="text-red-600 text-xl" /></span>
             <span><IoSettingsOutline className="text-xl" /></span>
             <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
-            <select
+            {/* <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="bg-[#4318FF] font-dm-sans outline-0 text-white md:w-[120px] font-medium  px-2 py-2 rounded-md"
             >
               <option value="Actual Ratio ">Bulk Action</option>
-            </select>
+            </select> */}
             <button className="bg-[#F4F7FE] rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
 
               {/* Month Input */}
@@ -443,9 +470,8 @@ export default function RTO() {
             </button>
           </div>
         </div>
-        <div className="overflow-x-auto">
-
-          <table className="table-auto w-full text-sm">
+        <div className="overflow-x-auto relative main-outer-wrapper w-full">
+            <table className="md:w-full w-auto display main-tables" id="rtoOrderTable">
             <thead>
               <tr className="text-[#A3AED0] uppercase text-left  border-b border-[#E9EDF7]">
                 <th className="p-3 px-5 whitespace-nowrap">SR.</th>
@@ -465,29 +491,36 @@ export default function RTO() {
             </thead>
             <tbody>
               {orders.map((order, index) => (
+
                 <tr key={order.id} className="border-b capitalize align-top text-[#304174] font-semibold border-[#E9EDF7]">
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    {index + 1}
+                  {/* Index */}
+                  <td className="p-3 px-5 whitespace-nowrap">{index + 1}</td>
 
-                  </td>
-                  <td className="p-3 px-5 whitespace-nowrap">{order.orderNumber}
-                    <span className='block'> {order.createdAt
-                      ? new Date(order.createdAt).toLocaleDateString()
-                      : "N/A"}</span>
-                  </td>
+                  {/* Order Number + Created Date */}
                   <td className="p-3 px-5 whitespace-nowrap">
-                    {order.shippingName}
+                    <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
+                    <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
+                  </td>
+
+                  {/* Shipping Name, Phone, Email */}
+                  <td className="p-3 px-5 whitespace-nowrap">
+                    <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
                     <br />
-                    <span className="text-sm block">{order.shippingPhone}</span>
-                    <span className="text-sm text-[#01b574]">{order.shippingEmail}</span>
+                    <span className="text-sm block">
+                      <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
+                    </span>
+                    <span className="text-sm text-[#01b574]">
+                      <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
+                    </span>
                   </td>
 
+                  {/* Payment Info */}
                   <td className="p-3 px-5 whitespace-nowrap font-semibold">
-                    <p>Method:<span className=' font-bold'>{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
-                    <p>Transaction Id:<span className=' font-bold'>{order.payment?.transactionId || "N/A"}</span></p>
-                    <p>Amount :<span className=' font-bold'>{order.payment?.amount || "N/A"}</span></p>
+                    <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
+                    <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p>
+                    <p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p>
                     <p>
-                      Status:
+                      Status:{" "}
                       <span
                         className={`font-bold ${order.payment?.status === "failed"
                           ? "text-red-500"
@@ -496,63 +529,92 @@ export default function RTO() {
                             : "text-green-500"
                           }`}
                       >
-                        {order.payment?.status || "N/A"}
+                        <PermissionField permissionKey="status">{order.payment?.status || "N/A"}</PermissionField>
                       </span>
                     </p>
                   </td>
 
+                  {/* Shipping details + AWB */}
                   <td className="p-3 px-5 whitespace-nowrap">
-                    {order.shippingApiResult?.data?.order_number || "N/A"}
+                    <PermissionField permissionKey="orderNumber">{order.shippingApiResult?.data?.order_number}</PermissionField>
                     <br />
-                    {order.shippingAddress || "N/A"}
+                    <PermissionField permissionKey="shippingAddress">{order.shippingAddress}</PermissionField>
                     <br />
-                    <span className='text-green-500'> {order.shippingPhone || "N/A"}</span>
+                    <span className="text-green-500">
+                      <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
+                    </span>
                     <br />
-                    AWB: {order.shippingApiResult?.data?.awb_number || "N/A"}
+                    AWB: <PermissionField permissionKey="awbNumber">{order.shippingApiResult?.data?.awb_number}</PermissionField>
                   </td>
+
+                  {/* Tracking Numbers */}
                   <td className="p-3 px-5 whitespace-nowrap">
                     {order.items
-                      .map((item) => item.supplierRTOResponse?.trackingNumber || "N/A")
-                      .join(", ")}
+                      .map((item) => (
+                        <PermissionField key={item.id} permissionKey="awbNumber">
+                          {item.supplierRTOResponse?.trackingNumber || "N/A"}
+                        </PermissionField>
+                      ))
+                      .reduce((prev, curr) => [prev, ", ", curr])}
                   </td>
+
+                  {/* RTO Delivered */}
                   <td className="p-3 px-5 whitespace-nowrap">
-                    {order.rtoDelivered ? (
-                      <span className="text-green-600">Delivered</span>
-                    ) : (
-                      <span className="text-red-500">Pending</span>
-                    )}
+                    <PermissionField permissionKey="status">
+                      {order.rtoDelivered ? (
+                        <span className="text-green-600">Delivered</span>
+                      ) : (
+                        <span className="text-red-500">Pending</span>
+                      )}
+                    </PermissionField>
                   </td>
+
+                  {/* RTO Delivered Date */}
                   <td className="p-3 px-5 whitespace-nowrap">
-                    {order.rtoDeliveredDate
-                      ? new Date(order.rtoDeliveredDate).toLocaleDateString()
-                      : "N/A"}
+                    <PermissionField permissionKey="status">
+                      {order.rtoDeliveredDate ? new Date(order.rtoDeliveredDate).toLocaleDateString() : "N/A"}
+                    </PermissionField>
                   </td>
+
+                  {/* Number of Items */}
                   <td className="p-3 px-5 whitespace-nowrap">{order.items.length}</td>
-                  <td className="p-3 px-5 whitespace-nowrap">₹{order.totalAmount}</td>
+
+                  {/* Total Amount */}
                   <td className="p-3 px-5 whitespace-nowrap">
-                    {order.delivered ? (
-                      <span className="text-green-600 font-medium">Yes</span>
-                    ) : (
-                      <span className="text-red-500 font-medium">No</span>
-                    )}
+                    <PermissionField permissionKey="totalAmount">₹{order.totalAmount}</PermissionField>
                   </td>
+
+                  {/* Delivered */}
                   <td className="p-3 px-5 whitespace-nowrap">
-                    {new Date(order.createdAt).toLocaleDateString()}
+                    <PermissionField permissionKey="status">
+                      {order.delivered ? (
+                        <span className="text-green-600 font-medium">Yes</span>
+                      ) : (
+                        <span className="text-red-500 font-medium">No</span>
+                      )}
+                    </PermissionField>
                   </td>
+
+                  {/* Created At Date */}
+                  <td className="p-3 px-5 whitespace-nowrap">
+                    <PermissionField permissionKey="orderNote">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </PermissionField>
+                  </td>
+
+                  {/* Action Button */}
                   <td className="p-3 px-5 whitespace-nowrap">
                     <button
-                      onClick={() =>
-                        handleViewVariant(order, order.items)
-                      }
+                      onClick={() => handleViewVariant(order, order.items)}
                       className="bg-orange-500 rounded-md p-3 text-white text-sm"
                     >
                       View Variant
                     </button>
-
                   </td>
                 </tr>
               ))}
             </tbody>
+
           </table>
 
 
@@ -707,46 +769,7 @@ export default function RTO() {
 
           )}
         </div>
-        <div className="flex flex-wrap lg:justify-end justify-center items-center mt-4 p-4 pt-0">
-          <div className="flex gap-1 items-center">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border-[#2B3674] flex gap-1 items-center  rounded mx-1 disabled:opacity-50"
-            >
-              <MdKeyboardArrowLeft /> Previous
-            </button>
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentPage(index + 1)}
-                className={`px-3 hidden md:block py-1 border-[#2B3674]  rounded mx-1 ${currentPage === index + 1 ? "bg-[#2B3674] text-white" : ""}`}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 border-[#2B3674] flex gap-1 items-center  rounded mx-1 disabled:opacity-50"
-            >
-              Next <MdKeyboardArrowRight />
-            </button>
-          </div>
-
-          {/* Per Page Selection */}
-          <select
-            value={perPage}
-            onChange={(e) => setPerPage(Number(e.target.value))}
-            className="border-[#2B3674] bg-[#F8FBFF]  rounded px-3 py-2 font-semibold"
-          >
-            {[5, 10, 15].map((num) => (
-              <option key={num} value={num}>
-                {num} /Per Page
-              </option>
-            ))}
-          </select>
-        </div>
+       
       </div>
       <dialog ref={modalRefNew} className="rounded-md w-full m-auto max-w-2xl p-6 z-50">
         {selectedDisputeItem && (

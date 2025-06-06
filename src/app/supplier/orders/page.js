@@ -1,8 +1,8 @@
-import Orders from '@/components/supplier/orders/Orders'
-import React from 'react'
+"use client"
+import dynamic from 'next/dynamic';
+
+const Orders = dynamic(() => import('@/components/supplier/orders/Orders'), { ssr: false });
 
 export default function Page() {
-  return (
-   <Orders/>
-  )
+  return <Orders />;
 }
