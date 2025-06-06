@@ -8,6 +8,10 @@ import { HashLoader } from 'react-spinners';
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import dynamic from 'next/dynamic';
 
+// Dynamically import TinyMCE Editor with SSR disabled
+const Editor = dynamic(() => import('@tinymce/tinymce-react').then(mod => mod.Editor), {
+  ssr: false,
+});
 const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function ProductDetails() {
   const {
@@ -25,6 +29,9 @@ export default function ProductDetails() {
   } = useContext(ProductContext);
 
   const { fetchSupplier, suppliers } = useAdmin();
+  const handleEditorChange = (value, field) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   useEffect(() => {
     fetchCategory();
@@ -119,13 +126,42 @@ export default function ProductDetails() {
         <label className="block text-[#232323] font-semibold">
           Description <span className="text-red-500">*</span>
         </label>
-        <textarea
-          name="description"
-          className={`w-full border ${errors.description ? 'border-red-500' : 'border-[#DFEAF2]'} p-2 rounded-md text-[#718EBF] font-bold mt-2 outline-0 h-24`}
-          placeholder="Description"
-          onChange={handleChange}
-          value={formData.description || ''}
-        ></textarea>
+
+
+        <Editor
+          apiKey="frnlhul2sjabyse5v4xtgnphkcgjxm316p0r37ojfop0ux83"
+          value={formData.description}
+          onEditorChange={(content) => handleEditorChange(content, 'description')}
+          init={{
+            height: 300,
+            menubar: false,
+            plugins: [
+              'anchor', 'autolink', 'charmap', 'codesample', 'emoticons',
+              'image', 'link', 'lists', 'media', 'searchreplace', 'table',
+              'visualblocks', 'wordcount',
+              'checklist', 'mediaembed', 'casechange', 'formatpainter',
+              'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen',
+              'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate',
+              'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes',
+              'mergetags', 'autocorrect', 'typography', 'inlinecss',
+              'markdown', 'importword', 'exportword', 'exportpdf'
+            ],
+            toolbar:
+              'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | ' +
+              'link image media table mergetags | addcomment showcomments | ' +
+              'spellcheckdialog a11ycheck typography | align lineheight | ' +
+              'checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            mergetags_list: [
+              { value: 'First.Name', title: 'First Name' },
+              { value: 'Email', title: 'Email' },
+            ],
+            ai_request: (request, respondWith) =>
+              respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+          }}
+        />
+
         {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
       </div>
 

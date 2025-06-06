@@ -17,7 +17,7 @@ import { ProductContext } from '../addproducts/ProductContext';
 
 const ProductTable = () => {
     const { setActiveTab } = useContext(ProductContextEdit);
-    const {setActiveTabs} = useContext(ProductContext)
+    const { setActiveTabs } = useContext(ProductContext)
     const [showVariantPopup, setShowVariantPopup] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -30,13 +30,15 @@ const ProductTable = () => {
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
     const [selected, setSelected] = useState([]);
     const [selectedMonth, setSelectedMonth] = useState(() => {
         const today = new Date();
         return today.toISOString().slice(0, 7);
     });
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/product", "products");
-
+  
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -172,9 +174,9 @@ const ProductTable = () => {
                 <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">Import Inventory</button>
                 <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
                 <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>
-                <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() =>{
-                     setActiveTab('product-details');
-                      setActiveTabs('product-details')
+                <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() => {
+                    setActiveTab('product-details');
+                    setActiveTabs('product-details')
                 }}>
                     <Link href="/admin/products/create">Add New</Link>
                 </button>
@@ -342,7 +344,41 @@ const ProductTable = () => {
                                                     <span className="truncate"> {item.name || 'NIL'}</span>
                                                 </div>
                                             </td>
-                                            <td className="p-2 px-5 capitalize  text-left whitespace-nowrap">{item.description || 'NIL'}</td>
+                                            <td className="p-2 px-5 capitalize text-left whitespace-nowrap">
+                                                <button
+                                                    onClick={() => setIsOpen(true)}
+                                                    className="text-blue-600 underline"
+                                                >
+                                                    View
+                                                </button>
+                                            </td>
+                                            {isOpen && (
+                                                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                                                    <div className="bg-white max-w-3xl w-full max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
+                                                        {/* Close Button */}
+                                                        <button
+                                                            onClick={() => setIsOpen(false)}
+                                                            className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+                                                        >
+                                                            &times;
+                                                        </button>
+
+                                                        {/* HTML Description Content */}
+                                                        {item.description ? (
+                                                            <div
+                                                                className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                                                                dangerouslySetInnerHTML={{ __html: item.description }}
+                                                            />
+
+
+                                                        ) : (
+                                                            <p className="text-gray-500">NIL</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+
+
                                             <td className="p-2 px-5 capitalize  text-left whitespace-nowrap">{item.main_sku || 'NIL'}</td>
                                             {showRtoLiveCount && <td className="p-2 px-5 capitalize  text-left whitespace-nowrap text-blue-500">{item.liveRtoStock || 'NIL'}</td>}
 
@@ -439,42 +475,46 @@ const ProductTable = () => {
                                                                 : [];
 
                                                             return (
-                                                                <tr key={variant.id || idx}>
-                                                                    <td className="border px-4 py-2">
-                                                                        <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
-                                                                            {imageUrls.length > 0 ? (
-                                                                                imageUrls.map((url, i) => (
+                                                                <React.Fragment key={variant.id || idx}>
+                                                                    <tr>
+                                                                        <td className="border px-4 py-2">
+                                                                            <div className="flex space-x-2 overflow-x-auto max-w-[200px]">
+                                                                                {imageUrls.length > 0 ? (
+                                                                                    imageUrls.map((url, i) => (
+                                                                                        <Image
+                                                                                            key={i}
+                                                                                            height={40}
+                                                                                            width={40}
+                                                                                            src={url}
+                                                                                            alt={variant.name || 'NIL'}
+                                                                                            className="shrink-0 rounded"
+                                                                                        />
+                                                                                    ))
+                                                                                ) : (
                                                                                     <Image
-                                                                                        key={i}
                                                                                         height={40}
                                                                                         width={40}
-                                                                                        src={url}
-                                                                                        alt={variant.name || 'NIL'}
+                                                                                        src="https://placehold.co/400"
+                                                                                        alt="Placeholder"
                                                                                         className="shrink-0 rounded"
                                                                                     />
-                                                                                ))
-                                                                            ) : (
-                                                                                <Image
-                                                                                    height={40}
-                                                                                    width={40}
-                                                                                    src="https://placehold.co/400"
-                                                                                    alt="Placeholder"
-                                                                                    className="shrink-0 rounded"
-                                                                                />
-                                                                            )}
-                                                                        </div>
-                                                                    </td>
-                                                                    <td className="border px-4 py-2">{variant.modal || 'NIL'}</td>
-                                                                    <td className="border px-4 py-2">{variant.product_link || 'NIL'}</td>
-                                                                    <td className="border px-4 py-2">{variant.suggested_price ?? 'NIL'}</td>
-                                                                    <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
-                                                                    {isExists && (
-                                                                        <>
-                                                                        <td className="border px-4 py-2">{variant.name || 'NIL'}</td>
-                                                                            <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
-                                                                        </>
-                                                                    )}
-                                                                </tr>
+                                                                                )}
+                                                                            </div>
+
+                                                                        </td>
+                                                                        <td className="border px-4 py-2">{variant.modal || 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.product_link || 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.suggested_price ?? 'NIL'}</td>
+                                                                        <td className="border px-4 py-2">{variant.sku || 'NIL'}</td>
+                                                                        {isExists && (
+                                                                            <>
+                                                                                <td className="border px-4 py-2">{variant.name || 'NIL'}</td>
+                                                                                <td className="border px-4 py-2">{variant.color || 'NIL'}</td>
+                                                                            </>
+                                                                        )}
+                                                                    </tr>
+
+                                                                </React.Fragment>
                                                             );
                                                         })}
                                                     </tbody>
@@ -502,6 +542,7 @@ const ProductTable = () => {
                 </div>
             )}
         </div>
+
     );
 };
 

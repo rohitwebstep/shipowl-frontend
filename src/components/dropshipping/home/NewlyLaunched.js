@@ -370,7 +370,7 @@ const Section = ({ title, products, shopifyStores, setActiveTab, fetchProduct, a
 
       <div className="products-grid pb-5 md:pb-0  grid grid-cols-2 xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
         <div className="grid bg-[#212B36] rounded-xl shadow-xl overflow-hidden cursor-default">
-          <Image src={productimg} alt={`Best of ${title}`} className={`w-full  object-cover ${activeTab == "notmy" ? "md:max-h-[250px] h-[150px]" : "md:max-h-[230px] h-[150px]"}`} />
+          <Image src={productimg} alt={`Best of ${title}`} className={`w-full  object-cover ${activeTab == "notmy" ? "md:max-h-[250px] h-[200px]" : "md:max-h-[230px] h-[200px]"}`} />
           <div className="bg-[#212B36] bg-opacity-50 p-4 px-2 text-center text-white">
             <p className="text-[16px] font-semibold font-lato">Best of {title}</p>
             <p className="text-[15px] text-[#F98F5C] font-lato">{products.length} Products</p>
