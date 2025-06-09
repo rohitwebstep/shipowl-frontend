@@ -78,7 +78,7 @@ const [activeTab,setActiveTab] = useState("product-details");
     }
 
     try {
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com//api/admin/category', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/admin/category', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ const [activeTab,setActiveTab] = useState("product-details");
     }
 
     try {
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com//api/admin/brand', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/admin/brand', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +172,7 @@ const [activeTab,setActiveTab] = useState("product-details");
 
     try {
       setLoading(true);
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com//api/location/country', {
+      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/location/country', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -55,7 +55,7 @@ export default function Login() {
         });
     
         try {
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com//api/admin/auth/login`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),

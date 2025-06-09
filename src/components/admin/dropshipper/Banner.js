@@ -96,7 +96,7 @@ export default function Banner() {
                 });
             }
 
-            const url = "https://sleeping-owl-we0m.onrender.com//api/admin/Banner";
+            const url = "https://sleeping-owl-we0m.onrender.com/api/admin/Banner";
 
             const response = await fetch(url, {
                 method: "POST",

@@ -42,7 +42,7 @@ function Permission() {
 
   const fetchPermission = useCallback(() => {
     fetchProtected(
-      "https://sleeping-owl-we0m.onrender.com//api/admin/permission",
+      "https://sleeping-owl-we0m.onrender.com/api/admin/permission",
       setPermission,
       "permissions",
       setLoading
@@ -84,7 +84,7 @@ function Permission() {
         redirect: "follow"
       };
 
-      const res = await fetch("https://sleeping-owl-we0m.onrender.com//api/admin/permission", requestOptions);
+      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/admin/permission", requestOptions);
 
       const result = await res.json();
 
