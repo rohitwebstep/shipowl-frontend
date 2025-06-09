@@ -24,6 +24,13 @@ import { GiWeight } from "react-icons/gi";
 import { HiShieldCheck } from "react-icons/hi";
 import { LuArrowUpRight } from "react-icons/lu";
 import { IoIosReturnLeft } from "react-icons/io";
+import { TbCube } from "react-icons/tb";
+import { GoArrowUpRight } from "react-icons/go";
+import { FiArrowDownLeft } from "react-icons/fi";
+import { RiResetRightLine } from "react-icons/ri";
+import { RxCross1 } from "react-icons/rx";
+import { ChevronRight, ChevronDown } from "lucide-react"; // Optional: Lucide icons
+
 const tabs = [
   { key: "my", label: "Pushed to Shopify" },
   { key: "notmy", label: "Not Pushed to Shopify" },
@@ -35,8 +42,16 @@ const ProductDetails = () => {
   const type = searchParams.get('type');
   const [showPopup, setShowPopup] = useState(false);
   // Dynamic images setup
+  const [openSection, setOpenSection] = useState(null);
+  const [shipCost, setShipCost] = useState([]);
+
+
+  const toggleSection = (section) => {
+    setOpenSection(openSection === section ? null : section);
+  };
   const [activeTab, setActiveTab] = useState('my');
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [openCalculator, setOpenCalculator] = useState(null);
   const [productDetails, setProductDetails] = useState([]);
   const [otherSuppliers, setOtherSuppliers] = useState([]);
   const images = selectedVariant?.variant?.image?.split(",") || [];
@@ -53,7 +68,113 @@ const ProductDetails = () => {
     isVarientExists: '',
     shopifyApp: '',
   });
-  console.log('inventoryData', inventoryData)
+
+
+  //fields for calculator
+
+  const [form, setForm] = useState({
+    sellingPrice: '',
+    totalOrderQty: '',
+    confirmOrderPercentage: '90',
+    deliveryPercentage: '50',
+    adSpends: '',
+    miscCharges: '',
+  });
+
+  const [errors, setErrors] = useState({});
+  const [showResult, setShowResult] = useState(false);
+
+  const handleChange = (key, value) => {
+    const updatedForm = { ...form, [key]: value };
+    setForm(updatedForm);
+
+    const validationPassed = validate(updatedForm);
+    setShowResult(validationPassed);
+  };
+
+  const validate = (formToValidate = form) => {
+    const newErrors = {};
+
+    Object.keys(formToValidate).forEach((key) => {
+      if (key === 'miscCharges') return; // Skip missCharge
+
+      if (!formToValidate[key] || isNaN(formToValidate[key])) {
+        newErrors[key] = 'This Field is Required';
+      }
+    });
+
+    if (
+      formToValidate.sellingPrice &&
+      !isNaN(formToValidate.sellingPrice) &&
+      parseFloat(formToValidate.sellingPrice) < selectedVariant?.price
+    ) {
+      newErrors.sellingPrice = 'Selling price should be Greater than on equal to Shipowl price';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+
+  const resetForm = () => {
+    setForm({
+      sellingPrice: '',
+      totalOrderQty: '',
+      confirmOrderPercentage: '90',
+      deliveryPercentage: '50',
+      adSpends: '',
+      miscCharges: '',
+    });
+    setErrors({});
+    setShowResult(false);
+  };
+
+  // Safely parsed values
+  const sellingPrice = parseFloat(form.sellingPrice) || 0;
+
+  const totalOrderQty = parseFloat(form.totalOrderQty) || 0;
+
+  const confirmOrderPercentage = parseFloat(form.confirmOrderPercentage) || 0;
+
+  const deliveryPercentage = parseFloat(form.deliveryPercentage) || 0;
+
+  const deliveryRTOPercentage = 100 - deliveryPercentage;
+
+  const adSpends = parseFloat(form.adSpends) || 0;
+
+  const miscCharges = parseFloat(form.miscCharges) || 0;
+
+  const productPrice = selectedVariant?.price;
+  const deliveryCostPerUnit = shipCost;
+  // Derived Quantities
+  const confirmedQtyrAW = totalOrderQty * (confirmOrderPercentage / 100);
+  const confirmedQty = Math.round(confirmedQtyrAW);
+
+  // Calculate Delivered Quantity and round up if there is a decimal
+  const deliveredQtyRaw = confirmedQty * (deliveryPercentage / 100);
+  const deliveredQty = Math.round(deliveredQtyRaw);
+
+  // Calculate Delivered RTO Quantity
+  const deliveredRTOQty = confirmedQty - deliveredQty;
+
+
+  // Cost Calculations
+
+  const productCostForDelivered = deliveredQty * productPrice;
+
+  const revenueFromDelivered = deliveredQty * sellingPrice;
+
+  const totalRTODeliveryCost = deliveredRTOQty * deliveryCostPerUnit;
+
+  // Final Margin Calculation
+  const totalAddSpend = adSpends * totalOrderQty; //order*adSpends
+  const perOrderMargin = sellingPrice - productPrice;
+  const finalEarnings = perOrderMargin * deliveredQty;
+  const totalExpenses = totalRTODeliveryCost + totalAddSpend + miscCharges;
+  const finalMargin = finalEarnings - totalExpenses; //total earning-totalspend
+
+
+  const profitPerOrder = finalMargin / totalOrderQty;
   const fetchProductDetails = useCallback(async () => {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -73,9 +194,9 @@ const ProductDetails = () => {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory/${id}`;
+        url = `https://sleeping-owl-we0m.onrender.com//api/dropshipper/product/inventory/${id}`;
       } else {
-        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}`;
+        url = `https://sleeping-owl-we0m.onrender.com//api/dropshipper/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
@@ -95,7 +216,7 @@ const ProductDetails = () => {
         });
         throw new Error(result.message || result.error || "Something went wrong!");
       }
-
+      setShipCost(result?.shippingCost || []);
 
       if (type === "notmy") {
         const ProductDataSup = result?.supplierProduct;
@@ -149,7 +270,7 @@ const ProductDetails = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com//api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -169,6 +290,7 @@ const ProductDetails = () => {
 
       setRelatedProducts(result?.products || []);
       setShopifyStores(result?.shopifyStores || []);
+
     } catch (error) {
       console.error("Error fetching related products:", error);
     } finally {
@@ -245,7 +367,7 @@ const ProductDetails = () => {
 
 
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = "https://sleeping-owl-we0m.onrender.com//api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -404,7 +526,7 @@ const ProductDetails = () => {
                       </p>
                     </div>
 
-                    <div className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer">
+                    <div onClick={() => setOpenCalculator(true)} className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer">
                       <FaCalculator className="text-purple-700 mr-2 text-2xl" />
                       <span className="text-black underline font-semibold text-sm">
                         Calculate <br /> Expected Profit
@@ -937,10 +1059,239 @@ const ProductDetails = () => {
               </div>
             </div>
           )}
+
         </div>
       ) : (
         <p className="text-center font-bold text-3xl mt-8"> Product Not Found</p>
       )}
+
+      {
+        openCalculator && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white w-full max-w-4xl rounded shadow-lg p-6 max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex justify-between items-center border-b pb-3">
+                <div className='flex gap-3 items-center'>
+                  <div className='bg-gray-200 text-center p-3 flex justify-center items-center rounded-full'>
+                    <FaCalculator className="text-2xl" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Pricing Calculator</h2>
+                    <p className='text-xs'>Please enter all the required fields (<span className='text-red-500'>*</span>) to calculate your expected profit</p>
+                  </div>
+                </div>
+                <div className='flex gap-4 justify-end'>
+                  <button className="text-sm underline font-bold items-center gap-2 flex text-black" onClick={resetForm}>
+                    <RiResetRightLine /> Reset
+                  </button>
+                  <button onClick={() => setOpenCalculator(false)} className="text-sm text-black font-bold" >
+                    <RxCross1 />
+                  </button>
+                </div>
+              </div>
+
+              {/* Info Bar */}
+              <div className="flex gap-6 mt-4 mb-6">
+                <Image src={selectedVariant?.variant?.image?.split(",")} alt="Demo Image"/>
+                <ProductInfo label="Shipowl Price" value={selectedVariant?.price} />
+                <ProductInfo label="RTO Charges" value={shipCost} />
+                <ProductInfo label="Product Weight" value={`${productDetails?.weight} GM `} />
+              </div>
+
+              {/* Main Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Form Side */}
+                <div className="space-y-4 bg-[#f5f5f5] rounded-md p-4">
+                  <InputField
+                    label="Selling Price"
+                    value={form.sellingPrice}
+                    onChange={(val) => handleChange('sellingPrice', val)}
+                    error={errors.sellingPrice}
+                    required
+
+                  />
+                  <InputField
+                    label="Expected Orders"
+                    value={form.totalOrderQty}
+                    onChange={(val) => handleChange('totalOrderQty', val)}
+                    error={errors.totalOrderQty}
+                    required
+                  />
+                  <InputField
+                    label="Confirmed Orders (%)"
+                    value={form.confirmOrderPercentage}
+                    onChange={(val) => handleChange('confirmOrderPercentage', Math.min(100, val))}
+                    error={errors.confirmOrderPercentage}
+                    required
+                    suffix="%"
+                  />
+                  <InputField
+                    label="Expected Delivery (%)"
+                    value={form.deliveryPercentage}
+                    onChange={(val) => handleChange('deliveryPercentage', Math.min(100, val))}
+                    error={errors.deliveryPercentage}
+                    required
+                    suffix="%"
+                  />
+                  <InputField
+                    label="Ad Spends per Order"
+                    value={form.adSpends}
+                    onChange={(val) => handleChange('adSpends', val)}
+                    error={errors.adSpends}
+                    required
+                    suffix="₹"
+                  />
+                  <InputField
+                    label="Total Misc. Charges"
+                    value={form.miscCharges}
+                    onChange={(val) => handleChange('miscCharges', val)}
+                    suffix="₹"
+                  />
+                </div>
+
+
+                {/* Results Side */}
+                <div>
+                  <div className={`p-4 rounded-md ${showResult ? (finalMargin < 0 ? 'bg-red-50' : 'bg-green-50') : 'bg-gray-100'}`}>
+                    <ResultItem label="Net Profit" value={`₹${finalMargin.toFixed(2)}`} isVisible={showResult} />
+                    <p className='text-xs'>Total Earnings - Total Spends</p>
+                    <hr className='my-4' />
+                    <ResultItem label="Net Profit (Per Order)" value={`₹${profitPerOrder.toFixed(2)}`} isVisible={showResult} />
+                    <p className='text-xs'>Net Profit / Expected Orders</p>
+                  </div>
+
+
+                  <div className="border border-gray-300 p-4 rounded-md space-y-4 mt-3">
+                    {/* Orders Section */}
+                    <div className="border-b border-gray-200 pb-2">
+                      <div
+                        className="flex items-center justify-between cursor-pointer"
+                        onClick={() => toggleSection("orders")}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="bg-purple-100 p-2 rounded-full">
+                            <TbCube className="text-purple-700" />
+                          </div>
+                          <ResultItem
+                            label="# Orders"
+                            value={totalOrderQty}
+                            isVisible={showResult}
+                            placeholder="N/A"
+                          />
+                        </div>
+                        {openSection === "orders" ? (
+                          <ChevronDown className="text-gray-500" />
+                        ) : (
+                          <ChevronRight className="text-gray-500" />
+                        )}
+                      </div>
+                      {openSection === "orders" && (
+                        <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
+                          <ul>
+                            <li>
+                              Confirmed Orders: <span>{confirmedQty}</span>
+                            </li>
+                            <li>
+                              Delivered Orders: <span>{deliveredQty}</span>
+                            </li>
+                            <li>
+                              RTO Orders: <span>{deliveredRTOQty}</span>
+                            </li>
+                            <li>
+                              Cancelled Orders: <span>{totalOrderQty - confirmedQty}</span>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Earnings Section */}
+                    <div className="border-b border-gray-200 pb-2">
+                      <div className="flex items-center  cursor-pointer"
+                        onClick={() => toggleSection("earnings")}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="bg-green-100 p-2 rounded-full">
+                            <FiArrowDownLeft className="text-green-700" />
+                          </div>
+                          <ResultItem
+                            label="Total Earnings"
+                            value={`₹${finalEarnings}`}
+                            isVisible={showResult}
+                          />
+                        </div>
+                        {openSection === "earnings" ? (
+                          <ChevronDown className="text-gray-500" />
+                        ) : (
+                          <ChevronRight className="text-gray-500" />
+                        )}
+                      </div>
+                      {openSection === "earnings" && (
+                        <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
+                          <ul>
+                            <li>
+
+                              Margin Per Order: <span>{sellingPrice > 0 ? sellingPrice - productPrice : 'N/A'}</span>
+                            </li>
+                            <li>
+                              Delivered Orders: <span>{deliveredQty}</span>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Expenses Section */}
+                    <div className="border-b border-gray-200 pb-2">
+                      <div
+                        className="flex items-center justify-between cursor-pointer w-full"
+                        onClick={() => toggleSection("expenses")}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="bg-red-100 p-2 rounded-full">
+                            <GoArrowUpRight className="text-red-700" />
+                          </div>
+                          <ResultItem
+                            label="Total Spends"
+                            value={`₹ ${totalExpenses}`}
+                            isVisible={showResult}
+                          />
+                        </div>
+                        {openSection === "expenses" ? (
+                          <ChevronDown className="text-gray-500" />
+                        ) : (
+                          <ChevronRight className="text-gray-500" />
+                        )}
+                      </div>
+                      {openSection === "expenses" && (
+                        <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
+                          <ul>
+                            <li>
+                              Total Ad Spends: <span>{totalAddSpend}</span>
+                            </li>
+                            <li>
+                              (+)Total RTO Charges:{" "}
+                              <span>{deliveryCostPerUnit * deliveredRTOQty}</span>
+                            </li>
+                            <li>
+                              (+)Total Misc. Charges: <span>{miscCharges}</span>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer Note */}
+              <p className="text-xs text-gray-500 mt-6">
+                Note: This calculator provides estimated figures. Actual results may vary. Shipowl does not commit to any expected profit based on these calculations.
+              </p>
+            </div>
+          </div>
+        )
+      }
     </>
 
 
@@ -948,3 +1299,46 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+function InputField({ label, value, onChange, error, required }) {
+  return (
+    <>
+      <div className='flex justify-between'>
+        <label className="md:w-7/12 block text-sm font-medium mb-1">
+          {label} {required && <span className="text-red-500">*</span>}
+          {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+        </label>
+
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={`md:w-5/12 bg-white border px-3 py-[6px] ${error ? 'border-red-500' : 'border-gray-300'}`}
+        />
+      </div>
+    </>
+  );
+}
+
+// Result output component with conditional display
+function ResultItem({ label, value, isVisible, placeholder = 'N/A' }) {
+  const numeric = parseFloat(value?.replace?.(/[₹,]/g, '')) || 0;
+  return (
+    <div className="flex justify-between text-sm w-full">
+      <span className="font-medium text-black">{label}</span>
+      <span className={` font-bold  text-green-800 ${!isVisible ? 'text-gray-400' : numeric < 0 ? 'text-red-800' : 'text-green-800'}`}>
+        {isVisible ? value : placeholder}
+      </span>
+    </div>
+  );
+}
+
+// Info box component
+function ProductInfo({ label, value }) {
+  return (
+    <div className="flex items-center space-x-1 text-sm">
+      <span className="text-gray-500">{label}:</span>
+      <span className="font-medium text-black">{value}</span>
+    </div>
+  );
+}
+

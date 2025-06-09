@@ -98,8 +98,6 @@ export default function Orders() {
 
   const handleSaveNote = () => {
     if (selectedNoteOrder) {
-      // Find the order and update its note - implement this based on your backend/API
-      console.log(`Saving note for order ${selectedNoteOrder}:`, noteInput);
       // Example: call API to save note here
 
       setIsNoteModalOpen(false);
@@ -137,7 +135,7 @@ export default function Orders() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/supplier/order?from=${formatDate(
+        `https://sleeping-owl-we0m.onrender.com//api/supplier/order?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {
@@ -191,7 +189,7 @@ export default function Orders() {
     try {
       setLoading(true);
 
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com//api/order/${id}/shipping`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -213,7 +211,7 @@ export default function Orders() {
           }).then(async (result) => {
             if (result.isConfirmed) {
               try {
-                const confirmResponse = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/confirm`, {
+                const confirmResponse = await fetch(`https://sleeping-owl-we0m.onrender.com//api/order/${id}/shipping/confirm`, {
                   method: 'POST',
                   headers: {
                     Authorization: `Bearer ${suppliertoken}`,
@@ -284,7 +282,7 @@ export default function Orders() {
     try {
       setLoading(true);
 
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/cancel`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com//api/order/${id}/shipping/cancel`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -332,7 +330,7 @@ export default function Orders() {
     try {
       setLoading(true);
 
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/status`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com//api/order/${id}/shipping/status`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -590,246 +588,240 @@ export default function Orders() {
 
           </div>
         </div>
-        {orders?.length > 0 ? (
-          <div className="overflow-x-auto relative main-outer-wrapper w-full">
-            <table className="md:w-full w-auto display main-tables" id="orderTable">
-              <thead>
-                <tr className="text-[#A3AED0] uppercase border-b border-[#E9EDF7]">
-                  <th className="p-3 px-5 whitespace-nowrap">Order #</th>
-                  <th className="p-3 px-5 whitespace-nowrap">Customer</th>
-                  <th className="p-3 px-5 whitespace-nowrap">Payment</th>
-                  <th className="p-3 px-5 whitespace-nowrap">Shipment Details</th>
-                  <th className="p-2 px-5 text-left whitespace-nowrap ">Order Status</th>
-                  <th className="p-2 px-5 text-left whitespace-nowrap ">Download Invoice</th>
-                  <th className="p-2 px-5 text-center ">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((order) => (
-                  <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
-                    {/* Order ID */}
-                    <td className="p-3 px-5 whitespace-nowrap">
-                      <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
-                      <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
-                    </td>
+       {orders?.length > 0 ? (
+  <>
+    {/* Orders Table */}
+    <div className="overflow-x-auto relative main-outer-wrapper w-full">
+      <table className="md:w-full w-auto display main-tables" id="orderTable">
+        <thead>
+          <tr className="text-[#A3AED0] uppercase border-b border-[#E9EDF7]">
+            <th className="p-3 px-5 whitespace-nowrap">Order #</th>
+            <th className="p-3 px-5 whitespace-nowrap">Customer</th>
+            <th className="p-3 px-5 whitespace-nowrap">Payment</th>
+            <th className="p-3 px-5 whitespace-nowrap">Shipment Details</th>
+            <th className="p-2 px-5 text-left whitespace-nowrap">Order Status</th>
+            <th className="p-2 px-5 text-left whitespace-nowrap">Download Invoice</th>
+            <th className="p-2 px-5 text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map((order) => (
+            <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
+              {/* Order ID */}
+              <td className="p-3 px-5 whitespace-nowrap">
+                <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
+                <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
+              </td>
 
-                    {/* Shipping Name, Phone, Email */}
-                    <td className="p-3 px-5 whitespace-nowrap">
-                      <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
-                      <br />
-                      <span className="text-sm block">
-                        <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
-                      </span>
-                      <span className="text-sm text-[#01b574]">
-                        <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
-                      </span>
-                    </td>
+              {/* Customer Info */}
+              <td className="p-3 px-5 whitespace-nowrap">
+                <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
+                <br />
+                <span className="text-sm block">
+                  <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
+                </span>
+                <span className="text-sm text-[#01b574]">
+                  <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
+                </span>
+              </td>
 
-                    {/* Payment Info */}
-                    <td className="p-3 px-5 whitespace-nowrap font-semibold">
-                      <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
-                      <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p>
-                      <p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p>
-                      <p>
-                        Status:{" "}
-                        <span
-                          className={`font-bold ${order.payment?.status === "failed"
-                            ? "text-red-500"
-                            : order.payment?.status === "pending"
-                              ? "text-yellow-500"
-                              : "text-green-500"
-                            }`}
-                        >
-                          <PermissionField permissionKey="status">{order.payment?.status || "N/A"}</PermissionField>
-                        </span>
-                      </p>
-                    </td>
-
-                    {/* Shipping details + AWB */}
-                    <td className="p-3 px-5 whitespace-nowrap">
-                      <PermissionField permissionKey="orderNumber">{order.shippingApiResult?.data?.order_number}</PermissionField>
-                      <br />
-                      <PermissionField permissionKey="shippingAddress">{order.shippingAddress}</PermissionField>
-                      <br />
-                      <span className="text-green-500">
-                        <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
-                      </span>
-                      <br />
-                      AWB: <PermissionField permissionKey="awbNumber">{order.shippingApiResult?.data?.awb_number}</PermissionField>
-                    </td>
-
-                    {/* Order Status */}
-                    <td className="p-2 whitespace-nowrap px-5">
-                      <span
-                        className={`px-2 py-1 rounded w-max inline-block text-white text-sm capitalize ${order.status === "success"
-                          ? "bg-green-500"
-                          : order.status === "cancelled"
-                            ? "bg-red-500"
-                            : order.status === "pending"
-                              ? "bg-yellow-500 text-black"
-                              : "bg-gray-400"
-                          }`}
-                      >
-                        {order.status}
-                      </span>
-                    </td>
-
-                    {/* Download Invoice */}
-                    <td className="p-2 whitespace-nowrap px-5">
-                      <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md text-sm">
-                        Generate Invoice
-                      </button>
-                    </td>
-
-                    {/* Action */}
-                    <td className="p-2 whitespace-nowrap px-5">
-
-
-                      <div className="flex gap-3 justify-end items-center mt-2">
-                        <button
-                          onClick={() => {
-                            setNoteInput(order.orderNote || "");
-                            setSelectedNoteOrder(order.id);
-                            setIsNoteModalOpen(true);
-                          }}
-                          className="text-[#F98F5C] border rounded-md font-dm-sans p-2 w-auto  text-sm"
-                        >
-                          View / Add Notes
-                        </button>
-
-
-                        {!order.shippingApiResult?.data?.awb_number ? (
-                          <button
-                            className="bg-orange-500 text-white font-medium px-4 py-2 rounded-md text-sm"
-                            onClick={() => handleShipping(order.id)}
-                          >
-                            Shipping
-                          </button>
-                        ) : (
-                          <>
-                            <button
-                              className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md text-sm"
-                              onClick={() => handleTracking(order.id)}
-                            >
-                              Tracking
-                            </button>
-                            <button
-                              className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md text-sm"
-                              onClick={() => handleCancel(order.id)}
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        )}
-                      </div>
-                      <ul className="flex gap-6  mt-4 justify-end">
-                        <li><RiFileEditFill className="text-black text-xl" /></li>
-                        <li><IoCloudDownloadOutline className="text-black text-xl" /></li>
-                        <li><RxCrossCircled className="text-black text-xl" /></li>
-                        <li><IoIosArrowDropdown className="text-black text-xl" /></li>
-                      </ul>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {isNoteModalOpen && (
-              <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
-                  <button
-                    onClick={() => setIsNoteModalOpen(false)}
-                    className="absolute top-2 right-2 text-gray-500 hover:text-black"
+              {/* Payment Info */}
+              <td className="p-3 px-5 whitespace-nowrap font-semibold">
+                <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
+                <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p>
+                <p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p>
+                <p>
+                  Status:{" "}
+                  <span
+                    className={`font-bold ${
+                      order.payment?.status === "failed"
+                        ? "text-red-500"
+                        : order.payment?.status === "pending"
+                        ? "text-yellow-500"
+                        : "text-green-500"
+                    }`}
                   >
-                    ✕
+                    <PermissionField permissionKey="status">{order.payment?.status || "N/A"}</PermissionField>
+                  </span>
+                </p>
+              </td>
+
+              {/* Shipping Info */}
+              <td className="p-3 px-5 whitespace-nowrap">
+                <PermissionField permissionKey="orderNumber">{order.shippingApiResult?.data?.order_number}</PermissionField>
+                <br />
+                <PermissionField permissionKey="shippingAddress">{order.shippingAddress}</PermissionField>
+                <br />
+                <span className="text-green-500">
+                  <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
+                </span>
+                <br />
+                AWB: <PermissionField permissionKey="awbNumber">{order.shippingApiResult?.data?.awb_number}</PermissionField>
+              </td>
+
+              {/* Order Status */}
+              <td className="p-2 px-5 whitespace-nowrap">
+                <span
+                  className={`px-2 py-1 rounded w-max inline-block text-white text-sm capitalize ${
+                    order.status === "success"
+                      ? "bg-green-500"
+                      : order.status === "cancelled"
+                      ? "bg-red-500"
+                      : order.status === "pending"
+                      ? "bg-yellow-500 text-black"
+                      : "bg-gray-400"
+                  }`}
+                >
+                  {order.status}
+                </span>
+              </td>
+
+              {/* Invoice */}
+              <td className="p-2 px-5 whitespace-nowrap">
+                <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md text-sm">
+                  Generate Invoice
+                </button>
+              </td>
+
+              {/* Action */}
+              <td className="p-2 px-5 whitespace-nowrap">
+                <div className="flex gap-3 justify-end items-center mt-2">
+                  <button
+                    onClick={() => {
+                      setNoteInput(order.orderNote || "");
+                      setSelectedNoteOrder(order.id);
+                      setIsNoteModalOpen(true);
+                    }}
+                    className="text-[#F98F5C] border rounded-md font-dm-sans p-2 text-sm"
+                  >
+                    View / Add Notes
                   </button>
-                  <h2 className="text-lg font-bold mb-4">Order Notes</h2>
-                  <textarea
-                    className="w-full border p-2 rounded-xl mb-4"
-                    rows={4}
-                    value={noteInput}
-                    onChange={(e) => setNoteInput(e.target.value)}
-                    placeholder="Add your note here..."
-                  />
-                  <div className="flex justify-end gap-2">
+
+                  {!order.shippingApiResult?.data?.awb_number ? (
                     <button
-                      onClick={() => setIsNoteModalOpen(false)}
-                      className="bg-gray-200 px-4 py-2 rounded-md"
+                      className="bg-orange-500 text-white font-medium px-4 py-2 rounded-md text-sm"
+                      onClick={() => handleShipping(order.id)}
                     >
-                      Cancel
+                      Shipping
                     </button>
-                    <button
-                      onClick={handleSaveNote}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md"
-                    >
-                      Save
-                    </button>
-                  </div>
+                  ) : (
+                    <>
+                      <button
+                        className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md text-sm"
+                        onClick={() => handleTracking(order.id)}
+                      >
+                        Tracking
+                      </button>
+                      <button
+                        className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md text-sm"
+                        onClick={() => handleCancel(order.id)}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  )}
                 </div>
-              </div>
-            )}
 
+                <ul className="flex gap-6 mt-4 justify-end">
+                  <li><RiFileEditFill className="text-black text-xl" /></li>
+                  <li><IoCloudDownloadOutline className="text-black text-xl" /></li>
+                  <li><RxCrossCircled className="text-black text-xl" /></li>
+                  <li><IoIosArrowDropdown className="text-black text-xl" /></li>
+                </ul>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
+      {/* Note Modal */}
+      {isNoteModalOpen && (
+        <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+            <button
+              onClick={() => setIsNoteModalOpen(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black"
+            >
+              ✕
+            </button>
+            <h2 className="text-lg font-bold mb-4">Order Notes</h2>
+            <textarea
+              className="w-full border p-2 rounded-xl mb-4"
+              rows={4}
+              value={noteInput}
+              onChange={(e) => setNoteInput(e.target.value)}
+              placeholder="Add your note here..."
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setIsNoteModalOpen(false)}
+                className="bg-gray-200 px-4 py-2 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveNote}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md"
+              >
+                Save
+              </button>
+            </div>
           </div>
-        ) : (
-          <p className='text-center'>No Orders Available</p>
-        )}
+        </div>
+      )}
+    </div>
+
+    {/* Shipping Report */}
+    {(reporting?.shipowl || reporting?.selfship) && (
+      <div className="overflow-x-auto mt-6 p-4 bg-white rounded-xl shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
+        <table className="rounded-md border-[#DFEAF2] w-full text-sm text-left text-gray-700">
+          <thead className="text-xs uppercase text-gray-700">
+            <tr className="border-b border-[#DFEAF2]">
+              <th className="px-6 py-3">Shipping Method</th>
+              <th className="px-6 py-3">Order Count</th>
+              <th className="px-6 py-3">Total Product Cost</th>
+              <th className="px-6 py-3">Delivered Orders</th>
+              <th className="px-6 py-3">RTO Orders</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+              <td className="px-6 py-4 font-medium text-gray-900">Shipowl</td>
+              <td className="px-6 py-4">{reporting.shipowl?.orderCount}</td>
+              <td className="px-6 py-4">₹{reporting.shipowl?.totalProductCost}</td>
+              <td className="px-6 py-4">{reporting.shipowl?.deliveredOrder}</td>
+              <td className="px-6 py-4">{reporting.shipowl?.rtoOrder}</td>
+            </tr>
+
+            <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+              <td className="px-6 py-4 font-medium text-gray-900">Selfship - Prepaid</td>
+              <td className="px-6 py-4">{reporting.selfship?.prepaid?.orderCount}</td>
+              <td className="px-6 py-4">₹{reporting.selfship?.prepaid?.totalProductCost}</td>
+              <td className="px-6 py-4">{reporting.selfship?.prepaid?.deliveredOrder}</td>
+              <td className="px-6 py-4">{reporting.selfship?.prepaid?.rtoOrder}</td>
+            </tr>
+
+            <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+              <td className="px-6 py-4 font-medium text-gray-900">Selfship - Postpaid</td>
+              <td className="px-6 py-4">{reporting.selfship?.postpaid?.orderCount}</td>
+              <td className="px-6 py-4">₹{reporting.selfship?.postpaid?.totalProductCost}</td>
+              <td className="px-6 py-4">{reporting.selfship?.postpaid?.deliveredOrder}</td>
+              <td className="px-6 py-4">{reporting.selfship?.postpaid?.rtoOrder}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    )}
+  </>
+) : (
+  <p className="text-center">No Orders Available</p>
+)}
 
 
 
 
       </div>
-      {
-        (reporting?.shipowl || reporting?.selfship) ? (
-          <>
-            <div className="overflow-x-auto mt-6 p-4 bg-white rounded-xl shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
 
-              <table className="rounded-md  border-[#DFEAF2]  w-full text-sm text-left text-gray-700">
-                <thead className="text-xs uppercase  text-gray-700">
-                  <tr className="border-b border-[#DFEAF2]">
-                    <th className="px-6 py-3">Shipping Method</th>
-                    <th className="px-6 py-3">Order Count</th>
-                    <th className="px-6 py-3">Total Product Cost</th>
-                    <th className="px-6 py-3">Delivered Orders</th>
-                    <th className="px-6 py-3">RTO Orders</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Shipowl Row */}
-                  <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">Shipowl</td>
-                    <td className="px-6 py-4">{reporting.shipowl?.orderCount}</td>
-                    <td className="px-6 py-4">₹{reporting.shipowl?.totalProductCost}</td>
-                    <td className="px-6 py-4">{reporting.shipowl?.deliveredOrder}</td>
-                    <td className="px-6 py-4">{reporting.shipowl?.rtoOrder}</td>
-                  </tr>
-
-                  {/* Selfship - Prepaid */}
-                  <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">Selfship - Prepaid</td>
-                    <td className="px-6 py-4">{reporting.selfship?.prepaid?.orderCount}</td>
-                    <td className="px-6 py-4">₹{reporting.selfship?.prepaid?.totalProductCost}</td>
-                    <td className="px-6 py-4">{reporting.selfship?.prepaid?.deliveredOrder}</td>
-                    <td className="px-6 py-4">{reporting.selfship?.prepaid?.rtoOrder}</td>
-                  </tr>
-
-                  {/* Selfship - Postpaid */}
-                  <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-                    <td className="px-6 py-4 font-medium text-gray-900">Selfship - Postpaid</td>
-                    <td className="px-6 py-4">{reporting.selfship?.postpaid?.orderCount}</td>
-                    <td className="px-6 py-4">₹{reporting.selfship?.postpaid?.totalProductCost}</td>
-                    <td className="px-6 py-4">{reporting.selfship?.postpaid?.deliveredOrder}</td>
-                    <td className="px-6 py-4">{reporting.selfship?.postpaid?.rtoOrder}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-          </>
-
-        ) : (
-          <p className="text-center text-gray-500">No Orders Found</p>
-        )
-      }
       {isModalOpen && tracking?.trackingData && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-2xl shadow-lg p-6 relative">

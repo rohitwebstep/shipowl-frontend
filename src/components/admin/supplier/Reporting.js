@@ -50,7 +50,7 @@ function Reporting() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${id}/payment-report?from=${formatDate(
+        `https://sleeping-owl-we0m.onrender.com//api/admin/supplier/${id}/payment-report?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {

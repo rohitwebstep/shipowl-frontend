@@ -75,7 +75,7 @@ const SupplierList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${id}/status?status=${item}`, {
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com//api/admin/supplier/${id}/status?status=${item}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

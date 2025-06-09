@@ -40,7 +40,7 @@ function OrderPermission() {
 
     const fetchPermission = useCallback(() => {
         fetchProtected(
-            "https://sleeping-owl-we0m.onrender.com/api/admin/supplier/order/permission",
+            "https://sleeping-owl-we0m.onrender.com//api/admin/supplier/order/permission",
             setPermission,
             "permissions",
             setLoading
@@ -55,7 +55,6 @@ function OrderPermission() {
 
 
 
-        console.log("Payload:", JSON.stringify({ permissions: payload }));
 
         try {
             const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -80,7 +79,7 @@ function OrderPermission() {
                 redirect: "follow"
             };
 
-            const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/admin/supplier/order/permission", requestOptions);
+            const res = await fetch("https://sleeping-owl-we0m.onrender.com//api/admin/supplier/order/permission", requestOptions);
 
             const result = await res.json();
 

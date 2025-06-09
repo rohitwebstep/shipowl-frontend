@@ -74,7 +74,7 @@ const handleChange = (e) => {
       didOpen: () => Swal.showLoading(),
     });
 
-    const url = "https://sleeping-owl-we0m.onrender.com/api/supplier/profile/bank-account/change-request";
+    const url = "https://sleeping-owl-we0m.onrender.com//api/supplier/profile/bank-account/change-request";
     const form = new FormData();
 
     for (const key in formData) {
