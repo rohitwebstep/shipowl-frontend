@@ -35,7 +35,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/staff`,
+                `http://localhost:3001/api/admin/staff`,
                 {
                     method: "GET",
                     headers: {
@@ -82,7 +82,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/staff/trashed`,
+                `http://localhost:3001/api/admin/staff/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -208,7 +208,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/staff/${item.id}`,
+                `http://localhost:3001/api/admin/staff/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -269,7 +269,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/staff/${item?.id}/restore`,
+                `http://localhost:3001/api/admin/staff/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -348,7 +348,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/staff/${item.id}/destroy`,
+                `http://localhost:3001/api/admin/staff/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

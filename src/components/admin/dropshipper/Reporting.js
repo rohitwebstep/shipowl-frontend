@@ -49,7 +49,7 @@ function Reporting() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/dropshipper/${id}/payment-report?from=${formatDate(
+                `http://localhost:3001/api/admin/dropshipper/${id}/payment-report?from=${formatDate(
                     fromDate
                 )}&to=${formatDate(toDate)}`,
                 {

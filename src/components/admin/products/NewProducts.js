@@ -31,7 +31,7 @@ export default function NewProducts() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/product/inventory?type=notmy`,
+                `http://localhost:3001/api/admin/product/inventory?type=notmy`,
                 {
                     method: "GET",
                     headers: {
@@ -93,7 +93,7 @@ export default function NewProducts() {
                 </select></div>
                 <div className='flex gap-2'><button className="bg-[#05CD99] text-white lg:px-8 p-4 py-2 rounded-md">Export</button>
                     <button className="bg-[#3965FF] text-white lg:px-8 p-4 py-2 rounded-md">Import</button>
-                    <Link href="https://sleeping-owl-we0m.onrender.com/dropshipping/product/source/create">
+                    <Link href="http://localhost:3001/dropshipping/product/source/create">
                         <button className="bg-[#F98F5C] text-white lg:px-8 p-4 py-2 rounded-md">
                             Add New
                         </button>
