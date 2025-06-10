@@ -224,7 +224,7 @@ const AccountInfoEdit = () => {
                         ifscCode: "",
                         cancelledChequeImage: [],
                     });
-                    router.push("/supplier/profile/list");
+                    router.push("/supplier/profile");
                 }
             });
 

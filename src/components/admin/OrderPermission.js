@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-
+import { HashLoader } from "react-spinners";
 function OrderPermission() {
     const router = useRouter();
     const [permissions, setPermission] = useState([]);
@@ -51,7 +51,7 @@ function OrderPermission() {
         fetchPermission();
     }, [fetchPermission]);
     const handleSubmit = async () => {
-       const payload = permissions.map(({ id, ...rest }) => rest);
+        const payload = permissions.map(({ id, ...rest }) => rest);
 
 
 
@@ -63,7 +63,7 @@ function OrderPermission() {
             myHeaders.append("Authorization", `Bearer ${token}`);
 
             const formdata = new FormData();
-            formdata.append("permissions", JSON.stringify(payload [0]));
+            formdata.append("permissions", JSON.stringify(payload[0]));
 
             Swal.fire({
                 title: "Updating Permissions...",
@@ -96,11 +96,15 @@ function OrderPermission() {
     return (
         <div>
             {loading ? (
-                <p>Loading permissions...</p>
+
+                <div className="flex items-center justify-center h-[80vh]">
+                    <HashLoader size={60} color="#F97316" loading={true} />
+                </div>
+
             ) : (
                 <div>
-
-                    {permissions.map((perm) => (
+{permissions.length>0 ? (
+permissions.map((perm) => (
                         <div key={perm.id} className="mb-6 w-6/12 bg-white rounded-md p-4">
                             <h4 className="font-semibold mb-2">Permission ID: {perm.id}</h4>
                             <table className="w-full border rounded-md border-[#E0E5F2] mb-4">
@@ -146,7 +150,11 @@ function OrderPermission() {
                                 Save Changes
                             </button>
                         </div>
-                    ))}
+                    ))
+):(
+    <p className="text-center">No Permissions Found</p>
+)}
+                    
 
                 </div>
             )}

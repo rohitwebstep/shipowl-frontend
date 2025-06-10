@@ -1,5 +1,5 @@
 "use client";
-import {useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
@@ -18,23 +18,23 @@ export default function List() {
     const router = useRouter();
     const fetchUsers = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-    
+
         if (supplierData?.project?.active_panel !== "supplier") {
             localStorage.removeItem("shippingData");
             router.push("/supplier/auth/login");
             return;
         }
-    
+
         const suppliertoken = supplierData?.security?.token;
         if (!suppliertoken) {
             router.push("/supplier/auth/login");
             return;
         }
-    
+
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier`,
+                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff`,
                 {
                     method: "GET",
                     headers: {
@@ -43,9 +43,9 @@ export default function List() {
                     },
                 }
             );
-    
+
             const result = await response.json();
-    
+
             if (!response.ok) {
                 Swal.fire({
                     icon: "error",
@@ -54,7 +54,7 @@ export default function List() {
                 });
                 throw new Error(result.message || result.error || "Something Wrong!");
             }
-    
+
             setData(result?.suppliers || []);
         } catch (error) {
             console.error("Error fetching cities:", error);
@@ -62,7 +62,7 @@ export default function List() {
             setLoading(false);
         }
     }, [router]);
-    
+
     const trashedUsers = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -81,7 +81,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/trashed`,
+                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -116,7 +116,7 @@ export default function List() {
             setLoading(false);
         }
     }, [router, setData]);
-  
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -207,7 +207,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -268,7 +268,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -297,7 +297,7 @@ export default function List() {
             if (result.status) {
                 Swal.fire({
                     icon: "success",
-                    text: `Rto Has Been Restored Successfully !`,
+                    text: `${item.name} Been Restored Successfully !`,
                 });
                 await trashedUsers();
             }
@@ -347,7 +347,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -390,16 +390,16 @@ export default function List() {
             setLoading(false);
         }
     };
-  if (loading) {
-          return (
-              <div className="flex items-center justify-center h-[80vh]">
-                  <HashLoader size={60} color="#F97316" loading={true} />
-              </div>
-          );
-      }
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <HashLoader size={60} color="#F97316" loading={true} />
+            </div>
+        );
+    }
 
-         
-                  
+
+
     return (
         <>
 
@@ -423,72 +423,77 @@ export default function List() {
                             )}
                         </button>
                         <div className="flex justify-start gap-5 items-end">
-                        <button
-                                    className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-                                    onClick={async () => {
-                                        if (isTrashed) {
-                                            setIsTrashed(false);
-                                            await fetchUsers();
-                                        } else {
-                                            setIsTrashed(true);
-                                            await trashedUsers();
-                                        }
-                                    }}
-                                >
-                                    {isTrashed ? "Subuser Listing (Simple)" : "Trashed Subuser"}
-                                </button>
+                            <button
+                                className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                onClick={async () => {
+                                    if (isTrashed) {
+                                        setIsTrashed(false);
+                                        await fetchUsers();
+                                    } else {
+                                        setIsTrashed(true);
+                                        await trashedUsers();
+                                    }
+                                }}
+                            >
+                                {isTrashed ? "Subuser Listing (Simple)" : "Trashed Subuser"}
+                            </button>
                             <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/supplier/sub-user/create">Add New</Link></button>
                         </div>
                     </div>
                 </div>
-              {data.length > 0 ?(
-                  <div className="overflow-x-auto relative main-outer-wrapper w-full">
+                {data.length > 0 ? (
+                    <div className="overflow-x-auto relative main-outer-wrapper w-full">
                         <table className="md:w-full w-auto display main-tables" id="rto-table">
-                      <thead>
-                          <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Name</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Email</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Role</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Type</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Profile Picture</th>
-                              <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {data.map((item) => (
-                              <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                             
-                                           
-                                  <td className="p-2 whitespace-nowrap px-5">{item.name}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.email}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.role}</td>
-                                  <td className="p-2 whitespace-nowrap px-5">{item.type}</td>
-                                  <td className="p-2 whitespace-nowrap px-5"> <img src={item.image} alt={item.name} /></td>
-                                  <td className="p-2 px-5 text-[#8F9BBA] text-center">
+                            <thead>
+                                <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">SR.</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Name</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Email</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Role</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Phone Number</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Profile Picture</th>
+                                    <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.map((item, index) => (
+                                    <tr key={item.id} className="border-b  border-[#E9EDF7] text-[#2B3674] font-semibold">
 
-                                    <div className="flex justify-end gap-2">{isTrashed ? (
-                                        <>
-                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
-                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
-                                        </>
-                                    )}</div>
 
-                                  </td>
-                              </tr>
-                          ))}
-                      </tbody>
-                  </table>
-              </div>
-              ):(
-                <p className="text-center">No Subuser Found</p>
-              )}
+                                        <td className="p-2 whitespace-nowrap text-left px-5">{index + 1}</td>
+                                        <td className="p-2 whitespace-nowrap px-5">{item.name || 'NIL'}</td>
+                                        <td className="p-2 whitespace-nowrap px-5">{item.email || 'NIL'}</td>
+                                        <td className="p-2 whitespace-nowrap px-5">
+                                            {item.role ? item.role.replace(/_/g, ' ') : 'NIL'}
+                                        </td>
 
-               
+                                        <td className="p-2 whitespace-nowrap px-5">{item.phoneNumber || 'NIL'}</td>
+                                        <td className="p-2 whitespace-nowrap px-5"> <img src={item.image} alt={item.name} /></td>
+                                        <td className="p-2 px-5 text-[#8F9BBA] text-center">
+
+                                            <div className="flex justify-end gap-2">{isTrashed ? (
+                                                <>
+                                                    <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
+                                                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
+                                                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                                </>
+                                            )}</div>
+
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p className="text-center">No Subuser Found</p>
+                )}
+
+
             </div>
 
 
