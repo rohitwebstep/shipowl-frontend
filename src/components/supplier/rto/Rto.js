@@ -115,7 +115,7 @@ export default function RTO() {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:3001/api/supplier/order?from=${formatDate(
+        `https://sleeping-owl-we0m.onrender.com/api/supplier/order?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {
@@ -253,7 +253,7 @@ export default function RTO() {
         });
       });
 
-      const url = `http://localhost:3001/api/supplier/order/${order.id}/rto/${id}/response?status=${status}`;
+      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/order/${order.id}/rto/${id}/response?status=${status}`;
 
       const response = await fetch(url, {
         method: "POST",

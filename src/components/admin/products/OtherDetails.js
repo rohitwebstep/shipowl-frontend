@@ -48,7 +48,7 @@ const handleSubmit = async (e) => {
       },
     });
 
-    const url = `http://localhost:3001/api/admin/product/${id}`;
+    const url = `https://sleeping-owl-we0m.onrender.com/api/admin/product/${id}`;
     const form = new FormData();
 
     const combinedData = { ...formData, ...files };

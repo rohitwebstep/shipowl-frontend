@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { BiSolidCategory } from "react-icons/bi";
 import { TbBrandBinance } from "react-icons/tb";
-import { FileBarChart2} from "lucide-react";
 
 import logo from "@/app/images/Shipowllogo.png";
 

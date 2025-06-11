@@ -48,7 +48,7 @@ function Reporting() {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:3001/api/supplier/order/report?from=${formatDate(
+        `https://sleeping-owl-we0m.onrender.com/api/supplier/order/report?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {

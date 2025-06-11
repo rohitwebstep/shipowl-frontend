@@ -35,7 +35,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/staff`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/staff`,
                 {
                     method: "GET",
                     headers: {
@@ -82,7 +82,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/staff/trashed`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/staff/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -208,7 +208,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/staff/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/staff/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -269,7 +269,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/staff/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/staff/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -348,7 +348,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/staff/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/staff/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

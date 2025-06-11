@@ -29,7 +29,7 @@ export default function RTO() {
         try {
             setLoading(true);
             const response = await fetch(
-                `http://localhost:3001/api/dropshipper/product/rto/inventory`,
+                `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/rto/inventory`,
                 {
                     method: "GET",
                     headers: {

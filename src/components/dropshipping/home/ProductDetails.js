@@ -194,9 +194,9 @@ const ProductDetails = () => {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `http://localhost:3001/api/dropshipper/product/inventory/${id}`;
+        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory/${id}`;
       } else {
-        url = `http://localhost:3001/api/dropshipper/product/my-inventory/${id}`;
+        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
@@ -270,7 +270,7 @@ const ProductDetails = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3001/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -367,7 +367,7 @@ const ProductDetails = () => {
 
 
 
-      const url = "http://localhost:3001/api/dropshipper/product/my-inventory";
+      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
