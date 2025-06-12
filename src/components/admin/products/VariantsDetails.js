@@ -261,13 +261,14 @@ export default function VariantDetails() {
               formData.variants.map((variant, index) => (
                 <div
                   key={index}
-                  className={`md:grid p-3 rounded-md border border-gray-400 mt-5 border-dotted overflow-auto md:grid-cols-2 gap-6 justify-between mb-4 border-b border-[#E9EDF7] pb-4  ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}
+                  className={`md:grid p-3 rounded-md border  mt-5 border-dotted overflow-auto md:grid-cols-2 gap-6 justify-between mb-4 border-b border-[#E9EDF7] pb-4  ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}
                 >
                   {formData.isVarientExists && (
                     <div>
                       <input type="text" value={variant.modal} name="modal" id="modal" readOnly />
                     </div>
                   )}
+
 
                   {formData.isVarientExists === 'yes' && (
                     <>
