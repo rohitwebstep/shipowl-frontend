@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { HashLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
-import { X, FileText, Tag, Truck,Pencil,RotateCcw , Trash2, Eye } from "lucide-react"; // Icons
+import { X, FileText, Tag, Truck, Pencil, RotateCcw, Trash2, Eye } from "lucide-react"; // Icons
 import { FaEye } from "react-icons/fa";
 export default function My() {
     const { verifySupplierAuth } = useSupplier();
@@ -21,6 +21,9 @@ export default function My() {
         id: '',
         isVarientExists: '',
     });
+    const [type, setType] = useState(false);
+
+    const [openDescriptionId, setOpenDescriptionId] = useState(null);
     const [showVariantPopup, setShowVariantPopup] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isTrashed, setIsTrashed] = useState(false);
@@ -69,6 +72,7 @@ export default function My() {
 
             const result = await response.json();
             if (result) {
+                setType(result?.type || '');
                 setProducts(result?.products || []);
             }
         } catch (error) {
@@ -172,12 +176,14 @@ export default function My() {
             });
 
             const form = new FormData();
-            const simplifiedVariants = inventoryData.variant.map((v) => ({
-                variantId: v.id || v.variantId,
-                stock: v.stock,
-                price: v.price,
-                status: v.status
-            }));
+            const simplifiedVariants = inventoryData.variant
+                .filter(v => v.status === true) // Only include variants with status true
+                .map(v => ({
+                    variantId: v.id || v.variantId,
+                    stock: v.stock,
+                    price: v.price,
+                    status: v.status
+                }));
 
             form.append('productId', inventoryData.productId);
             form.append('variants', JSON.stringify(simplifiedVariants));
@@ -238,7 +244,14 @@ export default function My() {
             setLoading(false);
         }
     };
+    const viewProduct = (id) => {
+        if (type == "notmy") {
+            router.push(`/supplier/product/?id=${id}&type=${type}`);
+        } else {
 
+            router.push(`/supplier/product/?id=${id}`);
+        }
+    };
 
     const handleDelete = async (item) => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -589,7 +602,7 @@ export default function My() {
                                 >
                                     {/* FLIPPING IMAGE */}
                                     <div className="relative h-[200px] perspective">
-                                        <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                                        <div onClick={() => viewProduct(product.id)} className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                                             {/* FRONT */}
                                             <Image
                                                 src={imageUrl}
@@ -623,7 +636,35 @@ export default function My() {
                                             <div className="flex items-center gap-2">
                                                 <FileText size={16} />
                                                 <span>
-                                                    {product?.product?.description || "No description"}
+                                                    <button
+                                                        onClick={() => setOpenDescriptionId(product.id)}
+                                                        className="text-blue-600"
+                                                    >
+                                                        View Description
+                                                    </button>
+                                                    {openDescriptionId === product.id && (
+                                                        <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                                                            <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
+                                                                {/* Close Button */}
+                                                                <button
+                                                                    onClick={() => setOpenDescriptionId(null)}
+                                                                    className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+                                                                >
+                                                                    &times;
+                                                                </button>
+
+                                                                {/* HTML Description Content */}
+                                                                {product.description ? (
+                                                                    <div
+                                                                        className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                                                                        dangerouslySetInnerHTML={{ __html: product.description }}
+                                                                    />
+                                                                ) : (
+                                                                    <p className="text-gray-500">NIL</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2">
@@ -665,7 +706,7 @@ export default function My() {
                                                             }}
                                                             className="bg-orange-500 text-white px-3 py-1 text-sm rounded hover:bg-orange-600"
                                                         >
-                                                            <RotateCcw/>
+                                                            <RotateCcw />
                                                         </button>
                                                         <button
                                                             onClick={(e) => {
@@ -674,7 +715,7 @@ export default function My() {
                                                             }}
                                                             className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600"
                                                         >
-                                                             <Trash2/>
+                                                            <Trash2 />
                                                         </button>
                                                     </>
                                                 ) : (
@@ -686,7 +727,7 @@ export default function My() {
                                                             }}
                                                             className="bg-yellow-500 text-white px-3 py-1 text-sm rounded hover:bg-yellow-600"
                                                         >
-                                                        <Pencil/>
+                                                            <Pencil />
                                                         </button>
                                                         <button
                                                             onClick={(e) => {
@@ -695,7 +736,7 @@ export default function My() {
                                                             }}
                                                             className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600"
                                                         >
-                                                          <Trash2/>
+                                                            <Trash2 />
                                                         </button>
                                                         <button
                                                             onClick={(e) => {
@@ -796,7 +837,7 @@ export default function My() {
 
                                                             {/* Status Switch */}
                                                             <div className="flex items-center justify-between mt-2">
-                                                                <span className="text-sm font-medium">Status:</span>
+                                                                <span className="text-sm font-medium">Add To List:</span>
                                                                 <label className="relative inline-flex items-center cursor-pointer">
                                                                     <input
                                                                         type="checkbox"

@@ -10,6 +10,7 @@ import { HashLoader } from 'react-spinners';
 import { X, FileText, Tag, Truck } from "lucide-react"; // Icons
 
 export default function NotMy() {
+  const [openDescriptionId, setOpenDescriptionId] = useState(null);
   const { verifySupplierAuth } = useSupplier();
   const [productsRequest, setProductsRequest] = useState([]);
   const [loading, setLoading] = useState(null);
@@ -241,8 +242,36 @@ export default function NotMy() {
                     <div className="mt-2 space-y-1 text-sm text-gray-700">
                       <div className="flex items-center gap-2">
                         <FileText size={16} />
-                        <span>
-                          {product?.description || "No description"}
+                         <span>
+                          <button
+                            onClick={() => setOpenDescriptionId(product.id)}
+                            className="text-blue-600"
+                          >
+                            View Description
+                          </button>
+                          {openDescriptionId === product.id && (
+                            <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                              <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
+                                {/* Close Button */}
+                                <button
+                                  onClick={() => setOpenDescriptionId(null)}
+                                  className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+                                >
+                                  &times;
+                                </button>
+
+                                {/* HTML Description Content */}
+                                {product.description ? (
+                                  <div
+                                    className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                                    dangerouslySetInnerHTML={{ __html: product.description }}
+                                  />
+                                ) : (
+                                  <p className="text-gray-500">NIL</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">

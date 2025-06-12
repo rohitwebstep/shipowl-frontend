@@ -7,10 +7,13 @@ import 'react-date-range/dist/theme/default.css';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from 'sweetalert2';
-import {
-  MdKeyboardArrowLeft,
-  MdKeyboardArrowRight
-} from "react-icons/md";
+const tabs = [
+  { key: "collected", label: "Collected at Warehouse" },
+  { key: "rto_count", label: "RTO Count" },
+  { key: "need_to_raise", label: "Need to Raise" },
+  { key: "dispute", label: "Dispute" },
+];
+
 import useScannerDetection from '../useScannerDetection';
 // import { RiFileEditFill } from "react-icons/ri";
 // import { IoCloudDownloadOutline } from "react-icons/io5";
@@ -24,6 +27,8 @@ import barcode from '@/app/assets/barcode.png'
 import Image from 'next/image';
 import { HashLoader } from 'react-spinners';
 export default function RTO() {
+  const [activeTab, setActiveTab] = useState('collected');
+
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -155,7 +160,7 @@ export default function RTO() {
     }
   }, [router, fromDate, toDate]);
 
- useEffect(() => {
+  useEffect(() => {
     if (typeof window !== 'undefined' && orders.length > 0 && !loading) {
       let table = null;
 
@@ -353,422 +358,422 @@ export default function RTO() {
 
   return (
     <div className='px-2 md:px-0'>
-      <div className='bg-white rounded-md p-3 mb-4'>
-        <div className="grid justify-between grid-cols-2 items-center">
-          <div className="">
-            <div className="flex  items-end gap-4 mb-6">
-              <div>
-                <label className="text-sm font-medium text-gray-700 block mb-1">From Date</label>
-                <DatePicker
-                  selected={fromDate}
-                  onChange={(date) => setFromDate(date)}
-                  maxDate={new Date()}
-                  dateFormat="yyyy-MM-dd"
-                  className="border border-gray-200 rounded px-3 py-2 w-full"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 block mb-1">To Date</label>
-                <DatePicker
-                  selected={toDate}
-                  onChange={(date) => setToDate(date)}
-                  maxDate={new Date()}
-                  minDate={fromDate}
-                  dateFormat="yyyy-MM-dd"
-                  className="border border-gray-200 rounded px-3 py-2 w-full"
-                />
-              </div>
-
-            </div>
-
-            {/* <div> <label className='text-[#232323] font-medium block'>Order ID(s):</label>  <input type="text" placeholder="Separated By Comma" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-          <div> <label className='text-[#232323] font-medium block'>Product Name</label>  <input type="text" placeholder="Name" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-          <div> <label className='text-[#232323] font-medium block'>Product SKU</label>  <input type="text" placeholder="SKU" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-          <div> <label className='text-[#232323] font-medium block'>Tag:</label>  <input type="text" placeholder="ALL" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-          <div> <label className='text-[#232323] font-medium block'>Article Id:</label>  <input type="text" placeholder="ID" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-          <div> <label className='text-[#232323] font-medium block'>Search Query:</label>  <input type="text" placeholder="Query" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl" /></div>
-          <div className="flex gap-2 items-end">
-            <button className="bg-blue-600 text-white px-6 py-2 rounded-md">Apply</button>
-            <button className="bg-red-500 text-white px-6 py-2 rounded-md">Reset</button>
-          </div> */}
-          </div>
-          <div className='flex justify-end' onClick={() => openBarCodeModal()}>
-            <Image src={barcode} height={70} width={70} alt="Barcode Image" />
-          </div>
-
-        </div>
-        {/* <div className='lg:flex gap-4 mb-5 items-center justify-between'>
-
-
-          <div className="grid md:grid-cols-3 gap-3 lg:w-8/12 grid-cols-1 items-end justify-between">
-            <div>
-              <label className='text-[#232323] font-medium block'>Status:</label>
-              <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
-                <option value="All">All</option>
-              </select>
-            </div>
-            <div > <label className='text-[#232323] font-medium block'>Select Model</label>
-              <select type="text" className="bg-white border text-[#718EBF] border-[#DFEAF2] mt-0 w-full p-2 rounded-xl">
-                <option value="Warehouse Model">Warehouse Model</option>
-              </select>
-            </div>
-            <div > <label className='text-[#232323] font-medium block'>Select Dropshipper</label>
-              <select type="text" className=" bg-white border text-[#718EBF]  border-[#DFEAF2]  mt-2 w-full p-2 rounded-xl">
-                <option value="John Doe (john@gmail.com)">John Doe (john@gmail.com)</option>
-              </select>
-            </div>
-          </div>
-          <div className='lg:w-4/12 mt-3 lg:mt-0 flex justify-end gap-3'>
-            <button className="bg-[#4C82FF] text-white font-medium px-6 py-2 rounded-md text-sm">Filter</button>
-            <button className="bg-[#F98F5C] text-white font-medium px-6 py-2 rounded-md text-sm">Export</button>
-          </div>
-        </div> */}
-
+      <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm ">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`md:px-6 py-2 font-medium px-2  md:text-xl border-b-2 transition-all duration-200
+                ${activeTab === tab.key
+                ? "border-orange-500 text-orange-600"
+                : "border-transparent text-gray-500 hover:text-orange-600"
+              }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
+      {activeTab == "collected" && (
+        <>
+          <div className='bg-white rounded-md p-3 mb-4'>
+            <div className="grid justify-between grid-cols-2 items-center">
+              <div className="">
+                <div className="flex  items-end gap-4 mb-6">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 block mb-1">From Date</label>
+                    <DatePicker
+                      selected={fromDate}
+                      onChange={(date) => setFromDate(date)}
+                      maxDate={new Date()}
+                      dateFormat="yyyy-MM-dd"
+                      className="border border-gray-200 rounded px-3 py-2 w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 block mb-1">To Date</label>
+                    <DatePicker
+                      selected={toDate}
+                      onChange={(date) => setToDate(date)}
+                      maxDate={new Date()}
+                      minDate={fromDate}
+                      dateFormat="yyyy-MM-dd"
+                      className="border border-gray-200 rounded px-3 py-2 w-full"
+                    />
+                  </div>
 
-      <div className="bg-white p-4 rounded-2xl">
-        <div className="flex flex-wrap justify-between items-center mb-4 lg:px-3">
-          <h2 className="text-2xl font-bold  font-dm-sans">RTO Order Details</h2>
-          <div className="flex gap-3  flex-wrap items-center">
-            <span onClick={() => fetchRto()} className="font-bold   font-dm-sans">Clear Filters</span>
-            <span><IoMdRefresh className="text-red-600 text-xl" /></span>
-            <span><IoSettingsOutline className="text-xl" /></span>
-            <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
-            {/* <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="bg-[#4318FF] font-dm-sans outline-0 text-white md:w-[120px] font-medium  px-2 py-2 rounded-md"
-            >
-              <option value="Actual Ratio ">Bulk Action</option>
-            </select> */}
-            <button className="bg-[#F4F7FE] rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
-
-              {/* Month Input */}
-              <input
-                type="month"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="outline-0 font-dm-sans"
-              />
-            </button>
-            <button
-              onClick={() => setIsPopupOpen((prev) => !prev)}
-              className="bg-[#F4F7FE] p-2 rounded-lg relative"
-            >
-              <MoreHorizontal className="text-[#F98F5C]" />
-              {isPopupOpen && (
-                <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
-                  <ul className="py-2 text-sm text-[#2B3674]">
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                  </ul>
                 </div>
-              )}
-            </button>
+
+
+              </div>
+              <div className='flex justify-end' onClick={() => openBarCodeModal()}>
+                <Image src={barcode} height={70} width={70} alt="Barcode Image" />
+              </div>
+
+            </div>
           </div>
-        </div>
-        <div className="overflow-x-auto relative main-outer-wrapper w-full">
-            <table className="md:w-full w-auto display main-tables" id="rtoOrderTable">
-            <thead>
-              <tr className="text-[#A3AED0] uppercase text-left  border-b border-[#E9EDF7]">
-                <th className="p-3 px-5 whitespace-nowrap">SR.</th>
-                <th className="p-3 px-5 whitespace-nowrap">Order #</th>
-                <th className="p-3 px-5 whitespace-nowrap">Customer</th>
-                <th className="p-3 px-5 whitespace-nowrap">Payment</th>
-                <th className="p-3 px-5 whitespace-nowrap">Shipment Details</th>
-                <th className="p-3 px-5 whitespace-nowrap">Return Tracking #</th>
-                <th className="p-3 px-5 whitespace-nowrap">Return Status</th>
-                <th className="p-3 px-5 whitespace-nowrap">Return Date</th>
-                <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
-                <th className="p-3 px-5 whitespace-nowrap">Total</th>
-                <th className="p-3 px-5 whitespace-nowrap">Delivered</th>
-                <th className="p-3 px-5 whitespace-nowrap">Date</th>
-                <th className="p-3 px-5 whitespace-nowrap">Items</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order, index) => (
 
-                <tr key={order.id} className="border-b capitalize align-top text-[#304174] font-semibold border-[#E9EDF7]">
-                  {/* Index */}
-                  <td className="p-3 px-5 whitespace-nowrap">{index + 1}</td>
+          <div className="bg-white p-4 rounded-2xl">
+            <div className="flex flex-wrap justify-between items-center mb-4 lg:px-3">
+              <h2 className="text-2xl font-bold  font-dm-sans">RTO Order Details</h2>
+              <div className="flex gap-3  flex-wrap items-center">
+                <span onClick={() => fetchRto()} className="font-bold   font-dm-sans">Clear Filters</span>
+                <span><IoMdRefresh className="text-red-600 text-xl" /></span>
+                <span><IoSettingsOutline className="text-xl" /></span>
+                <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
 
-                  {/* Order Number + Created Date */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
-                    <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
-                  </td>
-
-                  {/* Shipping Name, Phone, Email */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
-                    <br />
-                    <span className="text-sm block">
-                      <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
-                    </span>
-                    <span className="text-sm text-[#01b574]">
-                      <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
-                    </span>
-                  </td>
-
-                  {/* Payment Info */}
-                  <td className="p-3 px-5 whitespace-nowrap font-semibold">
-                    <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
-                    <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p>
-                    <p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p>
-                    <p>
-                      Status:{" "}
-                      <span
-                        className={`font-bold ${order.payment?.status === "failed"
-                          ? "text-red-500"
-                          : order.payment?.status === "pending"
-                            ? "text-yellow-500"
-                            : "text-green-500"
-                          }`}
-                      >
-                        <PermissionField permissionKey="status">{order.payment?.status || "N/A"}</PermissionField>
-                      </span>
-                    </p>
-                  </td>
-
-                  {/* Shipping details + AWB */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    <PermissionField permissionKey="orderNumber">{order.shippingApiResult?.data?.order_number}</PermissionField>
-                    <br />
-                    <PermissionField permissionKey="shippingAddress">{order.shippingAddress}</PermissionField>
-                    <br />
-                    <span className="text-green-500">
-                      <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
-                    </span>
-                    <br />
-                    AWB: <PermissionField permissionKey="awbNumber">{order.shippingApiResult?.data?.awb_number}</PermissionField>
-                  </td>
-
-                  {/* Tracking Numbers */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    {order.items
-                      .map((item) => (
-                        <PermissionField key={item.id} permissionKey="awbNumber">
-                          {item.supplierRTOResponse?.trackingNumber || "N/A"}
-                        </PermissionField>
-                      ))
-                      .reduce((prev, curr) => [prev, ", ", curr])}
-                  </td>
-
-                  {/* RTO Delivered */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    <PermissionField permissionKey="status">
-                      {order.rtoDelivered ? (
-                        <span className="text-green-600">Delivered</span>
-                      ) : (
-                        <span className="text-red-500">Pending</span>
-                      )}
-                    </PermissionField>
-                  </td>
-
-                  {/* RTO Delivered Date */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    <PermissionField permissionKey="status">
-                      {order.rtoDeliveredDate ? new Date(order.rtoDeliveredDate).toLocaleDateString() : "N/A"}
-                    </PermissionField>
-                  </td>
-
-                  {/* Number of Items */}
-                  <td className="p-3 px-5 whitespace-nowrap">{order.items.length}</td>
-
-                  {/* Total Amount */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    <PermissionField permissionKey="totalAmount">₹{order.totalAmount}</PermissionField>
-                  </td>
-
-                  {/* Delivered */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    <PermissionField permissionKey="status">
-                      {order.delivered ? (
-                        <span className="text-green-600 font-medium">Yes</span>
-                      ) : (
-                        <span className="text-red-500 font-medium">No</span>
-                      )}
-                    </PermissionField>
-                  </td>
-
-                  {/* Created At Date */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    <PermissionField permissionKey="orderNote">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </PermissionField>
-                  </td>
-
-                  {/* Action Button */}
-                  <td className="p-3 px-5 whitespace-nowrap">
-                    <button
-                      onClick={() => handleViewVariant(order, order.items)}
-                      className="bg-orange-500 rounded-md p-3 text-white text-sm"
-                    >
-                      View Variant
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-
-          </table>
+                <button className="bg-[#F4F7FE] rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
 
 
-
-          {showModal && selectedVariant && (
-
-            <div className="fixed inset-0 flex items-center justify-center bg-[#000000ba] bg-opacity-50 z-50">
-              <div className="bg-white w-full max-w-3xl border-2 border-orange-500 p-6 rounded-md shadow-lg relative">
-                <button
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-                  onClick={() => setShowModal(false)}
-                >
-                  ✕
+                  <input
+                    type="month"
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    className="outline-0 font-dm-sans"
+                  />
                 </button>
-                <h2 className="text-xl font-semibold mb-4">Product Variants</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {selectedVariant?.items?.map((item, idx) => {
-                    const variant = item.dropshipperVariant?.supplierProductVariant?.variant;
-                    if (!variant) return null;
-                    return (
-                      <div key={idx}>
-                        <div
-                          key={idx}
-                          className="border hover:border-orange-400 border-[#DFEAF2] p-4 rounded-md shadow-sm"
-                        >
-                          <div className="flex gap-2 mb-2 overflow-x-auto">
-                            {(variant.image || '')
-                              .split(',')
-                              .filter((img) => img.trim() !== '')
-                              .map((imgUrl, imgIdx) => (
-                                <img
-                                  key={imgIdx}
-                                  src={`https://placehold.co/400` || imgUrl.trim()}
-                                  alt={`Variant ${idx}`}
-                                  className="h-24 w-24 object-cover rounded border border-[#DFEAF2]"
-                                />
-                              ))}
-                          </div>
-                          <p><strong>Name:</strong> {variant.name}</p>
-                          <p><strong>Color:</strong> {variant.color}</p>
-                          <p><strong>Model:</strong> {variant.modal}</p>
-                          <p><strong>SKU:</strong> {variant.sku}</p>
-                          <p><strong>Suggested Price:</strong> ₹{variant.suggested_price}</p>
+                <button
+                  onClick={() => setIsPopupOpen((prev) => !prev)}
+                  className="bg-[#F4F7FE] p-2 rounded-lg relative"
+                >
+                  <MoreHorizontal className="text-[#F98F5C]" />
+                  {isPopupOpen && (
+                    <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                      <ul className="py-2 text-sm text-[#2B3674]">
+                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                      </ul>
+                    </div>
+                  )}
+                </button>
+              </div>
+            </div>
+            {orders.length > 0 ? (
+              <div className="overflow-x-auto relative main-outer-wrapper w-full">
+                <table className="md:w-full w-auto display main-tables" id="rtoOrderTable">
+                  <thead>
+                    <tr className="text-[#A3AED0] uppercase text-left  border-b border-[#E9EDF7]">
+                      <th className="p-3 px-5 whitespace-nowrap">SR.</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Order #</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Customer</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Payment</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Shipment Details</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Return Tracking #</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Return Status</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Return Date</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Total</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Delivered</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Date</th>
+                      <th className="p-3 px-5 whitespace-nowrap">Items</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map((order, index) => (
 
-                          {item?.supplierRTOResponse && Object.keys(item.supplierRTOResponse).length > 0 ? (
-                            <button
-                              className="px-4 mt-2 py-2 text-white bg-blue-600 rounded"
-                              onClick={() => {
-                                setSelectedDisputeItem(item); // Save clicked dispute item to state
-                                modalRefNew.current?.showModal(); // Open dialog
-                              }}
+                      <tr key={order.id} className="border-b capitalize align-top text-[#304174] font-semibold border-[#E9EDF7]">
+                        {/* Index */}
+                        <td className="p-3 px-5 whitespace-nowrap">{index + 1}</td>
+
+                        {/* Order Number + Created Date */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
+                          <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
+                        </td>
+
+                        {/* Shipping Name, Phone, Email */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
+                          <br />
+                          <span className="text-sm block">
+                            <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
+                          </span>
+                          <span className="text-sm text-[#01b574]">
+                            <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
+                          </span>
+                        </td>
+
+                        {/* Payment Info */}
+                        <td className="p-3 px-5 whitespace-nowrap font-semibold">
+                          <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
+                          <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p>
+                          <p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p>
+                          <p>
+                            Status:{" "}
+                            <span
+                              className={`font-bold ${order.payment?.status === "failed"
+                                ? "text-red-500"
+                                : order.payment?.status === "pending"
+                                  ? "text-yellow-500"
+                                  : "text-green-500"
+                                }`}
                             >
-                              View Dispute
-                            </button>
+                              <PermissionField permissionKey="status">{order.payment?.status || "N/A"}</PermissionField>
+                            </span>
+                          </p>
+                        </td>
 
-                          ) : (
-                            selectedVariant?.rtoDelivered &&
-                            (() => {
-                              const rtoDate = new Date(selectedVariant.rtoDeliveredDate);
-                              const now = new Date();
-                              const diffInHours = (now - rtoDate) / (1000 * 60 * 60);
+                        {/* Shipping details + AWB */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="orderNumber">{order.shippingApiResult?.data?.order_number}</PermissionField>
+                          <br />
+                          <PermissionField permissionKey="shippingAddress">{order.shippingAddress}</PermissionField>
+                          <br />
+                          <span className="text-green-500">
+                            <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
+                          </span>
+                          <br />
+                          AWB: <PermissionField permissionKey="awbNumber">{order.shippingApiResult?.data?.awb_number}</PermissionField>
+                        </td>
 
-                              if (diffInHours <= 24) {
-                                return (
-                                  <button
-                                    onClick={() => openModal()}
-                                    className="bg-orange-500 text-white p-2 mt-2 px-4 rounded-md"
-                                  >
-                                    Dispute
-                                  </button>
-                                );
-                              }
-                              return null;
-                            })()
-                          )}
+                        {/* Tracking Numbers */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          {order.items
+                            .map((item) => (
+                              <PermissionField key={item.id} permissionKey="awbNumber">
+                                {item.supplierRTOResponse?.trackingNumber || "N/A"}
+                              </PermissionField>
+                            ))
+                            .reduce((prev, curr) => [prev, ", ", curr])}
+                        </td>
+
+                        {/* RTO Delivered */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="status">
+                            {order.rtoDelivered ? (
+                              <span className="text-green-600">Delivered</span>
+                            ) : (
+                              <span className="text-red-500">Pending</span>
+                            )}
+                          </PermissionField>
+                        </td>
+
+                        {/* RTO Delivered Date */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="status">
+                            {order.rtoDeliveredDate ? new Date(order.rtoDeliveredDate).toLocaleDateString() : "N/A"}
+                          </PermissionField>
+                        </td>
+
+                        {/* Number of Items */}
+                        <td className="p-3 px-5 whitespace-nowrap">{order.items.length}</td>
+
+                        {/* Total Amount */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="totalAmount">₹{order.totalAmount}</PermissionField>
+                        </td>
+
+                        {/* Delivered */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="status">
+                            {order.delivered ? (
+                              <span className="text-green-600 font-medium">Yes</span>
+                            ) : (
+                              <span className="text-red-500 font-medium">No</span>
+                            )}
+                          </PermissionField>
+                        </td>
+
+                        {/* Created At Date */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="orderNote">
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </PermissionField>
+                        </td>
+
+                        {/* Action Button */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <button
+                            onClick={() => handleViewVariant(order, order.items)}
+                            className="bg-orange-500 rounded-md p-3 text-white text-sm"
+                          >
+                            View Variant
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+
+                </table>
 
 
 
 
+              </div>
+            ) : (
+              <p className='text-center'>No RTO Orders Available</p>
+            )}
 
-                        </div>
-                        <dialog ref={modalRef} className="rounded-md w-full m-auto  max-w-md p-6 z-10">
-                          <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-bold">Raise a Dispute</h2>
-                            <button onClick={closeModal} className="text-gray-500 hover:text-black">✕</button>
-                          </div>
 
-                          <div className="space-y-4">
-                            <div>
-                              <label className="block font-medium mb-1">Status</label>
-                              <select
-                                className="w-full border rounded px-3 py-2"
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
+          </div>
+        </>
+      )}
+      {activeTab == "rto_count" && (
+        <p> Live RTO Count</p>
+      )
+      }
+      {activeTab == "need_to_raise" && (
+        <p>Need To Raise</p>
+      )
+      }
+      {activeTab == "dispute" && (
+        <p>Dispute Orders</p>
+      )
+      }
+
+      {showModal && selectedVariant && (
+
+        <div className="fixed inset-0 flex items-center justify-center bg-[#000000ba] bg-opacity-50 z-50">
+          <div className="bg-white w-full max-w-3xl border-2 border-orange-500 p-6 rounded-md shadow-lg relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+              onClick={() => setShowModal(false)}
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-semibold mb-4">Product Variants</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {selectedVariant?.items?.map((item, idx) => {
+                const variant = item.dropshipperVariant?.supplierProductVariant?.variant;
+                if (!variant) return null;
+                return (
+                  <div key={idx}>
+                    <div
+                      key={idx}
+                      className="border hover:border-orange-400 border-[#DFEAF2] p-4 rounded-md shadow-sm"
+                    >
+                      <div className="flex gap-2 mb-2 overflow-x-auto">
+                        {(variant.image || '')
+                          .split(',')
+                          .filter((img) => img.trim() !== '')
+                          .map((imgUrl, imgIdx) => (
+                            <img
+                              key={imgIdx}
+                              src={`https://placehold.co/400` || imgUrl.trim()}
+                              alt={`Variant ${idx}`}
+                              className="h-24 w-24 object-cover rounded border border-[#DFEAF2]"
+                            />
+                          ))}
+                      </div>
+                      <p><strong>Name:</strong> {variant.name}</p>
+                      <p><strong>Color:</strong> {variant.color}</p>
+                      <p><strong>Model:</strong> {variant.modal}</p>
+                      <p><strong>SKU:</strong> {variant.sku}</p>
+                      <p><strong>Suggested Price:</strong> ₹{variant.suggested_price}</p>
+
+                      {item?.supplierRTOResponse && Object.keys(item.supplierRTOResponse).length > 0 ? (
+                        <button
+                          className="px-4 mt-2 py-2 text-white bg-blue-600 rounded"
+                          onClick={() => {
+                            setSelectedDisputeItem(item); // Save clicked dispute item to state
+                            modalRefNew.current?.showModal(); // Open dialog
+                          }}
+                        >
+                          View Dispute
+                        </button>
+
+                      ) : (
+                        selectedVariant?.rtoDelivered &&
+                        (() => {
+                          const rtoDate = new Date(selectedVariant.rtoDeliveredDate);
+                          const now = new Date();
+                          const diffInHours = (now - rtoDate) / (1000 * 60 * 60);
+
+                          if (diffInHours <= 24) {
+                            return (
+                              <button
+                                onClick={() => openModal()}
+                                className="bg-orange-500 text-white p-2 mt-2 px-4 rounded-md"
                               >
-                                <option value="">Select Status</option>
-                                <option value="wrong item received">Wrong Item Received</option>
-                                <option value="received">Delivered</option>
-                                <option value="not received">Not Delivered</option>
+                                Dispute
+                              </button>
+                            );
+                          }
+                          return null;
+                        })()
+                      )}
 
-                              </select>
+
+
+
+
+                    </div>
+                    <dialog ref={modalRef} className="rounded-md w-full m-auto  max-w-md p-6 z-10">
+                      <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold">Raise a Dispute</h2>
+                        <button onClick={closeModal} className="text-gray-500 hover:text-black">✕</button>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block font-medium mb-1">Status</label>
+                          <select
+                            className="w-full border rounded px-3 py-2"
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                          >
+                            <option value="">Select Status</option>
+                            <option value="wrong item received">Wrong Item Received</option>
+                            <option value="received">Delivered</option>
+                            <option value="not received">Not Delivered</option>
+
+                          </select>
+                        </div>
+
+                        {status === 'wrong item received' && (
+                          <>
+                            <div>
+                              <label className="block font-medium mb-1">Packing Gallery (images/videos)</label>
+                              <input
+                                type="file"
+                                multiple
+                                accept="image/*,video/*"
+                                name='packingGallery'
+                                onChange={handleFileChange}
+                                className="w-full border rounded px-3 py-2"
+                              />
                             </div>
 
-                            {status === 'wrong item received' && (
-                              <>
-                                <div>
-                                  <label className="block font-medium mb-1">Packing Gallery (images/videos)</label>
-                                  <input
-                                    type="file"
-                                    multiple
-                                    accept="image/*,video/*"
-                                    name='packingGallery'
-                                    onChange={handleFileChange}
-                                    className="w-full border rounded px-3 py-2"
-                                  />
-                                </div>
-
-                                <div>
-                                  <label className="block font-medium mb-1">Unboxing Gallery (images/videos)</label>
-                                  <input
-                                    type="file"
-                                    multiple
-                                    name='unboxingGallery'
-                                    accept="image/*,video/*"
-                                    onChange={handleFileChange}
-                                    className="w-full border rounded px-3 py-2"
-                                  />
-                                </div>
-                              </>
-                            )}
-                          </div>
-
-                          <div className="mt-6 flex justify-end gap-2">
-                            <button onClick={closeModal} className="px-4 py-2 border rounded">
-                              Cancel
-                            </button>
-                            <button
-                              onClick={(e) => handleSubmit(e, selectedVariant, variant.id)} className="px-4 py-2 bg-orange-500 text-white rounded"
-                            >
-                              Submit Dispute
-                            </button>
-                          </div>
-                        </dialog>
+                            <div>
+                              <label className="block font-medium mb-1">Unboxing Gallery (images/videos)</label>
+                              <input
+                                type="file"
+                                multiple
+                                name='unboxingGallery'
+                                accept="image/*,video/*"
+                                onChange={handleFileChange}
+                                className="w-full border rounded px-3 py-2"
+                              />
+                            </div>
+                          </>
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
 
-
-              </div>
+                      <div className="mt-6 flex justify-end gap-2">
+                        <button onClick={closeModal} className="px-4 py-2 border rounded">
+                          Cancel
+                        </button>
+                        <button
+                          onClick={(e) => handleSubmit(e, selectedVariant, variant.id)} className="px-4 py-2 bg-orange-500 text-white rounded"
+                        >
+                          Submit Dispute
+                        </button>
+                      </div>
+                    </dialog>
+                  </div>
+                );
+              })}
             </div>
 
-          )}
+
+          </div>
         </div>
-       
-      </div>
+
+      )}
+
+
+
+
       <dialog ref={modalRefNew} className="rounded-md w-full m-auto max-w-2xl p-6 z-50">
         {selectedDisputeItem && (
           <div>
@@ -815,6 +820,8 @@ export default function RTO() {
           </div>
         )}
       </dialog>
+
+
       {isBarCodePopupOpen && (
         <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">

@@ -1,8 +1,8 @@
-import Products from '@/components/supplier/products/Products'
+import ProductDetails from '@/components/supplier/products/ProductDetails'
 import React from 'react'
 
 export default function Page() {
   return (
-    <Products/>
+    <ProductDetails/>
   )
 }

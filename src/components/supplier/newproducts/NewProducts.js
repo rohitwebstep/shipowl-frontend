@@ -15,13 +15,24 @@ export default function NewProducts() {
   const [productsRequest, setProductsRequest] = useState([]);
   const [loading, setLoading] = useState(null);
   const router = useRouter();
+  const [type, setType] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [openDescriptionId, setOpenDescriptionId] = useState(null);
   const [inventoryData, setInventoryData] = useState({
     productId: "",
     variant: [],
     id: '',
     isVarientExists: '',
   });
+
+  const viewProduct = (id) => {
+    if (type == "notmy") {
+      router.push(`/supplier/product/?id=${id}&type=${type}`);
+    } else {
+
+      router.push(`/supplier/product/?id=${id}`);
+    }
+  };
   const handleVariantChange = (id, field, value) => {
     setInventoryData((prevData) => ({
       ...prevData,
@@ -71,6 +82,7 @@ export default function NewProducts() {
       const result = await response.json();
       if (result) {
         setProductsRequest(result?.products || []);
+        setType(result?.type || '');
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -126,12 +138,14 @@ export default function NewProducts() {
       });
 
       const form = new FormData();
-      const simplifiedVariants = inventoryData.variant.map((v) => ({
-        variantId: v.id || v.variantId,
-        stock: v.stock,
-        price: v.price,
-        status: v.status
-      }));
+        const simplifiedVariants = inventoryData.variant
+        .filter(v => v.status === true) // Only include variants with status true
+        .map(v => ({
+          variantId: v.id || v.variantId,
+          stock: v.stock,
+          price: v.price,
+          status: v.status
+        }));
 
       form.append('productId', inventoryData.productId);
       form.append('variants', JSON.stringify(simplifiedVariants));
@@ -194,12 +208,13 @@ export default function NewProducts() {
       setLoading(false);
     }
   };
+  console.log('inventory',inventoryData)
 
   return (
     <>
       <div>
         {productsRequest.length > 0 ? (
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 gap-6">
+          <div className="grid lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-1 gap-6">
             {productsRequest.map((product) => {
               const firstVariant = product.variants?.[0];
               const imageUrl = productImage || "/placeholder.png"; // Fallback
@@ -217,7 +232,7 @@ export default function NewProducts() {
                 >
                   {/* Flip Image Section */}
                   <div className="relative h-[200px] perspective">
-                    <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                    <div onClick={() => viewProduct(product.id)} className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                       {/* FRONT */}
                       <Image
                         src={imageUrl}
@@ -243,7 +258,35 @@ export default function NewProducts() {
                       <div className="flex items-center gap-2">
                         <FileText size={16} />
                         <span>
-                          {product?.description || "No description"}
+                          <button
+                            onClick={() => setOpenDescriptionId(product.id)}
+                            className="text-blue-600"
+                          >
+                            View Description
+                          </button>
+                          {openDescriptionId === product.id && (
+                            <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                              <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
+                                {/* Close Button */}
+                                <button
+                                  onClick={() => setOpenDescriptionId(null)}
+                                  className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+                                >
+                                  &times;
+                                </button>
+
+                                {/* HTML Description Content */}
+                                {product.description ? (
+                                  <div
+                                    className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                                    dangerouslySetInnerHTML={{ __html: product.description }}
+                                  />
+                                ) : (
+                                  <p className="text-gray-500">NIL</p>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -259,7 +302,7 @@ export default function NewProducts() {
                     </div>
 
                     <button
-                   
+
                       className="mt-3 w-full bg-orange-500 text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition"
                     >
                       Add to List
@@ -346,6 +389,7 @@ export default function NewProducts() {
                                   <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
                                   <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
                                   <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
+                                  <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
                                 </>
                               )}
                             </div>
@@ -377,7 +421,7 @@ export default function NewProducts() {
 
                           {/* Status Switch */}
                           <div className="flex items-center justify-between mt-2">
-                            <span className="text-sm font-medium">Status:</span>
+                            <span className="text-sm font-medium">Add To List:</span>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input
                                 type="checkbox"
@@ -431,6 +475,8 @@ export default function NewProducts() {
           </div>
         </div>
       )}
+
+
     </>
   );
 }

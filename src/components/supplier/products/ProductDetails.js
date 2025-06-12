@@ -32,8 +32,8 @@ import { RxCross1 } from "react-icons/rx";
 import { ChevronRight, ChevronDown } from "lucide-react"; // Optional: Lucide icons
 
 const tabs = [
-  { key: "notmy", label: "Not Pushed to Shopify" },
-  { key: "my", label: "Pushed to Shopify" },
+  { key: "notmy", label: "Not Listed Products" },
+  { key: "my", label: "Listed Products" },
 ];
 const ProductDetails = () => {
   const router = useRouter();
@@ -42,10 +42,10 @@ const ProductDetails = () => {
   const type = searchParams.get('type');
   const [showPopup, setShowPopup] = useState(false);
   // Dynamic images setup
+  const [openSection, setOpenSection] = useState(null);
   const [shipCost, setShipCost] = useState([]);
   const [openDescriptionId, setOpenDescriptionId] = useState(null);
-  
-  const [openSection, setOpenSection] = useState(null);
+
 
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
@@ -63,11 +63,10 @@ const ProductDetails = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [inventoryData, setInventoryData] = useState({
-    supplierProductId: "",
-    id: '',
+    productId: "",
     variant: [],
+    id: '',
     isVarientExists: '',
-    shopifyApp: '',
   });
 
 
@@ -177,17 +176,17 @@ const ProductDetails = () => {
 
   const profitPerOrder = finalMargin / totalOrderQty;
   const fetchProductDetails = useCallback(async () => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
+    if (supplierData?.project?.active_panel !== "supplier") {
       localStorage.removeItem("shippingData");
-      router.push("/dropshipping/auth/login");
+      router.push("/supplier/auth/login");
       return;
     }
 
-    const dropshippertoken = dropshipperData?.security?.token;
-    if (!dropshippertoken) {
-      router.push("/dropshipping/auth/login");
+    const suppliertoken = supplierData?.security?.token;
+    if (!suppliertoken) {
+      router.push("/supplier/auth/login");
       return;
     }
 
@@ -195,16 +194,16 @@ const ProductDetails = () => {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory/${id}`;
+        url = `https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory/${id}`;
       } else {
-        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}`;
+        url = `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${dropshippertoken}`,
+          Authorization: `Bearer ${suppliertoken}`,
         },
       });
 
@@ -220,20 +219,20 @@ const ProductDetails = () => {
       setShipCost(result?.shippingCost || []);
 
       if (type === "notmy") {
-        const ProductDataSup = result?.supplierProduct;
+        const ProductDataSup = result?.product;
         const ProductDataOther = result?.otherSuppliers;
-        setProductDetails(ProductDataSup?.product || {});
+        setProductDetails(ProductDataSup || {});
         setOtherSuppliers(ProductDataOther || []);
         setVariantDetails(ProductDataSup.variants || []);
         setSelectedVariant(ProductDataSup?.variants[0])
         if (ProductDataSup) {
           setCategoryId(ProductDataSup?.product?.categoryId)
-          fetchRelatedProducts(ProductDataSup?.product?.categoryId, activeTab)
+          fetchRelatedProducts(ProductDataSup?.categoryId, activeTab)
 
         }
       }
       else {
-        const ProductDataDrop = result?.dropshipperProduct;
+        const ProductDataDrop = result?.supplierProduct;
         setProductDetails(ProductDataDrop?.product || {});
         setVariantDetails(ProductDataDrop.variants || []);
         setSelectedVariant(ProductDataDrop?.variants[0]);
@@ -255,27 +254,27 @@ const ProductDetails = () => {
   };
   // Fetch related products by category
   const fetchRelatedProducts = useCallback(async (catid, tab) => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
+    if (supplierData?.project?.active_panel !== "supplier") {
       localStorage.removeItem("shippingData");
-      router.push("/dropshipping/auth/login");
+      router.push("/supplier/auth/login");
       return;
     }
 
-    const dropshippertoken = dropshipperData?.security?.token;
-    if (!dropshippertoken) {
-      router.push("/dropshipping/auth/login");
+    const suppliertoken = supplierData?.security?.token;
+    if (!suppliertoken) {
+      router.push("/supplier/auth/login");
       return;
     }
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory?category=${catid}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${dropshippertoken}`,
+          Authorization: `Bearer ${suppliertoken}`,
         },
       });
 
@@ -299,47 +298,29 @@ const ProductDetails = () => {
     }
   }, [router]);
 
-
-
   const handleVariantChange = (id, field, value) => {
-    // If field is global (e.g., shopifyApp), update it at root level
-    if (id == null) {
-      setInventoryData((prevData) => ({
-        ...prevData,
-        [field]: value,
-      }));
-      return;
-    }
-
-    // Otherwise, update specific variant
     setInventoryData((prevData) => ({
       ...prevData,
       variant: prevData.variant.map((v) =>
-        v.id === id
-          ? {
-            ...v,
-            [field]: ['qty', 'shipowl_price', 'dropStock', 'dropPrice'].includes(field)
-              ? Number(value)
-              : value,
-          }
-          : v
+        v.id === id ? { ...v, [field]: field === 'qty' || field === 'shipowl_price' ? Number(value) : value } : v
       ),
     }));
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
+    if (dropshipperData?.project?.active_panel !== "supplier") {
       localStorage.clear("shippingData");
-      router.push("/dropshipper/auth/login");
+      router.push("/supplier/auth/login");
       return;
     }
 
     const token = dropshipperData?.security?.token;
     if (!token) {
-      router.push("/dropshipper/auth/login");
+      router.push("/supplier/auth/login");
       return;
     }
 
@@ -353,22 +334,22 @@ const ProductDetails = () => {
         }
       });
 
-
       const form = new FormData();
-      const simplifiedVariants = inventoryData.variant.map((v) => ({
-        variantId: v.id || v.variantId,
-        stock: v.dropStock,
-        price: v.dropPrice,
-        status: v.Dropstatus
-      }));
+      const simplifiedVariants = inventoryData.variant
+        .filter(v => v.status === true) // Only include variants with status true
+        .map(v => ({
+          variantId: v.id || v.variantId,
+          stock: v.stock,
+          price: v.price,
+          status: v.status
+        }));
 
-      form.append('supplierProductId', inventoryData.supplierProductId);
-      form.append('shopifyApp', inventoryData.shopifyApp);
+      form.append('productId', inventoryData.productId);
       form.append('variants', JSON.stringify(simplifiedVariants));
 
 
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = "https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -385,9 +366,10 @@ const ProductDetails = () => {
       if (!response.ok) {
         Swal.fire({
           icon: "error",
-          title: "Creation Failed",
+          title: isEdit ? "Updation Failed" : "Creation Failed",
           text: result.message || result.error || "An error occurred",
         });
+        Swal.close();
         return;
       }
 
@@ -395,7 +377,7 @@ const ProductDetails = () => {
       Swal.fire({
         icon: "success",
         title: "Product Created",
-        text: result.message || "The Product has been created successfully!",
+        text: "The Product has been created successfully!",
         showConfirmButton: true,
       }).then((res) => {
         if (res.isConfirmed) {
@@ -403,11 +385,9 @@ const ProductDetails = () => {
             productId: "",
             variant: [],
             id: '',
-            shopifyApp: ''
           });
           setShowPopup(false);
-          fetchProduct('my');
-          setActiveTab('my');
+          fetchProducts();
         }
       });
 
@@ -420,6 +400,7 @@ const ProductDetails = () => {
         title: "Submission Error",
         text: error.message || "Something went wrong. Please try again.",
       });
+      Swal.close();
     } finally {
       setLoading(false);
     }
@@ -431,7 +412,6 @@ const ProductDetails = () => {
   };
   useEffect(() => {
     fetchProductDetails();
-
   }, [fetchProductDetails]);
 
 
@@ -444,12 +424,13 @@ const ProductDetails = () => {
   }
   const viewProduct = (id) => {
     if (type == "notmy") {
-      router.push(`/dropshipping/product/?id=${id}&type=${type}`);
+      router.push(`/supplier/product/?id=${id}&type=${type}`);
     } else {
 
-      router.push(`/dropshipping/product/?id=${id}`);
+      router.push(`/supplier/product/?id=${id}`);
     }
   };
+  console.log('productDetails', productDetails)
   return (
     <>
       {productDetails && Object.keys(productDetails).length > 0 ? (
@@ -464,7 +445,7 @@ const ProductDetails = () => {
                     alt="Product Image"
                     width={320}
                     height={320}
-                    className="w-full h-100 object-cover rounded-lg"
+                    className="w-full h-100  object-cover rounded-lg"
                   />
                 </div>
 
@@ -494,7 +475,7 @@ const ProductDetails = () => {
 
 
             <div className="w-full md:w-8/12 bg-white rounded-lg border border-[#E0E2E7] p-6">
-              <h2 className="text-3xl font-bold text-[#2C3454] pb-4">
+              <h2 className="text-3xl font-bold text-[#2C3454] pb-4 capitalize">
                 {productDetails?.name}
               </h2>
 
@@ -518,7 +499,7 @@ const ProductDetails = () => {
                 <div>
                   <div className="md:flex gap-3 items-end">
                     <div>
-                      <h2 className="text-2xl font-bold">₹{selectedVariant?.price}</h2>
+                      <h2 className="text-2xl font-bold">₹{selectedVariant?.price || selectedVariant?.suggested_price}</h2>
                       <p className="text-gray-500 flex items-center text-sm">
                         <a href="#" className="underline text-sm">
                           Including GST & Shipping Charges
@@ -577,11 +558,11 @@ const ProductDetails = () => {
                 {variantDetails.map((item, index) => {
                   let variant;
                   if (type === "notmy") {
-                    variant = item?.variant;
+                    variant = item;
                   } else {
-                    variant = item?.supplierProductVariant?.variant;
+                    variant = item?.variant;
                   }
-                  const isSelected = selectedVariant?.id === variant.id;
+                  const isSelected = selectedVariant?.id === variant?.id;
 
                   return (
                     <div
@@ -608,7 +589,7 @@ const ProductDetails = () => {
                           <div>Color: <span className="font-medium">{variant?.color || 'NIL'}</span></div>
                           <div>Modal: <span className="font-medium">{variant?.modal}</span></div>
                           <div className="text-green-600 font-semibold">
-                            Price: ₹{type === "notmy" ? item?.price : item.price}
+                            Price: ₹{type === "notmy" ? item?.suggested_price : item.price}
                           </div>
                         </div>
                       </div>
@@ -627,10 +608,7 @@ const ProductDetails = () => {
                       {[
                         ...new Set(
                           variantDetails.map((item) => {
-                            const color =
-                              type === "notmy"
-                                ? item?.variant?.color
-                                : item?.supplierProductVariant?.variant?.color;
+                            const color = type === "notmy" ? item?.color : item?.variant?.color
                             return color?.trim().toLowerCase();
                           }).filter(Boolean)
                         ),
@@ -645,16 +623,10 @@ const ProductDetails = () => {
                       ))}
 
                       {variantDetails.every((item) => {
-                        const color =
-                          type === "notmy"
-                            ? item?.variant?.color
-                            : item?.supplierProductVariant?.variant?.color;
+                        const color = type === "notmy" ? item?.color : item?.color
                         return !color;
-                      }) && (
-                          <div className="px-4 py-2 bg-gray-300 text-black rounded-md mb-2">
-                            <span>No Color Found</span>
-                          </div>
-                        )}
+                      })
+                      }
                     </div>
                   </div>
 
@@ -668,7 +640,7 @@ const ProductDetails = () => {
                             return tags.map((tag, index) => (
                               <button
                                 key={index}
-                                className="px-4 py-2 text-white bg-green-400 rounded-md mb-2"
+                                className="px-4 py-2 text-white capitalize bg-blue-400 rounded-md mb-2"
                               >
                                 <span>{tag}</span>
                               </button>
@@ -683,7 +655,7 @@ const ProductDetails = () => {
                       })()}
                     </div>
                   </div>
-                  {otherSuppliers.length > 0 && (
+                  {/* {otherSuppliers.length > 0 && (
                     <div className="">
                       <h3 className=" text-[18px] pt-5 font-bold">Other Suppliers</h3>
                       {otherSuppliers.map((sup, index) => {
@@ -707,7 +679,7 @@ const ProductDetails = () => {
                       })}
 
                     </div>
-                  )}
+                  )} */}
 
                 </div>
               </div>
@@ -721,32 +693,32 @@ const ProductDetails = () => {
                   >
                     View Description
                   </button>
-                 
+
                 </span>
               </p>
-               {openDescriptionId === productDetails.id && (
-                    <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                      <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
-                        {/* Close Button */}
-                        <button
-                          onClick={() => setOpenDescriptionId(null)}
-                          className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
-                        >
-                          &times;
-                        </button>
+              {openDescriptionId === productDetails.id && (
+                <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                  <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setOpenDescriptionId(null)}
+                      className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+                    >
+                      &times;
+                    </button>
 
-                        {/* HTML Description Content */}
-                        {productDetails.description ? (
-                          <div
-                            className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                            dangerouslySetInnerHTML={{ __html: productDetails.description }}
-                          />
-                        ) : (
-                          <p className="text-gray-500">NIL</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                    {/* HTML Description Content */}
+                    {productDetails.description ? (
+                      <div
+                        className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                        dangerouslySetInnerHTML={{ __html: productDetails.description }}
+                      />
+                    ) : (
+                      <p className="text-gray-500">NIL</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <p className="pt-2 text-[18px] font-bold border-t mt-3 border-[#E0E2E7]">Platform Assurance</p>
               <div className="xl:grid lg:grid-cols-4 flex my-5 md:my-0 overflow-auto gap-8">
@@ -775,20 +747,19 @@ const ProductDetails = () => {
                     <button onClick={() => {
                       setShowPopup(true);
                       setInventoryData({
-                        supplierProductId: productDetails.id,
+                        productId: productDetails.id,
                         id: productDetails.id,
                         variant: variantDetails,
                         isVarientExists: productDetails?.isVarientExists,
-                        shopifyApp: '',
                       });
                     }} className="bg-orange-500 text-white px-6 py-3 text-xl flex items-center justify-center w-full sm:w-autofont-semibold">
-                      <LuArrowUpRight className="mr-2" /> Push To Shopify
+                      <LuArrowUpRight className="mr-2" /> Add To List
                     </button>
 
                   ) :
                     (
                       <button className="bg-black text-white px-6 py-3 text-xl flex items-center justify-center w-full sm:w-autofont-semibold">
-                        <LuArrowUpRight className="mr-2" />  Edit From Shopify
+                        <LuArrowUpRight className="mr-2" />  Edit
                       </button>
                     )}
 
@@ -836,10 +807,15 @@ const ProductDetails = () => {
             ) : (
               <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 md:gap-6 gap-2 xl:gap-10">
                 {relatedProducts.map((item, index) => {
-                  const product = item.product || {};
+
+                  const product = type == "notmy" ? item : item.product || {};
                   const variants = item.variants || [];
 
-                  const prices = variants.map(v => v.price).filter(p => typeof p === "number");
+                  const prices = variants
+                    .map(v => type === "notmy" ? v.suggested_price : v.price)
+                    .filter(p => typeof p === "number");
+                  console.log('prices', prices)
+                  console.log('variants', variants)
                   const lowestPrice = prices.length > 0 ? Math.min(...prices) : "N/A";
                   const productName = product.name || "Unnamed Product";
 
@@ -936,160 +912,135 @@ const ProductDetails = () => {
 
 
           {showPopup && (
-            <div className="px-6 md:px-0 fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
-              <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
-                <h2 className="text-xl font-semibold mb-4">Push To Shopify</h2>
+            <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+              <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
+                <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
 
                 {(() => {
-                  const varinatExists = inventoryData?.isVarientExists ? 'yes' : 'no';
+                  const varinatExists = inventoryData?.isVarientExists ? "yes" : "no";
                   const isExists = varinatExists === "yes";
+
                   return (
                     <>
-                      <div className="mb-2">
-                        <select
-                          className="w-full mt-1 border border-[#E0E2E7] shadow p-2 rounded-md"
-                          name="shopifyApp"
-                          id="shopifyApp"
-                          onChange={(e) =>
-                            handleVariantChange(null, 'shopifyApp', e.target.value)
-                          }
-                          value={inventoryData.shopifyApp || ''}
-                        >
-                          <option value="">Select Store</option>
-                          {shopifyStores.map((item, index) => (
-                            <option value={item.id} key={index}>
-                              {item.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                        {inventoryData.variant?.map((v, idx) => {
-                          const variantInfo = {
-                            ...(v.variant || {}),
-                            ...v,
-                          };
-
-                          const imageUrls = variantInfo.image
-                            ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
+                        {inventoryData.variant?.map((variant, idx) => {
+                          const imageUrls = variant.image
+                            ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
                             : [];
 
                           return (
                             <div
-                              key={variantInfo.id || idx}
-                              className="relative bg-white border border-[#E0E2E7] shadow rounded-lg p-4  hover:shadow-lg transition group"
+                              key={variant.id || idx}
+                              className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
                             >
-                              <div className="flex items-center gap-4 mb-4">
-                                <div className="flex gap-2 overflow-x-auto max-w-[120px]">
+                              <div className='flex gap-2'>
+                                {/* Image Preview */}
+                                <div className="md:min-w-4/12 h-20 rounded-lg flex items-center justify-center overflow-hidden">
                                   {imageUrls.length > 0 ? (
-                                    imageUrls.map((url, i) => (
-                                      <Image
-                                        key={i}
-                                        height={100}
-                                        width={100}
-                                        src={`https://placehold.co/600x400?text=${idx + 1}`}
-                                        alt={variantInfo.name || 'NIL'}
-                                        className="shrink-0 border border-[#E0E2E7] shadow "
-                                      />
-                                    ))
+                                    <img
+                                      src={`https://placehold.co/600x400?text=${idx + 1}`}
+                                      alt={variant.name || "Variant Image"}
+                                      className="h-full object-cover"
+                                    />
                                   ) : (
-                                    <Image
-                                      height={40}
-                                      width={40}
+                                    <img
                                       src="https://placehold.co/600x400"
                                       alt="Placeholder"
-                                      className="rounded shrink-0"
+                                      className="h-full object-cover"
                                     />
                                   )}
                                 </div>
-                                <div>
-                                  <p className="font-semibold">Model: {variantInfo.modal || 'NIL'}</p>
+
+                                <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
+                                  <p><span className="font-semibold">Modal:</span> {variant.modal || "NIL"}</p>
                                   {isExists && (
                                     <>
-                                      <p>Name: {variantInfo.name || 'NIL'}</p>
-                                      <p>SKU: {variantInfo.sku || 'NIL'}</p>
-                                      <p>Color: {variantInfo.color || 'NIL'}</p>
+                                      <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
+                                      <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
+                                      <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
+                                      <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
                                     </>
                                   )}
                                 </div>
                               </div>
 
-                              <div className="space-y-3">
+                              {/* Input Fields */}
+                              <div className="flex flex-col space-y-2">
                                 <input
                                   type="number"
                                   placeholder="Stock"
-                                  name="dropStock"
-                                  className="w-full border border-[#E0E2E7] shadow rounded p-2"
-                                  value={variantInfo.dropStock || ''}
-                                  onChange={(e) => handleVariantChange(variantInfo.id, 'dropStock', e.target.value)}
+                                  name="stock"
+                                  className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
+                                  value={variant.stock || ""}
+                                  onChange={(e) =>
+                                    handleVariantChange(variant.id, "stock", e.target.value)
+                                  }
                                 />
                                 <input
                                   type="number"
                                   placeholder="Price"
-                                  name="dropPrice"
-                                  className="w-full border border-[#E0E2E7] shadow rounded p-2"
-                                  value={variantInfo.dropPrice || ''}
-                                  onChange={(e) => handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)}
+                                  name="price"
+                                  className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
+                                  value={variant.price || ""}
+                                  onChange={(e) =>
+                                    handleVariantChange(variant.id, "price", e.target.value)
+                                  }
                                 />
-
-                                <label className="flex items-center cursor-pointer">
-                                  <input
-                                    type="checkbox"
-                                    name="Dropstatus"
-                                    className="sr-only"
-                                    checked={!!variantInfo.Dropstatus}
-                                    onChange={(e) => handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)}
-                                  />
-                                  <div
-                                    className={`relative w-10 h-5 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : 'bg-gray-300'}`}
-                                  >
-                                    <div
-                                      className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
-                                        }`}
-                                    ></div>
-                                  </div>
-                                  <span className="ml-2 text-sm">{variantInfo.Dropstatus ? 'Active' : 'Inactive'}</span>
-                                </label>
                               </div>
 
-
-
+                              {/* Status Switch */}
+                              <div className="flex items-center justify-between mt-2">
+                                <span className="text-sm font-medium">Add to List:</span>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={variant.status || false}
+                                    onChange={(e) =>
+                                      handleVariantChange(variant.id, "status", e.target.checked)
+                                    }
+                                    className="sr-only peer"
+                                  />
+                                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-orange-500 transition-all"></div>
+                                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transform transition-all"></div>
+                                </label>
+                              </div>
                             </div>
                           );
                         })}
                       </div>
 
-
-
-
+                      {/* Footer Buttons */}
                       <div className="flex justify-end space-x-3 mt-6">
                         <button
                           onClick={() => setShowPopup(false)}
-                          className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                          className="flex items-center gap-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded transition"
                         >
-                          <X size={16} />
-                          Cancel
+                          <span>Cancel</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                         </button>
-
                         <button
-                          onClick={handleSubmit}
-                          className="flex items-center gap-2 px-4 py-2 bg-[#F98F5C] text-white rounded hover:bg-[#e97b45] transition-colors"
+                          onClick={(e) => handleSubmit(e)}
+                          className="flex items-center gap-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
                         >
-                          <Send size={16} />
-                          Submit
+                          <span>Submit</span>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
                         </button>
                       </div>
+
+                      {/* Close Button */}
+                      <button
+                        onClick={() => setShowPopup(false)}
+                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl"
+                      >
+                        ×
+                      </button>
                     </>
                   );
-
                 })()}
-
-                <button
-                  onClick={() => setShowPopup(false)}
-                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-                >
-                  ×
-                </button>
               </div>
             </div>
           )}
@@ -1126,7 +1077,7 @@ const ProductDetails = () => {
 
               {/* Info Bar */}
               <div className="flex gap-6 mt-4 mb-6">
-                <Image src={selectedVariant?.variant?.image?.split(",")} alt="" />
+                <Image src={selectedVariant?.variant?.image?.split(",") || productimg} alt="Demo Image" />
                 <ProductInfo label="Shipowl Price" value={selectedVariant?.price} />
                 <ProductInfo label="RTO Charges" value={shipCost} />
                 <ProductInfo label="Product Weight" value={`${productDetails?.weight} GM `} />
