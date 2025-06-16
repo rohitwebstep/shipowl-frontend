@@ -481,21 +481,7 @@ const BusinessInfo = () => {
           />
           {renderError('billingCity')}
         </div>
-        <div>
-          {renderLabel('Business Type', 'businessType')}
-          <select
-            name="businessType"
-            value={formData.businessType}
-            onChange={handleChange}
-            className={inputClasses('businessType')}
-          >
-            <option value="">Select</option>
-            <option value="Business">Business</option>
-            <option value="Freelancer">Freelancer</option>
-            <option value="Startup">Startup</option>
-          </select>
-          {renderError('businessType')}
-        </div>
+       
 
         <div>
           {renderLabel('Form of Client’s Entity', 'clientEntryType')}
@@ -505,10 +491,26 @@ const BusinessInfo = () => {
             onChange={handleChange}
             className={inputClasses('clientEntryType')}
           >
-            <option value="">Select</option>
-            <option value="Entrepreneurship">Entrepreneurship</option>
-            <option value="Partnership">Partnership</option>
-            <option value="Corporation">Corporation</option>
+           <option value="">Select</option>
+            <option value="Private Limited (Pvt Ltd)">Private Limited (Pvt Ltd)</option>
+            <option value="Public Limited (Ltd)">Public Limited (Ltd)</option>
+            <option value="Limited Liability Partnership (LLP)">Limited Liability Partnership (LLP)</option>
+            <option value="One Person Company (OPC)">One Person Company (OPC)</option>
+            <option value="Sole Proprietorship">Sole Proprietorship</option>
+            <option value="Partnership Firm">Partnership Firm</option>
+            <option value="Joint Venture">Joint Venture</option>
+            <option value="Branch Office">Branch Office</option>
+            <option value="Subsidiary Company">Subsidiary Company</option>
+            <option value="Government Owned">Government Owned</option>
+            <option value="Non-Profit / Section 8 Company">Non-Profit / Section 8 Company</option>
+            <option value="Trust">Trust</option>
+            <option value="Co-operative Society">Co-operative Society</option>
+            <option value="Unlimited Company">Unlimited Company</option>
+            <option value="Foreign Company">Foreign Company</option>
+            <option value="Holding Company">Holding Company</option>
+            <option value="Franchise">Franchise</option>
+            <option value="Startup">Startup</option>
+            <option value="Other">Other</option>
           </select>
           {renderError('clientEntryType')}
         </div>
@@ -667,7 +669,7 @@ const BusinessInfo = () => {
                 </Swiper>
               </div>    </div>
           )}
-
+  {renderError('panCardImage')}
 
         </div>
 
@@ -729,6 +731,7 @@ const BusinessInfo = () => {
                   ))}
                 </Swiper>
               )}
+               {renderError('aadharCardImage')}
             </div>
           </div>
         </div>

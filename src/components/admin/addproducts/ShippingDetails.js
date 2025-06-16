@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useContext } from 'react';
+import { useContext } from 'react';
 import { UploadCloud } from 'lucide-react';
 import { ProductContext } from './ProductContext';
 import { useRouter } from 'next/navigation';
 
 export default function ShippingDetails() {
-  const { formData, validateForm2, setFormData, shippingErrors, fileFields, setActiveTabs } = useContext(ProductContext);
+  const { formData, validateForm2, setFormData, shippingErrors, fileFields, setActiveTabs ,videoFields} = useContext(ProductContext);
 
-     const router = useRouter();
+  const router = useRouter();
 
   const handleFileChange = (event, key) => {
     const selectedFiles = Array.from(event.target.files);
@@ -64,24 +64,60 @@ export default function ShippingDetails() {
         </div>
 
         <div className="grid xl:grid-cols-5 md:grid-cols-2 gap-4 mb-4">
-          {['weight', 'package_length', 'package_width', 'package_height', 'chargable_weight'].map((field) => (
-            <div key={field}>
-              <label className="text-[#232323] font-bold block">
-                {field.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())} <span className="text-red-500">*</span>
-              </label>
+          {['weight', 'package_length', 'package_width', 'package_height'].map((field) => {
+            const unit = field.includes('weight') ? 'KG' : 'CM';
+            return (
+              <div key={field} className="relative">
+                <label className="text-[#232323] font-bold block">
+                  {field.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                  <span className="text-red-500"> *</span>
+                </label>
+                <div className="relative mt-2">
+                  <input
+                    type="number"
+                    name={field}
+                    value={formData[field] || ''}
+                    onChange={handleChange}
+                    className={`border ${shippingErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'} w-full p-3 pr-12 rounded-xl`}
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">{unit}</span>
+                </div>
+                {shippingErrors[field] && (
+                  <p className="text-red-500 text-sm mt-1">{shippingErrors[field]}</p>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Chargable Weight Field (Read-only + unit visible) */}
+          <div className="relative">
+            <label className="text-[#232323] font-bold block">
+              Chargable Weight <span className="text-red-500">*</span>
+            </label>
+            <div className="relative mt-2">
               <input
                 type="number"
-                placeholder={field.includes('weight') ? 'GM' : 'CM'}
-                className={`border placeholder-black placeholder:text-right ${shippingErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'
-                  } mt-2 w-full p-3 rounded-xl`}
-                name={field}
-                value={formData[field] || ''}
-                onChange={handleChange}
+                name="chargable_weight"
+                readOnly
+                value={(() => {
+                  const weight = parseFloat(formData.weight) || 0;
+                  const length = parseFloat(formData.package_length) || 0;
+                  const width = parseFloat(formData.package_width) || 0;
+                  const height = parseFloat(formData.package_height) || 0;
+                  const volumetric = (length * width * height) / 5000;
+                  return Math.max(weight, volumetric).toFixed(2);
+                })()}
+                className={`border ${shippingErrors.chargable_weight ? 'border-red-500' : 'border-[#DFEAF2]'} w-full p-3 pr-12 rounded-xl bg-gray-100`}
               />
-              {shippingErrors[field] && <p className="text-red-500 text-sm">{shippingErrors[field]}</p>}
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">KG</span>
             </div>
-          ))}
+            {shippingErrors.chargable_weight && (
+              <p className="text-red-500 text-sm mt-1">{shippingErrors.chargable_weight}</p>
+            )}
+          </div>
+
         </div>
+
 
         <div className="flex flex-wrap gap-8 my-8">
           {fileFields.map(({ label, key }) => (
@@ -101,12 +137,37 @@ export default function ShippingDetails() {
                 <input
                   type="file"
                   multiple
+                  accept="image/*"
                   className="absolute opacity-0 w-full h-full cursor-pointer"
                   onChange={(e) => handleFileChange(e, key)}
                 />
               </div>
 
               {shippingErrors[key] && <p className="text-red-500 text-sm">{shippingErrors[key]}</p>}
+            </div>
+          ))}
+          {videoFields.map(({ label, key }) => (
+            <div key={key} className="flex flex-col space-y-2 w-full md:w-[250px]">
+              <label className="text-[#232323] font-bold block mb-1">
+                {label}
+              </label>
+
+              <div className="relative border-2 border-dashed border-red-300 rounded-xl p-4 w-full h-36 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition">
+                <UploadCloud className="w-6 h-6 text-[#232323] mb-2" />
+                <span className="text-xs text-[#232323] text-center">
+                  {Array.isArray(formData?.[key]) && formData[key].length > 0
+                    ? formData[key].map((file, i) => file.name || `File ${i + 1}`).join(', ')
+                    : 'Upload'}
+                </span>
+
+                <input
+                  type="file"
+                  multiple
+                  accept="video/*"
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  onChange={(e) => handleFileChange(e, key)}
+                />
+              </div>
             </div>
           ))}
         </div>

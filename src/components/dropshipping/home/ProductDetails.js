@@ -454,6 +454,7 @@ const ProductDetails = () => {
   };
   return (
     <>
+      {productDetails && Object.keys(productDetails).length > 0 ? (
         <div>
           <div className="container mx-auto  gap-4 justify-between  rounded-lg flex flex-col md:flex-row">
             {/* Image Slider */}
@@ -1096,7 +1097,9 @@ const ProductDetails = () => {
           )}
 
         </div>
-      
+      ) : (
+        <p className="text-center font-bold text-3xl mt-8"> Product Not Found</p>
+      )}
 
       {
         openCalculator && (

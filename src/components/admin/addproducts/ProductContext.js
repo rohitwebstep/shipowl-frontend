@@ -50,7 +50,6 @@ const ProductProvider = ({ children }) => {
     package_width_image: 0,
     package_height_image: 0,
     product_detail_video: 0,
-    training_guidance_video: 0,
     hsn_code: '',
     tax_rate: '',
     isVisibleToAll: true,
@@ -156,8 +155,9 @@ const ProductProvider = ({ children }) => {
     { label: 'Package Length Image', key: 'package_length_image' },
     { label: 'Package Width Image', key: 'package_width_image' },
     { label: 'Package Height Image', key: 'package_height_image' },
+  ];
+  const videoFields = [
     { label: 'Upload Product Details Video', key: 'product_detail_video' },
-    { label: 'Upload Training Guidance Video', key: 'training_guidance_video' },
   ];
   const fetchCountry = useCallback(async () => {
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
@@ -216,32 +216,39 @@ const ProductProvider = ({ children }) => {
     video: 'Product Video URL',
     list_as: 'List As',
   };
-  const validateForm2 = () => {
-    const newErrors = {};
-    const requiredFields = [
-      'shipping_time',
-      'weight',
-      'package_length',
-      'package_width',
-      'package_height',
-      'chargable_weight',
-    ];
+ const validateForm2 = () => {
+  const newErrors = {};
+  const requiredFields = [
+    'shipping_time',
+    'weight',
+    'package_length',
+    'package_width',
+    'package_height',
+    'chargable_weight',
+  ];
 
-    requiredFields.forEach((field) => {
-      if (!formData[field]) {
-        newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
-      }
-    });
+  requiredFields.forEach((field) => {
+    if (!formData[field]) {
+      newErrors[field] = `${field.replace(/_/g, ' ')} is required`;
+    }
+  });
 
-    fileFields.forEach(({ key }) => {
-      if (!formData[key]) {
-        newErrors[key] = `Please upload a file for ${key.replace(/_/g, ' ')}`;
-      }
-    });
+  fileFields.forEach(({ key }) => {
+    if (!formData[key]) {
+      newErrors[key] = `Please upload a file for ${key.replace(/_/g, ' ')}`;
+    }
+  });
 
-    setShippingErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  videoFields.forEach(({ key }) => {
+    if (!formData[key]) {
+      newErrors[key] = `Please upload a file for ${key.replace(/_/g, ' ')}`;
+    }
+  });
+
+  setShippingErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
 
   const validateFields = () => {
     const requiredFields = [
@@ -288,6 +295,7 @@ const ProductProvider = ({ children }) => {
         formData,
         setFormData,
         fileFields,
+        videoFields,
         categoryData,
         setCategoryData,
         brandData,

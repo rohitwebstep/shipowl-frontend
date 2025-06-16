@@ -261,7 +261,7 @@ const BusinessInfo = () => {
           } else if (value instanceof File) {
             form.append(key, value, value.name);
           }
-        }else if (value instanceof FileList) {
+        } else if (value instanceof FileList) {
           Array.from(value).forEach(file => form.append(key, file));
 
         } else if (Array.isArray(value) || typeof value === 'object') {
@@ -416,22 +416,22 @@ const BusinessInfo = () => {
       </div>
 
       {/* Billing Address */}
-     
+
 
       {/* Pincode, State, City */}
       <div className="grid lg:grid-cols-3 py-5 gap-4">
-         <div>
-        {renderLabel('Company Billing Address', 'billingAddress')}
-        <input
-          type="text"
-          name="billingAddress"
-          value={formData.billingAddress}
-          onChange={handleChange}
-          className={inputClasses('billingAddress')}
-        />
-        {renderError('billingAddress')}
-      </div>
-       <div>
+        <div>
+          {renderLabel('Company Billing Address', 'billingAddress')}
+          <input
+            type="text"
+            name="billingAddress"
+            value={formData.billingAddress}
+            onChange={handleChange}
+            className={inputClasses('billingAddress')}
+          />
+          {renderError('billingAddress')}
+        </div>
+        <div>
           {renderLabel('Form of Client’s Entity', 'clientEntryType')}
           <select
             name="clientEntryType"
@@ -440,8 +440,25 @@ const BusinessInfo = () => {
             className={inputClasses('clientEntryType')}
           >
             <option value="">Select</option>
-            <option value="PVT">PVT</option>
-            <option value="LLP">LLP</option>
+            <option value="Private Limited (Pvt Ltd)">Private Limited (Pvt Ltd)</option>
+            <option value="Public Limited (Ltd)">Public Limited (Ltd)</option>
+            <option value="Limited Liability Partnership (LLP)">Limited Liability Partnership (LLP)</option>
+            <option value="One Person Company (OPC)">One Person Company (OPC)</option>
+            <option value="Sole Proprietorship">Sole Proprietorship</option>
+            <option value="Partnership Firm">Partnership Firm</option>
+            <option value="Joint Venture">Joint Venture</option>
+            <option value="Branch Office">Branch Office</option>
+            <option value="Subsidiary Company">Subsidiary Company</option>
+            <option value="Government Owned">Government Owned</option>
+            <option value="Non-Profit / Section 8 Company">Non-Profit / Section 8 Company</option>
+            <option value="Trust">Trust</option>
+            <option value="Co-operative Society">Co-operative Society</option>
+            <option value="Unlimited Company">Unlimited Company</option>
+            <option value="Foreign Company">Foreign Company</option>
+            <option value="Holding Company">Holding Company</option>
+            <option value="Franchise">Franchise</option>
+            <option value="Startup">Startup</option>
+            <option value="Other">Other</option>
           </select>
           {renderError('clientEntryType')}
         </div>
@@ -498,9 +515,9 @@ const BusinessInfo = () => {
           />
           {renderError('billingCity')}
         </div>
-     
 
-       
+
+
       </div>
 
       {/* KYC Documents */}
@@ -607,6 +624,7 @@ const BusinessInfo = () => {
             onChange={handleChange}
             className={inputClasses('panCardImage')}
           />
+          {renderError('panCardImage')}
           <div className="py-6">
             {formData.panCardImage?.length > 0 && (
               <div className="mt-2">
@@ -669,6 +687,7 @@ const BusinessInfo = () => {
             onChange={handleChange}
             className={inputClasses('aadharCardImage')}
           />
+          {renderError('aadharCardImage')}
           <div className="py-6">
             <div className="mt-2">
               {formData?.aadharCardImage?.length > 0 && (

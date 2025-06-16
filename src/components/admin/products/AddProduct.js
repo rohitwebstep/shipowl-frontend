@@ -111,7 +111,6 @@ const AddProduct = () => {
         package_width_image: products.package_width_image || '',
         package_height_image: products.package_height_image || '',
         product_detail_video: products.product_detail_video || '',
-        training_guidance_video: products.training_guidance_video || '',
         hsn_code: products.hsnCode || '',
         tax_rate: products.taxRate || '',
         isVisibleToAll: products.isVisibleToAll,

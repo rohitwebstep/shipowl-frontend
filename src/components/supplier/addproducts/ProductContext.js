@@ -51,7 +51,6 @@ const ProductProvider = ({ children }) => {
     package_width_image: 0,
     package_height_image: 0,
     product_detail_video: 0,
-    training_guidance_video: 0,
     hsn_code: '',
     tax_rate: '',
   });
@@ -154,7 +153,6 @@ const ProductProvider = ({ children }) => {
     { label: 'Package Width Image', key: 'package_width_image' },
     { label: 'Package Height Image', key: 'package_height_image' },
     { label: 'Upload Product Details Video', key: 'product_detail_video' },
-    { label: 'Upload Training Guidance Video', key: 'training_guidance_video' },
   ];
   const fetchCountry = useCallback(async () => {
     const supplierData = JSON.parse(localStorage.getItem('shippingData'));

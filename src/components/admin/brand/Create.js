@@ -39,9 +39,7 @@ export default function Create() {
         if (!formData.name || formData.name.trim() === '') {
             errors.name = 'Brand name is required.';
         }
-        if (!formData.description || formData.description.trim() === '') {
-            errors.description = 'Brand description is required.';
-        }
+     
         if (!files || files.length === 0) {
             errors.image = 'At least one brand image is required.';
         }
@@ -198,7 +196,7 @@ export default function Create() {
 
                         <div>
                             <label htmlFor="description" className="font-bold block text-[#232323]">
-                                Brand Description <span className='text-red-500 text-lg'>*</span>
+                                Brand Description
                             </label>
                             <input
                                 type="text"
@@ -209,9 +207,7 @@ export default function Create() {
                                 className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.description ? "border-red-500" : "border-[#E0E5F2]"
                                     } `}
                             />
-                            {validationErrors.description && (
-                                <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
-                            )}
+                        
                         </div>
                     </div>
 

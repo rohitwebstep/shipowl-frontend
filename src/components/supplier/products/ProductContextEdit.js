@@ -53,7 +53,6 @@ const [activeTab,setActiveTab] = useState("product-details");
     package_width_image:0,
     package_height_image:0,
     product_detail_video:0,
-    training_guidance_video:0,
     upc: '',
     ean: '',
     hsn_code: '',
@@ -160,7 +159,6 @@ const [activeTab,setActiveTab] = useState("product-details");
     { label: 'Package Width Image', key: 'package_width_image' },
     { label: 'Package Height Image', key: 'package_height_image' },
     { label: 'Upload Product Details Video', key: 'product_detail_video' },
-    { label: 'Upload Training Guidance Video', key: 'training_guidance_video' },
   ];
   const fetchCountry = useCallback(async () => {
     const adminData = JSON.parse(localStorage.getItem('shippingData'));

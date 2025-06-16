@@ -3,6 +3,7 @@
 import { useState, createContext, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
+
 const ProfileContext = createContext();
 
 const ProfileProvider = ({ children }) => {
@@ -14,6 +15,7 @@ const ProfileProvider = ({ children }) => {
   const [files, setFiles] = useState({});
   const [countryData, setCountryData] = useState([]);
   const [activeTab, setActiveTab] = useState("profile-edit");
+
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -49,8 +51,26 @@ const ProfileProvider = ({ children }) => {
     documentId: "",
     documentName: "",
     documentImage: "",
-
+    uploadGstDoc: "",
+    panCardImage: "",
+    aadharCardImage: "",
   });
+
+  const requiredFields = {
+    companyName: "Company Name is required",
+    brandName: "Brand Name is required",
+    billingAddress: "Billing Address is required",
+    billingPincode: "Billing Pincode is required",
+    billingCountry: "Billing Country is required",
+    billingState: "Billing State is required",
+    billingCity: "Billing City is required",
+    clientEntryType: "Client Entry Type is required",
+    companyPanNumber: "Company PAN Number is required",
+    gstNumber: "GST Number is required",
+    panCardHolderName: "PAN Card Holder Name is required",
+    aadharNumber: "Aadhar Number is required",
+    aadharCardHolderName: "Aadhar Card Holder Name is required"
+  };
 
   const fetchCountry = useCallback(async () => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -89,7 +109,7 @@ const ProfileProvider = ({ children }) => {
 
       setCountryData(result?.countries || []);
     } catch (error) {
-      console.error("Error fetching cities:", error);
+      console.error("Error fetching countries:", error);
     } finally {
       setLoading(false);
     }
@@ -111,35 +131,96 @@ const ProfileProvider = ({ children }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-
-  const requiredFields = {
-    companyName: 'Registered Company Name is required',
-    brandName: 'Brand Name is required',
-    billingAddress: 'Billing Address is required',
-    billingPincode: 'Pincode is required',
-    billingCountry: 'Country is required',
-    billingState: 'State is required',
-    billingCity: 'City is required',
-    businessType: 'Business Type is required',
-    clientEntryType: 'Client Entry Type is required',
-    gstNumber: 'GST Number is required',
-    companyPanNumber: 'PAN Number is required',
-    aadharNumber: 'Aadhar Number is required',
-    panCardHolderName: 'PAN Card Holder Name is required',
-    aadharCardHolderName: 'Aadhar Card Holder Name is required',
-  };
-  const validateBusiness = () => {
+   const validateBusiness = () => {
     const newErrors = {};
-    for (let key in requiredFields) {
-      if (!formData[key] || formData[key].toString().trim() === '') {
-        newErrors[key] = requiredFields[key];
+
+    const alwaysRequiredFields = [
+      'companyName',
+      'brandName',
+      'billingAddress',
+      'billingPincode',
+      'billingCountry',
+      'billingState',
+      'billingCity',
+      'clientEntryType'
+    ];
+
+    alwaysRequiredFields.forEach((field) => {
+      if (!formData[field] || formData[field].toString().trim() === '') {
+        newErrors[field] = requiredFields[field];
+      }
+    });
+
+    // GST/PAN logic
+    const hasGST = !!formData.gstNumber?.trim();
+    const hasAadhar = !!formData.aadharNumber?.trim();
+
+    if (hasGST ) {
+      if (!hasCompanyPAN) {
+        newErrors.companyPanNumber = requiredFields.companyPanNumber;
+      }
+      if (!hasGST) {
+        newErrors.gstNumber = requiredFields.gstNumber;
+      }
+      if (!formData.panCardHolderName?.trim()) {
+        newErrors.panCardHolderName = requiredFields.panCardHolderName;
+      }
+      if (!formData.gstDocument) {
+        newErrors.gstDocument = 'GST Document is required';
       }
     }
+
+
+    // Aadhar section
+    if (hasAadhar) {
+      if (!formData.aadharNumber?.trim()) {
+        newErrors.aadharNumber = requiredFields.aadharNumber;
+      }
+      if (!formData.companyPanNumber?.trim()) {
+        newErrors.companyPanNumber = requiredFields.companyPanNumber;
+      }
+      if (!formData.aadharCardHolderName?.trim()) {
+        newErrors.aadharCardHolderName = requiredFields.aadharCardHolderName;
+      }
+      if (!formData.panCardHolderName?.trim()) {
+        newErrors.panCardHolderName = requiredFields.panCardHolderName;
+      }
+      if (!formData.panCardImage) {
+        newErrors.panCardImage = 'PAN Card Image is required';
+      }
+      if (!formData.aadharCardImage) {
+        newErrors.aadharCardImage = 'Aadhar Card Image is required';
+      }
+    }
+
     setBusinessErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
   return (
-    <ProfileContext.Provider value={{ businessErrors, setBusinessErrors, errors, setErrors, validateBusiness, validate, requiredFields, fetchCountry, files, setFiles, cityData, setCityData, stateData, setStateData, formData, activeTab, countryData, setActiveTab, setFormData }}>
+    <ProfileContext.Provider
+      value={{
+        errors,
+        setErrors,
+        businessErrors,
+        setBusinessErrors,
+        formData,
+        setFormData,
+        validate,
+        validateBusiness,
+        requiredFields,
+        fetchCountry,
+        countryData,
+        stateData,
+        setStateData,
+        cityData,
+        setCityData,
+        files,
+        setFiles,
+        activeTab,
+        setActiveTab,
+      }}
+    >
       {children}
     </ProfileContext.Provider>
   );

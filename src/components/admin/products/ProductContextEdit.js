@@ -52,7 +52,6 @@ const ProductProviderEdit = ({ children }) => {
     package_width_image: 0,
     package_height_image: 0,
     product_detail_video: 0,
-    training_guidance_video: 0,
     hsn_code: '',
     tax_rate: '',
     isVisibleToAll: true,
@@ -158,9 +157,11 @@ const ProductProviderEdit = ({ children }) => {
     { label: 'Package Length Image', key: 'package_length_image' },
     { label: 'Package Width Image', key: 'package_width_image' },
     { label: 'Package Height Image', key: 'package_height_image' },
-    { label: 'Upload Product Details Video', key: 'product_detail_video' },
-    { label: 'Upload Training Guidance Video', key: 'training_guidance_video' },
+   
   ];
+  const videoFields =[
+     { label: 'Upload Product Details Video', key: 'product_detail_video' },
+  ]
   const fetchCountry = useCallback(async () => {
     const adminData = JSON.parse(localStorage.getItem('shippingData'));
 
@@ -227,7 +228,6 @@ const ProductProviderEdit = ({ children }) => {
       'package_length',
       'package_width',
       'package_height',
-      'chargable_weight',
     ];
 
     // Validate simple fields
@@ -289,6 +289,7 @@ const ProductProviderEdit = ({ children }) => {
         formData,
         setFormData,
         fileFields,
+        videoFields,
         categoryData,
         setCategoryData,
         brandData,
