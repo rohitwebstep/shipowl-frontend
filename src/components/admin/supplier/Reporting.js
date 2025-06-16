@@ -272,7 +272,7 @@ function Reporting() {
                       <td className="p-3 px-5 whitespace-nowrap">{index + 1}</td>
                       <td className="p-3 px-5 whitespace-nowrap">
                         <PermissionField permissionKey="order-variables.orderNumber">{order.orderNumber}</PermissionField>
-                        <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
+                        <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
                       </td>
 
                       {hasAnyPermission(
@@ -299,15 +299,15 @@ function Reporting() {
                         "order-variables.status"
                       ) && (
                           <td className="p-3 px-5 whitespace-nowrap font-semibold">
-                            <PermissionField permissionKey="order-variables.payment_mode"> <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p></PermissionField>
-                            <PermissionField permissionKey="order-variables.transactionId">  <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p></PermissionField>
-                            <PermissionField permissionKey="order-variables.amount"><p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p></PermissionField>
+                            <PermissionField permissionKey="order-variables.payment_mode"> <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "-"}</span></p></PermissionField>
+                            <PermissionField permissionKey="order-variables.transactionId">  <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "-"}</span></p></PermissionField>
+                            <PermissionField permissionKey="order-variables.amount"><p>Amount: <span className="font-bold">{order.payment?.amount || "-"}</span></p></PermissionField>
                             <PermissionField permissionKey="order-variables.status"> <p>
 
                               <span className={`font-bold ${order.payment?.status === "failed" ? "text-red-500" :
                                 order.payment?.status === "pending" ? "text-yellow-500" : "text-green-500"
                                 }`}>
-                                {order.payment?.status || "N/A"}
+                                {order.payment?.status || "-"}
                               </span>
                             </p>
                             </PermissionField>
@@ -322,21 +322,21 @@ function Reporting() {
                       ) && (
                           <td className="p-3 px-5 whitespace-nowrap">
                             <PermissionField permissionKey="order-variables.orderNumber">
-                              {order.shippingApiResult?.data?.order_number || "N/A"}
+                              {order.shippingApiResult?.data?.order_number || "-"}
                             </PermissionField>
                             <br />
                             <PermissionField permissionKey="order-variables.shippingAddress">
-                              {order.shippingAddress || "N/A"}
+                              {order.shippingAddress || "-"}
                             </PermissionField>
                             <br />
                             <span className="text-green-500">
                               <PermissionField permissionKey="order-variables.shippingPhone">
-                                {order.shippingPhone || "N/A"}
+                                {order.shippingPhone || "-"}
                               </PermissionField>
                             </span>
                             <br />
                             <PermissionField permissionKey="order-variables.awbNumber">
-                              {order.shippingApiResult?.data?.awb_number || "N/A"}
+                              {order.shippingApiResult?.data?.awb_number || "-"}
                             </PermissionField>
                           </td>
                         )}
@@ -347,7 +347,7 @@ function Reporting() {
                           {order.items
                             .map((item) => (
                               <PermissionField key={item.id} permissionKey="order-variables.trackingNumber">
-                                {item.supplierRTOResponse?.trackingNumber || "N/A"}
+                                {item.supplierRTOResponse?.trackingNumber || "-"}
                               </PermissionField>
                             ))
                             .reduce((prev, curr) => [prev, ", ", curr])}
@@ -375,9 +375,9 @@ function Reporting() {
                           <PermissionField permissionKey="order-variables.rtoDeliveredDate">
 
                             {order.deliveredDate ? (
-                              <span>{order.deliveredDate ? new Date(order.deliveredDate).toLocaleDateString() : "N/A"}</span>
+                              <span>{order.deliveredDate ? new Date(order.deliveredDate).toLocaleDateString() : "-"}</span>
                             ) : order.rtoDeliveredDate ? (
-                              <span>{order.rtoDeliveredDate ? new Date(order.rtoDeliveredDate).toLocaleDateString() : "N/A"}</span>
+                              <span>{order.rtoDeliveredDate ? new Date(order.rtoDeliveredDate).toLocaleDateString() : "-"}</span>
                             ) : (
                               <span className="text-red-500">Pending</span>
                             )}

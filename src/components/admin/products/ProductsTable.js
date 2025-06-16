@@ -370,7 +370,7 @@ const ProductTable = () => {
                                             </td>
                                             {openDescriptionId === item.id && (
                                                 <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                                                    <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
+                                                    <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
                                                         {/* Close Button */}
                                                         <button
                                                             onClick={() => setOpenDescriptionId(null)}

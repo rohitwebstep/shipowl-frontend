@@ -7,6 +7,7 @@ import ReactTagInput from "@pathofdev/react-tag-input";
 import { HashLoader } from 'react-spinners';
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 
 // Dynamically import TinyMCE Editor with SSR disabled
 const Editor = dynamic(() => import('@tinymce/tinymce-react').then(mod => mod.Editor), {
@@ -27,7 +28,7 @@ export default function ProductDetails() {
     validateFields,
     errors, setErrors, loading
   } = useContext(ProductContext);
-
+ const router = useRouter();
   const { fetchSupplier, suppliers } = useAdmin();
   const handleEditorChange = (value, field) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -380,7 +381,13 @@ export default function ProductDetails() {
         >
           Next
         </button>
-        <button className="bg-[#8F9BBA] text-white px-14 py-2 rounded-md">Cancel</button>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+        >
+          Cancel
+        </button>
       </div>
     </div>
   );

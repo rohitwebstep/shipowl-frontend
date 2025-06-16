@@ -1055,7 +1055,7 @@ const Section = ({ title, form, showResult, setForm, errors, setShowResult, setE
                           label="# Orders"
                           value={totalOrderQty}
                           isVisible={showResult}
-                          placeholder="N/A"
+                          placeholder="-"
                         />
                       </div>
                       {openSection === "orders" ? (
@@ -1110,7 +1110,7 @@ const Section = ({ title, form, showResult, setForm, errors, setShowResult, setE
                         <ul>
                           <li>
 
-                            Margin Per Order: <span>{dropPrice > 0 ? dropPrice - productPrice : 'N/A'}</span>
+                            Margin Per Order: <span>{dropPrice > 0 ? dropPrice - productPrice : '-'}</span>
                           </li>
                           <li>
                             Delivered Orders: <span>{deliveredQty}</span>
@@ -1273,7 +1273,7 @@ function InputField({ label, value, onChange, error, required }) {
 }
 
 // Result output component with conditional display
-function ResultItem({ label, value, isVisible, placeholder = 'N/A' }) {
+function ResultItem({ label, value, isVisible, placeholder = '-' }) {
   const numeric = parseFloat(value?.replace?.(/[₹,]/g, '')) || 0;
   return (
     <div className="flex justify-between text-sm w-full">

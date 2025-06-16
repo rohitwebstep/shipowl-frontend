@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 export default function OtherDetails() {
   const { formData, setFormData, files } = useContext(ProductContextEdit);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [error, setError] = useState({});
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -20,108 +20,122 @@ export default function OtherDetails() {
       [name]: value,
     }));
   };
+  const validateForm = () => {
+    const newError = {};
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
 
-  const adminData = JSON.parse(localStorage.getItem('shippingData'));
-  if (adminData?.project?.active_panel !== 'admin') {
-    localStorage.clear();
-    router.push('/admin/auth/login');
-    return;
-  }
 
-  const token = adminData?.security?.token;
-  if (!token) {
-    router.push('/admin/auth/login');
-    return;
-  }
-
-  try {
-    Swal.fire({
-      title: 'Updating Product...',
-      text: 'Please wait while we update your product.',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    const url = `https://sleeping-owl-we0m.onrender.com/api/admin/product/${id}`;
-    const form = new FormData();
-
-    const combinedData = { ...formData, ...files };
-
-    for (const key in combinedData) {
-      let value = combinedData[key];
-
-      if (value === null || value === undefined || value === '') continue;
-
-      if (key === "isVarientExists") {
-        // Convert "yes"/"no" to boolean
-        value = value === "yes";
-        form.append(key, value);
-      } else if (Array.isArray(value) && value[0] instanceof File) {
-        // For array of files
-        value.forEach((file) => form.append(key, file));
-      } else if (value instanceof File) {
-        form.append(key, value);
-      } else if (Array.isArray(value) || typeof value === 'object') {
-        // Objects and arrays (non-files)
-        form.append(key, JSON.stringify(value));
-      } else {
-        form.append(key, value);
-      }
+    if (formData.hsn_code && formData.hsn_code.toString().length !== 8) {
+      newError.hsn_code = 'HSN Code must be exactly 8 digits long.';
     }
 
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: form,
-    });
+    setError(newError);
+    return Object.keys(newError).length === 0;
+  };
 
-    const result = await response.json();
-    Swal.close();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    setLoading(true);
+    setLoading(true);
 
-    if (!response.ok) {
+    const adminData = JSON.parse(localStorage.getItem('shippingData'));
+    if (adminData?.project?.active_panel !== 'admin') {
+      localStorage.clear();
+      router.push('/admin/auth/login');
+      return;
+    }
+
+    const token = adminData?.security?.token;
+    if (!token) {
+      router.push('/admin/auth/login');
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: 'Updating Product...',
+        text: 'Please wait while we update your product.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const url = `https://sleeping-owl-we0m.onrender.com/api/admin/product/${id}`;
+      const form = new FormData();
+
+      const combinedData = { ...formData, ...files };
+
+      for (const key in combinedData) {
+        let value = combinedData[key];
+
+        if (value === null || value === undefined || value === '') continue;
+
+        if (key === "isVarientExists") {
+          // Convert "yes"/"no" to boolean
+          value = value === "yes";
+          form.append(key, value);
+        } else if (Array.isArray(value) && value[0] instanceof File) {
+          // For array of files
+          value.forEach((file) => form.append(key, file));
+        } else if (value instanceof File) {
+          form.append(key, value);
+        } else if (Array.isArray(value) || typeof value === 'object') {
+          // Objects and arrays (non-files)
+          form.append(key, JSON.stringify(value));
+        } else {
+          form.append(key, value);
+        }
+      }
+
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: form,
+      });
+
+      const result = await response.json();
+      Swal.close();
+
+      if (!response.ok) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Update Failed',
+          text: result.message || result.error || 'An error occurred',
+        });
+        Swal.close();
+
+        throw new Error(result.message || result.error || 'Update failed');
+        Swal.close();
+
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Product Updated',
+        text: 'The product has been updated successfully!',
+        showConfirmButton: true,
+      }).then((res) => {
+        if (res.isConfirmed) {
+          setFormData({});
+          router.push('/admin/products/list');
+        }
+      });
+    } catch (err) {
+      console.error('Submission Error:', err);
+      Swal.close();
       Swal.fire({
         icon: 'error',
-        title: 'Update Failed',
-        text: result.message || result.error || 'An error occurred',
+        title: 'Submission Error',
+        text: err.message || 'Something went wrong. Please try again.',
       });
-     Swal.close();
-
-      throw new Error(result.message || result.error || 'Update failed');
-    Swal.close();
-
+    } finally {
+      setLoading(false);
     }
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Product Updated',
-      text: 'The product has been updated successfully!',
-      showConfirmButton: true,
-    }).then((res) => {
-      if (res.isConfirmed) {
-        setFormData({});
-        router.push('/admin/products/list');
-      }
-    });
-  } catch (err) {
-    console.error('Submission Error:', err);
-    Swal.close();
-    Swal.fire({
-      icon: 'error',
-      title: 'Submission Error',
-      text: err.message || 'Something went wrong. Please try again.',
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
 
@@ -130,14 +144,17 @@ const handleSubmit = async (e) => {
       <div className="xl:w-11/12 mt-4 p-6 rounded-2xl bg-white">
         <div className="grid md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label htmlFor="hsn_code" className="font-bold block uppercase">HSN Code</label>
+            <label htmlFor="hsn_code" className="font-bold block uppercase">
+              HSN Code <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               name="hsn_code"
               value={formData.hsn_code || ''}
               onChange={handleChange}
-              className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full"
+              className={`border p-3 mt-2 rounded-md w-full ${error.hsn_code ? 'border-red-500' : 'border-[#DFEAF2]'}`}
             />
+            {error.hsn_code && <p className="text-red-500 text-sm mt-1">{error.hsn_code}</p>}
           </div>
           <div>
             <label htmlFor="tax_rate" className="font-bold block">
@@ -148,9 +165,10 @@ const handleSubmit = async (e) => {
               name="tax_rate"
               value={formData.tax_rate || ''}
               onChange={handleChange}
-              className={`border p-3 mt-2 rounded-md w-full ${errors.tax_rate ? 'border-red-500' : 'border-[#DFEAF2]'}`}
+              className={`border p-3 mt-2 rounded-md w-full ${error.tax_rate ? 'border-red-500' : 'border-[#DFEAF2]'
+                }`}
             />
-            {errors.tax_rate && <p className="text-red-500 text-sm mt-1">{errors.tax_rate}</p>}
+            {error.tax_rate && <p className="text-red-500 text-sm mt-1">{error.tax_rate}</p>}
           </div>
         </div>
 

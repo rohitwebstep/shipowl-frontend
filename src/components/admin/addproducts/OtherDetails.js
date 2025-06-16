@@ -28,9 +28,14 @@ export default function OtherDetails() {
       }
     });
 
+    if (formData.hsn_code && formData.hsn_code.toString().length !== 8) {
+      newError.hsn_code = 'HSN Code must be exactly 8 digits long.';
+    }
+
     setError(newError);
     return Object.keys(newError).length === 0;
   };
+
 
   const getTabByFieldName = (fieldName) => {
     const ProductDetails = [
@@ -60,6 +65,7 @@ export default function OtherDetails() {
 
     return null;
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -186,15 +192,16 @@ export default function OtherDetails() {
 
           <div>
             <label htmlFor="hsn_code" className="font-bold block uppercase">
-              HSN Code
+              HSN Code <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="hsn_code"
               value={formData.hsn_code || ''}
               onChange={handleChange}
-              className="border border-[#DFEAF2] p-3 mt-2 rounded-md w-full"
+              className={`border p-3 mt-2 rounded-md w-full ${error.hsn_code ? 'border-red-500' : 'border-[#DFEAF2]'}`}
             />
+            {error.hsn_code && <p className="text-red-500 text-sm mt-1">{error.hsn_code}</p>}
           </div>
           <div>
             <label htmlFor="tax_rate" className="font-bold block">
@@ -222,8 +229,8 @@ export default function OtherDetails() {
           </button>
           <button
             type="button"
-            className="bg-[#8F9BBA] text-white px-14 py-2 rounded-md"
-            onClick={() => router.push('/admin/product')}
+            onClick={() => router.back()}
+            className="px-4 py-2 bg-gray-400 text-white rounded-lg"
           >
             Cancel
           </button>

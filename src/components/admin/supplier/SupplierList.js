@@ -289,18 +289,18 @@ const SupplierList = () => {
                                             <td className="p-3 px-4 text-left whitespace-nowrap">{item.name}</td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">{item.email}</td>
 
-                                            <td className="p-3 px-4 text-left">{item.currentAddress || 'N/A'}</td>
-                                            <td className="p-3 px-4 text-left">{item.permanentAddress || 'N/A'}</td>
+                                            <td className="p-3 px-4 text-left">{item.currentAddress || '-'}</td>
+                                            <td className="p-3 px-4 text-left">{item.permanentAddress || '-'}</td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                {item.permanentCountry?.name || 'N/A'}
+                                                {item.permanentCountry?.name || '-'}
                                             </td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                {item.permanentState?.name || 'N/A'}
+                                                {item.permanentState?.name || '-'}
                                             </td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                {item.permanentCity?.name || 'N/A'}
+                                                {item.permanentCity?.name || '-'}
                                             </td>
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">{item.permanentPostalCode || 'N/A'}</td>
+                                            <td className="p-3 px-4 text-left whitespace-nowrap">{item.permanentPostalCode || '-'}</td>
                                             <td className="p-3 px-4 text-center whitespace-nowrap">
                                                 <button
                                                     onClick={() =>
@@ -329,7 +329,7 @@ const SupplierList = () => {
                                                             : 'bg-gray-300'
                                                         }`}
                                                 >
-                                                    {item.status?.toLowerCase() === 'active' ? 'inactive' : 'active' || 'N/A'}
+                                                    {item.status?.toLowerCase() === 'active' ? 'inactive' : 'active' || '-'}
                                                 </button>
                                             </td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
@@ -382,11 +382,11 @@ const SupplierList = () => {
                                 </button>
                                 <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Bank Account Details</h2>
                                 <div className="space-y-3 text-sm text-[#2B3674]">
-                                    <p><span className="font-semibold">Account Holder:</span> {expandedItem?.bankAccount?.accountHolderName || "N/A"}</p>
-                                    <p><span className="font-semibold">Account Number:</span> {expandedItem?.bankAccount?.accountNumber || "N/A"}</p>
-                                    <p><span className="font-semibold">Bank Name:</span> {expandedItem?.bankAccount?.bankName || "N/A"}</p>
-                                    <p><span className="font-semibold">Account Type:</span> {expandedItem?.bankAccount?.accountType || "N/A"}</p>
-                                    <p><span className="font-semibold">IFSC Code:</span> {expandedItem?.bankAccount?.ifscCode || "N/A"}</p>
+                                    <p><span className="font-semibold">Account Holder:</span> {expandedItem?.bankAccount?.accountHolderName || "-"}</p>
+                                    <p><span className="font-semibold">Account Number:</span> {expandedItem?.bankAccount?.accountNumber || "-"}</p>
+                                    <p><span className="font-semibold">Bank Name:</span> {expandedItem?.bankAccount?.bankName || "-"}</p>
+                                    <p><span className="font-semibold">Account Type:</span> {expandedItem?.bankAccount?.accountType || "-"}</p>
+                                    <p><span className="font-semibold">IFSC Code:</span> {expandedItem?.bankAccount?.ifscCode || "-"}</p>
                                     <p className="flex items-center">
                                         <span className="font-semibold mr-2">Cheque Image:</span>
                                         {expandedItem?.bankAccount?.cancelledChequeImage ? (
@@ -399,7 +399,7 @@ const SupplierList = () => {
                                                 View Cheque Image
                                             </a>
                                         ) : (
-                                            "N/A"
+                                            "-"
                                         )}
                                     </p>
                                 </div>

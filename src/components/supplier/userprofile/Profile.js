@@ -81,7 +81,6 @@ const fetchSupplier = useCallback(async () => {
       id: suppliers.id || "",
       username: suppliers.username || "",
       email: suppliers.email || "",
-      dateOfBirth:formData.dateOfBirth || suppliers.dateOfBirth || "",
       currentAddress: suppliers.currentAddress || "",
       permanentAddress: suppliers.permanentAddress || "",
       permanentCity: suppliers.permanentCityId || "",

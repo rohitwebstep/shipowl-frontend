@@ -698,7 +698,7 @@ const ProductDetails = () => {
               </p>
               {openDescriptionId === productDetails.id && (
                 <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                  <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
+                  <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
                     {/* Close Button */}
                     <button
                       onClick={() => setOpenDescriptionId(null)}
@@ -816,7 +816,7 @@ const ProductDetails = () => {
                     .filter(p => typeof p === "number");
                   console.log('prices', prices)
                   console.log('variants', variants)
-                  const lowestPrice = prices.length > 0 ? Math.min(...prices) : "N/A";
+                  const lowestPrice = prices.length > 0 ? Math.min(...prices) : "-";
                   const productName = product.name || "Unnamed Product";
 
                   return (
@@ -847,7 +847,7 @@ const ProductDetails = () => {
                         {/* PRICE & NAME */}
                         <div className="flex justify-between items-center mt-3">
                           <p className="text-lg font-extrabold font-lato text-[#2C3454]">
-                            ₹{lowestPrice !== "N/A" ? lowestPrice : "N/A"}
+                            ₹{lowestPrice !== "-" ? lowestPrice : "-"}
                           </p>
                         </div>
                         <p className="text-[13px] text-[#7A7A7A] font-lato font-semibold mt-1 hover:text-black transition-colors duration-300">
@@ -858,11 +858,11 @@ const ProductDetails = () => {
                         <div className="flex items-center border-t pt-3 group-hover:pb-16 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <Image src={gift} className="w-5" alt="Gift" />
-                            <span className="font-lato text-[#2C3454] font-bold">MOQ: N/A</span>
+                            <span className="font-lato text-[#2C3454] font-bold">MOQ: -</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Image src={ship} className="w-5" alt="Shipping" />
-                            <span className="font-lato text-[#2C3454] font-bold">Rating: N/A</span>
+                            <span className="font-lato text-[#2C3454] font-bold">Rating: -</span>
                           </div>
                         </div>
 
@@ -1161,7 +1161,7 @@ const ProductDetails = () => {
                             label="# Orders"
                             value={totalOrderQty}
                             isVisible={showResult}
-                            placeholder="N/A"
+                            placeholder="-"
                           />
                         </div>
                         {openSection === "orders" ? (
@@ -1216,7 +1216,7 @@ const ProductDetails = () => {
                           <ul>
                             <li>
 
-                              Margin Per Order: <span>{sellingPrice > 0 ? sellingPrice - productPrice : 'N/A'}</span>
+                              Margin Per Order: <span>{sellingPrice > 0 ? sellingPrice - productPrice : '-'}</span>
                             </li>
                             <li>
                               Delivered Orders: <span>{deliveredQty}</span>
@@ -1305,7 +1305,7 @@ function InputField({ label, value, onChange, error, required }) {
 }
 
 // Result output component with conditional display
-function ResultItem({ label, value, isVisible, placeholder = 'N/A' }) {
+function ResultItem({ label, value, isVisible, placeholder = '-' }) {
   const numeric = parseFloat(value?.replace?.(/[₹,]/g, '')) || 0;
   return (
     <div className="flex justify-between text-sm w-full">

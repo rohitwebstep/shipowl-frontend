@@ -261,10 +261,7 @@ const BusinessInfo = () => {
           } else if (value instanceof File) {
             form.append(key, value, value.name);
           }
-        } else if (key === 'dateOfBirth' && value) {
-          const formattedDate = new Date(value).toLocaleDateString('en-GB');
-          form.append(key, formattedDate);
-        } else if (value instanceof FileList) {
+        }else if (value instanceof FileList) {
           Array.from(value).forEach(file => form.append(key, file));
 
         } else if (Array.isArray(value) || typeof value === 'object') {
@@ -419,7 +416,11 @@ const BusinessInfo = () => {
       </div>
 
       {/* Billing Address */}
-      <div>
+     
+
+      {/* Pincode, State, City */}
+      <div className="grid lg:grid-cols-3 py-5 gap-4">
+         <div>
         {renderLabel('Company Billing Address', 'billingAddress')}
         <input
           type="text"
@@ -430,9 +431,20 @@ const BusinessInfo = () => {
         />
         {renderError('billingAddress')}
       </div>
-
-      {/* Pincode, State, City */}
-      <div className="grid lg:grid-cols-3 py-5 gap-4">
+       <div>
+          {renderLabel('Form of Client’s Entity', 'clientEntryType')}
+          <select
+            name="clientEntryType"
+            value={formData.clientEntryType}
+            onChange={handleChange}
+            className={inputClasses('clientEntryType')}
+          >
+            <option value="">Select</option>
+            <option value="PVT">PVT</option>
+            <option value="LLP">LLP</option>
+          </select>
+          {renderError('clientEntryType')}
+        </div>
         <div>
           {renderLabel('Pincode', 'billingPincode')}
           <input
@@ -473,10 +485,6 @@ const BusinessInfo = () => {
         </div>
 
 
-      </div>
-
-      {/* Business Type, Client Entry Type */}
-      <div className="grid lg:grid-cols-3 gap-4">
         <div>
           {renderLabel('City', 'billingCity')}
 
@@ -490,37 +498,9 @@ const BusinessInfo = () => {
           />
           {renderError('billingCity')}
         </div>
-        <div>
-          {renderLabel('Business Type', 'businessType')}
-          <select
-            name="businessType"
-            value={formData.businessType}
-            onChange={handleChange}
-            className={inputClasses('businessType')}
-          >
-            <option value="">Select</option>
-            <option value="Business">Business</option>
-            <option value="Freelancer">Freelancer</option>
-            <option value="Startup">Startup</option>
-          </select>
-          {renderError('businessType')}
-        </div>
+     
 
-        <div>
-          {renderLabel('Form of Client’s Entity', 'clientEntryType')}
-          <select
-            name="clientEntryType"
-            value={formData.clientEntryType}
-            onChange={handleChange}
-            className={inputClasses('clientEntryType')}
-          >
-            <option value="">Select</option>
-            <option value="Entrepreneurship">Entrepreneurship</option>
-            <option value="Partnership">Partnership</option>
-            <option value="Corporation">Corporation</option>
-          </select>
-          {renderError('clientEntryType')}
-        </div>
+       
       </div>
 
       {/* KYC Documents */}

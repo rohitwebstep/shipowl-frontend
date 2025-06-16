@@ -191,22 +191,6 @@ const AccountInfo = () => {
             continue;
           }
 
-          // ✅ Special handling for date fields
-          if (key === 'dateOfBirth' && value) {
-            const dateObj = new Date(value);
-            const day = String(dateObj.getDate()).padStart(2, '0'); // e.g., "26"
-            const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // e.g., "04"
-            const year = dateObj.getFullYear(); // e.g., "2025"
-            const formattedDate = `${day}-${month}-${year}`; // 👉 "26-04-2025"
-            form.append(key, formattedDate);
-          }
-
-          // ✅ Files
-          else if (value instanceof File) {
-            form.append(key, value);
-          }
-
-          // ✅ bankAccounts array
           else if (key === 'bankAccounts') {
             value.forEach((bank, bankIndex) => {
               const file = bank['cancelledChequeImage'];

@@ -15,7 +15,7 @@ export default function Update() {
         name: '',
         description: '',
         status: '',
-        image:'',
+        image: '',
     });
     const [files, setFiles] = useState([]);
     const searchParams = useSearchParams();
@@ -38,7 +38,7 @@ export default function Update() {
         if (!formData.image && files.length === 0) errors.image = 'Category image is required.';
         return errors;
     };
-    
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -91,7 +91,7 @@ export default function Update() {
 
             setFormData({
                 name: category.name || '',
-                description: category.description ||'',
+                description: category.description || '',
                 status: category.status || true,
                 image: category.image || '',
             });
@@ -147,7 +147,7 @@ export default function Update() {
             form.append('name', formData.name);
             form.append('description', formData.description);
             form.append('status', formData.status);
-    
+
             // Add images if available
             if (files.length > 0) {
                 files.forEach((file) => {
@@ -184,9 +184,9 @@ export default function Update() {
                 if (res.isConfirmed) {
                     setFormData({
                         name: '',
-        description: '',
-        status: '',
-        image:'',
+                        description: '',
+                        status: '',
+                        image: '',
                     });
                     router.push("/supplier/category/list");
                 }
@@ -210,80 +210,80 @@ export default function Update() {
         setFiles(selectedFiles);
     };
 
-          const handleImageDelete = async (index) => {
-            setLoading(true);
-    
-            const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-            if (dropshipperData?.project?.active_panel !== "supplier") {
-                localStorage.removeItem("shippingData");
-                router.push("/supplier/auth/login");
-                return;
-            }
-    
-            const token = dropshipperData?.security?.token;
-            if (!token) {
-                router.push("/supplier/auth/login");
-                return;
-            }
-    
-            try {
-                Swal.fire({
-                    title: 'Deleting Image...',
-                    text: 'Please wait while we remove the image.',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-    
-                const url = `https://sleeping-owl-we0m.onrender.com/api/admin/category/${id}/image/${index}`;
-    
-                const response = await fetch(url, {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-    
-                if (!response.ok) {
-                    Swal.close();
-                    const errorMessage = await response.json();
-                    Swal.fire({
-                        icon: "error",
-                        title: "Delete Failed",
-                        text: errorMessage.message || errorMessage.error || "An error occurred",
-                    });
-                    throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
+    const handleImageDelete = async (index) => {
+        setLoading(true);
+
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+        if (dropshipperData?.project?.active_panel !== "supplier") {
+            localStorage.removeItem("shippingData");
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        const token = dropshipperData?.security?.token;
+        if (!token) {
+            router.push("/supplier/auth/login");
+            return;
+        }
+
+        try {
+            Swal.fire({
+                title: 'Deleting Image...',
+                text: 'Please wait while we remove the image.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
-    
-                const result = await response.json();
+            });
+
+            const url = `https://sleeping-owl-we0m.onrender.com/api/admin/category/${id}/image/${index}`;
+
+            const response = await fetch(url, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
                 Swal.close();
-    
-                if (result) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Image Deleted",
-                        text: `The image has been deleted successfully!`,
-                        showConfirmButton: true,
-                    }).then((res) => {
-                        if (res.isConfirmed) {
-                            fetchCategory(); // Refresh formData with updated images
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                Swal.close();
+                const errorMessage = await response.json();
                 Swal.fire({
                     icon: "error",
-                    title: "Submission Error",
-                    text: error.message || "Something went wrong. Please try again.",
+                    title: "Delete Failed",
+                    text: errorMessage.message || errorMessage.error || "An error occurred",
                 });
-                setError(error.message || "Submission failed.");
-            } finally {
-                setLoading(false);
+                throw new Error(errorMessage.message || errorMessage.error || "Submission failed");
             }
-        };
+
+            const result = await response.json();
+            Swal.close();
+
+            if (result) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Image Deleted",
+                    text: `The image has been deleted successfully!`,
+                    showConfirmButton: true,
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        fetchCategory(); // Refresh formData with updated images
+                    }
+                });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Submission Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+            setError(error.message || "Submission failed.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
     return (
@@ -406,7 +406,7 @@ export default function Update() {
                                         type="checkbox"
                                         name='status'
                                         className="sr-only"
-                                        checked={formData.status }
+                                        checked={formData.status}
                                         onChange={handleChange}
                                     />
                                     <div
@@ -426,7 +426,7 @@ export default function Update() {
 
                             <div className="flex flex-wrap gap-3 mt-5">
                                 <button type="submit" className="bg-orange-500 text-white px-15 rounded-md p-3">
-                                    UPDATE
+                                    Update
                                 </button>
                                 <button type="button" className="bg-gray-500 text-white px-15 rounded-md p-3" onClick={() => router.back()}>
                                     Cancel

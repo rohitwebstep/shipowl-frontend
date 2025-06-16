@@ -156,7 +156,7 @@ function List() {
                         <tbody>
                             {requests.map((req) => (
                                 <tr key={req.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                    <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req?.supplier?.name || "N/A"}</td>
+                                    <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req?.supplier?.name || "-"}</td>
                                     <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req.accountNumber}</td>
                                     <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req.bankName}</td>
                                     <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req.ifscCode}</td>

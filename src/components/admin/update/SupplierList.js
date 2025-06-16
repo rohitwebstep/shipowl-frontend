@@ -443,7 +443,6 @@ return (
                                 <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Sr.</th>
                                 <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Name</th>
                                 <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Email</th>
-                                <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Date Of Birth</th>
                                 <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Present Address</th>
                                 <th className="p-3 px-4 whitespace-nowrap text-left uppercase">Permanent Address</th>
                                 <th className="p-3 px-4 whitespace-nowrap text-left uppercase">State</th>
@@ -478,16 +477,11 @@ return (
                                         <td className="p-2 px-4 whitespace-nowrap text-left">{item.name}</td>
                                         <td className="p-2 px-4 whitespace-nowrap text-left">{item.email}</td>
 
-                                        {/* Handle empty dateOfBirth and other date fields */}
-                                        <td className="p-2 px-4 whitespace-nowrap text-left">
-                                            {item.dateOfBirth && Object.keys(item.dateOfBirth).length ? item.dateOfBirth : 'N/A'}
-                                        </td>
-
-                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.currentAddress || 'N/A'}</td>
-                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.permanentAddress || 'N/A'}</td>
-                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.state || 'N/A'}</td>
-                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.city || 'N/A'}</td>
-                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.permanentPostalCode || 'N/A'}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.currentAddress || '-'}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.permanentAddress || '-'}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.state || '-'}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.city || '-'}</td>
+                                        <td className="p-2 px-4 whitespace-nowrap text-left">{item.permanentPostalCode || '-'}</td>
 
                                         {/* Action Column (Edit/Delete/Restore) */}
                                         <td className="p-2 px-5 whitespace-nowrap text-center text-[#8F9BBA]">

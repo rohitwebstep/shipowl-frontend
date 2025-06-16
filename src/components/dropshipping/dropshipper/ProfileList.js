@@ -192,15 +192,14 @@ const ProfileList = () => {
             <div className="bg-white rounded-2xl p-6 shadow-md">
                 <h3 className="text-xl font-semibold text-[#2B3674] mb-4">Personal Information</h3>
                 <div className="space-y-2 text-[#2B3674]">
-                    <p><strong>Name:</strong> {suppliers.name || 'N/A'}</p>
-                    <p><strong>Email:</strong> {suppliers.email || 'N/A'}</p>
-                    <p><strong>Date of Birth:</strong> {suppliers.dateOfBirth || 'N/A'}</p>
-                    <p><strong>Website Url:</strong> {suppliers.website || 'N/A'}</p>
-                    <p><strong>Referral Code:</strong> {suppliers.referralCode || 'N/A'}</p>
-                    <p><strong>Permanent Address:</strong> {suppliers.permanentAddress || 'N/A'}</p>
-                    <p><strong>State:</strong> {stateData.find(s => s.id === suppliers.permanentStateId)?.name || 'N/A'}</p>
-                    <p><strong>City:</strong> {cityData.find(c => c.id === suppliers.permanentCityId)?.name || 'N/A'}</p>
-                    <p><strong>Postal Code:</strong> {suppliers.permanentPostalCode || 'N/A'}</p>
+                    <p><strong>Name:</strong> {suppliers.name || '-'}</p>
+                    <p><strong>Email:</strong> {suppliers.email || '-'}</p>
+                    <p><strong>Website Url:</strong> {suppliers.website || '-'}</p>
+                    <p><strong>Referral Code:</strong> {suppliers.referralCode || '-'}</p>
+                    <p><strong>Permanent Address:</strong> {suppliers.permanentAddress || '-'}</p>
+                    <p><strong>State:</strong> {stateData.find(s => s.id === suppliers.permanentStateId)?.name || '-'}</p>
+                    <p><strong>City:</strong> {cityData.find(c => c.id === suppliers.permanentCityId)?.name || '-'}</p>
+                    <p><strong>Postal Code:</strong> {suppliers.permanentPostalCode || '-'}</p>
                 </div>
                 <div className="mt-4 text-right">
                     <button onClick={() => handleEdit(suppliers.id)} className='bg-orange-500 text-white p-3 rounded-md'>Update Profile</button>

@@ -251,7 +251,7 @@ export default function NotMy() {
                           </button>
                           {openDescriptionId === product.id && (
                             <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                              <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
+                              <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
                                 {/* Close Button */}
                                 <button
                                   onClick={() => setOpenDescriptionId(null)}
@@ -276,12 +276,12 @@ export default function NotMy() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Tag size={16} />
-                        <span>SKU: {product?.main_sku || "N/A"}</span>
+                        <span>SKU: {product?.main_sku || "-"}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Truck size={16} />
                         <span>
-                          Shipping Time: {product?.shipping_time || "N/A"}
+                          Shipping Time: {product?.shipping_time || "-"}
                         </span>
                       </div>
                     </div>

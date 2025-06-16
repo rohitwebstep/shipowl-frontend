@@ -31,7 +31,6 @@ export default function Register() {
     username: "",
     email: "",
     password: "",
-    dateOfBirth: "",
     currentAddress: "",
     permanentAddress: "",
     permanentPostalCode: "",
@@ -79,7 +78,6 @@ export default function Register() {
       username,
       email,
       password,
-      dateOfBirth,
       currentAddress,
       permanentAddress,
       permanentPostalCode,
@@ -104,7 +102,6 @@ export default function Register() {
       newErrors.email = "Invalid email format";
     }
     if (!password.trim()) newErrors.password = "Password is required";
-    if (!dateOfBirth.trim()) newErrors.dateOfBirth = "Date of Birth is required";
     if (!currentAddress.trim()) newErrors.currentAddress = "Current Address is required";
     if (!permanentAddress.trim()) newErrors.permanentAddress = "Permanent Address is required";
     if (!permanentPostalCode.trim()) newErrors.permanentPostalCode = "Postal Code is required";
@@ -136,10 +133,7 @@ export default function Register() {
     const data = new FormData();
 
     for (const key in formData) {
-      if (key === 'dateOfBirth' && formData[key]) {
-        const formattedDate = new Date(formData[key]).toLocaleDateString('en-GB');
-        data.append(key, formattedDate);
-      } else if (formData[key] !== null && formData[key] !== '') {
+    if (formData[key] !== null && formData[key] !== '') {
         data.append(key, formData[key]);
       }
     }
@@ -172,7 +166,6 @@ export default function Register() {
         username: "",
         email: "",
         password: "",
-        dateOfBirth: "",
         currentAddress: "",
         permanentAddress: "",
         permanentPostalCode: "",
@@ -399,21 +392,8 @@ export default function Register() {
             {errors.password && <p className="text-red-600 text-sm">{errors.password}</p>}
           </div>
 
-          <div className="md:col-span-3">
-            <label className="block text-[#232323] font-bold mb-1" htmlFor="dateOfBirth">
-              Date of Birth <span className="text-red-600">*</span>
-            </label>
-            <input
-              type="date"
-              id="dateOfBirth"
-              name="dateOfBirth"
-              value={formData.dateOfBirth || ''}
-              onChange={handleChange}
-              className={`w-full p-3 border rounded-lg font-bold ${errors.dateOfBirth ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
-                }`}
-            />
-            {errors.dateOfBirth && <p className="text-red-600 text-sm">{errors.dateOfBirth}</p>}
-          </div>
+         
+         
 
           <div className="md:col-span-3">
             <label className="block text-[#232323] font-bold mb-1" htmlFor="currentAddress">

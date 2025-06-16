@@ -161,13 +161,13 @@ const ProfileEdit = () => {
 
   const handleCancel = () => {
     setErrors({});
+    router.back()
   };
 
 
 
   const inputClasses = (field) =>
-    `w-full p-3 border rounded-lg font-bold ${
-      errors[field] ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+    `w-full p-3 border rounded-lg font-bold ${errors[field] ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
     }`;
 
   const labelClasses = (field) =>
@@ -176,12 +176,12 @@ const ProfileEdit = () => {
     value: country.id,
     label: country.name,
   }));
-  
+
   const stateOptions = stateData?.map((state) => ({
     value: state.id,
     label: state.name,
   }));
-  
+
   const cityOptions = cityData?.map((city) => ({
     value: city.id,
     label: city.name,
@@ -218,7 +218,6 @@ const ProfileEdit = () => {
             { label: 'Your Name', name: 'name', type: 'text' },
             { label: 'User Name', name: 'username', type: 'text' },
             { label: 'Email', name: 'email', type: 'email' },
-            { label: 'Date of Birth', name: 'dateOfBirth', type: 'date' },
             { label: 'Present Address', name: 'currentAddress', type: 'text' },
             { label: 'Permanent Address', name: 'permanentAddress', type: 'text' },
             { label: 'Postal Code', name: 'permanentPostalCode', type: 'number' },
@@ -238,80 +237,80 @@ const ProfileEdit = () => {
             </div>
           ))}
 
-        <div className="relative">
-                   <label className={labelClasses('permanentCountry')}>
-                     Country <span className="text-red-500">*</span>
-                   </label>
-                   <div className="relative">
-                     <Select
-                     name="permanentCountry"
-                     value={countryOptions.find(opt => opt.value === formData.permanentCountry) || null}
-                     onChange={(selected) => handleChange({ target: { name: "permanentCountry", value: selected?.value } })}
-                     options={countryOptions}
-                     placeholder="Select Country"
-       
-                  />
-                     {loading && (
-                       <div className="absolute inset-y-0 right-3 flex items-center">
-                         <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
-                       </div>
-                     )}
-                   </div>
-                   {errors.permanentCountry && (
-                     <p className="text-red-500 text-sm mt-1">{errors.permanentCountry}</p>
-                   )}
-                 </div>
-       
-                 {/* State Select */}
-                 <div className="relative">
-                   <label className={labelClasses('permanentState')}>
-                     State <span className="text-red-500">*</span>
-                   </label>
-                   <div className="relative">
-                   <Select
-                     name="permanentState"
-                     value={stateOptions.find(opt => opt.value === formData.permanentState) || null}
-                     onChange={(selected) => handleChange({ target: { name: "permanentState", value: selected?.value } })}
-                     options={stateOptions}
-                     placeholder="Select State"
-       
-                  />
-                     {loading && (
-                       <div className="absolute inset-y-0 right-3 flex items-center">
-                         <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
-                       </div>
-                     )}
-                   </div>
-                   {errors.permanentState && (
-                     <p className="text-red-500 text-sm mt-1">{errors.permanentState}</p>
-                   )}
-                 </div>
-               
-                 {/* City Select */}
-                 <div className="relative">
-                   <label className={labelClasses('permanentCity')}>
-                     City <span className="text-red-500">*</span>
-                   </label>
-                   <div className="relative">
-                   <Select
-                     name="permanentCity"
-                     value={cityOptions.find(opt => opt.value === formData.permanentCity) || null}
-                     onChange={(selected) => handleChange({ target: { name: "permanentCity", value: selected?.value } })}
-                     options={cityOptions}
-                     placeholder="Select City"
-       
-                  />
-                     {loading && (
-                       <div className="absolute inset-y-0 right-3 flex items-center">
-                         <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
-                       </div>
-                     )}
-                   </div>
-                   {errors.permanentCity && (
-                     <p className="text-red-500 text-sm mt-1">{errors.permanentCity}</p>
-                   )}
-                 </div>
-                 </div>
+          <div className="relative">
+            <label className={labelClasses('permanentCountry')}>
+              Country <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <Select
+                name="permanentCountry"
+                value={countryOptions.find(opt => opt.value === formData.permanentCountry) || null}
+                onChange={(selected) => handleChange({ target: { name: "permanentCountry", value: selected?.value } })}
+                options={countryOptions}
+                placeholder="Select Country"
+
+              />
+              {loading && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
+            </div>
+            {errors.permanentCountry && (
+              <p className="text-red-500 text-sm mt-1">{errors.permanentCountry}</p>
+            )}
+          </div>
+
+          {/* State Select */}
+          <div className="relative">
+            <label className={labelClasses('permanentState')}>
+              State <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <Select
+                name="permanentState"
+                value={stateOptions.find(opt => opt.value === formData.permanentState) || null}
+                onChange={(selected) => handleChange({ target: { name: "permanentState", value: selected?.value } })}
+                options={stateOptions}
+                placeholder="Select State"
+
+              />
+              {loading && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
+            </div>
+            {errors.permanentState && (
+              <p className="text-red-500 text-sm mt-1">{errors.permanentState}</p>
+            )}
+          </div>
+
+          {/* City Select */}
+          <div className="relative">
+            <label className={labelClasses('permanentCity')}>
+              City <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <Select
+                name="permanentCity"
+                value={cityOptions.find(opt => opt.value === formData.permanentCity) || null}
+                onChange={(selected) => handleChange({ target: { name: "permanentCity", value: selected?.value } })}
+                options={cityOptions}
+                placeholder="Select City"
+
+              />
+              {loading && (
+                <div className="absolute inset-y-0 right-3 flex items-center">
+                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+                </div>
+              )}
+            </div>
+            {errors.permanentCity && (
+              <p className="text-red-500 text-sm mt-1">{errors.permanentCity}</p>
+            )}
+          </div>
+        </div>
 
         {/* Buttons */}
         <div className='flex space-x-4 mt-6'>

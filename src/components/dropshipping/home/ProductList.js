@@ -259,7 +259,7 @@ const ProductList = () => {
               const variant = product?.product?.variants?.[0];
               const imageUrl = variant?.image?.split(",")?.[0]?.trim() || "/default-image.png";
               const productName = product?.product?.name || "NIL";
-              const price = variant?.shipowl_price ?? "N/A";
+              const price = variant?.shipowl_price ?? "-";
 
               return (
                 <div

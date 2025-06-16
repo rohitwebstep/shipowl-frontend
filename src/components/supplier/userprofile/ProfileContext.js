@@ -21,7 +21,6 @@ const ProfileProvider = ({ children }) => {
     username: "",
     email: "",
     permanentState: "",
-    dateOfBirth: "",
     currentAddress: "",
     permanentAddress: "",
     permanentCity: "",
@@ -101,7 +100,6 @@ const ProfileProvider = ({ children }) => {
     if (!formData.name) newErrors.name = 'Full Name is required';
     if (!formData.username) newErrors.username = 'Username is required';
     if (!formData.email) newErrors.email = 'Email is required';
-    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of Birth is required';
     if (!formData.currentAddress) newErrors.currentAddress = 'Present Address is required';
     if (!formData.permanentAddress) newErrors.permanentAddress = 'Permanent Address is required';
     if (!formData.permanentCity) newErrors.permanentCity = 'City is required';

@@ -632,7 +632,7 @@ export default function RTO() {
                         </td>
                         <td className="p-3 px-5 whitespace-nowrap">
                           <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
-                          <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
+                          <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
                         </td>
 
                         {hasAnyPermission("shippingName", "shippingPhone", "shippingEmail") && (
@@ -651,13 +651,13 @@ export default function RTO() {
                         {hasAnyPermission("payment_mode", "transactionId", "amount", "status") && (
                           <td className="p-3 px-5 whitespace-nowrap font-semibold">
                             <PermissionField permissionKey="payment_mode">
-                              <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
+                              <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "-"}</span></p>
                             </PermissionField>
                             <PermissionField permissionKey="transactionId">
-                              <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p>
+                              <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "-"}</span></p>
                             </PermissionField>
                             <PermissionField permissionKey="amount">
-                              <p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p>
+                              <p>Amount: <span className="font-bold">{order.payment?.amount || "-"}</span></p>
                             </PermissionField>
                             <PermissionField permissionKey="status">
                               <p>
@@ -667,7 +667,7 @@ export default function RTO() {
                                     ? "text-yellow-500"
                                     : "text-green-500"
                                   }`}>
-                                  {order.payment?.status || "N/A"}
+                                  {order.payment?.status || "-"}
                                 </span>
                               </p>
                             </PermissionField>
@@ -677,21 +677,21 @@ export default function RTO() {
                         {hasAnyPermission("orderNumber", "shippingPhone", "shippingAddress", "awbNumber") && (
                           <td className="p-3 px-5 whitespace-nowrap">
                             <PermissionField permissionKey="orderNumber">
-                              {order.shippingApiResult?.data?.order_number || "N/A"}
+                              {order.shippingApiResult?.data?.order_number || "-"}
                             </PermissionField>
                             <br />
                             <PermissionField permissionKey="shippingAddress">
-                              {order.shippingAddress || "N/A"}
+                              {order.shippingAddress || "-"}
                             </PermissionField>
                             <br />
                             <span className="text-green-500">
                               <PermissionField permissionKey="shippingPhone">
-                                {order.shippingPhone || "N/A"}
+                                {order.shippingPhone || "-"}
                               </PermissionField>
                             </span>
                             <br />
                             <PermissionField permissionKey="awbNumber">
-                              {order.shippingApiResult?.data?.awb_number || "N/A"}
+                              {order.shippingApiResult?.data?.awb_number || "-"}
                             </PermissionField>
                           </td>
                         )}
@@ -701,7 +701,7 @@ export default function RTO() {
                             {order.items
                               .map((item) => (
                                 <PermissionField key={item.id} permissionKey="trackingNumber">
-                                  {item.supplierRTOResponse?.trackingNumber || "N/A"}
+                                  {item.supplierRTOResponse?.trackingNumber || "-"}
                                 </PermissionField>
                               ))
                               .reduce((prev, curr) => [prev, ", ", curr])}

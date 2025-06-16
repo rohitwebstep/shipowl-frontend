@@ -4,21 +4,16 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Menu, X, Home, ShoppingCart, Package, Gift, BarChart, CreditCard,
+  Menu, X, Mail, Home, ShoppingCart, Package, Gift, BarChart, CreditCard,
   FileText, Settings, Volume2, MapPin, User, Warehouse, ClipboardList,
-  BadgeDollarSign, ShieldCheck,
+  BadgeDollarSign, ShieldCheck, LayoutDashboard, UserCheck, Users, Image as LucideImage, Banknote, Tags
 } from "lucide-react";
 import logo from "@/app/images/Shipowllogo.png";
-import { LuLayoutDashboard } from "react-icons/lu";
-import { SiGoogletagmanager } from "react-icons/si";
 import { useAdmin } from "./middleware/AdminMiddleWareContext";
-import { FaUserLock, FaRegUser } from "react-icons/fa";
-import { CiBank,CiImageOn } from "react-icons/ci";
 export default function Sidebar() {
   const { openSubMenus, setOpenSubMenus } = useAdmin();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const toggleSubMenu = (name) => {
     setOpenSubMenus((prev) => ({
       ...prev,
@@ -27,19 +22,20 @@ export default function Sidebar() {
   };
 
   const menuSections = [
-
-    { title: "Category Management", icon: SiGoogletagmanager, href: "/admin/category/list" },
-    { title: "Brand Management", icon: SiGoogletagmanager, href: "/admin/brand/list" },
+    { title: "Category Management", icon: Tags, href: "/admin/category/list" },
+    { title: "Brand Management", icon: Tags, href: "/admin/brand/list" },
     { title: "Product Management", icon: Package, href: "/admin/products/list" },
-    { title: "Dropshipper Banners", icon: CiImageOn, href: "/admin/dropshipper/banner" },
+    { title: "Dropshipper Banners", icon: LucideImage, href: "/admin/dropshipper/banner" },
+    { title: "Email Settings", icon: Mail, href: "/admin/email-settings" },
+
     {
       children: [
         {
           name: "Permissions",
-          icon: FaUserLock,
+          icon: UserCheck,
           subMenu: [
-            { icon: FaUserLock, name: "Global Permission ", href: "/admin/permission" },
-            { name: "Order Permission", icon: FaUserLock, href: "/admin/permission/order" }
+            { icon: UserCheck, name: "Global Permission", href: "/admin/permission" },
+            { icon: UserCheck, name: "Order Permission", href: "/admin/permission/order" },
           ],
         },
       ],
@@ -49,35 +45,36 @@ export default function Sidebar() {
       children: [
         {
           name: "Supplier Dashboard",
-          icon: LuLayoutDashboard,
+          icon: LayoutDashboard,
           subMenu: [
-            { icon: ClipboardList, name: "Supplier List ", href: "/admin/supplier/list" },
-            { name: "New Product Request", icon: ClipboardList, href: "/admin/products/new" },
-            { name: "Orders(In progress)", icon: ShoppingCart, href: "/admin/supplier/orders" },
-            { name: "Warehouse", icon: Warehouse, href: "/admin/supplier/warehouse/list" },
-            { name: "RTO Management (in progress)", icon: ClipboardList, href: "/admin/supplier/orders/rto-orders" },
-            { name: "Billings(In progress)", icon: BadgeDollarSign, href: "/admin/billing" },
-            { name: "Payment(In progress)", icon: CreditCard, href: "/admin/payments" },
+            { icon: ClipboardList, name: "Supplier List", href: "/admin/supplier/list" },
+            { icon: ClipboardList, name: "New Product Request", href: "/admin/products/new" },
+            { icon: ShoppingCart, name: "Orders(In progress)", href: "/admin/supplier/orders" },
+            { icon: Warehouse, name: "Warehouse", href: "/admin/supplier/warehouse/list" },
+            { icon: ClipboardList, name: "RTO Management (in progress)", href: "/admin/supplier/orders/rto-orders" },
+            { icon: BadgeDollarSign, name: "Billings(In progress)", href: "/admin/billing" },
+            { icon: CreditCard, name: "Payment(In progress)", href: "/admin/payments" },
           ],
         },
       ],
     },
+
     {
       children: [
         {
           name: "Dropshipping Dashboard",
-          icon: LuLayoutDashboard,
+          icon: LayoutDashboard,
           subMenu: [
-            { name: "Dropshippers List", icon: LuLayoutDashboard, href: "/admin/dropshipper/list" },
-            { name: "Manage Orders(In progress)", icon: ShoppingCart, href: "/admin/dropshipper/manage-orders" },
-            { name: "Manage Products(In progress)", icon: Package, href: "/admin/dropshipper/manage-products" },
-            { name: "Source a Product(In progress)", icon: Gift, href: "/admin/dropshipper/product/source" },
-            { name: "Reports(In progress)", icon: BarChart, href: "/report" },
-            { name: "Payments(In progress)", icon: CreditCard, href: "#" },
-            { name: "Manage NDR(In progress)", icon: FileText, href: "#" },
-            { name: "High RTO Pincode(In progress)", icon: MapPin, href: "#" },
-            { name: "Boosters(In progress)", icon: Volume2, href: "#" },
-            { name: "Integrations(In progress)", icon: Settings, href: "#" },
+            { icon: Users, name: "Dropshippers List", href: "/admin/dropshipper/list" },
+            { icon: ShoppingCart, name: "Manage Orders(In progress)", href: "/admin/dropshipper/manage-orders" },
+            { icon: Package, name: "Manage Products(In progress)", href: "/admin/dropshipper/manage-products" },
+            { icon: Gift, name: "Source a Product(In progress)", href: "/admin/dropshipper/product/source" },
+            { icon: BarChart, name: "Reports(In progress)", href: "/report" },
+            { icon: CreditCard, name: "Payments(In progress)", href: "#" },
+            { icon: FileText, name: "Manage NDR(In progress)", href: "#" },
+            { icon: MapPin, name: "High RTO Pincode(In progress)", href: "#" },
+            { icon: Volume2, name: "Boosters(In progress)", href: "#" },
+            { icon: Settings, name: "Integrations(In progress)", href: "#" },
           ],
         },
       ],
@@ -87,27 +84,28 @@ export default function Sidebar() {
       children: [
         {
           name: "Shipping Dashboard",
-          icon: LuLayoutDashboard,
+          icon: LayoutDashboard,
           subMenu: [
             { icon: ClipboardList, name: "Courier Company", href: "/admin/courier/list" },
             { icon: ClipboardList, name: "Api Credentials (in progress)", href: "/admin/api/list" },
             { icon: ClipboardList, name: "Good Performing Page", href: "/admin/good-pincodes/list" },
             { icon: ClipboardList, name: "Bad Performing Page", href: "/admin/bad-pincodes/list" },
-            { name: "High RTO", icon: Package, href: "/admin/high-rto/list" },
+            { icon: Package, name: "High RTO", href: "/admin/high-rto/list" },
           ],
         },
       ],
     },
 
-    { title: "Subuser Listing", icon: FaRegUser, href: "/admin/sub-user/list" },
-    { title: "Country Management", icon: SiGoogletagmanager, href: "/admin/country/list" },
+    { title: "Subuser Listing", icon: User, href: "/admin/sub-user/list" },
+    { title: "Country Management", icon: Tags, href: "/admin/country/list" },
     { title: "State Management", icon: ShieldCheck, href: "/admin/state/list" },
     { title: "City Management", icon: ShieldCheck, href: "/admin/city/list" },
     { title: "Settings(In progress)", icon: Settings, href: "/admin/setting" },
     { title: "Profile(In progress)", icon: User, href: "/admin/profile" },
-    { title: "Bank Details Update Requests", icon: CiBank, href: "/admin/bankaccount-update-requests" },
+    { title: "Bank Details Update Requests", icon: Banknote, href: "/admin/bankaccount-update-requests" },
     { title: "Terms & Condition(In progress)", icon: ShieldCheck, href: "/admin/terms" },
   ];
+
 
   return (
     <>

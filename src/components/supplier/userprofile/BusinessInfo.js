@@ -260,10 +260,7 @@ const BusinessInfo = () => {
         }
       }
       for (const key in formData) {
-        if (key === 'dateOfBirth' && formData[key]) {
-          const formattedDate = new Date(formData[key]).toLocaleDateString('en-GB');
-          form.append(key, formattedDate);
-        } else if (formData[key] !== null && formData[key] !== '') {
+       if (formData[key] !== null && formData[key] !== '') {
           form.append(key, formData[key]);
         }
       }
@@ -412,7 +409,11 @@ const BusinessInfo = () => {
       </div>
 
       {/* Billing Address */}
-      <div>
+    
+
+      {/* Pincode, State, City */}
+      <div className="grid lg:grid-cols-3 py-5 gap-4">
+          <div>
         {renderLabel('Company Billing Address', 'billingAddress')}
         <input
           type="text"
@@ -423,9 +424,6 @@ const BusinessInfo = () => {
         />
         {renderError('billingAddress')}
       </div>
-
-      {/* Pincode, State, City */}
-      <div className="grid lg:grid-cols-3 py-5 gap-4">
         <div>
           {renderLabel('Pincode', 'billingPincode')}
           <input

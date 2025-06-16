@@ -3,11 +3,12 @@
 import { useState, useContext } from 'react';
 import { UploadCloud } from 'lucide-react';
 import { ProductContext } from './ProductContext';
+import { useRouter } from 'next/navigation';
 
 export default function ShippingDetails() {
   const { formData, validateForm2, setFormData, shippingErrors, fileFields, setActiveTabs } = useContext(ProductContext);
 
-
+     const router = useRouter();
 
   const handleFileChange = (event, key) => {
     const selectedFiles = Array.from(event.target.files);
@@ -114,7 +115,11 @@ export default function ShippingDetails() {
           <button type="submit" className="bg-orange-500 text-white px-14 py-2 rounded-md">
             Next
           </button>
-          <button type="button" className="bg-[#8F9BBA] text-white px-14 py-2 rounded-md">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+          >
             Cancel
           </button>
         </div>

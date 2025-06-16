@@ -1,17 +1,17 @@
 "use client"
 
-import {useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import { useAdmin } from '../middleware/AdminMiddleWareContext'
 
 export default function Create() {
     const router = useRouter();
-  const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState({
         name: '',
         description: '',
         status: false,
-    });    const [validationErrors, setValidationErrors] = useState({});
+    }); const [validationErrors, setValidationErrors] = useState({});
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const { verifyAdminAuth } = useAdmin();
@@ -34,13 +34,11 @@ export default function Create() {
         if (!formData.name || formData.name.trim() === '') {
             errors.name = 'Category name is required.';
         }
-        if (!formData.description || formData.description.trim() === '') {
-            errors.description = 'Category description is required.';
-        }
+
         if (!files || files.length === 0) {
             errors.image = 'At least one category image is required.';
         }
-      
+
 
         return errors;
     };
@@ -53,29 +51,29 @@ export default function Create() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-    
+
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
         if (dropshipperData?.project?.active_panel !== "admin") {
             localStorage.clear("shippingData");
             router.push("/admin/auth/login");
             return;
         }
-    
+
         const token = dropshipperData?.security?.token;
         if (!token) {
             router.push("/admin/auth/login");
             return;
         }
-    
+
         const errors = validate();
         if (Object.keys(errors).length > 0) {
             setValidationErrors(errors);
             setLoading(false);
             return;
         }
-    
+
         setValidationErrors({});
-    
+
         try {
             Swal.fire({
                 title: 'Creating Category...',
@@ -85,21 +83,21 @@ export default function Create() {
                     Swal.showLoading();
                 }
             });
-    
+
             const form = new FormData();
             form.append('name', formData.name);
             form.append('description', formData.description);
             form.append('status', formData.status);
-    
+
             // Add images if available
             if (files.length > 0) {
                 files.forEach((file) => {
                     form.append('image', file); // use 'images[]' if backend expects an array
                 });
             }
-    
+
             const url = "https://sleeping-owl-we0m.onrender.com/api/admin/category";
-    
+
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -107,9 +105,9 @@ export default function Create() {
                 },
                 body: form,
             });
-    
+
             const result = await response.json(); // Parse the response only once
-    
+
             if (!response.ok) {
                 Swal.close();
                 Swal.fire({
@@ -117,23 +115,23 @@ export default function Create() {
                     title: "Creation Failed",
                     text: result.message || result.error || "An error occurred",
                 });
-    
+
                 if (result.error && typeof result.error === 'object') {
                     const entries = Object.entries(result.error);
                     let focused = false;
-    
+
                     entries.forEach(([key, message]) => {
                         setValidationErrors((prev) => ({
                             ...prev,
                             [key]: message,
                         }));
-    
+
                         if (!focused) {
                             setTimeout(() => {
                                 const input = document.querySelector(`[name="${key}"]`);
                                 if (input) input.focus();
                             }, 300);
-    
+
                             focused = true;
                         }
                     });
@@ -165,7 +163,7 @@ export default function Create() {
             setLoading(false);
         }
     };
-    
+
 
     return (
         <section className="add-warehouse xl:w-8/12">
@@ -191,7 +189,7 @@ export default function Create() {
 
                         <div>
                             <label htmlFor="description" className="font-bold block text-[#232323]">
-                                Category Description <span className='text-red-500 text-lg'>*</span>
+                                Category Description
                             </label>
                             <input
                                 type="text"
@@ -199,12 +197,9 @@ export default function Create() {
                                 value={formData.description || ''}
                                 id="description"
                                 onChange={handleChange}
-                                className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold  ${validationErrors.description ? "border-red-500" : "border-[#E0E5F2]"
-                                    } `}
+                                className={`text-[#718EBF] border w-full rounded-md p-3 mt-2 font-bold  border-[#E0E5F2] `}
                             />
-                            {validationErrors.description && (
-                                <p className="text-red-500 text-sm mt-1">{validationErrors.description}</p>
-                            )}
+
                         </div>
                     </div>
 

@@ -218,7 +218,7 @@ export default function VariantDetails() {
 
       <>
         {showAddButton && (
-          <div className="flex justify-end md:hidden mt-4">
+          <div className="flex justify-end md:hidden mt-4 mb-2">
             <button className="bg-green-500 text-white p-2 rounded-lg" onClick={addVariant}>
               <Plus className="w-4 h-4" />
             </button>
@@ -265,7 +265,7 @@ export default function VariantDetails() {
                 >
                   {formData.isVarientExists && (
                     <div>
-                      <input type="text" value={variant.modal} name="modal" id="modal" readOnly />
+                      <input type="text" value={variant.modal} className='uppercase' name="modal" id="modal" readOnly />
                     </div>
                   )}
 
@@ -277,7 +277,7 @@ export default function VariantDetails() {
                         <input
                           type="text"
                           placeholder="name"
-                          className="border p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2] mb-2"
+                          className="border  p-2 rounded-xl text-[#718EBF] font-bold w-full border-[#DFEAF2] mb-2"
                           value={variant.name}
                           onChange={(e) => handleChange(index, 'name', e.target.value)}
                         />
@@ -411,7 +411,7 @@ export default function VariantDetails() {
                   )}
 
                   {showAddButton && (
-                    <div className="flex items-start justify-end gap-2">
+                    <div className="flex items-start justify-end gap-2 mt-2">
                       <button className="bg-red-500 text-white p-2 rounded" onClick={() => removeVariant(index)}>
                         <Minus className="w-4 h-4" />
                       </button>

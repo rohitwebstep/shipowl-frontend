@@ -610,7 +610,7 @@ export default function Orders() {
               {/* Order ID */}
               <td className="p-3 px-5 whitespace-nowrap">
                 <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
-                <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
+                <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
               </td>
 
               {/* Customer Info */}
@@ -627,9 +627,9 @@ export default function Orders() {
 
               {/* Payment Info */}
               <td className="p-3 px-5 whitespace-nowrap font-semibold">
-                <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
-                <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p>
-                <p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p>
+                <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "-"}</span></p>
+                <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "-"}</span></p>
+                <p>Amount: <span className="font-bold">{order.payment?.amount || "-"}</span></p>
                 <p>
                   Status:{" "}
                   <span
@@ -641,7 +641,7 @@ export default function Orders() {
                         : "text-green-500"
                     }`}
                   >
-                    <PermissionField permissionKey="status">{order.payment?.status || "N/A"}</PermissionField>
+                    <PermissionField permissionKey="status">{order.payment?.status || "-"}</PermissionField>
                   </span>
                 </p>
               </td>

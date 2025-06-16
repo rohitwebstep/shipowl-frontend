@@ -152,20 +152,19 @@ const ProfileEdit = () => {
     }
   };
 
- useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    await fetchCountry();
-    setLoading(false);
-  };
-  
-  fetchData();
-}, [fetchCountry]);
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      await fetchCountry();
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [fetchCountry]);
 
 
   const inputClasses = (field) =>
-    `w-full p-3 border rounded-lg font-bold ${
-      errors[field] ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
+    `w-full p-3 border rounded-lg font-bold ${errors[field] ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
     }`;
 
   const labelClasses = (field) =>
@@ -173,17 +172,18 @@ const ProfileEdit = () => {
 
   const handleCancel = () => {
     setErrors({});
+    router.back();
   };
   const countryOptions = countryData.map((country) => ({
     value: country.id,
     label: country.name,
   }));
-  
+
   const stateOptions = stateData?.map((state) => ({
     value: state.id,
     label: state.name,
   }));
-  
+
   const cityOptions = cityData?.map((city) => ({
     value: city.id,
     label: city.name,
@@ -224,7 +224,6 @@ const ProfileEdit = () => {
             { label: 'User Name', name: 'username', type: 'text' },
             { label: 'Email', name: 'email', type: 'email' },
             { label: 'Password', name: 'password', type: 'password' },
-            { label: 'Date of Birth', name: 'dateOfBirth', type: 'date' },
             { label: 'Present Address', name: 'currentAddress', type: 'text' },
             { label: 'Permanent Address', name: 'permanentAddress', type: 'text' },
             { label: 'Postal Code', name: 'permanentPostalCode', type: 'number' },
@@ -246,21 +245,21 @@ const ProfileEdit = () => {
             </div>
           ))}
 
-        {/* Country Select */}
-        <div className="relative">
+          {/* Country Select */}
+          <div className="relative">
             <label className={labelClasses('permanentCountry')}>
               Country <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <Select
-              name="permanentCountry"
-              value={countryOptions.find(opt => opt.value === formData.permanentCountry) || null}
-              onChange={(selected) => handleChange({ target: { name: "permanentCountry", value: selected?.value } })}
-              options={countryOptions}
-              isDisabled={loading}
-              placeholder="Select Country"
+                name="permanentCountry"
+                value={countryOptions.find(opt => opt.value === formData.permanentCountry) || null}
+                onChange={(selected) => handleChange({ target: { name: "permanentCountry", value: selected?.value } })}
+                options={countryOptions}
+                isDisabled={loading}
+                placeholder="Select Country"
 
-           />
+              />
               {loading && (
                 <div className="absolute inset-y-0 right-3 flex items-center">
                   <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
@@ -278,15 +277,15 @@ const ProfileEdit = () => {
               State <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-            <Select
-              name="permanentState"
-              value={stateOptions.find(opt => opt.value === formData.permanentState) || null}
-              onChange={(selected) => handleChange({ target: { name: "permanentState", value: selected?.value } })}
-              options={stateOptions}
-              isDisabled={stateLoading}
-              placeholder="Select State"
+              <Select
+                name="permanentState"
+                value={stateOptions.find(opt => opt.value === formData.permanentState) || null}
+                onChange={(selected) => handleChange({ target: { name: "permanentState", value: selected?.value } })}
+                options={stateOptions}
+                isDisabled={stateLoading}
+                placeholder="Select State"
 
-           />
+              />
               {stateLoading && (
                 <div className="absolute inset-y-0 right-3 flex items-center">
                   <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
@@ -297,22 +296,21 @@ const ProfileEdit = () => {
               <p className="text-red-500 text-sm mt-1">{errors.permanentState}</p>
             )}
           </div>
-          </div>
           {/* City Select */}
           <div className="relative">
             <label className={labelClasses('permanentCity')}>
               City <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-            <Select
-              name="permanentCity"
-              value={cityOptions.find(opt => opt.value === formData.permanentCity) || null}
-              onChange={(selected) => handleChange({ target: { name: "permanentCity", value: selected?.value } })}
-              options={cityOptions}
-              placeholder="Select City"
-              isDisabled={cityLoading}
+              <Select
+                name="permanentCity"
+                value={cityOptions.find(opt => opt.value === formData.permanentCity) || null}
+                onChange={(selected) => handleChange({ target: { name: "permanentCity", value: selected?.value } })}
+                options={cityOptions}
+                placeholder="Select City"
+                isDisabled={cityLoading}
 
-           />
+              />
               {cityLoading && (
                 <div className="absolute inset-y-0 right-3 flex items-center">
                   <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
@@ -323,7 +321,9 @@ const ProfileEdit = () => {
               <p className="text-red-500 text-sm mt-1">{errors.permanentCity}</p>
             )}
           </div>
-       
+        </div>
+
+
 
         <div className="flex space-x-4 mt-6">
           <button

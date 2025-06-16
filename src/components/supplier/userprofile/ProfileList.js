@@ -196,27 +196,23 @@ const ProfileList = () => {
                 <div className="bg-white rounded-2xl p-6 shadow-md">
                     <h3 className="text-2xl font-semibold text-[#2B3674] mb-4">Personal Information</h3>
                     <div className="space-y-2 text-[#2B3674]">
-                        <p><strong>Name:</strong> {suppliers.name || 'N/A'}</p>
-                        <p><strong>Email:</strong> {suppliers.email || 'N/A'}</p>
-                        <p><strong>Date of Birth:</strong>
-                            {(typeof suppliers.dateOfBirth === 'string' && suppliers.dateOfBirth.trim() !== '')
-                                ? suppliers.dateOfBirth
-                                : 'N/A'}
-                        </p>
-                        <p><strong>Permanent Address:</strong> {suppliers.permanentAddress || 'N/A'}</p>
-                        <p><strong>State:</strong> {stateData.find(s => s.id === suppliers.permanentStateId)?.name || 'N/A'}</p>
-                        <p><strong>City:</strong> {cityData.find(c => c.id === suppliers.permanentCityId)?.name || 'N/A'}</p>
-                        <p><strong>Postal Code:</strong> {suppliers.permanentPostalCode || 'N/A'}</p>
+                        <p><strong>Name:</strong> {suppliers.name || '-'}</p>
+                        <p><strong>Email:</strong> {suppliers.email || '-'}</p>
+                      
+                        <p><strong>Permanent Address:</strong> {suppliers.permanentAddress || '-'}</p>
+                        <p><strong>State:</strong> {stateData.find(s => s.id === suppliers.permanentStateId)?.name || '-'}</p>
+                        <p><strong>City:</strong> {cityData.find(c => c.id === suppliers.permanentCityId)?.name || '-'}</p>
+                        <p><strong>Postal Code:</strong> {suppliers.permanentPostalCode || '-'}</p>
                     </div>
                     <h3 className="text-2xl font-semibold text-[#2B3674] my-4">Company Details</h3>
                     <div className="space-y-2 text-[#2B3674]">
-                        <p><strong>Company Name:</strong> {suppliers?.companyDetail?.companyName || 'N/A'}</p>
-                        <p><strong>Company PanNumber:</strong> {suppliers?.companyDetail?.companyPanNumber || 'N/A'}</p>
-                        <p><strong>Brand Name:</strong> {suppliers?.companyDetail?.brandName || 'N/A'}</p>
-                        <p><strong>Brand Short Name:</strong> {suppliers?.companyDetail?.brandShortName || 'N/A'}</p>
-                        <p><strong>Billing Address:</strong> {suppliers?.companyDetail?.billingAddress || 'N/A'}</p>
-                        <p><strong>Billing Pincode:</strong> {suppliers?.companyDetail?.billingPincode || 'N/A'}</p>
-                        <p><strong>AadharCardHolderName:</strong> {suppliers?.companyDetail?.aadharCardHolderName || 'N/A'}</p>
+                        <p><strong>Company Name:</strong> {suppliers?.companyDetail?.companyName || '-'}</p>
+                        <p><strong>Company PanNumber:</strong> {suppliers?.companyDetail?.companyPanNumber || '-'}</p>
+                        <p><strong>Brand Name:</strong> {suppliers?.companyDetail?.brandName || '-'}</p>
+                        <p><strong>Brand Short Name:</strong> {suppliers?.companyDetail?.brandShortName || '-'}</p>
+                        <p><strong>Billing Address:</strong> {suppliers?.companyDetail?.billingAddress || '-'}</p>
+                        <p><strong>Billing Pincode:</strong> {suppliers?.companyDetail?.billingPincode || '-'}</p>
+                        <p><strong>AadharCardHolderName:</strong> {suppliers?.companyDetail?.aadharCardHolderName || '-'}</p>
 
                     </div>
                     <div className="mt-4 text-right">

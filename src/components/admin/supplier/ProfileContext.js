@@ -20,7 +20,6 @@ const ProfileProvider = ({ children }) => {
     username: "",
     email: "",
     password: "",
-    dateOfBirth: "",
     currentAddress: "",
     permanentAddress: "",
     permanentCity: "",
@@ -34,7 +33,6 @@ const ProfileProvider = ({ children }) => {
     profilePicture: '',
     billingState: "",
     billingCity: "",
-    businessType: "",
     clientEntryType: "",
     gstNumber: "",
     companyPanNumber: "",
@@ -100,7 +98,6 @@ const ProfileProvider = ({ children }) => {
     billingCountry: 'Country is required',
     billingState: 'State is required',
     billingCity: 'City is required',
-    businessType: 'Business Type is required',
     clientEntryType: 'Client Entry Type is required',
     gstNumber: 'GST Number is required',
     companyPanNumber: 'PAN Number is required',
@@ -114,7 +111,6 @@ const ProfileProvider = ({ children }) => {
     if (!formData.username) newErrors.username = 'Username is required';
     if (!formData.email) newErrors.email = 'Email is required';
     if (!formData.password) newErrors.password = 'Password is required';
-    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of Birth is required';
     if (!formData.currentAddress) newErrors.currentAddress = 'Present Address is required';
     if (!formData.permanentAddress) newErrors.permanentAddress = 'Permanent Address is required';
     if (!formData.permanentCity) newErrors.permanentCity = 'City is required';

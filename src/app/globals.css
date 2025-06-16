@@ -49,7 +49,7 @@ th.text-left {
 .overflow-auto,
 .overflow-x-auto,
 .overflow-y-auto {
-  scrollbar-width: none;
+  scrollbar-width: thin;
   scrollbar-color: #131a46 transparent;
 }
 
@@ -118,18 +118,7 @@ table tr th i {
   position: relative;
 }
 
-table tr th i::after {
-  content: "";
-  height: 12px;
-  width: 12px;
-  position: absolute;
-  right: -22px;
-  top: 5px;
-  background-image: url(./assets/tablearrow.png);
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-}
+
 
 
 @media(min-width:380px) and (max-width:600px) {
@@ -197,18 +186,7 @@ table tr th i {
   position: relative;
 }
 
-table tr th i::after {
-  content: "";
-  height: 12px;
-  width: 12px;
-  position: absolute;
-  right: -22px;
-  top: 5px;
-  background-image: url(./images/tablearrow.png);
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-}
+
 
 @media(max-width:767px) {
   .container {
@@ -300,20 +278,7 @@ table tr th:last-child {
   border-radius: 7px !important;
 }
 
-.main-tables thead th,
-.main-tables tbody td {
-  border: none !important;
-  background: none !important;
-  box-shadow: none;
-}
 
-.main-tables thead th,
-.main-tables tbody td {
-  border: none !important;
-  background: none !important;
-  box-shadow: none !important;
-  outline: none;
-}
 
 /* Optional: remove pagination button styles */
 .dataTables_wrapper .dataTables_paginate .paginate_button {
@@ -392,4 +357,16 @@ button.dt-paging-button {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.main-tables thead th,
+.main-tables tbody td {
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  outline: none;
+}
+.main-tables .popup-boxes thead th,
+.main-tables .popup-boxes tbody td {
+  border: 1px solid !important; 
 }
