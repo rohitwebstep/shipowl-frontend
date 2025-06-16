@@ -108,13 +108,38 @@ export default function ShippingDetails() {
   };
 
 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    // Update the main field
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: value,
+      };
+
+      // Recalculate chargable weight if any of the dimensions or weight changes
+      const weight = parseFloat(
+        name === 'weight' ? value : updated.weight
+      ) || 0;
+      const length = parseFloat(
+        name === 'package_length' ? value : updated.package_length
+      ) || 0;
+      const width = parseFloat(
+        name === 'package_width' ? value : updated.package_width
+      ) || 0;
+      const height = parseFloat(
+        name === 'package_height' ? value : updated.package_height
+      ) || 0;
+
+      const volumetric = (length * width * height) / 5000;
+      const chargable = Math.max(weight, volumetric).toFixed(2);
+
+      return {
+        ...updated,
+        chargable_weight: chargable,
+      };
+    });
   };
 
 
@@ -175,7 +200,6 @@ export default function ShippingDetails() {
             );
           })}
 
-          {/* Chargable Weight Field (Read-only + unit visible) */}
           <div className="relative">
             <label className="text-[#232323] font-bold block">
               Chargable Weight <span className="text-red-500">*</span>
@@ -185,16 +209,11 @@ export default function ShippingDetails() {
                 type="number"
                 name="chargable_weight"
                 readOnly
-                value={(() => {
-                  const weight = parseFloat(formData.weight) || 0;
-                  const length = parseFloat(formData.package_length) || 0;
-                  const width = parseFloat(formData.package_width) || 0;
-                  const height = parseFloat(formData.package_height) || 0;
-                  const volumetric = (length * width * height) / 5000;
-                  return Math.max(weight, volumetric).toFixed(2);
-                })()}
-                className={`border ${shippingErrors.chargable_weight ? 'border-red-500' : 'border-[#DFEAF2]'} w-full p-3 pr-12 rounded-xl bg-gray-100`}
+                value={formData.chargable_weight || ''}
+                className={`border ${shippingErrors.chargable_weight ? 'border-red-500' : 'border-[#DFEAF2]'
+                  } w-full p-3 pr-12 rounded-xl bg-gray-100`}
               />
+
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">KG</span>
             </div>
             {shippingErrors.chargable_weight && (
