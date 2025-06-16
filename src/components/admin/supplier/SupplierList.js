@@ -289,8 +289,8 @@ const SupplierList = () => {
                                             <td className="p-3 px-4 text-left whitespace-nowrap">{item.name}</td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">{item.email}</td>
 
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">{item.currentAddress || 'N/A'}</td>
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">{item.permanentAddress || 'N/A'}</td>
+                                            <td className="p-3 px-4 text-left">{item.currentAddress || 'N/A'}</td>
+                                            <td className="p-3 px-4 text-left">{item.permanentAddress || 'N/A'}</td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
                                                 {item.permanentCountry?.name || 'N/A'}
                                             </td>

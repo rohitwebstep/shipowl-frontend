@@ -131,7 +131,7 @@ export default function Create() {
       });
 
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message || "Failed to create supplier");
+      if (!res.ok) throw new Error(result.message ||result.error || "Failed to create supplier");
 
       Swal.fire("Success", "supplier created Successfuly!", "success");
       // Reset form
