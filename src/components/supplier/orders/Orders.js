@@ -135,7 +135,7 @@ export default function Orders() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/supplier/order?from=${formatDate(
+        `sleeping-owl-we0m.onrender.com/api/supplier/order?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {
@@ -189,7 +189,7 @@ export default function Orders() {
     try {
       setLoading(true);
 
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/order/${id}/shipping`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -211,7 +211,7 @@ export default function Orders() {
           }).then(async (result) => {
             if (result.isConfirmed) {
               try {
-                const confirmResponse = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/confirm`, {
+                const confirmResponse = await fetch(`sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/confirm`, {
                   method: 'POST',
                   headers: {
                     Authorization: `Bearer ${suppliertoken}`,
@@ -282,7 +282,7 @@ export default function Orders() {
     try {
       setLoading(true);
 
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/cancel`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/cancel`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -330,7 +330,7 @@ export default function Orders() {
     try {
       setLoading(true);
 
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/status`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/order/${id}/shipping/status`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -418,7 +418,7 @@ export default function Orders() {
     const isAllowed = permission[permissionKey];
     return (
       <span style={isAllowed ? {} : { filter: "blur(3px)", opacity: 0.5, userSelect: "none" }}>
-        {children || "N/A"}
+        {' '}
       </span>
     );
   };

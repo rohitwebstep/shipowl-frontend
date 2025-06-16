@@ -44,7 +44,7 @@ const ProductDetails = () => {
   // Dynamic images setup
   const [shipCost, setShipCost] = useState([]);
   const [openDescriptionId, setOpenDescriptionId] = useState(null);
-  
+
   const [openSection, setOpenSection] = useState(null);
 
   const toggleSection = (section) => {
@@ -195,9 +195,9 @@ const ProductDetails = () => {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory/${id}`;
+        url = `sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory/${id}`;
       } else {
-        url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}`;
+        url = `sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
@@ -271,7 +271,7 @@ const ProductDetails = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -355,12 +355,14 @@ const ProductDetails = () => {
 
 
       const form = new FormData();
-      const simplifiedVariants = inventoryData.variant.map((v) => ({
-        variantId: v.id || v.variantId,
-        stock: v.dropStock,
-        price: v.dropPrice,
-        status: v.Dropstatus
-      }));
+      const simplifiedVariants = inventoryData.variant
+        .filter(v => v.status === true) // Only include variants with status true
+        .map((v) => ({
+          variantId: v.id || v.variantId,
+          stock: v.dropStock,
+          price: v.dropPrice,
+          status: v.Dropstatus
+        }));
 
       form.append('supplierProductId', inventoryData.supplierProductId);
       form.append('shopifyApp', inventoryData.shopifyApp);
@@ -368,7 +370,7 @@ const ProductDetails = () => {
 
 
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = "sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -721,32 +723,32 @@ const ProductDetails = () => {
                   >
                     View Description
                   </button>
-                 
+
                 </span>
               </p>
-               {openDescriptionId === productDetails.id && (
-                    <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                      <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
-                        {/* Close Button */}
-                        <button
-                          onClick={() => setOpenDescriptionId(null)}
-                          className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
-                        >
-                          &times;
-                        </button>
+              {openDescriptionId === productDetails.id && (
+                <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                  <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg">
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setOpenDescriptionId(null)}
+                      className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+                    >
+                      &times;
+                    </button>
 
-                        {/* HTML Description Content */}
-                        {productDetails.description ? (
-                          <div
-                            className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                            dangerouslySetInnerHTML={{ __html: productDetails.description }}
-                          />
-                        ) : (
-                          <p className="text-gray-500">NIL</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                    {/* HTML Description Content */}
+                    {productDetails.description ? (
+                      <div
+                        className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                        dangerouslySetInnerHTML={{ __html: productDetails.description }}
+                      />
+                    ) : (
+                      <p className="text-gray-500">NIL</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <p className="pt-2 text-[18px] font-bold border-t mt-3 border-[#E0E2E7]">Platform Assurance</p>
               <div className="xl:grid lg:grid-cols-4 flex my-5 md:my-0 overflow-auto gap-8">

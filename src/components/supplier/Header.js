@@ -36,6 +36,9 @@ export default function Header() {
     "/supplier/product/not-my/": "Other Products",
     "/supplier/product/my/": "My Products",
     "/supplier/product/request/": "My Inventory",
+    "/supplier/sub-user/create/": "Sub user Create",
+    "/supplier/sub-user/update/": "Sub user Update",
+    "/supplier/sub-user/list/": "Sub user List",
   };
 
   const currentPage = pageTitles[pathname] || "Dashboard";

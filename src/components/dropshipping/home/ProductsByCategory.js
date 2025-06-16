@@ -86,12 +86,14 @@ function ProductsByCategory() {
 
 
       const form = new FormData();
-      const simplifiedVariants = inventoryData.variant.map((v) => ({
-        variantId: v.id || v.variantId,
-        stock: v.dropStock,
-        price: v.dropPrice,
-        status: v.Dropstatus
-      }));
+        const simplifiedVariants = inventoryData.variant
+        .filter(v => v.status === true) // Only include variants with status true
+        .map((v) => ({
+          variantId: v.id || v.variantId,
+          stock: v.dropStock,
+          price: v.dropPrice,
+          status: v.Dropstatus
+        }));
 
       form.append('supplierProductId', inventoryData.supplierProductId);
       form.append('shopifyApp', inventoryData.shopifyApp);
@@ -99,7 +101,7 @@ function ProductsByCategory() {
 
 
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = "sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -177,7 +179,7 @@ function ProductsByCategory() {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${id}&type=${tab}`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${id}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

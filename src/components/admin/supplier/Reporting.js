@@ -14,7 +14,8 @@ function Reporting() {
   const [showModal, setShowModal] = useState(false);
 
   const handleViewVariants = (items) => {
-    const variants = items.map(item => item.variant?.supplierProductVariant?.variant).filter(Boolean);
+    console.log('items', items)
+    const variants = items.map(item => item.dropshipperVariant?.supplierProductVariant?.variant).filter(Boolean);
     setSelectedVariants(variants);
     setShowModal(true);
   };
@@ -22,12 +23,13 @@ function Reporting() {
   const [loading, setLoading] = useState(false);
   const [reporting, setReporting] = useState([]);
 
+  const [permission, setPermission] = useState([]);
+  
   const [fromDate, setFromDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 6);
     return d;
   });
-
   const [toDate, setToDate] = useState(new Date());
 
   const formatDate = (date) => date.toISOString().split("T")[0];
@@ -50,7 +52,7 @@ function Reporting() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${id}/payment-report?from=${formatDate(
+        `sleeping-owl-we0m.onrender.com/api/admin/supplier/${id}/payment-report?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {
@@ -78,6 +80,10 @@ function Reporting() {
       const result = await response.json();
       setReporting(result?.reportAnalytics || []);
       setOrders(result?.orders || []);
+      if (result.staffPermissionApplied == true) {
+        setPermission(result?.assignedPermissions || []);
+
+      }
     } catch (error) {
       console.error("Error fetching report:", error);
     } finally {
@@ -85,9 +91,40 @@ function Reporting() {
     }
   }, [router, id, fromDate, toDate]);
 
-  useEffect(() => {
+  const permissionMap = permission.reduce((acc, item) => {
+    const key = `${item.permission.module}.${item.permission.action}`;
+    acc[key] = item.permission.status;
+    return acc;
+  }, {});
+  console.log('permissionMap', permissionMap)
+  console.log('permission', permission)
+  const PermissionField = ({ permissionKey, children }) => {
+    const isAllowed = permissionMap[permissionKey];
+    console.log('isAllowed', isAllowed)
+    console.log('permissionMap[permissionKey]', permissionMap[permissionKey])
+    return (
+      <span
+        style={
+          isAllowed
+            ? {}
+            : {
+              filter: "blur(3px)",
+              opacity: 0.5,
+              userSelect: "none",
+              pointerEvents: "none",
+            }
+        }
+      >
+        {isAllowed ? children : ' '}
+      </span>
+    );
+  };
+  const hasPermission = (key) => permissionMap?.[key];
+  const hasAnyPermission = (...keys) => keys.some((key) => permissionMap?.[key]); useEffect(() => {
     fetchReporting();
   }, [fetchReporting]);
+
+  console.log('selectedVariants', selectedVariants)
 
   return (
     <div className="p-6 bg-white rounded-xl">
@@ -175,29 +212,195 @@ function Reporting() {
             <h2 className="text-xl font-bold pt-5 text-center">Orders Details</h2>
             <div className="overflow-x-auto p-4 mt-5 bg-white rounded-xl shadow-[0_2px_8px_0_rgba(0,0,0,0.1)] border border-gray-200">
 
-              <table className="min-w-full ">
+              <table className="min-w-full">
                 <thead className="uppercase text-gray-700">
-                  <tr className=" border-b border-[#DFEAF2]">
-                    <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Order #</th>
-                    <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Status</th>
-                    <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Customer</th>
-                    <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Total (INR)</th>
-                    <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Tax</th>
-                    <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Payment Transaction Id</th>
-                    <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Payment Status</th>
-                    <th className="px-4 py-2 text-left text-sm whitespace-nowrap font-semibold text-gray-700">Actions</th>
+                  <tr className="border-b border-[#DFEAF2] text-left">
+                    <th className="p-3 px-5 whitespace-nowrap">SR.</th>
+                    <th className="p-3 px-5 whitespace-nowrap">Order #</th>
+
+                    {hasAnyPermission(
+                      "order-variables.shippingName",
+                      "order-variables.shippingPhone",
+                      "order-variables.shippingEmail"
+                    ) && <th className="p-3 px-5 whitespace-nowrap">Customer Information</th>}
+
+                    {hasAnyPermission(
+                      "order-variables.payment_mode",
+                      "order-variables.transactionId",
+                      "order-variables.amount",
+                      "order-variables.status"
+                    ) && (
+                        <th className="p-3 px-5 whitespace-nowrap">Payment</th>
+                      )}
+                    {hasAnyPermission(
+                      "order-variables.order_number",
+                      "order-variables.shippingPhone",
+                      "order-variables.shippingAddress",
+                      "order-variables.awb_number",
+                    ) && <th className="p-3 px-5 whitespace-nowrap">Shipment Details</th>}
+
+                    {hasPermission("order-variables.trackingNumber ") && (
+                      <th className="p-3 px-5 whitespace-nowrap">Return Tracking #</th>
+                    )}
+
+                    {hasPermission("order-variables.rtoDelivered", "order-variables.delivered") && (
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">Status</th>
+                      </>
+                    )}
+                    {hasPermission("order-variables.rtoDeliveredDate", "order-variables.deliveredDate") && (
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">Date</th>
+                      </>
+                    )}
+
+                    <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
+
+                    {hasPermission("order-variables.totalAmount") && (
+                      <th className="p-3 px-5 whitespace-nowrap">Total</th>
+                    )}
+
+
+
+                    <th className="px-4 py-2 text-center text-sm whitespace-nowrap font-semibold text-gray-700">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y  bg-white">
-                  {orders.map((order) => (
-                    <tr key={order.id} className=" border-b border-[#DFEAF2]">
-                      <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">{order.orderNumber}</td>
-                      <td className="px-4 py-2 text-sm whitespace-nowrap text-yellow-600 capitalize">{order.status}</td>
-                      <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">{order.shippingName}</td>
-                      <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">₹{order.totalAmount}</td>
-                      <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800">₹{order.tax}</td>
-                      <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800 text-center">{order.payment?.transactionId}</td>
-                      <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-800 text-center">{order.payment?.status}</td>
+
+                <tbody className="divide-y bg-white">
+                  {orders.map((order, index) => (
+                    <tr key={order.id} className="border-b border-[#DFEAF2]">
+                      <td className="p-3 px-5 whitespace-nowrap">{index + 1}</td>
+                      <td className="p-3 px-5 whitespace-nowrap">
+                        <PermissionField permissionKey="order-variables.orderNumber">{order.orderNumber}</PermissionField>
+                        <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
+                      </td>
+
+                      {hasAnyPermission(
+                        "order-variables.shippingName",
+                        "order-variables.shippingPhone",
+                        "order-variables.shippingEmail"
+                      ) && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="order-variables.shippingName">{order.shippingName}</PermissionField>
+                            <br />
+                            <span className="text-sm block">
+                              <PermissionField permissionKey="order-variables.shippingPhone">{order.shippingPhone}</PermissionField>
+                            </span>
+                            <span className="text-sm text-[#01b574]">
+                              <PermissionField permissionKey="order-variables.shippingEmail">{order.shippingEmail}</PermissionField>
+                            </span>
+                          </td>
+                        )}
+
+                      {hasAnyPermission(
+                        "order-variables.payment_mode",
+                        "order-variables.transactionId",
+                        "order-variables.amount",
+                        "order-variables.status"
+                      ) && (
+                          <td className="p-3 px-5 whitespace-nowrap font-semibold">
+                            <PermissionField permissionKey="order-variables.payment_mode"> <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p></PermissionField>
+                            <PermissionField permissionKey="order-variables.transactionId">  <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p></PermissionField>
+                            <PermissionField permissionKey="order-variables.amount"><p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p></PermissionField>
+                            <PermissionField permissionKey="order-variables.status"> <p>
+
+                              <span className={`font-bold ${order.payment?.status === "failed" ? "text-red-500" :
+                                order.payment?.status === "pending" ? "text-yellow-500" : "text-green-500"
+                                }`}>
+                                {order.payment?.status || "N/A"}
+                              </span>
+                            </p>
+                            </PermissionField>
+                          </td>
+                        )}
+
+                      {hasAnyPermission(
+                        "order-variables.orderNumber",
+                        "order-variables.shippingPhone",
+                        "order-variables.shippingAddress",
+                        "order-variables.awbNumber"
+                      ) && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="order-variables.orderNumber">
+                              {order.shippingApiResult?.data?.order_number || "N/A"}
+                            </PermissionField>
+                            <br />
+                            <PermissionField permissionKey="order-variables.shippingAddress">
+                              {order.shippingAddress || "N/A"}
+                            </PermissionField>
+                            <br />
+                            <span className="text-green-500">
+                              <PermissionField permissionKey="order-variables.shippingPhone">
+                                {order.shippingPhone || "N/A"}
+                              </PermissionField>
+                            </span>
+                            <br />
+                            <PermissionField permissionKey="order-variables.awbNumber">
+                              {order.shippingApiResult?.data?.awb_number || "N/A"}
+                            </PermissionField>
+                          </td>
+                        )}
+
+
+                      {hasPermission("order-variables.trackingNumber ") && (
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          {order.items
+                            .map((item) => (
+                              <PermissionField key={item.id} permissionKey="order-variables.trackingNumber">
+                                {item.supplierRTOResponse?.trackingNumber || "N/A"}
+                              </PermissionField>
+                            ))
+                            .reduce((prev, curr) => [prev, ", ", curr])}
+                        </td>)}
+
+                      {hasPermission("order-variables.rtoDelivered", "order-variables.delivered") && (
+                        <>
+                          <td className="p-3 px-5 whitespace-nowrap capitalize">
+                            <PermissionField permissionKey="order-variables.rtoDelivered">
+                              {order.delivered ? (
+                                <span className="text-green-600">Delivered</span>
+                              ) : order.rtoDelivered ? (
+                                <span className="text-orange-500">RTO Delivered</span>
+                              ) : (
+                                <span className="text-red-500">Pending</span>
+                              )}
+
+                            </PermissionField>
+                          </td>
+
+                        </>
+                      )}
+                      {hasPermission("order-variables.rtoDeliveredDate", "order-variables.deliveredDate") && (
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="order-variables.rtoDeliveredDate">
+
+                            {order.deliveredDate ? (
+                              <span>{order.deliveredDate ? new Date(order.deliveredDate).toLocaleDateString() : "N/A"}</span>
+                            ) : order.rtoDeliveredDate ? (
+                              <span>{order.rtoDeliveredDate ? new Date(order.rtoDeliveredDate).toLocaleDateString() : "N/A"}</span>
+                            ) : (
+                              <span className="text-red-500">Pending</span>
+                            )}
+
+                          </PermissionField>
+                        </td>
+
+                      )}
+
+                      {/* Item Count */}
+                      <td className="p-3 px-5 whitespace-nowrap">{order.items.length}</td>
+
+                      {/* Total Amount */}
+                      {hasPermission("order-variables.totalAmount") && (
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="order-variables.totalAmount">₹{order.totalAmount}</PermissionField>
+                        </td>
+                      )}
+
+                      {/* Delivered */}
+
+
+                      {/* Actions */}
                       <td className="px-4 py-2 text-sm whitespace-nowrap text-center">
                         <button
                           onClick={() => handleViewVariants(order.items)}
@@ -210,6 +413,7 @@ function Reporting() {
                   ))}
                 </tbody>
               </table>
+
 
 
               {/* Modal */}

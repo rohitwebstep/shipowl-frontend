@@ -45,7 +45,7 @@ const AccountInfoEdit = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/profile`, {
+            const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/profile`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -142,7 +142,7 @@ const AccountInfoEdit = () => {
                 didOpen: () => Swal.showLoading(),
             });
 
-            const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/profile/bank-account/change-request";
+            const url = "sleeping-owl-we0m.onrender.com/api/dropshipper/profile/bank-account/change-request";
             const form = new FormData();
             // Append all formData key-value pairs
             Object.entries(formData).forEach(([key, value]) => {

@@ -32,7 +32,7 @@ export default function AddShopifyStore() {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/shopify`, {
+            const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/shopify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -124,7 +124,7 @@ export default function AddShopifyStore() {
             form.append('shop', formData.shop);
 
 
-            const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/shopify/connect";
+            const url = "sleeping-owl-we0m.onrender.com/api/dropshipper/shopify/connect";
 
             const response = await fetch(url, {
                 method: "POST",

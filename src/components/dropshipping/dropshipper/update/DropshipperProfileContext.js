@@ -31,7 +31,7 @@ const DropshipperProfileProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/location/country`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +115,7 @@ const DropshipperProfileProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/profile`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/profile`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -197,7 +197,7 @@ const DropshipperProfileProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -241,7 +241,7 @@ const DropshipperProfileProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+        `sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {

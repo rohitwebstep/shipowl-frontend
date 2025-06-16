@@ -194,9 +194,9 @@ const ProductDetails = () => {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory/${id}`;
+        url = `sleeping-owl-we0m.onrender.com/api/supplier/product/inventory/${id}`;
       } else {
-        url = `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${id}`;
+        url = `sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
@@ -270,7 +270,7 @@ const ProductDetails = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory?category=${catid}&type=${tab}`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/supplier/product/inventory?category=${catid}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -349,7 +349,7 @@ const ProductDetails = () => {
 
 
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory";
+      const url = "sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",

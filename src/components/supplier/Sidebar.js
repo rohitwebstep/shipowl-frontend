@@ -33,15 +33,7 @@ export default function Sidebar() {
   const menuItems = [
     { name: "Dashboard", icon: Home, href: "/supplier" },
     { name: "Inventory", icon: ShoppingCart, href: "/supplier/inventory" },
-    {
-      name: "Products",
-      icon: Package,
-      href: "#",
-      subMenu: [
-        { name: "Listed", href: "/supplier/product/my" },
-        { name: "Not Listed", href: "/supplier/product/not-my" },
-      ],
-    },
+    { name: "Products", icon: Package, href: "/supplier/product/my" },
     { name: "New Product Request", icon: Package, href: "/supplier/product/request" },
     { name: "Orders", icon: ClipboardList, href: "/supplier/orders" },
     // { name: "Reporting", icon: FileBarChart2, href: "/supplier/reporting" },

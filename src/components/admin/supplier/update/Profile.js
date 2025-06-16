@@ -34,7 +34,7 @@ export default function Profile() {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${id}`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/admin/supplier/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -138,7 +138,7 @@ export default function Profile() {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState || id}/cities`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState || id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -182,7 +182,7 @@ export default function Profile() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/location/country/${formData?.permanentCountry || id}/states`,
+        `sleeping-owl-we0m.onrender.com/api/location/country/${formData?.permanentCountry || id}/states`,
         {
           method: "GET",
           headers: {

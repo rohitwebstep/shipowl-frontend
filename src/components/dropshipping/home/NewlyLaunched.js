@@ -64,7 +64,7 @@ const NewlyLaunched = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=${type}`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=${type}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +114,7 @@ const NewlyLaunched = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/trashed`, {
+      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/trashed`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -245,7 +245,7 @@ const NewlyLaunched = () => {
   );
 };
 
-const Section = ({ title, form, showResult, setForm, errors,setShowResult, setErrors, products, shopifyStores, calculateData, openCalculator, setOpenCalculator, setcalculateData, shipCost, setShipCost, setActiveTab, fetchProduct, activeTab }) => {
+const Section = ({ title, form, showResult, setForm, errors, setShowResult, setErrors, products, shopifyStores, calculateData, openCalculator, setOpenCalculator, setcalculateData, shipCost, setShipCost, setActiveTab, fetchProduct, activeTab }) => {
 
 
   const [openSection, setOpenSection] = useState(null);
@@ -404,12 +404,14 @@ const Section = ({ title, form, showResult, setForm, errors,setShowResult, setEr
 
 
       const form = new FormData();
-      const simplifiedVariants = inventoryData.variant.map((v) => ({
-        variantId: v.id || v.variantId,
-        stock: v.dropStock,
-        price: v.dropPrice,
-        status: v.Dropstatus
-      }));
+      const simplifiedVariants = inventoryData.variant
+        .filter(v => v.status === true) // Only include variants with status true
+        .map((v) => ({
+          variantId: v.id || v.variantId,
+          stock: v.dropStock,
+          price: v.dropPrice,
+          status: v.Dropstatus
+        }));
 
       form.append('supplierProductId', inventoryData.supplierProductId);
       form.append('shopifyApp', inventoryData.shopifyApp);
@@ -417,7 +419,7 @@ const Section = ({ title, form, showResult, setForm, errors,setShowResult, setEr
 
 
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = "sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -548,7 +550,7 @@ const Section = ({ title, form, showResult, setForm, errors,setShowResult, setEr
                       )}
                   </p>
                 </div>
-                <p className="text-[12px] text-[#ADADAD] font-lato font-semibold">
+                <p className="text-[12px] text-[#ADADAD] capitalize font-lato font-semibold">
                   {productName}
                 </p>
 
@@ -747,8 +749,6 @@ const Section = ({ title, form, showResult, setForm, errors,setShowResult, setEr
                   </div>
 
 
-
-
                   <div className="flex justify-end space-x-3 mt-6">
                     <button
                       onClick={() => setShowPopup(false)}
@@ -931,8 +931,7 @@ const Section = ({ title, form, showResult, setForm, errors,setShowResult, setEr
         </div>
       )}
 
-      {
-        calculateData && openCalculator && (
+      {calculateData && openCalculator && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white w-full max-w-4xl rounded shadow-lg p-6 max-h-[90vh] overflow-y-auto">
               {/* Header */}
@@ -1171,10 +1170,9 @@ const Section = ({ title, form, showResult, setForm, errors,setShowResult, setEr
               </p>
             </div>
           </div>
-        )
-      }
-      {
-        showVariantPopup && selectedProduct && (
+      )}
+
+      { showVariantPopup && selectedProduct && (
           <div className="fixed  px-6 md:px-0  inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
             <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-4xl shadow-xl relative">
               {/* Header */}
@@ -1247,8 +1245,7 @@ const Section = ({ title, form, showResult, setForm, errors,setShowResult, setEr
 
             </div>
           </div>
-        )
-      }
+      )}
 
     </>
   );

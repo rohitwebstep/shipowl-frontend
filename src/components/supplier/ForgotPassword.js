@@ -19,7 +19,7 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch('https://sleeping-owl-we0m.onrender.com/api/supplier/auth/password/forget', {
+      const res = await fetch('sleeping-owl-we0m.onrender.com/api/supplier/auth/password/forget', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

@@ -45,7 +45,7 @@ export default function My() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory?type=my`,
+                `sleeping-owl-we0m.onrender.com/api/supplier/product/inventory?type=my`,
                 {
                     method: "GET",
                     headers: {
@@ -119,7 +119,7 @@ export default function My() {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/trashed`, {
+            const response = await fetch(`sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/trashed`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -189,7 +189,7 @@ export default function My() {
             form.append('variants', JSON.stringify(simplifiedVariants));
 
 
-            const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${inventoryData.id}`;
+            const url = `sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${inventoryData.id}`;
 
             const response = await fetch(url, {
                 method: 'PUT',
@@ -292,7 +292,7 @@ export default function My() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${item.id}`,
+                `sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -374,7 +374,7 @@ export default function My() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${item.id}/destroy`,
+                `sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {
@@ -436,7 +436,7 @@ export default function My() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${item?.id}/restore`,
+                `sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -495,7 +495,7 @@ export default function My() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${item.id}`,
+                `sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${item.id}`,
                 {
                     method: "GET",
                     headers: {
@@ -654,13 +654,13 @@ export default function My() {
                                                                 </button>
 
                                                                 {/* HTML Description Content */}
-                                                                {product.description ? (
+                                                                {product?.description ? (
                                                                     <div
                                                                         className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
                                                                         dangerouslySetInnerHTML={{ __html: product.description }}
                                                                     />
                                                                 ) : (
-                                                                    <p className="text-gray-500">NIL</p>
+                                                                    <p className="text-gray-500">{product.description}</p>
                                                                 )}
                                                             </div>
                                                         </div>

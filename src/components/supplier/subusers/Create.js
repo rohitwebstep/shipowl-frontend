@@ -19,7 +19,6 @@ export default function Create() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    type: "main",
     status: "active",
     password: "",
     profilePicture: null,
@@ -123,7 +122,7 @@ export default function Create() {
 
 
     try {
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/staff`, {
+      const res = await fetch(`sleeping-owl-we0m.onrender.com/api/supplier/staff`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -139,7 +138,6 @@ export default function Create() {
       setFormData({
         name: "",
         email: "",
-        type: "",
         password: "",
         profilePicture: null,
         phoneNumber: "",
@@ -186,7 +184,7 @@ export default function Create() {
   }, [router]);
   const fetchPermission = useCallback(() => {
     fetchProtected(
-      "https://sleeping-owl-we0m.onrender.com/api/supplier/staff/meta",
+      "sleeping-owl-we0m.onrender.com/api/supplier/staff/meta",
       setPermission,
       "staffPermissions",
       setLoading
@@ -195,7 +193,7 @@ export default function Create() {
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "https://sleeping-owl-we0m.onrender.com/api/location/country",
+      "sleeping-owl-we0m.onrender.com/api/location/country",
       setCountryData,
       "countries",
       setLoadingCountries
@@ -204,7 +202,7 @@ export default function Create() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+      `sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -213,7 +211,7 @@ export default function Create() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+      `sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities
@@ -303,19 +301,6 @@ export default function Create() {
         </div>
       </div>
 
-
-      <div className="mt-2">
-        <label className="block text-[#232323] font-bold mb-1">Type</label>
-        <select
-          name="type"
-          onChange={handleChange}
-          value={formData.type || ''}
-          className={`w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]
-            }`}        >
-          <option value='main'>Main</option>
-          <option value='sub'>Sub</option>
-        </select>
-      </div>
       <div className="grid grid-cols-3 gap-4 mt-3">
         {["permanentCountry", "permanentState", "permanentCity"].map((field) => (
           <div key={field} className="relative">
@@ -384,7 +369,7 @@ export default function Create() {
                   </div>
 
                   {/* Permission Checkboxes */}
-                  <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-3 gap-2">
+                 <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
                     {perms.map((perm) => (
                       <label key={perm.id} className="flex items-center space-x-2">
                          <input

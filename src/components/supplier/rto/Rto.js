@@ -8,9 +8,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from 'sweetalert2';
 const tabs = [
-  { key: "collected", label: "Collected at Warehouse" },
-  { key: "rto_count", label: "RTO Count" },
-  { key: "need_to_raise", label: "Need to Raise" },
+  { key: "warehouse-collected", label: "Collected at Warehouse" },
+  { key: "rto", label: "RTO Count" },
+  { key: "need-to-raise", label: "Need to Raise" },
   { key: "dispute", label: "Dispute" },
 ];
 
@@ -27,7 +27,7 @@ import barcode from '@/app/assets/barcode.png'
 import Image from 'next/image';
 import { HashLoader } from 'react-spinners';
 export default function RTO() {
-  const [activeTab, setActiveTab] = useState('collected');
+  const [activeTab, setActiveTab] = useState('warehouse-collected');
 
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -55,12 +55,15 @@ export default function RTO() {
   const [packingGallery, setPackingGallery] = useState([]);
   const [unboxingGallery, setUnboxingGallery] = useState([]);
   const [permission, setPermission] = useState([]);
+  const [assignedPermissions, setAssignedPermissions] = useState([]);
   const modalRef = useRef();
   const [files, setFiles] = useState([]);
+
   const openModal = () => {
     setIsModalOpen(true);
     modalRef.current.showModal();
   };
+
   useScannerDetection({
     onComplete: (code) => {
       const scanned = String(code);
@@ -96,10 +99,71 @@ export default function RTO() {
     d.setDate(d.getDate() - 6);
     return d;
   });
-
   const [toDate, setToDate] = useState(new Date());
 
   const formatDate = (date) => date.toISOString().split("T")[0];
+  console.log('formatDate', formatDate(fromDate), formatDate(toDate))
+
+
+  const sendBarCodeOrder = async () => {
+    const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+
+    if (!supplierData || supplierData?.project?.active_panel !== "supplier") {
+      localStorage.removeItem("shippingData");
+      router.push("/supplier/auth/login");
+      return;
+    }
+    const form = new FormData();
+    form.append('orderNumber', scannedCode);
+
+    const suppliertoken = supplierData?.security?.token;
+    if (!suppliertoken) {
+      router.push("/supplier/auth/login");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        `sleeping-owl-we0m.onrender.com/api/supplier/order/warehouse-collected`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+          body: form,
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong!",
+          customClass: {
+            container: 'custom-swal-zindex',
+          },
+          text:
+            result.error ||
+            result.message ||
+            "Your session has expired. Please log in again.",
+        });
+        throw new Error(result.message || result.error);
+      }
+
+      if (result) {
+        // Refresh the page
+        window.location.reload();
+      }
+
+    } catch (error) {
+      console.error("Error fetching order:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const fetchRto = useCallback(async () => {
@@ -120,7 +184,7 @@ export default function RTO() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/supplier/order?from=${formatDate(
+        `sleeping-owl-we0m.onrender.com/api/supplier/order/${activeTab}?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {
@@ -153,12 +217,15 @@ export default function RTO() {
       const result = await response.json();
       setOrders(result?.orders || []);
       setPermission(result?.permissions[0] || []);
+      if (result?.staffPermissionApplied == true) {
+        setAssignedPermissions(result?.assignedPermissions || []);
+      }
     } catch (error) {
       console.error("Error fetching report:", error);
     } finally {
       setLoading(false);
     }
-  }, [router, fromDate, toDate]);
+  }, [router, fromDate, toDate, activeTab]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && orders.length > 0 && !loading) {
@@ -258,7 +325,7 @@ export default function RTO() {
         });
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/order/${order.id}/rto/${id}/response?status=${status}`;
+      const url = `sleeping-owl-we0m.onrender.com/api/supplier/order/${order.id}/rto/${id}/response?status=${status}`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -339,15 +406,42 @@ export default function RTO() {
 
   useEffect(() => {
     fetchRto()
-  }, [fetchRto])
+  }, [fetchRto]);
+  let finalAllowedKeys = [];
+
+  if (assignedPermissions && assignedPermissions.length > 0) {
+    finalAllowedKeys = assignedPermissions
+      .map(p => p.permission?.action)
+      .filter(action => permission[action] === true);
+  } else {
+    finalAllowedKeys = Object.keys(permission).filter(key => permission[key] === true);
+  }
+
+  const hasAnyPermission = (...keys) => keys.some((key) => finalAllowedKeys.includes(key));
+
+
+
   const PermissionField = ({ permissionKey, children }) => {
-    const isAllowed = permission[permissionKey];
+    const isAllowed = finalAllowedKeys.includes(permissionKey);
+
     return (
-      <span style={isAllowed ? {} : { filter: "blur(3px)", opacity: 0.5, userSelect: "none" }}>
-        {children || "N/A"}
+      <span
+        style={
+          isAllowed
+            ? {}
+            : {
+              filter: "blur(3px)",
+              opacity: 0.5,
+              userSelect: "none",
+              pointerEvents: "none",
+            }
+        }
+      >
+        {isAllowed ? children : ' '}
       </span>
     );
   };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -373,253 +467,321 @@ export default function RTO() {
           </button>
         ))}
       </div>
-      {activeTab == "collected" && (
-        <>
-          <div className='bg-white rounded-md p-3 mb-4'>
-            <div className="grid justify-between grid-cols-2 items-center">
-              <div className="">
-                <div className="flex  items-end gap-4 mb-6">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 block mb-1">From Date</label>
-                    <DatePicker
-                      selected={fromDate}
-                      onChange={(date) => setFromDate(date)}
-                      maxDate={new Date()}
-                      dateFormat="yyyy-MM-dd"
-                      className="border border-gray-200 rounded px-3 py-2 w-full"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 block mb-1">To Date</label>
-                    <DatePicker
-                      selected={toDate}
-                      onChange={(date) => setToDate(date)}
-                      maxDate={new Date()}
-                      minDate={fromDate}
-                      dateFormat="yyyy-MM-dd"
-                      className="border border-gray-200 rounded px-3 py-2 w-full"
-                    />
-                  </div>
 
+      <>
+        <div className='bg-white rounded-md p-3 mb-4'>
+          <div className="grid justify-between grid-cols-2 items-center">
+            <div className="">
+              <div className="flex  items-end gap-4 mb-6">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 block mb-1">From Date</label>
+                  <DatePicker
+                    selected={fromDate}
+                    onChange={(date) => setFromDate(date)}
+                    maxDate={new Date()}
+                    dateFormat="yyyy-MM-dd"
+                    className="border border-gray-200 rounded px-3 py-2 w-full"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 block mb-1">To Date</label>
+                  <DatePicker
+                    selected={toDate}
+                    onChange={(date) => setToDate(date)}
+                    maxDate={new Date()}
+                    minDate={fromDate}
+                    dateFormat="yyyy-MM-dd"
+                    className="border border-gray-200 rounded px-3 py-2 w-full"
+                  />
                 </div>
 
-
               </div>
+
+
+            </div>
+            {activeTab === "warehouse-collected" && (
               <div className='flex justify-end' onClick={() => openBarCodeModal()}>
                 <Image src={barcode} height={70} width={70} alt="Barcode Image" />
               </div>
 
+            )}
+
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl">
+          <div className="flex flex-wrap justify-between items-center mb-4 lg:px-3">
+            <h2 className="text-2xl font-bold  font-dm-sans">RTO Order Details</h2>
+            <div className="flex gap-3  flex-wrap items-center">
+              <span onClick={() => fetchRto()} className="font-bold   font-dm-sans">Clear Filters</span>
+              <span><IoMdRefresh className="text-red-600 text-xl" /></span>
+              <span><IoSettingsOutline className="text-xl" /></span>
+              <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
+
+              <button className="bg-[#F4F7FE] rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
+
+
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="outline-0 font-dm-sans"
+                />
+              </button>
+              <button
+                onClick={() => setIsPopupOpen((prev) => !prev)}
+                className="bg-[#F4F7FE] p-2 rounded-lg relative"
+              >
+                <MoreHorizontal className="text-[#F98F5C]" />
+                {isPopupOpen && (
+                  <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
+                    <ul className="py-2 text-sm text-[#2B3674]">
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                    </ul>
+                  </div>
+                )}
+              </button>
             </div>
           </div>
+          {orders.length > 0 ? (
+            <div className="overflow-x-auto relative main-outer-wrapper w-full">
+              <table className="min-w-full">
+                <thead className="uppercase text-gray-700">
+                  <tr className="border-b border-[#DFEAF2] text-left">
+                    <th className="p-3 px-5 whitespace-nowrap">SR.</th>
+                    <th className="p-3 px-5 whitespace-nowrap">+ n more products</th>
+                    <th className="p-3 px-5 whitespace-nowrap">Order#</th>
 
-          <div className="bg-white p-4 rounded-2xl">
-            <div className="flex flex-wrap justify-between items-center mb-4 lg:px-3">
-              <h2 className="text-2xl font-bold  font-dm-sans">RTO Order Details</h2>
-              <div className="flex gap-3  flex-wrap items-center">
-                <span onClick={() => fetchRto()} className="font-bold   font-dm-sans">Clear Filters</span>
-                <span><IoMdRefresh className="text-red-600 text-xl" /></span>
-                <span><IoSettingsOutline className="text-xl" /></span>
-                <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
+                    {hasAnyPermission(
+                      "shippingName",
+                      "shippingPhone",
+                      "shippingEmail"
+                    ) && <th className="p-3 px-5 whitespace-nowrap">Customer Information</th>}
 
-                <button className="bg-[#F4F7FE] rela px-4 py-2 text-sm rounded-lg flex items-center text-[#A3AED0]">
+                    {hasAnyPermission(
+                      "payment_mode",
+                      "transactionId",
+                      "amount",
+                      "status"
+                    ) && (
+                        <th className="p-3 px-5 whitespace-nowrap">Payment</th>
+                      )}
+                    {hasAnyPermission(
+                      "order_number",
+                      "shippingPhone",
+                      "shippingAddress",
+                      "awb_number",
+                    ) && <th className="p-3 px-5 whitespace-nowrap">Shipment Details</th>}
 
-
-                  <input
-                    type="month"
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)}
-                    className="outline-0 font-dm-sans"
-                  />
-                </button>
-                <button
-                  onClick={() => setIsPopupOpen((prev) => !prev)}
-                  className="bg-[#F4F7FE] p-2 rounded-lg relative"
-                >
-                  <MoreHorizontal className="text-[#F98F5C]" />
-                  {isPopupOpen && (
-                    <div className="absolute left-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
-                      <ul className="py-2 text-sm text-[#2B3674]">
-                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Export CSV</li>
-                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Bulk Delete</li>
-                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                      </ul>
-                    </div>
-                  )}
-                </button>
-              </div>
-            </div>
-            {orders.length > 0 ? (
-              <div className="overflow-x-auto relative main-outer-wrapper w-full">
-                <table className="md:w-full w-auto display main-tables" id="rtoOrderTable">
-                  <thead>
-                    <tr className="text-[#A3AED0] uppercase text-left  border-b border-[#E9EDF7]">
-                      <th className="p-3 px-5 whitespace-nowrap">SR.</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Order #</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Customer</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Payment</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Shipment Details</th>
+                    {hasAnyPermission("trackingNumber ") && (
                       <th className="p-3 px-5 whitespace-nowrap">Return Tracking #</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Return Status</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Return Date</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
+                    )}
+
+                    {hasAnyPermission("rtoDelivered", "delivered") && (
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">Status</th>
+                      </>
+                    )}
+                    {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">Date</th>
+                      </>
+                    )}
+
+                    <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
+
+                    {hasAnyPermission("totalAmount") && (
                       <th className="p-3 px-5 whitespace-nowrap">Total</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Delivered</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Date</th>
-                      <th className="p-3 px-5 whitespace-nowrap">Items</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orders.map((order, index) => (
+                    )}
 
-                      <tr key={order.id} className="border-b capitalize align-top text-[#304174] font-semibold border-[#E9EDF7]">
-                        {/* Index */}
+
+
+                    <th className="px-4 py-2 text-center text-sm whitespace-nowrap font-semibold text-gray-700">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y bg-white">
+                  {orders.map((order, index) => {
+                    const variant = order.items?.[0]?.dropshipperVariant?.supplierProductVariant?.variant;
+                    const variantImages =
+                      (variant?.image || '')
+                        .split(',')
+                        .filter((img) => img.trim() !== '');
+
+                    return (
+                      <tr key={order.id} className="border-b border-[#DFEAF2]">
                         <td className="p-3 px-5 whitespace-nowrap">{index + 1}</td>
-
-                        {/* Order Number + Created Date */}
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <div className='flex items-center gap-3'>
+                            <div className="flex gap-2 flex-wrap">
+                              {variantImages.map((imgUrl, imgIdx) => (
+                                <img
+                                  key={imgIdx}
+                                  src={"https://placehold.co/400" || imgUrl.trim()}
+                                  alt={`Variant ${imgIdx}`}
+                                  className="h-12 w-12 object-cover rounded-full border border-[#DFEAF2]"
+                                />
+                              ))}
+                            </div>
+                            <div onClick={() => handleViewVariant(order, order.items)} className="mt-2 cursor-pointer text-sm text-gray-600">
+                              +{order.items.length} more products
+                            </div>
+                          </div>
+                        </td>
                         <td className="p-3 px-5 whitespace-nowrap">
                           <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
                           <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}</span>
                         </td>
 
-                        {/* Shipping Name, Phone, Email */}
-                        <td className="p-3 px-5 whitespace-nowrap">
-                          <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
-                          <br />
-                          <span className="text-sm block">
-                            <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
-                          </span>
-                          <span className="text-sm text-[#01b574]">
-                            <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
-                          </span>
-                        </td>
-
-                        {/* Payment Info */}
-                        <td className="p-3 px-5 whitespace-nowrap font-semibold">
-                          <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
-                          <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p>
-                          <p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p>
-                          <p>
-                            Status:{" "}
-                            <span
-                              className={`font-bold ${order.payment?.status === "failed"
-                                ? "text-red-500"
-                                : order.payment?.status === "pending"
-                                  ? "text-yellow-500"
-                                  : "text-green-500"
-                                }`}
-                            >
-                              <PermissionField permissionKey="status">{order.payment?.status || "N/A"}</PermissionField>
+                        {hasAnyPermission("shippingName", "shippingPhone", "shippingEmail") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
+                            <br />
+                            <span className="text-sm block">
+                              <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
                             </span>
-                          </p>
-                        </td>
+                            <span className="text-sm text-[#01b574]">
+                              <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
+                            </span>
+                          </td>
+                        )}
 
-                        {/* Shipping details + AWB */}
-                        <td className="p-3 px-5 whitespace-nowrap">
-                          <PermissionField permissionKey="orderNumber">{order.shippingApiResult?.data?.order_number}</PermissionField>
-                          <br />
-                          <PermissionField permissionKey="shippingAddress">{order.shippingAddress}</PermissionField>
-                          <br />
-                          <span className="text-green-500">
-                            <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
-                          </span>
-                          <br />
-                          AWB: <PermissionField permissionKey="awbNumber">{order.shippingApiResult?.data?.awb_number}</PermissionField>
-                        </td>
+                        {hasAnyPermission("payment_mode", "transactionId", "amount", "status") && (
+                          <td className="p-3 px-5 whitespace-nowrap font-semibold">
+                            <PermissionField permissionKey="payment_mode">
+                              <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "N/A"}</span></p>
+                            </PermissionField>
+                            <PermissionField permissionKey="transactionId">
+                              <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "N/A"}</span></p>
+                            </PermissionField>
+                            <PermissionField permissionKey="amount">
+                              <p>Amount: <span className="font-bold">{order.payment?.amount || "N/A"}</span></p>
+                            </PermissionField>
+                            <PermissionField permissionKey="status">
+                              <p>
+                                <span className={`font-bold ${order.payment?.status === "failed"
+                                  ? "text-red-500"
+                                  : order.payment?.status === "pending"
+                                    ? "text-yellow-500"
+                                    : "text-green-500"
+                                  }`}>
+                                  {order.payment?.status || "N/A"}
+                                </span>
+                              </p>
+                            </PermissionField>
+                          </td>
+                        )}
 
-                        {/* Tracking Numbers */}
-                        <td className="p-3 px-5 whitespace-nowrap">
-                          {order.items
-                            .map((item) => (
-                              <PermissionField key={item.id} permissionKey="awbNumber">
-                                {item.supplierRTOResponse?.trackingNumber || "N/A"}
+                        {hasAnyPermission("orderNumber", "shippingPhone", "shippingAddress", "awbNumber") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="orderNumber">
+                              {order.shippingApiResult?.data?.order_number || "N/A"}
+                            </PermissionField>
+                            <br />
+                            <PermissionField permissionKey="shippingAddress">
+                              {order.shippingAddress || "N/A"}
+                            </PermissionField>
+                            <br />
+                            <span className="text-green-500">
+                              <PermissionField permissionKey="shippingPhone">
+                                {order.shippingPhone || "N/A"}
                               </PermissionField>
-                            ))
-                            .reduce((prev, curr) => [prev, ", ", curr])}
-                        </td>
+                            </span>
+                            <br />
+                            <PermissionField permissionKey="awbNumber">
+                              {order.shippingApiResult?.data?.awb_number || "N/A"}
+                            </PermissionField>
+                          </td>
+                        )}
 
-                        {/* RTO Delivered */}
-                        <td className="p-3 px-5 whitespace-nowrap">
-                          <PermissionField permissionKey="status">
-                            {order.rtoDelivered ? (
-                              <span className="text-green-600">Delivered</span>
-                            ) : (
-                              <span className="text-red-500">Pending</span>
-                            )}
-                          </PermissionField>
-                        </td>
+                        {hasAnyPermission("trackingNumber") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            {order.items
+                              .map((item) => (
+                                <PermissionField key={item.id} permissionKey="trackingNumber">
+                                  {item.supplierRTOResponse?.trackingNumber || "N/A"}
+                                </PermissionField>
+                              ))
+                              .reduce((prev, curr) => [prev, ", ", curr])}
+                          </td>
+                        )}
 
-                        {/* RTO Delivered Date */}
-                        <td className="p-3 px-5 whitespace-nowrap">
-                          <PermissionField permissionKey="status">
-                            {order.rtoDeliveredDate ? new Date(order.rtoDeliveredDate).toLocaleDateString() : "N/A"}
-                          </PermissionField>
-                        </td>
+                        {hasAnyPermission("rtoDelivered", "delivered") && (
+                          <td className="p-3 px-5 whitespace-nowrap capitalize">
+                            <PermissionField permissionKey="rtoDelivered">
+                              {order.delivered ? (
+                                <span className="text-green-600">Delivered</span>
+                              ) : order.rtoDelivered ? (
+                                <span className="text-orange-500">RTO Delivered</span>
+                              ) : (
+                                <span className="text-red-500">Pending</span>
+                              )}
+                            </PermissionField>
+                          </td>
+                        )}
 
-                        {/* Number of Items */}
+                        {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="rtoDeliveredDate">
+                              {order.deliveredDate ? (
+                                <span>{new Date(order.deliveredDate).toLocaleDateString()}</span>
+                              ) : order.rtoDeliveredDate ? (
+                                <span>{new Date(order.rtoDeliveredDate).toLocaleDateString()}</span>
+                              ) : (
+                                <span className="text-red-500">Pending</span>
+                              )}
+                            </PermissionField>
+                          </td>
+                        )}
+
+                        {/* Item Count */}
                         <td className="p-3 px-5 whitespace-nowrap">{order.items.length}</td>
 
                         {/* Total Amount */}
-                        <td className="p-3 px-5 whitespace-nowrap">
-                          <PermissionField permissionKey="totalAmount">₹{order.totalAmount}</PermissionField>
-                        </td>
+                        {hasAnyPermission("totalAmount") && (
+                          <td className="p-3 px-5 whitespace-nowrap">
+                            <PermissionField permissionKey="totalAmount">₹{order.totalAmount}</PermissionField>
+                          </td>
+                        )}
 
-                        {/* Delivered */}
-                        <td className="p-3 px-5 whitespace-nowrap">
-                          <PermissionField permissionKey="status">
-                            {order.delivered ? (
-                              <span className="text-green-600 font-medium">Yes</span>
-                            ) : (
-                              <span className="text-red-500 font-medium">No</span>
-                            )}
-                          </PermissionField>
-                        </td>
-
-                        {/* Created At Date */}
-                        <td className="p-3 px-5 whitespace-nowrap">
-                          <PermissionField permissionKey="orderNote">
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </PermissionField>
-                        </td>
-
-                        {/* Action Button */}
-                        <td className="p-3 px-5 whitespace-nowrap">
+                        {/* Actions */}
+                        <td className="px-4 py-2 text-sm whitespace-nowrap text-center">
                           <button
                             onClick={() => handleViewVariant(order, order.items)}
-                            className="bg-orange-500 rounded-md p-3 text-white text-sm"
+                            className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600"
                           >
-                            View Variant
+                            View Variants
                           </button>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
+                    );
+                  })}
 
-                </table>
-
-
-
-
-              </div>
-            ) : (
-              <p className='text-center'>No RTO Orders Available</p>
-            )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className='text-center'>No RTO Orders Available</p>
+          )}
 
 
-          </div>
-        </>
-      )}
-      {activeTab == "rto_count" && (
+        </div>
+      </>
+
+      {/* {activeTab == "rto" && (
         <p> Live RTO Count</p>
       )
       }
-      {activeTab == "need_to_raise" && (
+      {activeTab == "need-to-raise" && (
         <p>Need To Raise</p>
       )
       }
       {activeTab == "dispute" && (
         <p>Dispute Orders</p>
       )
-      }
+      } */}
 
       {showModal && selectedVariant && (
 

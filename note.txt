@@ -1,4 +1,4 @@
 postman pass:Lu6Y%CBfArhxd?+
-render url:https://sleeping-owl-we0m.onrender.com/
-localhost url: https://sleeping-owl-we0m.onrender.com/
+render url:sleeping-owl-we0m.onrender.com/
+localhost url: sleeping-owl-we0m.onrender.com/
 shopify url :webproductstore.myshopify.com

@@ -86,7 +86,7 @@ export default function Create() {
         formdata.append("country", formData.countryId);
         formdata.append("state", formData.stateId);
   
-        const url = "https://sleeping-owl-we0m.onrender.com/api/location/city";
+        const url = "sleeping-owl-we0m.onrender.com/api/location/city";
   
         const response = await fetch(url, {
           method: "POST",
@@ -155,7 +155,7 @@ export default function Create() {
     try {
         setLoading(true);
         const response = await fetch(
-            `https://sleeping-owl-we0m.onrender.com/api/location/country`,
+            `sleeping-owl-we0m.onrender.com/api/location/country`,
             {
                 method: "GET",
                 headers: {
@@ -211,7 +211,7 @@ const fetchStateList = useCallback(async (id) => {
   try {
       setLoading(true);
       const response = await fetch(
-          `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+          `sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
           {
               method: "GET",
               headers: {

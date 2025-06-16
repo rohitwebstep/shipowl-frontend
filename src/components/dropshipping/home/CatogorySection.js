@@ -39,7 +39,7 @@ const CategorySection = () => {
 
     try {
       setLoading(true);
-      const response = await fetch('https://sleeping-owl-we0m.onrender.com/api/dropshipper/category', {
+      const response = await fetch('sleeping-owl-we0m.onrender.com/api/dropshipper/category', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

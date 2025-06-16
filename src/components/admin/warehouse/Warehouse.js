@@ -44,7 +44,7 @@ export default function Warehouse() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/warehouse`,
+        `sleeping-owl-we0m.onrender.com/api/warehouse`,
         {
           method: "GET",
           headers: {
@@ -98,7 +98,7 @@ export default function Warehouse() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/warehouse/trashed`,
+        `sleeping-owl-we0m.onrender.com/api/warehouse/trashed`,
         {
           method: "GET",
           headers: {
@@ -224,7 +224,7 @@ export default function Warehouse() {
       setLoading(true);
 
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/warehouse/${item.id}`,
+        `sleeping-owl-we0m.onrender.com/api/warehouse/${item.id}`,
         {
           method: "DELETE",
           headers: {
@@ -295,7 +295,7 @@ export default function Warehouse() {
 
       const results = await Promise.all(
         selected.map(id =>
-          fetch(`https://sleeping-owl-we0m.onrender.com/api/warehouse/${id}`, {
+          fetch(`sleeping-owl-we0m.onrender.com/api/warehouse/${id}`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -340,7 +340,7 @@ export default function Warehouse() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/warehouse/${item?.id}/restore`,
+        `sleeping-owl-we0m.onrender.com/api/warehouse/${item?.id}/restore`,
         {
           method: "PATCH",
           headers: {
@@ -420,7 +420,7 @@ export default function Warehouse() {
       setLoading(true);
 
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/warehouse/${item.id}/destroy`,
+        `sleeping-owl-we0m.onrender.com/api/warehouse/${item.id}/destroy`,
         {
           method: "DELETE",
           headers: {

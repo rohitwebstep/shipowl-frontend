@@ -28,7 +28,7 @@ function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/bank-account/change-request`,
+                `sleeping-owl-we0m.onrender.com/api/admin/supplier/bank-account/change-request`,
                 {
                     method: "GET",
                     headers: {
@@ -72,7 +72,7 @@ function List() {
 
         try {
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/bank-account/change-request/${requestId}/review`,
+                `sleeping-owl-we0m.onrender.com/api/admin/supplier/bank-account/change-request/${requestId}/review`,
                 {
                     method: "POST",
                     headers: {

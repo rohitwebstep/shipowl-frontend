@@ -38,7 +38,7 @@ export default function Allroducts() {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type='my'`, {
+            const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type='my'`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
