@@ -143,7 +143,7 @@ const NewlyLaunched = () => {
     }
   }, [router, setProducts]);
 
-  const viewProduct = (id, type) => {
+  const viewProduct = (id) => {
     if (type == "notmy") {
       router.push(`/dropshipping/product/?id=${id}&type=${type}`);
     } else {
@@ -221,6 +221,7 @@ const NewlyLaunched = () => {
                 activeTab={activeTab}
                 setShipCost={setShipCost}
                 form={form}
+                type={type}
                 setErrors={setErrors}
                 showResult={showResult}
                 setShowResult={setShowResult}
@@ -245,7 +246,7 @@ const NewlyLaunched = () => {
   );
 };
 
-const Section = ({ title, form, showResult, setForm, errors, setShowResult, setErrors, products, shopifyStores, calculateData, openCalculator, setOpenCalculator, setcalculateData, shipCost, setShipCost, setActiveTab, fetchProduct, activeTab }) => {
+const Section = ({ title, form, showResult, setForm,type, errors, setShowResult, setErrors, products, shopifyStores, calculateData, openCalculator, setOpenCalculator, setcalculateData, shipCost, setShipCost, setActiveTab, fetchProduct, activeTab }) => {
 
 
   const [openSection, setOpenSection] = useState(null);
@@ -331,7 +332,7 @@ const Section = ({ title, form, showResult, setForm, errors, setShowResult, setE
   const [loading, setLoading] = useState(false);
   const [showVariantPopup, setShowVariantPopup] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const viewProduct = (id, type) => {
+  const viewProduct = (id) => {
     if (type == "notmy") {
       router.push(`/dropshipping/product/?id=${id}&type=${type}`);
     } else {
