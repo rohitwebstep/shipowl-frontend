@@ -74,7 +74,7 @@ export default function Create() {
       formdata.append("amount", formData.amount);
       formdata.append("status", formData.status);
 
-      const res = await fetch("sleeping-owl-we0m.onrender.com/api/payment", {
+      const res = await fetch("https://sleeping-owl-we0m.onrender.com/api/payment", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formdata,

@@ -45,7 +45,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `sleeping-owl-we0m.onrender.com/api/location/state`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
                 {
                     method: "GET",
                     headers: {
@@ -100,7 +100,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `sleeping-owl-we0m.onrender.com/api/location/state/trashed`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/state/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -227,7 +227,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `sleeping-owl-we0m.onrender.com/api/location/state/${item.id}`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/state/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -298,7 +298,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`sleeping-owl-we0m.onrender.com/api/location/state/${id}`, {
+                    fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -343,7 +343,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `sleeping-owl-we0m.onrender.com/api/location/state/${item?.id}/restore`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/state/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -422,7 +422,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `sleeping-owl-we0m.onrender.com/api/location/state/${item.id}/destroy`,
+                `https://sleeping-owl-we0m.onrender.com/api/location/state/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

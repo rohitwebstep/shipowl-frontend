@@ -48,7 +48,7 @@ const AddProduct = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/admin/product/${id}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/product/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

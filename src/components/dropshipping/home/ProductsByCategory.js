@@ -101,7 +101,7 @@ function ProductsByCategory() {
 
 
 
-      const url = "sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -179,7 +179,7 @@ function ProductsByCategory() {
 
     try {
       setLoading(true);
-      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${id}&type=${tab}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?category=${id}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

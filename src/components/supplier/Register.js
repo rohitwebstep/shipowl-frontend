@@ -145,7 +145,7 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch(`sleeping-owl-we0m.onrender.com/api/supplier/auth/registration`, {
+      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/registration`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -218,7 +218,7 @@ export default function Register() {
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "sleeping-owl-we0m.onrender.com/api/location/country",
+      "https://sleeping-owl-we0m.onrender.com/api/location/country",
       setCountryData,
       "countries",             // ✅ make sure backend response uses this key
       setLoadingCountries
@@ -227,7 +227,7 @@ export default function Register() {
 
   const fetchState = useCallback((countryId) => {
     fetchProtected(
-      `sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
       setStates,
       "states",         // ⚠️ verify that your API returns a `billingstates` key
       setBillingStateLoading
@@ -236,7 +236,7 @@ export default function Register() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -245,7 +245,7 @@ export default function Register() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities
@@ -254,7 +254,7 @@ export default function Register() {
 
   const fetchCity2 = useCallback((stateId) => {
     fetchProtected(
-      `sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
       setCity,
       "cities",               // ⚠️ This key must match your API response structure
       setBillingCityLoading
@@ -262,7 +262,7 @@ export default function Register() {
   }, [fetchProtected]);
   const fetchContry2 = useCallback(() => {
     fetchProtected(
-      `sleeping-owl-we0m.onrender.com/api/location/country`,
+      `https://sleeping-owl-we0m.onrender.com/api/location/country`,
       setCountry,
       "countries",               // ⚠️ This key must match your API response structure
       setBillingCountryLoading

@@ -98,7 +98,7 @@ export default function Create() {
                 });
             }
     
-            const url = "sleeping-owl-we0m.onrender.com/api/admin/category";
+            const url = "https://sleeping-owl-we0m.onrender.com/api/admin/category";
     
             const response = await fetch(url, {
                 method: "POST",

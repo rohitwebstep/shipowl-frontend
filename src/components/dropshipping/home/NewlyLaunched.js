@@ -64,7 +64,7 @@ const NewlyLaunched = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=${type}`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=${type}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +114,7 @@ const NewlyLaunched = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/trashed`, {
+      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/trashed`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -419,7 +419,7 @@ const Section = ({ title, form, showResult, setForm, errors, setShowResult, setE
 
 
 
-      const url = "sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
