@@ -138,7 +138,7 @@ export default function NewProducts() {
       });
 
       const form = new FormData();
-        const simplifiedVariants = inventoryData.variant
+      const simplifiedVariants = inventoryData.variant
         .filter(v => v.status === true) // Only include variants with status true
         .map(v => ({
           variantId: v.id || v.variantId,
@@ -208,7 +208,7 @@ export default function NewProducts() {
       setLoading(false);
     }
   };
-  console.log('inventory',inventoryData)
+  console.log('inventory', inventoryData)
 
   return (
     <>
@@ -216,14 +216,47 @@ export default function NewProducts() {
         {productsRequest.length > 0 ? (
           <div className="grid lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-1 gap-6">
             {productsRequest.map((product) => {
-              const firstVariant = product.variants?.[0];
               const imageUrl = productImage || "/placeholder.png"; // Fallback
               const productName = product.name || "Unnamed Product";
 
-              const price =
-                product.variants.length === 1
-                  ? firstVariant?.suggested_price || 0
-                  : Math.min(...product.variants.map(v => v?.suggested_price ?? Infinity));
+              const getPriceDisplay = (variants) => {
+                if (!variants?.length) return "N/A";
+
+         
+                const modalMap = {};
+                variants.forEach((variant) => {
+                  const modal = variant.modal || "Default";
+                  if (!modalMap[modal]) modalMap[modal] = [];
+                  modalMap[modal].push(variant);
+                });
+
+                const modalKeys = Object.keys(modalMap);
+
+                // Case 1: Only 1 model and 1 variant
+                if (modalKeys.length === 1 && modalMap[modalKeys[0]].length === 1) {
+                  return `₹${modalMap[modalKeys[0]][0].suggested_price ?? 0}`;
+                }
+
+                // Case 2: 1 model, multiple variants
+                if (modalKeys.length === 1 && modalMap[modalKeys[0]].length > 1) {
+                  const prices = modalMap[modalKeys[0]].map(v => v?.suggested_price ?? 0);
+                  const min = Math.min(...prices);
+                  const max = Math.max(...prices);
+                  return `₹${min} - ₹${max}`;
+                }
+
+                // Case 3 or 4: multiple models
+                return modalKeys.map((modal) => {
+                  const variants = modalMap[modal];
+                  const prices = variants.map(v => v?.suggested_price ?? 0);
+                  const min = Math.min(...prices);
+                  const max = Math.max(...prices);
+                  const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
+                  return `${modal}: ${priceLabel}`;
+                }).join(" | ");
+              };
+
+
 
               return (
                 <div
@@ -232,7 +265,10 @@ export default function NewProducts() {
                 >
                   {/* Flip Image Section */}
                   <div className="relative h-[200px] perspective">
-                    <div onClick={() => viewProduct(product.id)} className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                    <div
+                      onClick={() => viewProduct(product.id)}
+                      className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180"
+                    >
                       {/* FRONT */}
                       <Image
                         src={imageUrl}
@@ -241,17 +277,21 @@ export default function NewProducts() {
                         width={100}
                         className="w-full h-full object-cover backface-hidden"
                       />
-                      {/* BACK (optional or just black layer) */}
+                      {/* BACK */}
                       <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
                         <span className="text-sm">Back View</span>
                       </div>
                     </div>
                   </div>
+
                   {/* Content */}
                   <div className="p-3 relative">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between flex-wrap items-center">
                       <h2 className="text-lg font-semibold nunito">{productName}</h2>
-                      <p className="text-black font-bold nunito">₹{price}</p>
+                      <p className="text-black font-bold nunito">
+                        {getPriceDisplay(product.variants)}
+                      </p>
+
                     </div>
 
                     <div className="mt-2 space-y-1 text-sm text-gray-700">
@@ -265,17 +305,14 @@ export default function NewProducts() {
                             View Description
                           </button>
                           {openDescriptionId === product.id && (
-                            <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                            <div className="fixed p-4 inset-0 z-50 m-auto flex items-center justify-center bg-black/50">
                               <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
-                                {/* Close Button */}
                                 <button
                                   onClick={() => setOpenDescriptionId(null)}
                                   className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
                                 >
                                   &times;
                                 </button>
-
-                                {/* HTML Description Content */}
                                 {product.description ? (
                                   <div
                                     className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
@@ -289,33 +326,29 @@ export default function NewProducts() {
                           )}
                         </span>
                       </div>
+
                       <div className="flex items-center gap-2">
                         <Tag size={16} />
                         <span>SKU: {product?.main_sku || "-"}</span>
                       </div>
+
                       <div className="flex items-center gap-2">
                         <Truck size={16} />
-                        <span>
-                          Shipping Time: {product?.shipping_time || "-"}
-                        </span>
+                        <span>Shipping Time: {product?.shipping_time || "-"}</span>
                       </div>
                     </div>
 
-                    <button
-
-                      className="mt-3 w-full bg-orange-500 text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition"
-                    >
+                    <button className="mt-3 w-full bg-orange-500 text-white px-4 py-2 rounded font-semibold hover:bg-orange-600 transition">
                       Add to List
                     </button>
 
                     {/* Hover Action Buttons */}
                     <div
                       className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 opacity-0 translate-y-4
-                      group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
-                      pointer-events-none group-hover:pointer-events-auto shadow border border-gray-100"
+            group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300
+            pointer-events-none group-hover:pointer-events-auto shadow border border-gray-100"
                     >
                       <div className="flex items-center gap-2">
-
                         <button
                           onClick={() => {
                             setShowPopup(true);
@@ -336,6 +369,7 @@ export default function NewProducts() {
                 </div>
               );
             })}
+
           </div>
 
         ) : (
@@ -384,12 +418,12 @@ export default function NewProducts() {
 
                             <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
                               <p><span className="font-semibold">Modal:</span> {variant.modal || "NIL"}</p>
+                              <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
                               {isExists && (
                                 <>
                                   <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
                                   <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
                                   <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
-                                  <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
                                 </>
                               )}
                             </div>

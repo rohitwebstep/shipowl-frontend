@@ -43,16 +43,17 @@ export default function Header() {
 
   const currentPage = pageTitles[pathname] || "Dashboard";
 
-  const [userName, setUserName] = useState("");
-  const [activePanel, setActivePanel] = useState("");
+  const [userName, setUserName] = useState('');
+  const [activePanel, setActivePanel] = useState('');
 
-  useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("shippingData"));
-    if (data) {
-      setUserName(data?.admin?.name || "User");
-      setActivePanel(data?.project?.active_panel || "Panel");
-    }
-  }, []);
+useEffect(() => {
+  const data = JSON.parse(localStorage.getItem("shippingData"));
+  if (data) {
+    setUserName(data?.supplier?.name || 'User');
+    setActivePanel(data?.project?.active_panel || 'Panel');
+  }
+}, []);
+
 
   const logout = () => {
     Swal.fire({
@@ -110,6 +111,10 @@ export default function Header() {
             <FaBell className="text-gray-500" />
             <span className="absolute top-1 right-1 bg-red-500 w-2 h-2 rounded-full"></span>
           </button>
+          <div className="hidden sm:block text-right">
+            <p className="text-sm font-medium whitespace-nowrap">{userName}</p>
+            <p className="text-xs text-gray-500">{activePanel}</p>
+          </div>
 
           <Image
             src={userImage}

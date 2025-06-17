@@ -445,7 +445,10 @@ const ProductTable = () => {
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Pencil onClick={() => router.push(`/admin/products/update?id=${item.id}`)} className="cursor-pointer text-2xl" />
+                                                        <Pencil onClick={() => {
+                                                            setActiveTab('product-details')
+                                                            router.push(`/admin/products/update?id=${item.id}`)
+                                                        }} className="cursor-pointer text-2xl" />
                                                         <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl" />
                                                     </>
                                                 )}</div>

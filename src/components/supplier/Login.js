@@ -22,23 +22,23 @@ export default function Login() {
     const [formErrors, setFormErrors] = useState({});
     useEffect(() => {
         const checkAuth = async () => {
-          const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-          const token = supplierData?.security?.token;
-      
-          if (supplierData?.project?.active_panel !== "supplier") {
-            localStorage.removeItem("shippingData");
-            router.push("/supplier/auth/login");
-            return;
-          }
-      
-          if (token && await verifySupplierAuth()) {
-            router.push("/supplier");
-          }
+            const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+            const token = supplierData?.security?.token;
+
+            if (supplierData?.project?.active_panel !== "supplier") {
+                localStorage.removeItem("shippingData");
+                router.push("/supplier/auth/login");
+                return;
+            }
+
+            if (token && await verifySupplierAuth()) {
+                router.push("/supplier");
+            }
         };
-      
+
         checkAuth();
-      }, []);
-      
+    }, []);
+
     const validateForm = () => {
         const errors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -64,17 +64,17 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
-    
+
         const validationError = validateForm();
-    
+
         if (Object.keys(validationError).length > 0) {
             setFormErrors(validationError);
             return;
         }
-    
+
         setFormErrors({});
         setLoading(true);
-    
+
         // 🌀 Show loading alert
         Swal.fire({
             title: "Logging in...",
@@ -84,14 +84,14 @@ export default function Login() {
                 Swal.showLoading();
             },
         });
-    
+
         try {
             const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-    
+
             if (!response.ok) {
                 const errorMessage = await response.json();
                 Swal.fire({
@@ -101,17 +101,22 @@ export default function Login() {
                 });
                 throw new Error(errorMessage.message || errorMessage.error || "Login failed");
             }
-    
+
             const result = await response.json();
             const { token, admin } = result;
-    
+
             const shippingData = {
                 project: {
                     name: "Shipping OWL",
                     environment: "production",
                     active_panel: "supplier",
                 },
-                supplier: admin,
+                supplier: {
+                    id: admin.id,
+                    name: admin.name,
+                    email: admin.email,
+                    role: admin.role,
+                },
                 session: {
                     is_authenticated: true,
                     last_active_at: new Date().toISOString(),
@@ -120,9 +125,10 @@ export default function Login() {
                     token: token,
                 },
             };
-    
+
+
             localStorage.setItem("shippingData", JSON.stringify(shippingData));
-    
+
             // ✅ Show success alert before redirect
             await Swal.fire({
                 icon: "success",
@@ -130,9 +136,9 @@ export default function Login() {
                 text: "Welcome to your supplier dashboard!",
                 showConfirmButton: true,
             });
-    
+
             router.push("/supplier");
-    
+
         } catch (error) {
             console.error("Error:", error);
             if (!Swal.isVisible()) {
@@ -147,7 +153,7 @@ export default function Login() {
             setLoading(false);
         }
     };
-    
+
 
     return (
         <div className="md:flex h-screen w-full ">

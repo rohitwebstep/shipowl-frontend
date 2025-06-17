@@ -68,6 +68,7 @@ export default function Login() {
                     title: "Login Failed",
                     text: errorMessage.message || errorMessage.error || "An error occurred",
                 });
+                Swal.close()
                 throw new Error(errorMessage.message || errorMessage.error || "Login failed");
             }
     
