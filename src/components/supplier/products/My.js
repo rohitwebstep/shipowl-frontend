@@ -815,18 +815,25 @@ export default function My() {
                                                         >
                                                             <div className='flex gap-2'>
                                                                 {/* Image Preview */}
-                                                                <div className="md:min-w-4/12 h-20 rounded-lg flex items-center justify-center overflow-hidden">
+                                                                <div className="flex gap-2 overflow-x-auto max-w-[120px] border border-[#E0E2E7] rounded-md p-3shadow bg-white">
                                                                     {imageUrls.length > 0 ? (
-                                                                        <img
-                                                                            src={`https://placehold.co/600x400?text=${idx + 1}`}
-                                                                            alt={variant.name || "Variant Image"}
-                                                                            className="h-full object-cover"
-                                                                        />
+                                                                        imageUrls.map((url, i) => (
+                                                                            <Image
+                                                                                key={i}
+                                                                                height={100}
+                                                                                width={100}
+                                                                                src={`https://placehold.co/600x400?text=${i + 1}`}
+                                                                                alt={variant.name || 'NIL'}
+                                                                                className="h-full w-full "
+                                                                            />
+                                                                        ))
                                                                     ) : (
-                                                                        <img
+                                                                        <Image
+                                                                            height={40}
+                                                                            width={40}
                                                                             src="https://placehold.co/600x400"
                                                                             alt="Placeholder"
-                                                                            className="h-full object-cover"
+                                                                            className="rounded shrink-0"
                                                                         />
                                                                     )}
                                                                 </div>
@@ -931,38 +938,38 @@ export default function My() {
 
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">                                    {selectedProduct.variants?.map((v, idx) => {
-                                    const imageUrls = v.image
-                                        ? v.image.split(',').map((img) => img.trim()).filter(Boolean)
-                                        : [];
-
+                                    
                                     const variant = v.variant || v;
                                     const variants = v;
                                     const isExists = selectedProduct?.product?.isVarientExists;
+                                    const imageUrls = variant.image
+                                        ? variant.image.split(',').map((img) => img.trim()).filter(Boolean)
+                                        : [];
 
                                     return (
                                         <div
                                             key={variant.id || idx}
                                             className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
                                         >
-                                            <div className="overflow-x-auto max-w-full pb-2">
+                                            <div className="flex gap-2 overflow-x-auto max-w-[120px] border border-[#E0E2E7] rounded-md p-3shadow bg-white">
                                                 {imageUrls.length > 0 ? (
                                                     imageUrls.map((url, i) => (
                                                         <Image
                                                             key={i}
                                                             height={100}
                                                             width={100}
-                                                            src={url}
-                                                            alt={variant.name || 'Image'}
-                                                            className="rounded border w-full  object-cover"
+                                                            src={`https://placehold.co/600x400?text=${i + 1}` || url}
+                                                            alt={variant.name || 'NIL'}
+                                                            className="h-full w-full "
                                                         />
                                                     ))
                                                 ) : (
                                                     <Image
-                                                        height={80}
-                                                        width={80}
-                                                        src="https://placehold.co/400"
+                                                        height={40}
+                                                        width={40}
+                                                        src="https://placehold.co/600x400"
                                                         alt="Placeholder"
-                                                        className="rounded border h-[150px] w-full object-cover"
+                                                        className="rounded shrink-0"
                                                     />
                                                 )}
                                             </div>

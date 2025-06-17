@@ -627,8 +627,8 @@ const ProductDetails = () => {
                                 key={index}
                                 onClick={() => handleVariantClick(variant.full)}
                                 className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
-                                    ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
-                                    : "border-gray-300 hover:shadow-lg bg-white"
+                                  ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
+                                  : "border-gray-300 hover:shadow-lg bg-white"
                                   }`}
                               >
                                 <div className="flex gap-3">
@@ -659,103 +659,103 @@ const ProductDetails = () => {
                       </div>
                     );
                   }
-              
-               
+
+
                   if (totalModals === 2 && modalNames.every(modal => groupedByModal[modal].length === 1)) {
                     return (
-                <div className="space-y-4">
-                  {modalNames.map((modal, index) => {
-                    const variant = getVariantData(groupedByModal[modal][0]);
-                    const isSelected = selectedVariant?.id === variant.id;
-                    return (
-                      <label key={index} className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="modal"
-                          value={modal}
-                          checked={isSelected}
-                          onChange={() => handleVariantClick(variant.full)}
-                        />
-                        <span className="text-gray-800 font-medium">{modal}</span>
-                        {isSelected && (
-                          <span className="ml-2 text-green-600 font-semibold">
-                            ₹{variant.suggested_price}
-                          </span>
-                        )}
-                      </label>
+                      <div className="space-y-4">
+                        {modalNames.map((modal, index) => {
+                          const variant = getVariantData(groupedByModal[modal][0]);
+                          const isSelected = selectedVariant?.id === variant.id;
+                          return (
+                            <label key={index} className="flex items-center gap-3 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="modal"
+                                value={modal}
+                                checked={isSelected}
+                                onChange={() => handleVariantClick(variant.full)}
+                              />
+                              <span className="text-gray-800 font-medium">{modal}</span>
+                              {isSelected && (
+                                <span className="ml-2 text-green-600 font-semibold">
+                                  ₹{variant.suggested_price}
+                                </span>
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
                     );
-                  })}
-                </div>
-                );
                   }
 
                   // CASE 3: Multiple modals with multiple variants → TABS
                   if (totalModals > 1 && modalNames.some(modal => groupedByModal[modal].length > 1)) {
                     return (
-                <>
-                  {/* Tabs */}
-                  <div className="flex gap-3 mb-4 border-b pb-2">
-                    {modalNames.map((modal, index) => (
-                      <button
-                        key={index}
-                        className={`px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 ${activeModal === modal
-                          ? "border-orange-600 text-orange-600"
-                          : "border-transparent text-gray-600 hover:text-orange-500"
-                          }`}
-                        onClick={() => {
-                          const sorted = groupedByModal[modal]
-                            .map(getVariantData)
-                            .sort((a, b) => a.suggested_price - b.suggested_price);
-                          setActiveModal(modal);
-                          setSelectedVariant(sorted[0].full);
-                        }}
-                      >
-                        {modal}
-                      </button>
-                    ))}
-                  </div>
+                      <>
+                        {/* Tabs */}
+                        <div className="flex gap-3 mb-4 border-b pb-2">
+                          {modalNames.map((modal, index) => (
+                            <button
+                              key={index}
+                              className={`px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 ${activeModal === modal
+                                ? "border-orange-600 text-orange-600"
+                                : "border-transparent text-gray-600 hover:text-orange-500"
+                                }`}
+                              onClick={() => {
+                                const sorted = groupedByModal[modal]
+                                  .map(getVariantData)
+                                  .sort((a, b) => a.suggested_price - b.suggested_price);
+                                setActiveModal(modal);
+                                setSelectedVariant(sorted[0].full);
+                              }}
+                            >
+                              {modal}
+                            </button>
+                          ))}
+                        </div>
 
-                  {/* Variant Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {(groupedByModal[activeModal] || [])
-                      .map(getVariantData)
-                      .sort((a, b) => a.suggested_price - b.suggested_price)
-                      .map((variant, index) => {
-                        const isSelected = selectedVariant?.id === variant.id;
-                        return (
-                          <div
-                            key={index}
-                            onClick={() => handleVariantClick(variant.full)}
-                            className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
-                              ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
-                              : "border-gray-300 hover:shadow-lg bg-white"
-                              }`}
-                          >
-                            <div className="flex gap-3">
-                              <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
-                                <Image
-                                  src={productimg || variant.image}
-                                  alt={variant.name}
-                                  width={140}
-                                  height={140}
-                                  className="object-cover w-full h-full"
-                                />
-                              </div>
-                              <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
-                                <div>Name: <span className="font-medium">{variant.name}</span></div>
-                                <div>Color: <span className="font-medium">{variant.color}</span></div>
-                                <div className="text-green-600 font-semibold">Price: ₹{variant.suggested_price}</div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </>
-                );
+                        {/* Variant Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          {(groupedByModal[activeModal] || [])
+                            .map(getVariantData)
+                            .sort((a, b) => a.suggested_price - b.suggested_price)
+                            .map((variant, index) => {
+                              const isSelected = selectedVariant?.id === variant.id;
+                              return (
+                                <div
+                                  key={index}
+                                  onClick={() => handleVariantClick(variant.full)}
+                                  className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
+                                    ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
+                                    : "border-gray-300 hover:shadow-lg bg-white"
+                                    }`}
+                                >
+                                  <div className="flex gap-3">
+                                    <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
+                                      <Image
+                                        src={productimg || variant.image}
+                                        alt={variant.name}
+                                        width={140}
+                                        height={140}
+                                        className="object-cover w-full h-full"
+                                      />
+                                    </div>
+                                    <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
+                                      <div>Name: <span className="font-medium">{variant.name}</span></div>
+                                      <div>Color: <span className="font-medium">{variant.color}</span></div>
+                                      <div className="text-green-600 font-semibold">Price: ₹{variant.suggested_price}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </>
+                    );
                   }
 
-                return <div>No variant available.</div>;
+                  return <div>No variant available.</div>;
                 })()}
               </div>
 
@@ -1130,7 +1130,7 @@ const ProductDetails = () => {
                                         key={i}
                                         height={100}
                                         width={100}
-                                        src={`https://placehold.co/600x400?text=${idx + 1}`}
+                                        src={`https://placehold.co/600x400?text=${i + 1}`}
                                         alt={variantInfo.name || 'NIL'}
                                         className="shrink-0 border border-[#E0E2E7] shadow "
                                       />

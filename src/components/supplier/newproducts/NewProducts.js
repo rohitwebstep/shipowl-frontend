@@ -222,7 +222,7 @@ export default function NewProducts() {
               const getPriceDisplay = (variants) => {
                 if (!variants?.length) return "N/A";
 
-         
+
                 const modalMap = {};
                 variants.forEach((variant) => {
                   const modal = variant.modal || "Default";
@@ -400,18 +400,25 @@ export default function NewProducts() {
                         >
                           <div className='flex gap-2'>
                             {/* Image Preview */}
-                            <div className="md:min-w-4/12 h-20 rounded-lg flex items-center justify-center overflow-hidden">
+                            <div className="flex gap-2 overflow-x-auto max-w-[120px] border border-[#E0E2E7] rounded-md p-3shadow bg-white">
                               {imageUrls.length > 0 ? (
-                                <img
-                                  src={`https://placehold.co/600x400?text=${idx + 1}`}
-                                  alt={variant.name || "Variant Image"}
-                                  className="h-full object-cover"
-                                />
+                                imageUrls.map((url, i) => (
+                                  <Image
+                                    key={i}
+                                    height={100}
+                                    width={100}
+                                    src={`https://placehold.co/600x400?text=${i + 1}`}
+                                    alt={variant.name || 'NIL'}
+                                    className="h-full w-full "
+                                  />
+                                ))
                               ) : (
-                                <img
+                                <Image
+                                  height={40}
+                                  width={40}
                                   src="https://placehold.co/600x400"
                                   alt="Placeholder"
-                                  className="h-full object-cover"
+                                  className="rounded shrink-0"
                                 />
                               )}
                             </div>
