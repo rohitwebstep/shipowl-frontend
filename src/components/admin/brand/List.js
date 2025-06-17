@@ -21,7 +21,7 @@ export default function List() {
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState([]);
     const [brandData, setBrandData] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/brand", "brands");
 
@@ -34,6 +34,7 @@ export default function List() {
     useEffect(() => {
         const fetchInitialData = async () => {
             setLoading(true)
+            await checkAdminRole();
             await verifyAdminAuth();
             await fetchAll(setBrandData, setLoading);
             setLoading(false)
@@ -106,7 +107,24 @@ export default function List() {
         table.button('.buttons-csv').trigger();
     };
 
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "brand" &&
+                perm.action === "trash-listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "brand" &&
+                perm.action === "create" &&
+                perm.status === true
+        )
+        : true;
 
     return (
         <div className="w-full">
@@ -123,17 +141,19 @@ export default function List() {
                         <div className="flex gap-3  items-center">
 
                             <div className="md:flex w-full justify-end gap-2">
-                                <button
+                                {canViewTrashed  && <button
                                     className={`text-sm p-2  gap-2 md:flex hidden items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                                     onClick={handleToggleTrash}
                                 >
                                     <Trash2 className="text-sm" /> {isTrashed ? "Brand Listing (Simple)" : "Trashed Brand"}
                                 </button>
-                                <button
+                                }
+
+                                {canAdd && <button
                                     className="bg-[#4285F4] gap-2 md:flex hidden text-sm  text-white rounded-md p-2 px-4"
                                 >
                                     <BadgePlus className="text-sm" />  <Link href="/admin/brand/create"> Add Brand</Link>
-                                </button>
+                                </button>}
 
                             </div>
                             <button
@@ -152,7 +172,7 @@ export default function List() {
                                             </li>
                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
                                             <li className="px-4 block md:hidden py-2 hover:bg-gray-100 cursor-pointer"><Link href="/admin/brand/create"> Add Brand</Link></li>
-                                            <li className="px-4 block md:hidden py-2 hover:bg-gray-100 cursor-pointer" onClick={handleToggleTrash}>{isTrashed ? "Brand Listing (Simple)" : "Trashed Category"}</li>
+                                            <li className="px-4 block md:hidden py-2 hover:bg-gray-100 cursor-pointer" onClick={handleToggleTrash}>{isTrashed ? "Brand Listing (Simple)" : "Trashed Brand"}</li>
                                         </ul>
                                     </div>
                                 )}
@@ -172,69 +192,104 @@ export default function List() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {brandData.map((item) => (
-                                        <tr key={item.id} className="bg-transparent border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                            <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
-                                                <div className="flex items-center">
-                                                    <label className="flex items-center cursor-pointer">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selected.includes(item.id)}
-                                                            onChange={() => handleCheckboxChange(item.id)}
-                                                            className="peer hidden"
-                                                        />
-                                                        <div className="w-4 me-2 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                                            <FaCheck className="peer-checked:block text-white w-3 h-3" />
-                                                        </div>
-                                                        {item.image && (<Swiper
-                                                            key={item.id}
-                                                            modules={[Navigation]}
-                                                            slidesPerView={1}
-                                                            loop={item.image?.split(',').length > 1}
-                                                            navigation={true}
-                                                            className="mySwiper w-[50px] ms-2"
-                                                        >
-                                                            {item.image?.split(',').map((img, index) => (
-                                                                <SwiperSlide key={index}>
-                                                                    <Image
-                                                                        src={`https://placehold.co/600x400?text=${index + 1}`}
-                                                                        alt={`Image ${index + 1}`}
-                                                                        width={40}
-                                                                        height={40}
-                                                                        className="me-3 object-cover rounded"
-                                                                    />
-                                                                </SwiperSlide>
-                                                            ))}
-                                                        </Swiper>)}
+                                    {brandData.map((item) => {
+                                        const canDelete = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "brand" &&
+                                                    perm.action === "permanent-delete" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        const canEdit = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "brand" &&
+                                                    perm.action === "update" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        const canSoftDelete = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "brand" &&
+                                                    perm.action === "soft-delete" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        const canRestore = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "brand" &&
+                                                    perm.action === "restore" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        return (
+                                            <tr key={item.id} className="bg-transparent border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                                <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
+                                                    <div className="flex items-center">
+                                                        <label className="flex items-center cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selected.includes(item.id)}
+                                                                onChange={() => handleCheckboxChange(item.id)}
+                                                                className="peer hidden"
+                                                            />
+                                                            <div className="w-4 me-2 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                                <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                                                            </div>
+                                                            {item.image && (<Swiper
+                                                                key={item.id}
+                                                                modules={[Navigation]}
+                                                                slidesPerView={1}
+                                                                loop={item.image?.split(',').length > 1}
+                                                                navigation={true}
+                                                                className="mySwiper w-[50px] ms-2"
+                                                            >
+                                                                {item.image?.split(',').map((img, index) => (
+                                                                    <SwiperSlide key={index}>
+                                                                        <Image
+                                                                            src={`https://placehold.co/600x400?text=${index + 1}`}
+                                                                            alt={`Image ${index + 1}`}
+                                                                            width={40}
+                                                                            height={40}
+                                                                            className="me-3 object-cover rounded"
+                                                                        />
+                                                                    </SwiperSlide>
+                                                                ))}
+                                                            </Swiper>)}
 
-                                                    </label>
-                                                    {item.name}
-                                                </div>
-                                            </td>
+                                                        </label>
+                                                        {item.name}
+                                                    </div>
+                                                </td>
 
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.description}</td>
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
-                                                {item.status ? (
-                                                    <span className="bg-green-100 text-green-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
-                                                ) : (
-                                                    <span className="bg-red-100 text-red-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
-                                                )}
-                                            </td>
-                                            <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
-                                                <div className="flex justify-center gap-2"> {isTrashed ? (
-                                                    <>
-                                                        <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-2xl text-green-500" />
-                                                        <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl" />
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Pencil onClick={() => router.push(`/admin/brand/update?id=${item.id}`)} className="cursor-pointer text-2xl" />
-                                                        <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl" />
-                                                    </>
-                                                )}</div>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">{item.description}</td>
+                                                <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
+                                                    {item.status ? (
+                                                        <span className="bg-green-100 text-green-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
+                                                    ) : (
+                                                        <span className="bg-red-100 text-red-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
+                                                    )}
+                                                </td>
+                                                <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
+                                                    <div className="flex justify-center gap-2"> {isTrashed ? (
+                                                        <>
+                                                            {canRestore && <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-2xl text-green-500" />}
+                                                            {canDelete && <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl" />}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            {canEdit && <Pencil onClick={() => router.push(`/admin/brand/update?id=${item.id}`)} className="cursor-pointer text-2xl" />}
+                                                            {canSoftDelete && <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl" />}
+                                                        </>
+                                                    )}</div>
+                                                </td>
+                                            </tr>
+
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                         </div>

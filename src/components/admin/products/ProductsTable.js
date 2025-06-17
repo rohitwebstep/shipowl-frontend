@@ -25,7 +25,7 @@ const ProductTable = () => {
     const [category, setCategory] = useState('');
     const [categoryData, setCategoryData] = useState([]);
     const [products, setProducts] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -127,6 +127,7 @@ const ProductTable = () => {
         const fetchData = async () => {
             setIsTrashed(false);
             setLoading(true);
+            await checkAdminRole();
             await verifyAdminAuth();
             await fetchAll(setProducts, setLoading);
             await fetchCategory();
@@ -174,6 +175,25 @@ const ProductTable = () => {
                 });
         }
     }, [products, loading]);
+
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "product" &&
+                perm.action === "trash-listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "product" &&
+                perm.action === "create" &&
+                perm.status === true
+        )
+        : true;
 
 
     return (
@@ -223,13 +243,14 @@ const ProductTable = () => {
                 <div className='flex gap-1 flex-wrap mt-3 md:mt-0 items-center'>   <button className="bg-[#EE5D50] text-white px-4 py-2 rounded-lg text-sm">Details for approval</button>
                     <button className="bg-[#2B3674] text-white px-4 py-2 rounded-lg text-sm">Import Inventory</button>
                     <button className="bg-[#05CD99] text-white px-4 py-2 rounded-lg text-sm">Export</button>
-                    <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>
-                    <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() => {
-                        setActiveTab('product-details');
-                        setActiveTabs('product-details')
-                    }}>
-                        <Link href="/admin/products/create">Add New</Link>
-                    </button>
+                    <button className="bg-[#3965FF] text-white px-4 py-2 rounded-lg text-sm">Import</button>{
+                        canAdd && <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm" onClick={() => {
+                            setActiveTab('product-details');
+                            setActiveTabs('product-details')
+                        }}>
+                            <Link href="/admin/products/create">Add New</Link>
+                        </button>
+                    }
                     <button className="bg-[#4285F4] text-white px-4 py-2 rounded-lg text-sm">Filters</button></div>
             </div>
 
@@ -286,12 +307,15 @@ const ProductTable = () => {
                                 )}
                             </button>
                             <div className="flex justify-end gap-2">
-                                <button
-                                    className={`text-sm p-2  gap-2 md:flex hidden items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
-                                    onClick={handleToggleTrash}
-                                >
-                                    <Trash2 className="text-sm" /> {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
-                                </button>
+                                {
+                                    canViewTrashed && <button
+                                        className={`text-sm p-2  gap-2 md:flex hidden items-center text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                        onClick={handleToggleTrash}
+                                    >
+                                        <Trash2 className="text-sm" /> {isTrashed ? "Product Listing (Simple)" : "Trashed Product"}
+                                    </button>
+                                }
+
 
                             </div>
                         </div>
@@ -342,119 +366,154 @@ const ProductTable = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredProducts.map((item) => (
-                                        <tr key={item.id} className="border-b capitalize border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                            <td className="p-2 px-5  text-left whitespace-nowrap">
-                                                <div className="flex items-center">
-                                                    <label className="flex items-center cursor-pointer me-2">
-                                                        <input type="checkbox" checked={selected.includes(item.id)} onChange={() => handleCheckboxChange(item.id)} className="peer hidden" />
-                                                        <div
-                                                            className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
-                                                peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white"
-                                                        >
-                                                            <FaCheck className=" peer-checked:block text-white w-3 h-3" />
-                                                        </div>
-                                                    </label>
-
-                                                    <span className="truncate"> {item.name || 'NIL'}</span>
-                                                </div>
-                                            </td>
-                                            <td className="p-2 px-5 text-left whitespace-nowrap">
-                                                <button
-                                                    onClick={() => setOpenDescriptionId(item.id)}
-                                                    className="text-blue-600"
-                                                >
-                                                    View
-                                                </button>
-
-                                            </td>
-                                            {openDescriptionId === item.id && (
-                                                <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                                                    <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
-                                                        {/* Close Button */}
-                                                        <button
-                                                            onClick={() => setOpenDescriptionId(null)}
-                                                            className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
-                                                        >
-                                                            &times;
-                                                        </button>
-
-                                                        {/* HTML Description Content */}
-                                                        {item.description ? (
-                                                            <div
-                                                                className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                                                                dangerouslySetInnerHTML={{ __html: item.description }}
-                                                            />
-                                                        ) : (
-                                                            <p className="text-gray-500">NIL</p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
-
-
-
-                                            <td className="p-2 px-5  text-left whitespace-nowrap">{item.main_sku || 'NIL'}</td>
-                                            {showRtoLiveCount && <td className="p-2 px-5  text-left whitespace-nowrap text-blue-500">{item.liveRtoStock || 'NIL'}</td>}
-
-                                            <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
-                                                {item.status ? (
-                                                    <span className="bg-green-100 text-green-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
-                                                ) : (
-                                                    <span className="bg-red-100 text-red-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
-                                                )}
-                                            </td>
-
-                                            {!showRtoLiveCount && (
-                                                <td className="p-2 px-5  text-left  whitespace-nowrap">
-                                                    <button
-                                                        className={`py-2 text-white rounded-md text-sm p-3  min-w-[95px] 
-    ${item.list_as?.toLowerCase() === "shipowl" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
-                                                    >
-                                                        {item.list_as || 'NIL'}
-                                                    </button>
-                                                </td>
-                                            )}
-                                            {showRtoLiveCount && (
+                                    {filteredProducts.map((item) => {
+                                        const canDelete = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "product" &&
+                                                    perm.action === "permanent-delete" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        const canEdit = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "product" &&
+                                                    perm.action === "update" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        const canSoftDelete = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "product" &&
+                                                    perm.action === "soft-delete" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        const canRestore = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "product" &&
+                                                    perm.action === "restore" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        return (
+                                            <tr key={item.id} className="border-b capitalize border-[#E9EDF7] text-[#2B3674] font-semibold">
                                                 <td className="p-2 px-5  text-left whitespace-nowrap">
-                                                    {" "}
+                                                    <div className="flex items-center">
+                                                        <label className="flex items-center cursor-pointer me-2">
+                                                            <input type="checkbox" checked={selected.includes(item.id)} onChange={() => handleCheckboxChange(item.id)} className="peer hidden" />
+                                                            <div
+                                                                className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center 
+                                                peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white"
+                                                            >
+                                                                <FaCheck className=" peer-checked:block text-white w-3 h-3" />
+                                                            </div>
+                                                        </label>
+
+                                                        <span className="truncate"> {item.name || 'NIL'}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="p-2 px-5 text-left whitespace-nowrap">
                                                     <button
-                                                        className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
-            ${item.rtoStatus === "Free" ? "bg-green-500" : item.rtoStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
+                                                        onClick={() => setOpenDescriptionId(item.id)}
+                                                        className="text-blue-600"
                                                     >
-                                                        {item.rtoStatus || 'NIL'}
+                                                        View
+                                                    </button>
+
+                                                </td>
+                                                {openDescriptionId === item.id && (
+                                                    <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                                                        <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
+                                                            {/* Close Button */}
+                                                            <button
+                                                                onClick={() => setOpenDescriptionId(null)}
+                                                                className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
+                                                            >
+                                                                &times;
+                                                            </button>
+
+                                                            {/* HTML Description Content */}
+                                                            {item.description ? (
+                                                                <div
+                                                                    className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                                                                    dangerouslySetInnerHTML={{ __html: item.description }}
+                                                                />
+                                                            ) : (
+                                                                <p className="text-gray-500">NIL</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+
+
+                                                <td className="p-2 px-5  text-left whitespace-nowrap">{item.main_sku || 'NIL'}</td>
+                                                {showRtoLiveCount && <td className="p-2 px-5  text-left whitespace-nowrap text-blue-500">{item.liveRtoStock || 'NIL'}</td>}
+
+                                                <td className="p-2 bg-transparent whitespace-nowrap px-5 border-0">
+                                                    {item.status ? (
+                                                        <span className="bg-green-100 text-green-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-green-400 border border-green-400">Active</span>
+                                                    ) : (
+                                                        <span className="bg-red-100 text-red-800 text-md font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-gray-700 dark:text-red-400 border border-red-400">Inactive</span>
+                                                    )}
+                                                </td>
+
+                                                {!showRtoLiveCount && (
+                                                    <td className="p-2 px-5  text-left  whitespace-nowrap">
+                                                        <button
+                                                            className={`py-2 text-white rounded-md text-sm p-3  min-w-[95px] 
+    ${item.list_as?.toLowerCase() === "shipowl" ? "bg-[#01B574]" : "bg-[#5CA4F9]"}`}
+                                                        >
+                                                            {item.list_as || 'NIL'}
+                                                        </button>
+                                                    </td>
+                                                )}
+                                                {showRtoLiveCount && (
+                                                    <td className="p-2 px-5  text-left whitespace-nowrap">
+                                                        {" "}
+                                                        <button
+                                                            className={` py-2 text-white rounded-md text-sm p-3  min-w-[95px]
+            ${item.rtoStatus === "Free" ? "bg-green-500" : item.rtoStatus === "Pending" ? "bg-[#FFB547]" : "bg-red-500"}`}
+                                                        >
+                                                            {item.rtoStatus || 'NIL'}
+                                                        </button>
+                                                    </td>
+                                                )}
+                                                <td className="p-2 px-5 text-left whitespace-nowrap">
+                                                    <button
+                                                        onClick={() => {
+                                                            setSelectedProduct(item); // `item` is your current product row
+                                                            setShowVariantPopup(true);
+                                                        }}
+                                                        className="py-2 px-4 text-white rounded-md text-sm bg-[#3965FF]"
+                                                    >
+                                                        View Variants
                                                     </button>
                                                 </td>
-                                            )}
-                                            <td className="p-2 px-5 text-left whitespace-nowrap">
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedProduct(item); // `item` is your current product row
-                                                        setShowVariantPopup(true);
-                                                    }}
-                                                    className="py-2 px-4 text-white rounded-md text-sm bg-[#3965FF]"
-                                                >
-                                                    View Variants
-                                                </button>
-                                            </td>
-                                            <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
-                                                <div className="flex justify-center gap-2"> {isTrashed ? (
-                                                    <>
-                                                        <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-2xl text-green-500" />
-                                                        <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl" />
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Pencil onClick={() => {
-                                                            setActiveTab('product-details')
-                                                            router.push(`/admin/products/update?id=${item.id}`)
-                                                        }} className="cursor-pointer text-2xl" />
-                                                        <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl" />
-                                                    </>
-                                                )}</div>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
+
+                                                    <div className="flex justify-center gap-2"> {isTrashed ? (
+                                                        <>
+                                                            {canRestore && <RotateCcw onClick={() => handleRestore(item.id)} className="cursor-pointer text-2xl text-green-500" />}
+                                                            {canDelete && <Trash2 onClick={() => handleDestroy(item.id)} className="cursor-pointer text-2xl" />}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            {canEdit && <Pencil onClick={() => {
+                                                                setActiveTab('product-details')
+                                                                router.push(`/admin/products/update?id=${item.id}`)
+                                                            }} className="cursor-pointer text-2xl" />}
+                                                            {canSoftDelete && <Trash2 onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-2xl" />}
+                                                        </>
+                                                    )}</div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                             {showVariantPopup && selectedProduct && (

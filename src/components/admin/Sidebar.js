@@ -12,12 +12,14 @@ import logo from "@/app/images/Shipowllogo.png";
 import { useAdmin } from "./middleware/AdminMiddleWareContext";
 
 export default function Sidebar() {
-  const { openSubMenus, setOpenSubMenus,isAdminStaff, setIsAdminStaff ,extractedPermissions, setExtractedPermissions} = useAdmin();
+  const { openSubMenus, setOpenSubMenus, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  useEffect(() => {
+    checkAdminRole()
+  }, [])
 
-  
   const toggleSubMenu = (name) => {
     setOpenSubMenus((prev) => ({
       ...prev,
@@ -25,7 +27,7 @@ export default function Sidebar() {
     }));
   };
 
-  const actions = ['view-listing', 'update', 'create', 'listing', 'view', 'soft-delete', 'trash-listing'];
+  const actions = ['view-listing', 'update', 'create', 'listing', 'view', 'soft-delete','restore', 'trash-listing'];
 
   const hasPermission = (module, actionList) => {
     return extractedPermissions.some(
@@ -117,12 +119,12 @@ export default function Sidebar() {
     { title: "Bank Details Update Requests", module: "bank", action: actions, icon: Banknote, href: "/admin/bankaccount-update-requests" },
     { title: "Terms & Condition(In progress)", module: "term", action: actions, icon: ShieldCheck, href: "/admin/terms" },
   ].filter(section => {
-    if (isAdminStaff || section.children) return true;
+    if (!isAdminStaff || section.children) return true;
     if (extractedPermissions.length > 0) {
       return hasPermission(section.module, section.action);
     }
     return true;
-  }), [isAdminStaff, extractedPermissions]);
+  }), [!isAdminStaff, extractedPermissions]);
 
   return (
     <>
@@ -189,7 +191,7 @@ export default function Sidebar() {
 
                 {section.children?.map((item) => {
                   const filteredSubMenu = item.subMenu?.filter((sub) => {
-                    if (isAdminStaff) return true;
+                    if (!isAdminStaff) return true;
                     if (extractedPermissions.length > 0) {
                       return hasPermission(sub.module, sub.action ?? actions);
                     }
