@@ -7,11 +7,12 @@ import user from "@/app/images/userimage.png";
 import { FaSignOutAlt } from 'react-icons/fa';
 import { useAdmin } from './middleware/AdminMiddleWareContext';
 import Swal from 'sweetalert2';
+import { useRouter } from 'next/navigation';
 const Header = () => {
-  const { verifyAdminAuth, setOpenSubMenus} = useAdmin();
+  const { verifyAdminAuth, setOpenSubMenus } = useAdmin();
   const [userName, setUserName] = useState('');
   const [activePanel, setActivePanel] = useState('');
-
+  const router = useRouter();
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("shippingData"));
     if (data) {
@@ -20,35 +21,43 @@ const Header = () => {
     }
   }, []);
 
-  const logout = () => {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "You will be logged out of your admin account.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, log me out",
-        cancelButtonText: "Cancel"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.removeItem("shippingData");
-            verifyAdminAuth();
-            Swal.fire({
-                icon: "success",
-                title: "Logged out",
-                text: "You have been logged out successfully.",
-                timer: 1500,
-                showConfirmButton: true
-            });
-        }
-    });
+ const logout = () => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You will be logged out of your admin account.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, log me out",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Clear local storage
+     localStorage.clear();
+
+      router.push('/admin/auth/login')
+      Swal.fire({
+        icon: "success",
+        title: "Logged out",
+        text: "You have been logged out successfully.",
+        timer: 1500,
+        showConfirmButton: true, // better UX: don't show OK for auto-dismiss
+      });
+
+      // Redirect or auth cleanup after delay
+      setTimeout(() => {
+        verifyAdminAuth(); // Redirect or invalidate auth
+      }, 1500); // Match timer above
+    }
+  });
 };
+
 
 
   return (
     <nav className="fixed rounded-xl lg:mt-3 lg:relative top-0 left-0 w-full bg-white p-4 flex items-center justify-between lg:shadow-none">
-      <button onClick={()=>setOpenSubMenus(false)} className="p-2 bg-black text-white rounded-full">
+      <button onClick={() => setOpenSubMenus(false)} className="p-2 bg-black text-white rounded-full">
         <Menu className="w-6 h-6" />
       </button>
 

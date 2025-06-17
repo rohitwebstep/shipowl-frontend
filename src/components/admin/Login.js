@@ -43,7 +43,7 @@ export default function Login() {
         e.preventDefault();
         setError(null);
         setLoading(true);
-    
+
         // 🌀 Show loading Swal
         Swal.fire({
             title: "Logging in...",
@@ -53,14 +53,14 @@ export default function Login() {
                 Swal.showLoading();
             },
         });
-    
+
         try {
             const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
-    
+
             if (!response.ok) {
                 const errorMessage = await response.json();
                 Swal.fire({
@@ -71,14 +71,14 @@ export default function Login() {
                 Swal.close()
                 throw new Error(errorMessage.message || errorMessage.error || "Login failed");
             }
-    
+
             const result = await response.json();
-            const { token, admin } = result;
-    
+            const { token, admin, assignedPermissions } = result;
+
             if (!token || !admin) {
                 throw new Error("Invalid login response. Missing token or admin data.");
             }
-    
+
             // ✅ Store session in localStorage
             const shippingData = {
                 project: {
@@ -95,8 +95,14 @@ export default function Login() {
                     token,
                 },
             };
+
+            if (admin.role === "admin_staff" && Array.isArray(assignedPermissions)) {
+                localStorage.setItem("permissions", JSON.stringify(assignedPermissions));
+            } else {
+                localStorage.removeItem("permissions");
+            }
             localStorage.setItem("shippingData", JSON.stringify(shippingData));
-    
+
             // ✅ Show success alert
             await Swal.fire({
                 icon: "success",
@@ -105,10 +111,10 @@ export default function Login() {
                 timer: 1500,
                 showConfirmButton: true,
             });
-    
+
             // ✅ Redirect
             router.push("/admin");
-    
+
         } catch (error) {
             console.error("Error:", error);
             if (!Swal.isVisible()) {
@@ -123,7 +129,7 @@ export default function Login() {
             setLoading(false);
         }
     };
-    
+
 
     return (
         <div className="md:flex h-screen w-full">

@@ -13,20 +13,51 @@ export const useAdmin = () => {
 };
 
 export default function AdminMiddleWareProvider({ children }) {
-    const [adminApiLoading, setAdminApiLoading] = useState(false);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const [openSubMenus, setOpenSubMenus] = useState({});
     const [suppliers, setSuppliers] = useState([]);
+    const [isAdminStaff, setIsAdminStaff] = useState(false);
+    const [extractedPermissions, setExtractedPermissions] = useState([]);
 
+
+    useEffect(() => {
+        try {
+            const shippingData = JSON.parse(localStorage.getItem("shippingdata"));
+            if (shippingData?.admin?.role === "admin_staff") {
+                setIsAdminStaff(true);
+            }
+        } catch (err) {
+            console.error("Error reading shippingdata:", err);
+            setIsAdminStaff(false);
+        }
+
+        try {
+            const rawPermissions = JSON.parse(localStorage.getItem("permissions")) || [];
+            const permissions = [];
+            rawPermissions.forEach((perm) => {
+                if (perm.permission) {
+                    permissions.push({
+                        panel: perm.permission.panel,
+                        module: perm.permission.module,
+                        action: perm.permission.action,
+                        status: perm.permission.status,
+                    });
+                }
+            });
+            setExtractedPermissions(permissions);
+        } catch (err) {
+            console.error("Error parsing permissions:", err);
+        }
+    }, []);
 
     const verifyAdminAuth = useCallback(async () => {
         setLoading(true);
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
         if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData"); // Correct way to remove a specific item
-        router.push("/admin/auth/login");        // Redirect to login
+            router.push("/admin/auth/login");        // Redirect to login
         }
 
         const admin_token = adminData?.security?.token;
@@ -59,61 +90,61 @@ export default function AdminMiddleWareProvider({ children }) {
         } catch (error) {
             console.error("Error:", error);
             setError(error.message || "Something went wrong");
-         router.push("/admin/auth/login");
+            router.push("/admin/auth/login");
         } finally {
             setLoading(false);
         }
     }, [router]);
-        const fetchSupplier = useCallback(async () => {
-            const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    
-            if (adminData?.project?.active_panel !== "admin") {
-                localStorage.removeItem("shippingData");
-                router.push("/admin/auth/login");
-                return;
-            }
-    
-            const admintoken = adminData?.security?.token;
-            if (!admintoken) {
-                router.push("/admin/auth/login");
-                return;
-            }
-    
-            try {
-                setLoading(true);
-                const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/supplier`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${admintoken}`,
-                    },
+    const fetchSupplier = useCallback(async () => {
+        const adminData = JSON.parse(localStorage.getItem("shippingData"));
+
+        if (adminData?.project?.active_panel !== "admin") {
+            localStorage.removeItem("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const admintoken = adminData?.security?.token;
+        if (!admintoken) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/supplier`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${admintoken}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.json();
+                Swal.fire({
+                    icon: "error",
+                    title: "Something Wrong!",
+                    text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
                 });
-    
-                if (!response.ok) {
-                    const errorMessage = await response.json();
-                    Swal.fire({
-                        icon: "error",
-                        title: "Something Wrong!",
-                        text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
-                    });
-                    throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
-                }
-    
-                const result = await response.json();
-                if (result) {
-                    setSuppliers(result?.suppliers || []);
-                }
-            } catch (error) {
-                console.error("Error fetching categories:", error);
-            } finally {
-                setLoading(false);
+                throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
             }
-        }, [router, setSuppliers]);
+
+            const result = await response.json();
+            if (result) {
+                setSuppliers(result?.suppliers || []);
+            }
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [router, setSuppliers]);
 
 
 
     return (
-        <AdminMiddleWareContext.Provider value={{openSubMenus,fetchSupplier,suppliers, setSuppliers, setOpenSubMenus, adminApiLoading, verifyAdminAuth, error, loading }}>
+        <AdminMiddleWareContext.Provider value={{ isAdminStaff, setIsAdminStaff, extractedPermissions, setExtractedPermissions, openSubMenus, fetchSupplier, suppliers, setSuppliers, setOpenSubMenus, verifyAdminAuth, error, loading }}>
             {children}
         </AdminMiddleWareContext.Provider>
     );
