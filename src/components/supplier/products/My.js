@@ -245,12 +245,7 @@ export default function My() {
         }
     };
     const viewProduct = (id) => {
-        if (type == "notmy") {
-            router.push(`/supplier/product/?id=${id}&type=${type}`);
-        } else {
-
-            router.push(`/supplier/product/?id=${id}`);
-        }
+        router.push(`/supplier/product/?id=${id}`);
     };
 
     const handleDelete = async (item) => {
@@ -595,6 +590,45 @@ export default function My() {
                                 variant?.image?.split(",")?.[0]?.trim() || productimg;
                             const productName = product?.product?.name || "NIL";
 
+                            const getPriceDisplay = (variants) => {
+                                if (!variants?.length) return "N/A";
+
+                                console.log('variants', variants)
+                                const modalMap = {};
+                                variants.forEach((variant) => {
+                                    const modal = variant?.variant?.modal || "Default";
+                                    if (!modalMap[modal]) modalMap[modal] = [];
+                                    modalMap[modal].push(variant);
+                                });
+
+                                const modalKeys = Object.keys(modalMap);
+
+                                // Case 1: Only 1 model and 1 variant
+                                if (modalKeys.length === 1 && modalMap[modalKeys[0]].length === 1) {
+                                    return `₹${modalMap[modalKeys[0]][0].price ?? 0}`;
+                                }
+
+                                // Case 2: 1 model, multiple variants
+                                if (modalKeys.length === 1 && modalMap[modalKeys[0]].length > 1) {
+                                    const prices = modalMap[modalKeys[0]].map(v => v?.price ?? 0);
+                                    const min = Math.min(...prices);
+                                    const max = Math.max(...prices);
+                                    return `₹${min} - ₹${max}`;
+                                }
+
+                                // Case 3 or 4: multiple models
+                                return modalKeys.map((modal) => {
+                                    const variants = modalMap[modal];
+                                    const prices = variants.map(v => v?.price ?? 0);
+                                    const min = Math.min(...prices);
+                                    const max = Math.max(...prices);
+                                    const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
+                                    return `${modal}: ${priceLabel}`;
+                                }).join(" | ");
+                            };
+
+
+
                             return (
                                 <div
                                     key={product.id}
@@ -620,14 +654,11 @@ export default function My() {
 
                                     {/* CONTENT */}
                                     <div className="p-3 relative ">
-                                        <div className="flex justify-between items-center">
+                                        <div className="flex flex-wrap justify-between items-center">
                                             <h2 className="text-lg font-semibold">{productName}</h2>
                                             {product.variants.length > 0 && (
                                                 <p className="text-black font-bold">
-                                                    ₹
-                                                    {product.variants.length === 1
-                                                        ? product.variants[0]?.price || 0
-                                                        : Math.min(...product.variants.map((v) => v?.price || 0))}
+                                                    {getPriceDisplay(product.variants)}
                                                 </p>
                                             )}
                                         </div>
@@ -761,8 +792,9 @@ export default function My() {
 
                     {showPopup && (
                         <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
-                            <div className="bg-white p-6 rounded-lg border-orange-500 w-full border  max-w-4xl shadow-xl relative">
+                            <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
                                 <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
+
 
                                 {(() => {
                                     const varinatExists = inventoryData?.isVarientExists ? "yes" : "no";
@@ -894,79 +926,72 @@ export default function My() {
 
                     {showVariantPopup && selectedProduct && (
                         <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
-                            <div className="bg-white p-6 rounded-lg border-orange-500 border w-full max-w-4xl shadow-xl relative">
-                                <h2 className="text-2xl font-bold mb-6">Variant Details</h2>
+                            <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
+                                <h2 className="text-xl font-semibold mb-6">Varinats Details</h2>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {selectedProduct.variants?.map((v, idx) => {
-                                        const imageUrls = v.image
-                                            ? v.image.split(',').map((img) => img.trim()).filter(Boolean)
-                                            : [];
 
-                                        const variant = v.variant || v;
-                                        const variants = v;
-                                        const isExists = selectedProduct?.product?.isVarientExists;
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">                                    {selectedProduct.variants?.map((v, idx) => {
+                                    const imageUrls = v.image
+                                        ? v.image.split(',').map((img) => img.trim()).filter(Boolean)
+                                        : [];
 
-                                        return (
-                                            <div
-                                                key={variant.id || idx}
-                                                className="bg-white border hover:border-orange-500 border-gray-200 rounded-xl shadow hover:shadow-lg transition p-4 "
-                                            >
-                                                <div className="overflow-x-auto max-w-full pb-2">
-                                                    {imageUrls.length > 0 ? (
-                                                        imageUrls.map((url, i) => (
-                                                            <Image
-                                                                key={i}
-                                                                height={100}
-                                                                width={100}
-                                                                src={url}
-                                                                alt={variant.name || 'Image'}
-                                                                className="rounded border w-full  object-cover"
-                                                            />
-                                                        ))
-                                                    ) : (
+                                    const variant = v.variant || v;
+                                    const variants = v;
+                                    const isExists = selectedProduct?.product?.isVarientExists;
+
+                                    return (
+                                        <div
+                                            key={variant.id || idx}
+                                            className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
+                                        >
+                                            <div className="overflow-x-auto max-w-full pb-2">
+                                                {imageUrls.length > 0 ? (
+                                                    imageUrls.map((url, i) => (
                                                         <Image
-                                                            height={80}
-                                                            width={80}
-                                                            src="https://placehold.co/400"
-                                                            alt="Placeholder"
-                                                            className="rounded border h-[150px] w-full object-cover"
+                                                            key={i}
+                                                            height={100}
+                                                            width={100}
+                                                            src={url}
+                                                            alt={variant.name || 'Image'}
+                                                            className="rounded border w-full  object-cover"
                                                         />
-                                                    )}
-                                                </div>
-
-                                                <div>
-                                                    <p><span className="font-semibold">Model:</span> {variant.modal || 'NIL'}</p>
-
-                                                    <p><span className="font-semibold">Suggested Price:</span> ₹{variants.price ?? 'NIL'}</p>
-                                                </div>
-
-                                                {isExists && (
-                                                    <div className="">
-                                                        <p><span className="font-semibold">Name:</span> {variant.name || 'NIL'}</p>
-                                                        <p><span className="font-semibold">SKU:</span> {variant.sku || 'NIL'}</p>
-                                                        <p><span className="font-semibold">Color:</span> {variant.color || 'NIL'}</p>
-                                                    </div>
+                                                    ))
+                                                ) : (
+                                                    <Image
+                                                        height={80}
+                                                        width={80}
+                                                        src="https://placehold.co/400"
+                                                        alt="Placeholder"
+                                                        className="rounded border h-[150px] w-full object-cover"
+                                                    />
                                                 )}
                                             </div>
-                                        );
-                                    })}
+
+                                            <div>
+                                                <p><span className="font-semibold">Model:</span> {variant.modal || 'NIL'}</p>
+
+                                                <p><span className="font-semibold">Suggested Price:</span> ₹{variants.price ?? 'NIL'}</p>
+                                            </div>
+
+                                            {isExists && (
+                                                <div className="">
+                                                    <p><span className="font-semibold">Name:</span> {variant.name || 'NIL'}</p>
+                                                    <p><span className="font-semibold">SKU:</span> {variant.sku || 'NIL'}</p>
+                                                    <p><span className="font-semibold">Color:</span> {variant.color || 'NIL'}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                                 </div>
 
-                                <div className="flex justify-end mt-6">
-                                    <button
-                                        onClick={() => setShowVariantPopup(false)}
-                                        className="flex items-center gap-1 bg-red-100 hover:bg-red-200 text-red-600 font-medium px-4 py-2 rounded transition"
-                                    >
-                                        <X className="w-4 h-4" /> Close
-                                    </button>
-                                </div>
+
 
                                 <button
                                     onClick={() => setShowVariantPopup(false)}
-                                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition"
+                                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl"
                                 >
-                                    <X className="w-6 h-6" />
+                                    ×
                                 </button>
                             </div>
                         </div>

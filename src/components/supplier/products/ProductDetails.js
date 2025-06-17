@@ -46,6 +46,7 @@ const ProductDetails = () => {
   const [shipCost, setShipCost] = useState([]);
   const [openDescriptionId, setOpenDescriptionId] = useState(null);
 
+  const [activeModal, setActiveModal] = useState('Shipowl');
 
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
@@ -55,7 +56,7 @@ const ProductDetails = () => {
   const [openCalculator, setOpenCalculator] = useState(null);
   const [productDetails, setProductDetails] = useState({});
   const [otherSuppliers, setOtherSuppliers] = useState([]);
-  const images = selectedVariant?.variant?.image?.split(",") || [];
+  const images = selectedVariant?.variant?.image?.split(",") || selectedVariant?.image?.split(",") || [];
   const [shopifyStores, setShopifyStores] = useState([]);
   const [selectedImage, setSelectedImage] = useState(images[0] || "");
   const [categoryId, setCategoryId] = useState('');
@@ -70,7 +71,6 @@ const ProductDetails = () => {
   });
 
 
-  //fields for calculator
 
   const [form, setForm] = useState({
     sellingPrice: '',
@@ -131,49 +131,30 @@ const ProductDetails = () => {
 
   // Safely parsed values
   const sellingPrice = parseFloat(form.sellingPrice) || 0;
-
   const totalOrderQty = parseFloat(form.totalOrderQty) || 0;
-
   const confirmOrderPercentage = parseFloat(form.confirmOrderPercentage) || 0;
-
   const deliveryPercentage = parseFloat(form.deliveryPercentage) || 0;
-
   const deliveryRTOPercentage = 100 - deliveryPercentage;
-
   const adSpends = parseFloat(form.adSpends) || 0;
-
   const miscCharges = parseFloat(form.miscCharges) || 0;
-
   const productPrice = selectedVariant?.price;
   const deliveryCostPerUnit = shipCost;
-  // Derived Quantities
   const confirmedQtyrAW = totalOrderQty * (confirmOrderPercentage / 100);
   const confirmedQty = Math.round(confirmedQtyrAW);
-
-  // Calculate Delivered Quantity and round up if there is a decimal
   const deliveredQtyRaw = confirmedQty * (deliveryPercentage / 100);
   const deliveredQty = Math.round(deliveredQtyRaw);
-
   // Calculate Delivered RTO Quantity
   const deliveredRTOQty = confirmedQty - deliveredQty;
-
-
   // Cost Calculations
-
   const productCostForDelivered = deliveredQty * productPrice;
-
   const revenueFromDelivered = deliveredQty * sellingPrice;
-
   const totalRTODeliveryCost = deliveredRTOQty * deliveryCostPerUnit;
-
   // Final Margin Calculation
   const totalAddSpend = adSpends * totalOrderQty; //order*adSpends
   const perOrderMargin = sellingPrice - productPrice;
   const finalEarnings = perOrderMargin * deliveredQty;
   const totalExpenses = totalRTODeliveryCost + totalAddSpend + miscCharges;
   const finalMargin = finalEarnings - totalExpenses; //total earning-totalspend
-
-
   const profitPerOrder = finalMargin / totalOrderQty;
   const fetchProductDetails = useCallback(async () => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -221,26 +202,38 @@ const ProductDetails = () => {
       if (type === "notmy") {
         const ProductDataSup = result?.product;
         const ProductDataOther = result?.otherSuppliers;
+
         setProductDetails(ProductDataSup || {});
         setOtherSuppliers(ProductDataOther || []);
-        setVariantDetails(ProductDataSup.variants || []);
-        setSelectedVariant(ProductDataSup?.variants[0])
-        if (ProductDataSup) {
-          setCategoryId(ProductDataSup?.product?.categoryId)
-          fetchRelatedProducts(ProductDataSup?.categoryId, activeTab)
 
+        const sortedVariants = (ProductDataSup?.variants || []).slice().sort(
+          (a, b) => a.suggested_price - b.suggested_price
+        );
+        setVariantDetails(sortedVariants);
+        setSelectedVariant(sortedVariants[0]);
+
+        if (ProductDataSup) {
+          setCategoryId(ProductDataSup?.product?.categoryId);
+          fetchRelatedProducts(ProductDataSup?.categoryId, activeTab);
         }
-      }
-      else {
+
+      } else {
         const ProductDataDrop = result?.supplierProduct;
+
         setProductDetails(ProductDataDrop?.product || {});
-        setVariantDetails(ProductDataDrop.variants || []);
-        setSelectedVariant(ProductDataDrop?.variants[0]);
+
+        const sortedVariants = (ProductDataDrop?.variants || []).slice().sort(
+          (a, b) => a.price - b.price
+        );
+        setVariantDetails(sortedVariants);
+        setSelectedVariant(sortedVariants[0]);
+
         if (ProductDataDrop) {
-          setCategoryId(ProductDataDrop?.product?.categoryId)
-          fetchRelatedProducts(ProductDataDrop?.product?.categoryId, activeTab)
+          setCategoryId(ProductDataDrop?.product?.categoryId);
+          fetchRelatedProducts(ProductDataDrop?.product?.categoryId, activeTab);
         }
       }
+
 
     } catch (error) {
       console.error("Error fetching product details:", error);
@@ -430,7 +423,7 @@ const ProductDetails = () => {
       router.push(`/supplier/product/?id=${id}`);
     }
   };
-  console.log('productDetails', productDetails)
+  console.log('selectedVariant', selectedVariant)
   return (
     <>
       {productDetails && Object.keys(productDetails).length > 0 ? (
@@ -481,7 +474,7 @@ const ProductDetails = () => {
 
               <p className="text-gray-600">
                 Sold: <span className="text-black">1,316 </span> | Rating: ⭐
-                <span className="text-black"> {selectedVariant?.variant?.stock} </span> | Stock:
+                <span className="text-black"> {selectedVariant?.variant?.stock || selectedVariant?.stock} </span> | Stock:
                 <span className="text-black"> 25 </span> | Message:
                 <span className="text-black"> 140</span>
               </p>
@@ -554,49 +547,175 @@ const ProductDetails = () => {
               </div>
 
               <h3 className="mt-4 font-bold text-[18px] pb-2">Variants</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-                {variantDetails.map((item, index) => {
-                  let variant;
-                  if (type === "notmy") {
-                    variant = item;
-                  } else {
-                    variant = item?.variant;
-                  }
-                  const isSelected = selectedVariant?.id === variant?.id;
+              <div className="">
+                {(() => {
+                  const groupedByModal = variantDetails.reduce((acc, curr) => {
+                    const modal = curr?.modal || curr?.variant?.modal || "Unknown";
+                    if (!acc[modal]) acc[modal] = [];
+                    acc[modal].push(curr);
+                    return acc;
+                  }, {});
 
-                  return (
-                    <div
-                      onClick={() => handleVariantClick(item)}
-                      key={index}
-                      className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
-                        ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
-                        : "border-gray-300 hover:shadow-lg bg-white"
-                        }`}
-                    >
-                      <div className='flex gap-3'>
-                        <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
-                          <Image
-                            src={productimg || variant?.image}
-                            alt={variant?.name || "Variant Image"}
-                            width={140}
-                            height={140}
-                            className="object-cover w-full h-full"
-                          />
-                        </div>
+                  const modalNames = Object.keys(groupedByModal);
+                  const totalModals = modalNames.length;
 
-                        <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
-                          <div>Name: <span className="font-medium">{variant?.name || 'NIL'}</span></div>
-                          <div>Color: <span className="font-medium">{variant?.color || 'NIL'}</span></div>
-                          <div>Modal: <span className="font-medium">{variant?.modal}</span></div>
-                          <div className="text-green-600 font-semibold">
-                            Price: ₹{type === "notmy" ? item?.suggested_price : item.price}
-                          </div>
-                        </div>
+                  const getVariantData = (v) => ({
+                    id: v?.id || v?.variant?.id,
+                    name: v?.name || v?.variant?.name || "NIL",
+                    modal: v?.modal || v?.variant?.modal || "Unknown",
+                    color: v?.color || v?.variant?.color || "NIL",
+                    image: (v?.image || v?.variant?.image || "").split(",")[0],
+                    suggested_price: v?.price || v?.variant?.suggested_price ,
+                    full: v,
+                  });
+
+                  // CASE 1: 1 modal, 1 variant
+                  if (totalModals === 1 && groupedByModal[modalNames[0]].length === 1) {
+                    const variant = getVariantData(groupedByModal[modalNames[0]][0]);
+                    return (
+                      <div className="p-4 rounded-lg border border-gray-300 bg-white text-left">
+                        <div className="text-gray-800 font-medium">Price:</div>
+                        <div className="text-green-600 font-bold text-xl">₹{variant.suggested_price}</div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  }
+
+                  // CASE 2: 1 modal, multiple variants
+                  if (totalModals === 1 && groupedByModal[modalNames[0]].length > 1) {
+                    return groupedByModal[modalNames[0]]
+                      .map(getVariantData)
+                      .sort((a, b) => a.suggested_price - b.suggested_price)
+                      .map((variant, index) => {
+                        const isSelected = selectedVariant?.id === variant.id;
+                        return (
+                          <div
+                            key={index}
+                            onClick={() => handleVariantClick(variant.full)}
+                            className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
+                                ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
+                                : "border-gray-300 hover:shadow-lg bg-white"
+                              }`}
+                          >
+                            <div className="flex gap-3">
+                              <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
+                                <Image
+                                  src={productimg || variant.image}
+                                  alt={variant.name}
+                                  width={140}
+                                  height={140}
+                                  className="object-cover w-full h-full"
+                                />
+                              </div>
+                              <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
+                                <div>Name: <span className="font-medium">{variant.name}</span></div>
+                                <div>Color: <span className="font-medium">{variant.color}</span></div>
+                                <div className="text-green-600 font-semibold">Price: ₹{variant.suggested_price}</div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      });
+                  }
+
+                  // CASE 4: Two modals, one variant each → radio buttons
+                  if (totalModals === 2 && modalNames.every(modal => groupedByModal[modal].length === 1)) {
+                    return (
+                      <div className="space-y-4">
+                        {modalNames.map((modal, index) => {
+                          const variant = getVariantData(groupedByModal[modal][0]);
+                          const isSelected = selectedVariant?.id === variant.id;
+                          return (
+                            <label key={index} className="flex items-center gap-3 cursor-pointer">
+                              <input
+                                type="radio"
+                                name="modal"
+                                value={modal}
+                                checked={isSelected}
+                                onChange={() => handleVariantClick(variant.full)}
+                              />
+                              <span className="text-gray-800 font-medium">{modal}</span>
+                              {isSelected && (
+                                <span className="ml-2 text-green-600 font-semibold">
+                                  ₹{variant.suggested_price}
+                                </span>
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    );
+                  }
+
+                  // CASE 3: Multiple modals with multiple variants → TABS
+                  if (totalModals > 1 && modalNames.some(modal => groupedByModal[modal].length > 1)) {
+                    return (
+                      <>
+                        {/* Tabs */}
+                        <div className="flex gap-3 mb-4 border-b pb-2">
+                          {modalNames.map((modal, index) => (
+                            <button
+                              key={index}
+                              className={`px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 ${activeModal === modal
+                                  ? "border-orange-600 text-orange-600"
+                                  : "border-transparent text-gray-600 hover:text-orange-500"
+                                }`}
+                              onClick={() => {
+                                const sorted = groupedByModal[modal]
+                                  .map(getVariantData)
+                                  .sort((a, b) => a.suggested_price - b.suggested_price);
+                                setActiveModal(modal);
+                                setSelectedVariant(sorted[0].full);
+                              }}
+                            >
+                              {modal}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Variant Cards */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          {(groupedByModal[activeModal] || [])
+                            .map(getVariantData)
+                            .sort((a, b) => a.suggested_price - b.suggested_price)
+                            .map((variant, index) => {
+                              const isSelected = selectedVariant?.id === variant.id;
+                              return (
+                                <div
+                                  key={index}
+                                  onClick={() => handleVariantClick(variant.full)}
+                                  className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
+                                      ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
+                                      : "border-gray-300 hover:shadow-lg bg-white"
+                                    }`}
+                                >
+                                  <div className="flex gap-3">
+                                    <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
+                                      <Image
+                                        src={productimg || variant.image}
+                                        alt={variant.name}
+                                        width={140}
+                                        height={140}
+                                        className="object-cover w-full h-full"
+                                      />
+                                    </div>
+                                    <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
+                                      <div>Name: <span className="font-medium">{variant.name}</span></div>
+                                      <div>Color: <span className="font-medium">{variant.color}</span></div>
+                                      <div className="text-green-600 font-semibold">Price: ₹{variant.suggested_price}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </>
+                    );
+                  }
+
+                  return <div>No variant available.</div>;
+                })()}
               </div>
+
 
 
 
@@ -819,6 +938,8 @@ const ProductDetails = () => {
                   const lowestPrice = prices.length > 0 ? Math.min(...prices) : "-";
                   const productName = product.name || "Unnamed Product";
 
+
+
                   return (
                     <div
                       key={index}
@@ -953,12 +1074,12 @@ const ProductDetails = () => {
 
                                 <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
                                   <p><span className="font-semibold">Modal:</span> {variant.modal || "NIL"}</p>
+                                  <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
                                   {isExists && (
                                     <>
                                       <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
                                       <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
                                       <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
-                                      <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
                                     </>
                                   )}
                                 </div>
@@ -1077,8 +1198,8 @@ const ProductDetails = () => {
 
               {/* Info Bar */}
               <div className="flex gap-6 mt-4 mb-6">
-                <Image src={selectedVariant?.variant?.image?.split(",") || productimg} alt="Demo Image" />
-                <ProductInfo label="Shipowl Price" value={selectedVariant?.price} />
+                <Image src={selectedVariant?.variant?.image?.split(",") || selectedVariant?.image?.split(",") || productimg} alt="Demo Image" />
+                <ProductInfo label="Shipowl Price" value={selectedVariant?.suggested_price} />
                 <ProductInfo label="RTO Charges" value={shipCost} />
                 <ProductInfo label="Product Weight" value={`${productDetails?.weight} GM `} />
               </div>
