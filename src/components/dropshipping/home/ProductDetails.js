@@ -53,7 +53,7 @@ const ProductDetails = () => {
   const [openCalculator, setOpenCalculator] = useState(null);
   const [productDetails, setProductDetails] = useState({});
   const [otherSuppliers, setOtherSuppliers] = useState([]);
-  const images = selectedVariant?.variant?.image?.split(",") || [];
+  const images = selectedVariant?.variant?.image?.split(",") || selectedVariant?.supplierProductVariant?.variant?.image?.split(",") || [];
   const [shopifyStores, setShopifyStores] = useState([]);
   const [selectedImage, setSelectedImage] = useState(images[0] || "");
   const [categoryId, setCategoryId] = useState('');
@@ -223,7 +223,7 @@ const ProductDetails = () => {
         setProductDetails(ProductDataSup?.product || {});
         setOtherSuppliers(ProductDataOther || []);
         const sortedVariants = (ProductDataSup?.variants || []).slice().sort(
-          (a, b) => a.suggested_price - b.suggested_price
+          (a, b) => a.price - b.price
         );
         setVariantDetails(sortedVariants);
         setSelectedVariant(sortedVariants[0]);
@@ -237,7 +237,7 @@ const ProductDetails = () => {
         const ProductDataDrop = result?.dropshipperProduct;
         setProductDetails(ProductDataDrop?.product || {});
         const sortedVariants = (ProductDataDrop?.variants || []).slice().sort(
-          (a, b) => a.suggested_price - b.suggested_price
+          (a, b) => a.price - b.price
         );
         setVariantDetails(sortedVariants);
         setSelectedVariant(sortedVariants[0]);
@@ -582,7 +582,7 @@ const ProductDetails = () => {
               <div className="">
                 {(() => {
                   const groupedByModal = variantDetails.reduce((acc, curr) => {
-                    const modal = curr?.modal || curr?.variant?.modal || "Unknown";
+                    const modal = curr?.modal || curr?.variant?.modal || curr?.supplierProductVariant?.variant?.modal || "Unknown";
                     if (!acc[modal]) acc[modal] = [];
                     acc[modal].push(curr);
                     return acc;
@@ -593,10 +593,10 @@ const ProductDetails = () => {
 
                   const getVariantData = (v) => ({
                     id: v?.id || v?.variant?.id,
-                    name: v?.name || v?.variant?.name || "NIL",
-                    modal: v?.modal || v?.variant?.modal || "Unknown",
-                    color: v?.color || v?.variant?.color || "NIL",
-                    image: (v?.image || v?.variant?.image || "").split(",")[0],
+                    name: v?.name || v?.supplierProductVariant?.variant?.name || "NIL",
+                    modal: v?.modal || v?.supplierProductVariant?.variant?.modal || "Unknown",
+                    color: v?.color || v?.supplierProductVariant?.variant?.color || "NIL",
+                    image: (v?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
                     suggested_price: v?.price || v?.suggested_price,
                     full: v,
                   });
@@ -705,7 +705,7 @@ const ProductDetails = () => {
                               onClick={() => {
                                 const sorted = groupedByModal[modal]
                                   .map(getVariantData)
-                                  .sort((a, b) => a.suggested_price - b.suggested_price);
+                                  .sort((a, b) => a.price - b.price);
                                 setActiveModal(modal);
                                 setSelectedVariant(sorted[0].full);
                               }}
@@ -827,7 +827,7 @@ const ProductDetails = () => {
                     </div>
                   </div>
                   {otherSuppliers.length > 0 && (
-                    <div className="">
+                    <div className="grid grid-cols-2">
                       <h3 className=" text-[18px] pt-5 font-bold">Other Suppliers</h3>
                       {otherSuppliers.map((sup, index) => {
                         // Find the variant with the lowest price
@@ -838,7 +838,7 @@ const ProductDetails = () => {
                         return (
                           <div onClick={() => viewProduct(sup?.id)} key={index} className="mb-4 p-3 border-dotted  border-2 border-orange-600 shadow-md bg-orange-50  rounded">
                             <div>
-                              <strong>Supplier ID:</strong> {sup?.supplier?.uniqueId || 'NIL'}
+                              <strong>Supplier ID:</strong> {sup?.supplier?.uniqeId || 'NIL'}
                             </div>
 
                             <div className='flex gap-3'>
