@@ -215,7 +215,7 @@ const ProductDetails = () => {
         });
         throw new Error(result.message || result.error || "Something went wrong!");
       }
-      setShipCost(result?.shippingCost || []);
+      setShipCost(result?.shippingCost || 75);
 
       if (type === "notmy") {
         const ProductDataSup = result?.supplierProduct;
@@ -593,10 +593,10 @@ const ProductDetails = () => {
 
                   const getVariantData = (v) => ({
                     id: v?.id || v?.variant?.id,
-                    name: v?.name || v?.supplierProductVariant?.variant?.name || "NIL",
-                    modal: v?.modal || v?.supplierProductVariant?.variant?.modal || "Unknown",
-                    color: v?.color || v?.supplierProductVariant?.variant?.color || "NIL",
-                    image: (v?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
+                    name: v?.variant?.name || v?.supplierProductVariant?.variant?.name || "NIL",
+                    modal: v?.variant?.modal || v?.supplierProductVariant?.variant?.modal || "Unknown",
+                    color: v?.variant?.color || v?.supplierProductVariant?.variant?.color || "NIL",
+                    image: (v?.variant?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
                     suggested_price: v?.price || v?.suggested_price,
                     full: v,
                   });
@@ -763,7 +763,7 @@ const ProductDetails = () => {
 
 
               <div className="mt-4 border-t border-[#E0E2E7] pt-0">
-                <div className="flex gap-6">
+                <div className="flex gap-6 flex-wrap">
                   <div>
                     <h3 className="text-[18px] pt-5 font-bold">Color Variant</h3>
                     <div className="flex flex-wrap gap-3 mt-2">
@@ -826,32 +826,35 @@ const ProductDetails = () => {
                       })()}
                     </div>
                   </div>
-                  {otherSuppliers.length > 0 && (
-                    <div className="grid grid-cols-2">
-                      <h3 className=" text-[18px] pt-5 font-bold">Other Suppliers</h3>
-                      {otherSuppliers.map((sup, index) => {
-                        // Find the variant with the lowest price
-                        const lowestPriceVariant = sup.variants.reduce((min, v) =>
-                          v.price < min.price ? v : min
-                        );
+                  <div>
+                    {otherSuppliers.length > 0 && (
+                      <>
+                        <h3 className=" text-[18px] pt-5 font-bold">Other Suppliers</h3>
+                        <div className="grid grid-cols-2 gap-3 items-start">
+                          {otherSuppliers.map((sup, index) => {
+                            // Find the variant with the lowest price
+                            const lowestPriceVariant = sup.variants.reduce((min, v) =>
+                              v.price < min.price ? v : min
+                            );
 
-                        return (
-                          <div onClick={() => viewProduct(sup?.id)} key={index} className="mb-4 p-3 border-dotted  border-2 border-orange-600 shadow-md bg-orange-50  rounded">
-                            <div>
-                              <strong>Supplier ID:</strong> {sup?.supplier?.uniqeId || 'NIL'}
-                            </div>
+                            return (
+                              <div onClick={() => viewProduct(sup?.id)} key={index} className="mb-4 p-3 border-dotted  border-2 border-orange-600 shadow-md bg-orange-50  rounded">
+                                <div>
+                                  <strong>Supplier ID:</strong> {sup?.supplier?.uniqeId || 'NIL'}
+                                </div>
 
-                            <div className='flex gap-3'>
-                              <strong> Price:</strong> ₹{lowestPriceVariant.price}
-                            </div>
+                                <div className='flex gap-3'>
+                                  <strong> Price:</strong> ₹{lowestPriceVariant.price}
+                                </div>
 
-                          </div>
-                        );
-                      })}
+                              </div>
+                            );
+                          })}
 
-                    </div>
-                  )}
-
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -1261,7 +1264,7 @@ const ProductDetails = () => {
                   <button className="text-sm underline font-bold items-center gap-2 flex text-black" onClick={resetForm}>
                     <RiResetRightLine /> Reset
                   </button>
-                  <button onClick={() => setOpenCalculator(false)} className="text-sm text-black font-bold" >
+                  <button onClick={() => {setOpenCalculator(false); resetForm}} className="text-sm text-black font-bold" >
                     <RxCross1 />
                   </button>
                 </div>
@@ -1269,9 +1272,19 @@ const ProductDetails = () => {
 
               {/* Info Bar */}
               <div className="flex gap-6 mt-4 mb-6">
-                <Image src={selectedVariant?.variant?.image?.split(",")} alt="" />
+                <Image
+                  src={
+                    selectedVariant?.variant?.image
+                      ? selectedVariant.variant.image.split(",")[0]
+                      : 'https://placehold.co/600x400'
+                  }
+                  alt='Invalid Image'
+                  height={50}
+                  width={50}
+                />
+
                 <ProductInfo label="Shipowl Price" value={selectedVariant?.price} />
-                <ProductInfo label="RTO Charges" value={shipCost} />
+                <ProductInfo label="RTO Charges" value={shipCost || 75} />
                 <ProductInfo label="Product Weight" value={`${productDetails?.weight} GM `} />
               </div>
 
