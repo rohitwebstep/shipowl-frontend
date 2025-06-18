@@ -560,9 +560,9 @@ const ProductDetails = () => {
                   if (totalModals === 1 && groupedByModal[modalNames[0]].length === 1) {
                     const variant = getVariantData(groupedByModal[modalNames[0]][0]);
                     return (
-                    <>
-                    
-                    </>
+                      <>
+
+                      </>
                     );
                   }
 
@@ -1252,7 +1252,7 @@ const ProductDetails = () => {
         // Prepaid Product Cost
         const prePaidCost = shipOwlPrice * totalOrderQty;
         //Shipping Deduction:
-        const shippingDeduction = deliveryCostPerUnit * totalOrderQty;
+        const shippingDeduction = deliveryCostPerUnit * confirmOrderPercentage;
         //Total Prepaid
         const totalPrepaid = prePaidCost;
         //COD Collected
@@ -1265,8 +1265,12 @@ const ProductDetails = () => {
         const selfshipTotalPrice = selfshipCodCollected - selfShipTotalDeduction;
 
 
+        if (variantsModal.toLowerCase() === 'selfship') {
 
+        }
+        if (variantsModal.toLowerCase() === 'shipowl') {
 
+        }
         // 2. Return your JSX
         return (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

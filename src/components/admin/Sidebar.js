@@ -27,7 +27,7 @@ export default function Sidebar() {
     }));
   };
 
-  const actions = ['view-listing', 'update', 'create', 'listing', 'view', 'soft-delete','restore', 'trash-listing'];
+  const actions = ['View Listing', 'Update', 'Create', 'Listing', 'View', 'Soft Delete', 'Restore', 'Trash Listing', 'Bank Account Change Request View Listing', 'Bank Account Change Request Review'];
 
   const hasPermission = (module, actionList) => {
     return extractedPermissions.some(
@@ -36,9 +36,9 @@ export default function Sidebar() {
   };
 
   const menuSections = useMemo(() => [
-    { title: "Category Management", module: "category", action: actions, icon: Tags, href: "/admin/category/list" },
-    { title: "Brand Management", module: "brand", action: actions, icon: Tags, href: "/admin/brand/list" },
-    { title: "Product Management", module: "product", action: actions, icon: Package, href: "/admin/products/list" },
+    { title: "Category Management", module: "Category", action: actions, icon: Tags, href: "/admin/category/list" },
+    { title: "Brand Management", module: "Brand", action: actions, icon: Tags, href: "/admin/brand/list" },
+    { title: "Product Management", module: "Product", action: actions, icon: Package, href: "/admin/products/list" },
     { title: "Dropshipper Banners", module: "dropshiperBanners", action: actions, icon: LucideImage, href: "/admin/dropshipper/banner" },
     { title: "Email Settings", module: "emailSetting", action: actions, icon: Mail, href: "/admin/email-settings" },
 
@@ -48,8 +48,8 @@ export default function Sidebar() {
           name: "Permissions",
           icon: UserCheck,
           subMenu: [
-            { icon: UserCheck, name: "Global Permission", href: "/admin/permission" },
-            { icon: UserCheck, name: "Order Permission", href: "/admin/permission/order" },
+            { icon: UserCheck, name: "Global Permission", module: "Global Permission", action: actions, href: "/admin/permission" },
+            { icon: UserCheck, name: "Order Permission", module: "Supplier Order Permission", action: actions, href: "/admin/permission/order" },
           ],
         },
       ],
@@ -61,7 +61,8 @@ export default function Sidebar() {
           name: "Supplier Dashboard",
           icon: LayoutDashboard,
           subMenu: [
-            { icon: ClipboardList, module: "supplier", action: actions, name: "Supplier List", href: "/admin/supplier/list" },
+            { icon: ClipboardList, module: "Supplier", action: actions, name: "Supplier List", href: "/admin/supplier/list" },
+            { icon: Banknote, module: "Supplier", action: actions, name: "Bank Details Update Requests", href: "/admin/bankaccount-update-requests" },
             { icon: ClipboardList, module: "productRequest", action: actions, name: "New Product Request", href: "/admin/products/new" },
             { icon: ShoppingCart, module: "order", action: actions, name: "Orders(In progress)", href: "/admin/supplier/orders" },
             { icon: Warehouse, module: "warehouse", action: actions, name: "Warehouse", href: "/admin/supplier/warehouse/list" },
@@ -79,7 +80,8 @@ export default function Sidebar() {
           name: "Dropshipping Dashboard",
           icon: LayoutDashboard,
           subMenu: [
-            { icon: Users, module: "dropshipper", action: actions, name: "Dropshippers List", href: "/admin/dropshipper/list" },
+            { icon: Users, module: "Dropshipper", action: actions, name: "Dropshippers List", href: "/admin/dropshipper/list" },
+            { icon: Banknote, module: "Dropshipper", action: actions, name: "Bank Details Update Requests", href: "/admin/bankaccount-update-requests" },
             { icon: ShoppingCart, module: "manange-orders", action: actions, name: "Manage Orders(In progress)", href: "/admin/dropshipper/manage-orders" },
             { icon: Package, module: "manage-products", action: actions, name: "Manage Products(In progress)", href: "/admin/dropshipper/manage-products" },
             { icon: Gift, module: "source", action: actions, name: "Source a Product(In progress)", href: "/admin/dropshipper/product/source" },
@@ -102,21 +104,20 @@ export default function Sidebar() {
           subMenu: [
             { icon: ClipboardList, module: "courier", action: actions, name: "Courier Company", href: "/admin/courier/list" },
             { icon: ClipboardList, module: "api", action: actions, name: "Api Credentials (in progress)", href: "/admin/api/list" },
-            { icon: ClipboardList, module: "good-pincode", action: actions, name: "Good Performing Page", href: "/admin/good-pincodes/list" },
-            { icon: ClipboardList, module: "bad-pincode", action: actions, name: "Bad Performing Page", href: "/admin/bad-pincodes/list" },
-            { icon: Package, name: "High RTO", module: "high-rto", action: actions, href: "/admin/high-rto/list" },
+            { icon: ClipboardList, module: "Good Pincode", action: actions, name: "Good Performing Page", href: "/admin/good-pincodes/list" },
+            { icon: ClipboardList, module: "Bad Pincode", action: actions, name: "Bad Performing Page", href: "/admin/bad-pincodes/list" },
+            { icon: Package, name: "High RTO", module: "High RTO", action: actions, href: "/admin/high-rto/list" },
           ],
         },
       ],
     },
 
-    { title: "Subuser Listing", module: "subuser", action: actions, icon: User, href: "/admin/sub-user/list" },
-    { title: "Country Management", module: "country", action: actions, icon: Tags, href: "/admin/country/list" },
-    { title: "State Management", module: "state", action: actions, icon: ShieldCheck, href: "/admin/state/list" },
-    { title: "City Management", module: "city", action: actions, icon: ShieldCheck, href: "/admin/city/list" },
+    { title: "Subuser Listing", module: "Sub User", action: actions, icon: User, href: "/admin/sub-user/list" },
+    { title: "Country Management", module: "Country", action: actions, icon: Tags, href: "/admin/country/list" },
+    { title: "State Management", module: "State", action: actions, icon: ShieldCheck, href: "/admin/state/list" },
+    { title: "City Management", module: "City", action: actions, icon: ShieldCheck, href: "/admin/city/list" },
     { title: "Settings(In progress)", module: "setting", action: actions, icon: Settings, href: "/admin/setting" },
     { title: "Profile(In progress)", module: "profile", action: actions, icon: User, href: "/admin/profile" },
-    { title: "Bank Details Update Requests", module: "bank", action: actions, icon: Banknote, href: "/admin/bankaccount-update-requests" },
     { title: "Terms & Condition(In progress)", module: "term", action: actions, icon: ShieldCheck, href: "/admin/terms" },
   ].filter(section => {
     if (!isAdminStaff || section.children) return true;

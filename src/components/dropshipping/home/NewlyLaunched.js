@@ -252,6 +252,8 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
 
   const [activeModal, setActiveModal] = useState("");
 
+
+
   const [openSection, setOpenSection] = useState(null);
 
   const toggleSection = (section) => {
@@ -392,7 +394,6 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
       ),
     }));
   };
-
   const groupedByModal = inventoryData.variant.reduce((acc, curr) => {
     const modal = curr.variant.modal || "Unknown";
     if (!acc[modal]) acc[modal] = [];
@@ -412,6 +413,27 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
     suggested_price: v?.price || v?.suggested_price,
     full: v,
   });
+  const [activeVariantId, setActiveVariantId] = useState(() => {
+    if (
+      modalNames.length === 0 ||
+      !groupedByModal ||
+      !groupedByModal[modalNames[0]] ||
+      groupedByModal[modalNames[0]].length === 0
+    ) {
+      return null;
+    }
+
+    const variants = groupedByModal[modalNames[0]];
+    const minPriceItem = variants.reduce((min, curr) => {
+      const currentVariant = getVariantData(curr);
+      const minVariant = getVariantData(min);
+      return currentVariant.suggested_price < minVariant.suggested_price ? curr : min;
+    }, variants[0]);
+
+    return getVariantData(minPriceItem).id;
+  });
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -538,9 +560,6 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
   };
 
 
-  console.log('inventory', inventoryData)
-
-  console.log('showVariantPopup', showVariantPopup)
   return (
     <>
 
@@ -792,10 +811,10 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                 onChange={(e) => handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)}
                               />
                               <div
-                                className={`relative w-10 h-5 rounded-full transition ${variantInfo.Dropstatus ? 'bg-orange-500' : 'bg-gray-300'}`}
+                                className={`relative w-10 h-5  transition ${variantInfo.Dropstatus ? 'bg-orange-500' : 'bg-gray-300'}`}
                               >
                                 <div
-                                  className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
+                                  className={`absolute top-1 left-1 w-3 h-3 bg-white  transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
                                     }`}
                                 ></div>
                               </div>
@@ -966,7 +985,6 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                             <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
                               Your Margin{" "}
                               <span className="float-right">
-                                ₹
                                 ₹{(variant.full?.dropPrice) - (variant.suggested_price)}
                               </span>
                             </div>
@@ -986,103 +1004,116 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
 
 
                   // CASE 2: 1 modal, multiple variants
+
                   if (totalModals === 1 && groupedByModal[modalNames[0]].length > 1) {
+                    const variants = groupedByModal[modalNames[0]].map(getVariantData);
+
                     return (
                       <div className="space-y-6">
-                        {groupedByModal[modalNames[0]].map((item, idx) => {
-                          const variant = getVariantData(item);
-                          return (
-                            <>
-                             
-                              <div key={variant.id || idx} className="space-y-5 border p-4 rounded-lg shadow-sm">
-                                {/* Product Info */}
-                                <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-                                  <Image
-                                    src={variant.image || 'https://placehold.co/80x80?text=Image'}
-                                    alt="Product"
-                                    width={64}
-                                    height={64}
-                                    className="rounded border object-cover"
-                                  />
-                                  <div>
-                                    <p className="text-sm font-medium leading-5 line-clamp-2">
-                                      {variant.name || 'Stainless Steel Cable Lock Ties'}
-                                    </p>
-                                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                      Modal:
-                                      <span className="font-semibold text-[#4C4C4C]">
-                                        {variant.modal || 'C2445129'}
-                                      </span>
-                                      <ClipboardCopy
-                                        className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
-                                        onClick={() => navigator.clipboard.writeText(variant.modal || '')}
-                                      />
-                                    </p>
-                                  </div>
-                                </div>
+                        {/* Variant Toggle Buttons */}
+                        <div className="flex flex-wrap gap-2">
+                          {variants.map((variant) => (
+                            <button
+                              key={variant.id}
+                              type="button"
+                              onClick={() => setActiveVariantId(variant.id)}
+                              className={`px-4 py-1  text-sm font-medium border transition ${activeVariantId === variant.id
+                                ? "bg-blue-600 text-white border-blue-600"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                }`}
+                            >
+                              {variant.name || 'Variant'}
+                            </button>
+                          ))}
+                        </div>
 
-                                {/* Pricing Section */}
-                                <div className="border-t pt-4 space-y-3">
-                                  <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                                    Pricing
-                                  </div>
-
-                                  <div className="flex items-center gap-2">
-                                    <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
-                                      Set Your Selling Price (₹)
-                                      <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
-                                    </div>
-                                    <input
-                                      type="number"
-                                      value={variant.full?.dropPrice || ''}
-                                      onChange={(e) =>
-                                        handleVariantChange(variant.id, 'dropPrice', e.target.value)
-                                      }
-                                      className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+                        {/* Selected Variant Display */}
+                        {variants
+                          .filter((v) => v.id === activeVariantId)
+                          .map((variant, idx) => (
+                            <div key={variant.id || idx} className="space-y-5 border p-4 rounded-lg shadow-sm">
+                              {/* Product Info */}
+                              <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
+                                <Image
+                                  src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                                  alt="Product"
+                                  width={64}
+                                  height={64}
+                                  className="rounded border object-cover"
+                                />
+                                <div>
+                                  <p className="text-sm font-medium leading-5 line-clamp-2">
+                                    {variant.name || 'Stainless Steel Cable Lock Ties'}
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                    Modal:
+                                    <span className="font-semibold text-[#4C4C4C]">{variant.modal}</span>
+                                    <ClipboardCopy
+                                      className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
+                                      onClick={() => navigator.clipboard.writeText(variant.modal || '')}
                                     />
-                                  </div>
-
-                                  <div
-                                    onClick={() => {
-                                      setcalculateData(variant.full);
-                                      setOpenCalculator(true);
-                                    }}
-                                    className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
-                                  >
-                                    <FaCalculator className="text-purple-700 mr-2 text-2xl" />
-                                    <span className="text-black underline font-semibold text-sm">
-                                      Calculate <br /> Expected Profit
-                                    </span>
-                                  </div>
-
-                                  <p className="text-sm font-semibold">
-                                    Shipowl Price
-                                    <span className="float-right">₹{variant.suggested_price || 0}</span>
                                   </p>
-                                  <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
-                                    Including GST & Shipping Charges
-                                    <HelpCircle className="w-3.5 h-3.5" />
-                                  </p>
+                                </div>
+                              </div>
 
-                                  <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
-                                    Your Margin
-                                    <span className="float-right">
-                                      ₹{(variant.full?.dropPrice) - (variant.suggested_price)}
-                                    </span>
+                              {/* Pricing Section */}
+                              <div className="border-t pt-4 space-y-3">
+                                <div className="text-sm font-bold text-gray-700 flex items-center gap-2">Pricing</div>
+
+                                <div className="flex items-center gap-2">
+                                  <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
+                                    Set Your Selling Price (₹)
+                                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
                                   </div>
+                                  <input
+                                    type="number"
+                                    value={variant.full?.dropPrice || ''}
+                                    onChange={(e) =>
+                                      handleVariantChange(variant.id, 'dropPrice', e.target.value)
+                                    }
+                                    className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+                                  />
                                 </div>
 
-                                {/* RTO/RVP Note */}
-                                <div className="text-xs text-gray-600 border-t pt-3">
-                                  RTO & RVP charges are applicable and vary depending on the product weight.{' '}
-                                  <span className="font-semibold underline cursor-pointer">
-                                    View charges for this product
+                                <div
+                                  onClick={() => {
+                                    setcalculateData(variant.full);
+                                    setOpenCalculator(true);
+                                  }}
+                                  className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
+                                >
+                                  <FaCalculator className="text-purple-700 mr-2 text-2xl" />
+                                  <span className="text-black underline font-semibold text-sm">
+                                    Calculate <br /> Expected Profit
+                                  </span>
+                                </div>
+
+                                <p className="text-sm font-semibold">
+                                  Shipowl Price
+                                  <span className="float-right">₹{variant.suggested_price || 0}</span>
+                                </p>
+                                <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
+                                  Including GST & Shipping Charges
+                                  <HelpCircle className="w-3.5 h-3.5" />
+                                </p>
+
+                                <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
+                                  Your Margin
+                                  <span className="float-right">
+                                    ₹{(variant.full?.dropPrice || 0) - (variant.suggested_price || 0)}
                                   </span>
                                 </div>
                               </div>
-                            </>
-                          );
-                        })}
+
+                              {/* RTO/RVP Note */}
+                              <div className="text-xs text-gray-600 border-t pt-3">
+                                RTO & RVP charges are applicable and vary depending on the product weight.{' '}
+                                <span className="font-semibold underline cursor-pointer">
+                                  View charges for this product
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                       </div>
                     );
                   }
@@ -1093,7 +1124,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                       <div className="space-y-4">
                         {modalNames.map((modal, index) => {
                           const variant = getVariantData(groupedByModal[modal][0]);
-                          const isSelected = variant.id;
+                          const isSelected = inventoryData.modal === modal;
 
                           return (
                             <label key={variant.id || index} className="flex flex-col gap-3 cursor-pointer border rounded-lg p-4">
@@ -1103,13 +1134,11 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                   name="modal"
                                   value={modal}
                                   required
-                                  checked={inventoryData.modal === modal}
+                                  checked={isSelected}
                                   onChange={(e) => {
                                     handleVariantChange(null, 'modal', e.target.value);
-                                  }
-                                  }
+                                  }}
                                 />
-
                                 <span className="text-gray-800 font-medium">{modal}</span>
                                 {isSelected && (
                                   <span className="ml-2 text-green-600 font-semibold">
@@ -1192,7 +1221,8 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                     <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
                                       Your Margin
                                       <span className="float-right">
-                                        ₹{(variant.full?.dropPrice) - (variant.suggested_price)}                                    </span>
+                                        ₹{(variant.full?.dropPrice || 0) - (variant.suggested_price || 0)}
+                                      </span>
                                     </div>
                                   </div>
 
@@ -1213,25 +1243,32 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                   }
 
 
+
                   // CASE 4: Multiple modals with multiple variants → TABS
-                  if (totalModals > 1 && modalNames.some(modal => groupedByModal[modal].length > 1)) {
+                  if (totalModals > 1 && modalNames.some(modal => groupedByModal[modal]?.length > 1)) {
+                    const variantsInActiveModal = groupedByModal[activeModal]?.map(getVariantData) || [];
+
                     return (
                       <>
-                        {/* Tabs */}
+                        {/* Modal Tabs */}
                         <div className="flex gap-3 mb-4 border-b pb-2">
                           {modalNames.map((modal, index) => (
                             <button
                               key={index}
+                              type="button"
                               className={`px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 ${activeModal === modal
                                 ? "border-orange-600 text-orange-600"
                                 : "border-transparent text-gray-600 hover:text-orange-500"
                                 }`}
                               onClick={() => {
-                                const sorted = groupedByModal[modal]
-                                  .map(getVariantData)
-                                  .sort((a, b) => a.price - b.price);
                                 setActiveModal(modal);
 
+                                const modalVariants = groupedByModal[modal]?.map(getVariantData) || [];
+                                const minVariant = modalVariants.reduce((min, curr) =>
+                                  curr.suggested_price < min.suggested_price ? curr : min,
+                                  modalVariants[0]);
+
+                                setActiveVariantId(minVariant?.id || null);
                               }}
                             >
                               {modal}
@@ -1239,102 +1276,114 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                           ))}
                         </div>
 
+                        {/* Variant Name Buttons */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {variantsInActiveModal.map((variant) => (
+                            <button
+                              key={variant.id}
+                              type="button"
+                              onClick={() => setActiveVariantId(variant.id)}
+                              className={`px-4 py-1  text-sm font-medium border transition ${activeVariantId === variant.id
+                                ? "bg-blue-600 text-white border-blue-600"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                }`}
+                            >
+                              {variant.name || 'Variant'}
+                            </button>
+                          ))}
+                        </div>
 
+                        {/* Selected Variant Details */}
                         <div className="grid grid-cols-1 gap-4">
-                          {(groupedByModal[activeModal] || [])
-                            .map(getVariantData)
-                            .sort((a, b) => a.suggested_price - b.suggested_price)
-                            .map((variant, index) => {
-                              return (
-                                <div key={variant.id || index} className="space-y-5 border p-4 rounded-lg shadow-sm">
-                                  {/* Product Info */}
-                                  <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-                                    <Image
-                                      src={variant.image || 'https://placehold.co/80x80?text=Image'}
-                                      alt={variant.name || 'Product Image'}
-                                      width={64}
-                                      height={64}
-                                      className="rounded border object-cover"
-                                    />
-                                    <div>
-                                      <p className="text-sm font-medium leading-5 line-clamp-2">
-                                        {variant.name || 'Stainless Steel Cable Lock Ties'}
-                                      </p>
-                                      <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                        Modal: <span className="font-semibold text-[#4C4C4C]">{variant.modal || 'N/A'}</span>
-                                        <ClipboardCopy
-                                          className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
-                                          onClick={() => navigator.clipboard.writeText(variant.modal || '')}
-                                        />
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  {/* Pricing Section */}
-                                  <div className="border-t pt-4 space-y-3">
-                                    <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                                      Pricing
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                      <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
-                                        Set Your Selling Price (₹)
-                                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
-                                      </div>
-                                      <input
-                                        type="number"
-                                        value={variant.dropPrice || ''}
-                                        onChange={(e) =>
-                                          handleVariantChange(variant.id, 'dropPrice', e.target.value)
-                                        }
-                                        className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+                          {variantsInActiveModal
+                            .filter((variant) => variant.id === activeVariantId)
+                            .map((variant, index) => (
+                              <div key={variant.id || index} className="space-y-5 border p-4 rounded-lg shadow-sm">
+                                {/* Product Info */}
+                                <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
+                                  <Image
+                                    src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                                    alt={variant.name || 'Product Image'}
+                                    width={64}
+                                    height={64}
+                                    className="rounded border object-cover"
+                                  />
+                                  <div>
+                                    <p className="text-sm font-medium leading-5 line-clamp-2">
+                                      {variant.name || 'Stainless Steel Cable Lock Ties'}
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                      Modal: <span className="font-semibold text-[#4C4C4C]">{variant.modal || 'N/A'}</span>
+                                      <ClipboardCopy
+                                        className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
+                                        onClick={() => navigator.clipboard.writeText(variant.modal || '')}
                                       />
-                                    </div>
-
-                                    <div
-                                      onClick={() => {
-                                        setcalculateData(variant);
-                                        setOpenCalculator(true);
-                                      }}
-                                      className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
-                                    >
-                                      <FaCalculator className="text-purple-700 mr-2 text-2xl" />
-                                      <span className="text-black underline font-semibold text-sm">
-                                        Calculate <br /> Expected Profit
-                                      </span>
-                                    </div>
-
-                                    <p className="text-sm font-semibold">
-                                      Shipowl Price <span className="float-right">₹{variant.suggested_price || 0}</span>
                                     </p>
-                                    <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
-                                      Including GST & Shipping Charges
-                                      <HelpCircle className="w-3.5 h-3.5" />
-                                    </p>
+                                  </div>
+                                </div>
 
-                                    <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
-                                      Your Margin{' '}
-                                      <span className="float-right">
-                                        ₹{(variant.full?.dropPrice) - (variant.suggested_price)}
-                                      </span>
+                                {/* Pricing Section */}
+                                <div className="border-t pt-4 space-y-3">
+                                  <div className="text-sm font-bold text-gray-700 flex items-center gap-2">Pricing</div>
+
+                                  <div className="flex items-center gap-2">
+                                    <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
+                                      Set Your Selling Price (₹)
+                                      <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
                                     </div>
+                                    <input
+                                      type="number"
+                                      value={variant.full?.dropPrice || ''}
+                                      onChange={(e) =>
+                                        handleVariantChange(variant.id, 'dropPrice', e.target.value)
+                                      }
+                                      className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+                                    />
                                   </div>
 
-                                  {/* RTO/RVP Note */}
-                                  <div className="text-xs text-gray-600 border-t pt-3">
-                                    RTO & RVP charges are applicable and vary depending on the product weight.{' '}
-                                    <span className="font-semibold underline cursor-pointer">
-                                      View charges for this product
+                                  <div
+                                    onClick={() => {
+                                      setcalculateData(variant);
+                                      setOpenCalculator(true);
+                                    }}
+                                    className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
+                                  >
+                                    <FaCalculator className="text-purple-700 mr-2 text-2xl" />
+                                    <span className="text-black underline font-semibold text-sm">
+                                      Calculate <br /> Expected Profit
+                                    </span>
+                                  </div>
+
+                                  <p className="text-sm font-semibold">
+                                    Shipowl Price <span className="float-right">₹{variant.suggested_price || 0}</span>
+                                  </p>
+                                  <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
+                                    Including GST & Shipping Charges
+                                    <HelpCircle className="w-3.5 h-3.5" />
+                                  </p>
+
+                                  <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
+                                    Your Margin{' '}
+                                    <span className="float-right">
+                                      ₹{(variant.full?.dropPrice || 0) - (variant.suggested_price || 0)}
                                     </span>
                                   </div>
                                 </div>
-                              );
-                            })}
-                        </div>
 
+                                {/* RTO/RVP Note */}
+                                <div className="text-xs text-gray-600 border-t pt-3">
+                                  RTO & RVP charges are applicable and vary depending on the product weight.{' '}
+                                  <span className="font-semibold underline cursor-pointer">
+                                    View charges for this product
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
                       </>
                     );
                   }
+
 
                   // Default fallback if no variants found
                   return <p className="text-gray-500">No variants available</p>;
@@ -1358,325 +1407,329 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
 
               </div>
             </form>
-          </div>
-        </div>
+          </div >
+        </div >
       )}
 
-      {calculateData && openCalculator && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white w-full max-w-4xl rounded shadow-lg p-6 max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="flex justify-between items-center border-b pb-3">
-              <div className='flex gap-3 items-center'>
-                <div className='bg-gray-200 text-center p-3 flex justify-center items-center rounded-full'>
-                  <FaCalculator className="text-2xl" />
+      {
+        calculateData && openCalculator && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white w-full max-w-4xl rounded shadow-lg p-6 max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex justify-between items-center border-b pb-3">
+                <div className='flex gap-3 items-center'>
+                  <div className='bg-gray-200 text-center p-3 flex justify-center items-center '>
+                    <FaCalculator className="text-2xl" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Pricing Calculator</h2>
+                    <p className='text-xs'>Please enter all the required fields (<span className='text-red-500'>*</span>) to calculate your expected profit</p>
+                  </div>
                 </div>
+                <div className='flex gap-4 justify-end'>
+                  <button className="text-sm underline font-bold items-center gap-2 flex text-black" onClick={() => setForm({
+                    dropPrice: '',
+                    totalOrderQty: '',
+                    confirmOrderPercentage: '90',
+                    deliveryPercentage: '50',
+                    adSpends: '',
+                    miscCharges: '',
+                  })}>
+                    <RiResetRightLine /> Reset
+                  </button>
+                  <button onClick={() => setOpenCalculator(false)} className="text-sm text-black font-bold" >
+                    <RxCross1 />
+                  </button>
+                </div>
+              </div>
+
+              {/* Info Bar */}
+              <div className="flex gap-6 mt-4 mb-6">
+                {calculateData?.image ? (
+                  <Image
+                    src={calculateData.image.split(",")[0] || null}
+                    alt={calculateData?.name || "Product Image"}
+                    width={100}
+                    height={100}
+                  />
+                ) : null}
+
+                <ProductInfo label="Shipowl Price" value={calculateData?.price} />
+                <ProductInfo label="RTO Charges" value={shipCost} />
+                <ProductInfo label="Product Weight" value={`${calculateData?.weight} GM `} />
+              </div>
+
+              {/* Main Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Form Side */}
+                <div className="space-y-4 bg-[#f5f5f5] rounded-md p-4">
+                  <InputField
+                    label="Selling Price"
+                    value={form.dropPrice}
+                    onChange={(val) => handleChange('dropPrice', val)}
+                    error={errors.dropPrice}
+                    required
+
+                  />
+                  <InputField
+                    label="Expected Orders"
+                    value={form.totalOrderQty}
+                    onChange={(val) => handleChange('totalOrderQty', val)}
+                    error={errors.totalOrderQty}
+                    required
+                  />
+                  <InputField
+                    label="Confirmed Orders (%)"
+                    value={form.confirmOrderPercentage}
+                    onChange={(val) => handleChange('confirmOrderPercentage', Math.min(100, val))}
+                    error={errors.confirmOrderPercentage}
+                    required
+                    suffix="%"
+                  />
+                  <InputField
+                    label="Expected Delivery (%)"
+                    value={form.deliveryPercentage}
+                    onChange={(val) => handleChange('deliveryPercentage', Math.min(100, val))}
+                    error={errors.deliveryPercentage}
+                    required
+                    suffix="%"
+                  />
+                  <InputField
+                    label="Ad Spends per Order"
+                    value={form.adSpends}
+                    onChange={(val) => handleChange('adSpends', val)}
+                    error={errors.adSpends}
+                    required
+                    suffix="₹"
+                  />
+                  <InputField
+                    label="Total Misc. Charges"
+                    value={form.miscCharges}
+                    onChange={(val) => handleChange('miscCharges', val)}
+                    suffix="₹"
+                  />
+                </div>
+
+
+                {/* Results Side */}
                 <div>
-                  <h2 className="text-xl font-bold">Pricing Calculator</h2>
-                  <p className='text-xs'>Please enter all the required fields (<span className='text-red-500'>*</span>) to calculate your expected profit</p>
-                </div>
-              </div>
-              <div className='flex gap-4 justify-end'>
-                <button className="text-sm underline font-bold items-center gap-2 flex text-black" onClick={() => setForm({
-                  dropPrice: '',
-                  totalOrderQty: '',
-                  confirmOrderPercentage: '90',
-                  deliveryPercentage: '50',
-                  adSpends: '',
-                  miscCharges: '',
-                })}>
-                  <RiResetRightLine /> Reset
-                </button>
-                <button onClick={() => setOpenCalculator(false)} className="text-sm text-black font-bold" >
-                  <RxCross1 />
-                </button>
-              </div>
-            </div>
-
-            {/* Info Bar */}
-            <div className="flex gap-6 mt-4 mb-6">
-              {calculateData?.image ? (
-                <Image
-                  src={calculateData.image.split(",")[0] || null}
-                  alt={calculateData?.name || "Product Image"}
-                  width={100}
-                  height={100}
-                />
-              ) : null}
-
-              <ProductInfo label="Shipowl Price" value={calculateData?.price} />
-              <ProductInfo label="RTO Charges" value={shipCost} />
-              <ProductInfo label="Product Weight" value={`${calculateData?.weight} GM `} />
-            </div>
-
-            {/* Main Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Form Side */}
-              <div className="space-y-4 bg-[#f5f5f5] rounded-md p-4">
-                <InputField
-                  label="Selling Price"
-                  value={form.dropPrice}
-                  onChange={(val) => handleChange('dropPrice', val)}
-                  error={errors.dropPrice}
-                  required
-
-                />
-                <InputField
-                  label="Expected Orders"
-                  value={form.totalOrderQty}
-                  onChange={(val) => handleChange('totalOrderQty', val)}
-                  error={errors.totalOrderQty}
-                  required
-                />
-                <InputField
-                  label="Confirmed Orders (%)"
-                  value={form.confirmOrderPercentage}
-                  onChange={(val) => handleChange('confirmOrderPercentage', Math.min(100, val))}
-                  error={errors.confirmOrderPercentage}
-                  required
-                  suffix="%"
-                />
-                <InputField
-                  label="Expected Delivery (%)"
-                  value={form.deliveryPercentage}
-                  onChange={(val) => handleChange('deliveryPercentage', Math.min(100, val))}
-                  error={errors.deliveryPercentage}
-                  required
-                  suffix="%"
-                />
-                <InputField
-                  label="Ad Spends per Order"
-                  value={form.adSpends}
-                  onChange={(val) => handleChange('adSpends', val)}
-                  error={errors.adSpends}
-                  required
-                  suffix="₹"
-                />
-                <InputField
-                  label="Total Misc. Charges"
-                  value={form.miscCharges}
-                  onChange={(val) => handleChange('miscCharges', val)}
-                  suffix="₹"
-                />
-              </div>
-
-
-              {/* Results Side */}
-              <div>
-                <div className={`p-4 rounded-md ${showResult ? (finalMargin < 0 ? 'bg-red-50' : 'bg-green-50') : 'bg-gray-100'}`}>
-                  <ResultItem label="Net Profit" value={`₹${finalMargin.toFixed(2)}`} isVisible={showResult} />
-                  <p className='text-xs'>Total Earnings - Total Spends</p>
-                  <hr className='my-4' />
-                  <ResultItem label="Net Profit (Per Order)" value={`₹${profitPerOrder.toFixed(2)}`} isVisible={showResult} />
-                  <p className='text-xs'>Net Profit / Expected Orders</p>
-                </div>
-
-
-                <div className="border border-gray-300 p-4 rounded-md space-y-4 mt-3">
-                  {/* Orders Section */}
-                  <div className="border-b border-gray-200 pb-2">
-                    <div
-                      className="flex items-center justify-between cursor-pointer"
-                      onClick={() => toggleSection("orders")}
-                    >
-                      <div className="flex items-center gap-2 w-full">
-                        <div className="bg-purple-100 p-2 rounded-full">
-                          <TbCube className="text-purple-700" />
-                        </div>
-                        <ResultItem
-                          label="# Orders"
-                          value={totalOrderQty}
-                          isVisible={showResult}
-                          placeholder="-"
-                        />
-                      </div>
-                      {openSection === "orders" ? (
-                        <ChevronDown className="text-gray-500" />
-                      ) : (
-                        <ChevronRight className="text-gray-500" />
-                      )}
-                    </div>
-                    {openSection === "orders" && (
-                      <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
-                        <ul>
-                          <li>
-                            Confirmed Orders: <span>{confirmedQty}</span>
-                          </li>
-                          <li>
-                            Delivered Orders: <span>{deliveredQty}</span>
-                          </li>
-                          <li>
-                            RTO Orders: <span>{deliveredRTOQty}</span>
-                          </li>
-                          <li>
-                            Cancelled Orders: <span>{totalOrderQty - confirmedQty}</span>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
+                  <div className={`p-4 rounded-md ${showResult ? (finalMargin < 0 ? 'bg-red-50' : 'bg-green-50') : 'bg-gray-100'}`}>
+                    <ResultItem label="Net Profit" value={`₹${finalMargin.toFixed(2)}`} isVisible={showResult} />
+                    <p className='text-xs'>Total Earnings - Total Spends</p>
+                    <hr className='my-4' />
+                    <ResultItem label="Net Profit (Per Order)" value={`₹${profitPerOrder.toFixed(2)}`} isVisible={showResult} />
+                    <p className='text-xs'>Net Profit / Expected Orders</p>
                   </div>
 
-                  {/* Earnings Section */}
-                  <div className="border-b border-gray-200 pb-2">
-                    <div className="flex items-center  cursor-pointer"
-                      onClick={() => toggleSection("earnings")}
-                    >
-                      <div className="flex items-center gap-2 w-full">
-                        <div className="bg-green-100 p-2 rounded-full">
-                          <FiArrowDownLeft className="text-green-700" />
+
+                  <div className="border border-gray-300 p-4 rounded-md space-y-4 mt-3">
+                    {/* Orders Section */}
+                    <div className="border-b border-gray-200 pb-2">
+                      <div
+                        className="flex items-center justify-between cursor-pointer"
+                        onClick={() => toggleSection("orders")}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="bg-purple-100 p-2 ">
+                            <TbCube className="text-purple-700" />
+                          </div>
+                          <ResultItem
+                            label="# Orders"
+                            value={totalOrderQty}
+                            isVisible={showResult}
+                            placeholder="-"
+                          />
                         </div>
-                        <ResultItem
-                          label="Total Earnings"
-                          value={`₹${finalEarnings}`}
-                          isVisible={showResult}
-                        />
+                        {openSection === "orders" ? (
+                          <ChevronDown className="text-gray-500" />
+                        ) : (
+                          <ChevronRight className="text-gray-500" />
+                        )}
                       </div>
-                      {openSection === "earnings" ? (
-                        <ChevronDown className="text-gray-500" />
-                      ) : (
-                        <ChevronRight className="text-gray-500" />
+                      {openSection === "orders" && (
+                        <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
+                          <ul>
+                            <li>
+                              Confirmed Orders: <span>{confirmedQty}</span>
+                            </li>
+                            <li>
+                              Delivered Orders: <span>{deliveredQty}</span>
+                            </li>
+                            <li>
+                              RTO Orders: <span>{deliveredRTOQty}</span>
+                            </li>
+                            <li>
+                              Cancelled Orders: <span>{totalOrderQty - confirmedQty}</span>
+                            </li>
+                          </ul>
+                        </div>
                       )}
                     </div>
-                    {openSection === "earnings" && (
-                      <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
-                        <ul>
-                          <li>
 
-                            Margin Per Order: <span>{dropPrice > 0 ? dropPrice - productPrice : '-'}</span>
-                          </li>
-                          <li>
-                            Delivered Orders: <span>{deliveredQty}</span>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Expenses Section */}
-                  <div className="border-b border-gray-200 pb-2">
-                    <div
-                      className="flex items-center justify-between cursor-pointer w-full"
-                      onClick={() => toggleSection("expenses")}
-                    >
-                      <div className="flex items-center gap-2 w-full">
-                        <div className="bg-red-100 p-2 rounded-full">
-                          <GoArrowUpRight className="text-red-700" />
+                    {/* Earnings Section */}
+                    <div className="border-b border-gray-200 pb-2">
+                      <div className="flex items-center  cursor-pointer"
+                        onClick={() => toggleSection("earnings")}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="bg-green-100 p-2 ">
+                            <FiArrowDownLeft className="text-green-700" />
+                          </div>
+                          <ResultItem
+                            label="Total Earnings"
+                            value={`₹${finalEarnings}`}
+                            isVisible={showResult}
+                          />
                         </div>
-                        <ResultItem
-                          label="Total Spends"
-                          value={`₹ ${totalExpenses}`}
-                          isVisible={showResult}
-                        />
+                        {openSection === "earnings" ? (
+                          <ChevronDown className="text-gray-500" />
+                        ) : (
+                          <ChevronRight className="text-gray-500" />
+                        )}
                       </div>
-                      {openSection === "expenses" ? (
-                        <ChevronDown className="text-gray-500" />
-                      ) : (
-                        <ChevronRight className="text-gray-500" />
+                      {openSection === "earnings" && (
+                        <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
+                          <ul>
+                            <li>
+
+                              Margin Per Order: <span>{dropPrice > 0 ? dropPrice - productPrice : '-'}</span>
+                            </li>
+                            <li>
+                              Delivered Orders: <span>{deliveredQty}</span>
+                            </li>
+                          </ul>
+                        </div>
                       )}
                     </div>
-                    {openSection === "expenses" && (
-                      <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
-                        <ul>
-                          <li>
-                            Total Ad Spends: <span>{totalAddSpend}</span>
-                          </li>
-                          <li>
-                            (+)Total RTO Charges:{" "}
-                            <span>{deliveryCostPerUnit * deliveredRTOQty}</span>
-                          </li>
-                          <li>
-                            (+)Total Misc. Charges: <span>{miscCharges}</span>
-                          </li>
-                        </ul>
+
+                    {/* Expenses Section */}
+                    <div className="border-b border-gray-200 pb-2">
+                      <div
+                        className="flex items-center justify-between cursor-pointer w-full"
+                        onClick={() => toggleSection("expenses")}
+                      >
+                        <div className="flex items-center gap-2 w-full">
+                          <div className="bg-red-100 p-2 ">
+                            <GoArrowUpRight className="text-red-700" />
+                          </div>
+                          <ResultItem
+                            label="Total Spends"
+                            value={`₹ ${totalExpenses}`}
+                            isVisible={showResult}
+                          />
+                        </div>
+                        {openSection === "expenses" ? (
+                          <ChevronDown className="text-gray-500" />
+                        ) : (
+                          <ChevronRight className="text-gray-500" />
+                        )}
                       </div>
-                    )}
+                      {openSection === "expenses" && (
+                        <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
+                          <ul>
+                            <li>
+                              Total Ad Spends: <span>{totalAddSpend}</span>
+                            </li>
+                            <li>
+                              (+)Total RTO Charges:{" "}
+                              <span>{deliveryCostPerUnit * deliveredRTOQty}</span>
+                            </li>
+                            <li>
+                              (+)Total Misc. Charges: <span>{miscCharges}</span>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Footer Note */}
-            <p className="text-xs text-gray-500 mt-6">
-              Note: This calculator provides estimated figures. Actual results may vary. Shipowl does not commit to any expected profit based on these calculations.
-            </p>
+              {/* Footer Note */}
+              <p className="text-xs text-gray-500 mt-6">
+                Note: This calculator provides estimated figures. Actual results may vary. Shipowl does not commit to any expected profit based on these calculations.
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {showVariantPopup && selectedProduct && (
-        <div className="fixed  px-6 md:px-0  inset-0 bg-[#000000b0] bg-opacity-40 flex z-50 items-center justify-center ">
-          <div className="bg-white border border-orange-500 p-6 rounded-lg w-full z-50 max-w-4xl shadow-xl relative">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">Variant Details</h2>
-              <button
-                onClick={() => setShowVariantPopup(false)}
-                className="text-gray-500 hover:text-gray-800 transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
+      {
+        showVariantPopup && selectedProduct && (
+          <div className="fixed  px-6 md:px-0  inset-0 bg-[#000000b0] bg-opacity-40 flex z-50 items-center justify-center ">
+            <div className="bg-white border border-orange-500 p-6 rounded-lg w-full z-50 max-w-4xl shadow-xl relative">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-gray-800">Variant Details</h2>
+                <button
+                  onClick={() => setShowVariantPopup(false)}
+                  className="text-gray-500 hover:text-gray-800 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
 
-            {/* Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
-              {selectedProduct.variants?.map((v, idx) => {
-                let variant = {};
-                if (activeTab === "notmy") {
-                  variant = { ...(v.variant || {}), ...v };
-                }
-                if (activeTab === "my") {
-                  const supplierProductVariant = v?.supplierProductVariant || {};
-                  variant = {
-                    ...(supplierProductVariant.variant || {}),
-                    ...v
-                  };
-                }
+              {/* Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
+                {selectedProduct.variants?.map((v, idx) => {
+                  let variant = {};
+                  if (activeTab === "notmy") {
+                    variant = { ...(v.variant || {}), ...v };
+                  }
+                  if (activeTab === "my") {
+                    const supplierProductVariant = v?.supplierProductVariant || {};
+                    variant = {
+                      ...(supplierProductVariant.variant || {}),
+                      ...v
+                    };
+                  }
 
-                const imageUrls = variant.image
-                  ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-                  : [];
+                  const imageUrls = variant.image
+                    ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
+                    : [];
 
-                const isExists = selectedProduct?.product?.isVarientExists;
+                  const isExists = selectedProduct?.product?.isVarientExists;
 
-                return (
-                  <div
-                    key={variant.id || idx}
-                    className="bg-white hover:border-orange-500 p-4 rounded-2xl shadow-md hover:shadow-xl border border-gray-200 transition-all duration-300 flex flex-col"
-                  >
-                    {/* Image */}
-                    <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
-                      {imageUrls.length > 0 ? (
-                        <img
-                          src={`https://placehold.co/600x400?text=${idx + 1}`}
-                          alt={`variant-img-${idx}`}
-                          className="h-full w-full object-cover p-3 rounded-md"
-                        />
-                      ) : (
-                        <span className="text-gray-400  text-xl font-bold">{idx + 1}</span>
-                      )}
+                  return (
+                    <div
+                      key={variant.id || idx}
+                      className="bg-white hover:border-orange-500 p-4 rounded-2xl shadow-md hover:shadow-xl border border-gray-200 transition-all duration-300 flex flex-col"
+                    >
+                      {/* Image */}
+                      <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
+                        {imageUrls.length > 0 ? (
+                          <img
+                            src={`https://placehold.co/600x400?text=${idx + 1}`}
+                            alt={`variant-img-${idx}`}
+                            className="h-full w-full object-cover p-3 rounded-md"
+                          />
+                        ) : (
+                          <span className="text-gray-400  text-xl font-bold">{idx + 1}</span>
+                        )}
+                      </div>
+
+                      {/* Text Info */}
+                      <div className="text-sm text-gray-700 space-y-1">
+                        <p><span className="font-semibold">Modal:</span> {variant.modal || "—"}</p>
+                        <p><span className="font-semibold">Suggested Price:</span> {v.price || v?.supplierProductVariant?.price || "—"}</p>
+
+                        {isExists && (
+                          <>
+                            <p><span className="font-semibold">Name:</span> {variant.name || "—"}</p>
+                            <p><span className="font-semibold">SKU:</span> {variant.sku || "—"}</p>
+                            <p><span className="font-semibold">Color:</span> {variant.color || "—"}</p>
+                          </>
+                        )}
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
 
-                    {/* Text Info */}
-                    <div className="text-sm text-gray-700 space-y-1">
-                      <p><span className="font-semibold">Modal:</span> {variant.modal || "—"}</p>
-                      <p><span className="font-semibold">Suggested Price:</span> {v.price || v?.supplierProductVariant?.price || "—"}</p>
-
-                      {isExists && (
-                        <>
-                          <p><span className="font-semibold">Name:</span> {variant.name || "—"}</p>
-                          <p><span className="font-semibold">SKU:</span> {variant.sku || "—"}</p>
-                          <p><span className="font-semibold">Color:</span> {variant.color || "—"}</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
             </div>
-
           </div>
-        </div>
-      )}
+        )
+      }
 
     </>
   );
