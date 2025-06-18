@@ -1,3 +1,4 @@
+"use client"
 import { useEffect } from "react";
 import { useDropshipper } from "../middleware/DropshipperMiddleWareContext";
 import { useSearchParams } from "next/navigation";
