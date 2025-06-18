@@ -560,10 +560,9 @@ const ProductDetails = () => {
                   if (totalModals === 1 && groupedByModal[modalNames[0]].length === 1) {
                     const variant = getVariantData(groupedByModal[modalNames[0]][0]);
                     return (
-                      <div className="p-4 rounded-lg border border-gray-300 bg-white text-left">
-                        <div className="text-gray-800 font-medium">Price:</div>
-                        <div className="text-green-600 font-bold text-xl">₹{variant.suggested_price}</div>
-                      </div>
+                    <>
+                    
+                    </>
                     );
                   }
 
