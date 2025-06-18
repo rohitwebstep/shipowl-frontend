@@ -10,7 +10,7 @@ import { ProfileProvider } from "../admin/supplier/ProfileContext";
 import { HashLoader } from "react-spinners";
 function LayoutWrapperInner({ children }) {
     const pathname = usePathname();
-    const isAuthPage = pathname == "/dropshipping/shopify/success/" || pathname == "/dropshipping/shopify/success/" || pathname == "/dropshipping/shopify/success/" || pathname === '/dropshipping/auth/login/' || pathname === '/dropshipping/auth/password/forget/' || pathname === '/dropshipping/auth/password/reset/' || pathname === '/dropshipping/auth/register/' || pathname === '/dropshipping/auth/register/verify/';
+    const isAuthPage = pathname == "/dropshipping/shopify/success/" || pathname == "/dropshipping/shopify/connecting/" || pathname == "/dropshipping/shopify/failed/" || pathname === '/dropshipping/auth/login/' || pathname === '/dropshipping/auth/password/forget/' || pathname === '/dropshipping/auth/password/reset/' || pathname === '/dropshipping/auth/register/' || pathname === '/dropshipping/auth/register/verify/';
 
     return (
         <div className="main">
