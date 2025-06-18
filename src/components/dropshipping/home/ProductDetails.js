@@ -129,51 +129,6 @@ const ProductDetails = () => {
   };
 
   // Safely parsed values
-  const sellingPrice = parseFloat(form.sellingPrice) || 0;
-
-  const totalOrderQty = parseFloat(form.totalOrderQty) || 0;
-
-  const confirmOrderPercentage = parseFloat(form.confirmOrderPercentage) || 0;
-
-  const deliveryPercentage = parseFloat(form.deliveryPercentage) || 0;
-
-  const deliveryRTOPercentage = 100 - deliveryPercentage;
-
-  const adSpends = parseFloat(form.adSpends) || 0;
-
-  const miscCharges = parseFloat(form.miscCharges) || 0;
-
-  const productPrice = selectedVariant?.price;
-  const deliveryCostPerUnit = shipCost;
-  // Derived Quantities
-  const confirmedQtyrAW = totalOrderQty * (confirmOrderPercentage / 100);
-  const confirmedQty = Math.round(confirmedQtyrAW);
-
-  // Calculate Delivered Quantity and round up if there is a decimal
-  const deliveredQtyRaw = confirmedQty * (deliveryPercentage / 100);
-  const deliveredQty = Math.round(deliveredQtyRaw);
-
-  // Calculate Delivered RTO Quantity
-  const deliveredRTOQty = confirmedQty - deliveredQty;
-
-
-  // Cost Calculations
-
-  const productCostForDelivered = deliveredQty * productPrice;
-
-  const revenueFromDelivered = deliveredQty * sellingPrice;
-
-  const totalRTODeliveryCost = deliveredRTOQty * deliveryCostPerUnit;
-
-  // Final Margin Calculation
-  const totalAddSpend = adSpends * totalOrderQty; //order*adSpends
-  const perOrderMargin = sellingPrice - productPrice;
-  const finalEarnings = perOrderMargin * deliveredQty;
-  const totalExpenses = totalRTODeliveryCost + totalAddSpend + miscCharges;
-  const finalMargin = finalEarnings - totalExpenses; //total earning-totalspend
-
-
-  const profitPerOrder = finalMargin / totalOrderQty;
   const fetchProductDetails = useCallback(async () => {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -1083,7 +1038,7 @@ const ProductDetails = () => {
 
           {showPopup && (
             <div className="px-6 md:px-0 fixed inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
-              <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
+              <div className="bg-white border border-orange-500 h-[85%] overflow-x-auto p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
                 <h2 className="text-xl font-semibold mb-4">Push To Shopify</h2>
 
                 {(() => {
@@ -1245,8 +1200,76 @@ const ProductDetails = () => {
         <p className="text-center font-bold text-3xl mt-8"> Product Not Found</p>
       )}
 
-      {
-        openCalculator && (
+      {openCalculator && (() => {
+        // 1. Move your calculations outside JSX block
+        const sellingPrice = parseFloat(form.sellingPrice) || 0;
+        const totalOrderQty = parseFloat(form.totalOrderQty) || 0;
+        const confirmOrderPercentage = parseFloat(form.confirmOrderPercentage) || 0;
+        const deliveryPercentage = parseFloat(form.deliveryPercentage) || 0;
+        const adSpends = parseFloat(form.adSpends) || 0;
+        const miscCharges = parseFloat(form.miscCharges) || 0;
+
+        const deliveryRTOPercentage = 100 - deliveryPercentage;
+        const productPrice = selectedVariant?.price || 0;
+        const deliveryCostPerUnit = shipCost || 75;
+
+        const confirmedQty = Math.round(totalOrderQty * (confirmOrderPercentage / 100));
+        const deliveredQty = Math.round(confirmedQty * (deliveryPercentage / 100));
+        const deliveredRTOQty = confirmedQty - deliveredQty;
+        const cancelledOrders = totalOrderQty - confirmedQty;
+
+        const productCostForDelivered = deliveredQty * productPrice;
+        const revenueFromDelivered = deliveredQty * sellingPrice;
+        const totalShippingCost = confirmedQty * deliveryCostPerUnit;
+        const totalAddSpend = adSpends * totalOrderQty;
+
+        const perOrderMargin = sellingPrice - productPrice;
+        const finalEarnings = perOrderMargin * deliveredQty;
+        const totalExpenses = totalShippingCost + totalAddSpend + miscCharges;
+        const finalMargin = finalEarnings - totalExpenses;
+        const profitPerOrder = totalOrderQty ? finalMargin / totalOrderQty : 0;   //profit 
+
+
+        //new calculation acc to shipowl modal
+        const shipOwlPrice = selectedVariant?.price;
+
+        const variantsModal = selectedVariant?.variant?.modal || selectedVariant?.supplierProductVariant?.variant?.modal
+        //COD Collected
+        const CodCollected = sellingPrice * confirmOrderPercentage;
+        //ProductCost
+        const ProductCost = shipOwlPrice * deliveredQty;
+        //Shipping Cost
+        const shippingCost = deliveryCostPerUnit * totalOrderQty;
+        //Total Deduction
+        const totalDeduction = ProductCost + shippingCost;
+        //Remitted to Dropshipper
+        const finalAmout = CodCollected - totalDeduction;
+
+
+        //calulation by selfship
+
+
+
+        // Prepaid Product Cost
+        const prePaidCost = shipOwlPrice * totalOrderQty;
+        //Shipping Deduction:
+        const shippingDeduction = deliveryCostPerUnit * totalOrderQty;
+        //Total Prepaid
+        const totalPrepaid = prePaidCost;
+        //COD Collected
+        const selfshipCodCollected = sellingPrice * deliveredQty;
+        //Shipping Cost (₹75 x 100)
+        const selfShipShippingCost = deliveryCostPerUnit * totalOrderQty;
+        //Total Deduction
+        const selfShipTotalDeduction = selfShipShippingCost;
+        //Remitted to Dropshipper
+        const selfshipTotalPrice = selfshipCodCollected - selfShipTotalDeduction;
+
+
+
+
+        // 2. Return your JSX
+        return (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white w-full max-w-4xl rounded shadow-lg p-6 max-h-[90vh] overflow-y-auto">
               {/* Header */}
@@ -1264,7 +1287,7 @@ const ProductDetails = () => {
                   <button className="text-sm underline font-bold items-center gap-2 flex text-black" onClick={resetForm}>
                     <RiResetRightLine /> Reset
                   </button>
-                  <button onClick={() => {setOpenCalculator(false); resetForm}} className="text-sm text-black font-bold" >
+                  <button onClick={() => { setOpenCalculator(false); resetForm }} className="text-sm text-black font-bold" >
                     <RxCross1 />
                   </button>
                 </div>
@@ -1284,6 +1307,7 @@ const ProductDetails = () => {
                 />
 
                 <ProductInfo label="Shipowl Price" value={selectedVariant?.price} />
+                <ProductInfo label="Modal" value={variantsModal} />
                 <ProductInfo label="RTO Charges" value={shipCost || 75} />
                 <ProductInfo label="Product Weight" value={`${productDetails?.weight} GM `} />
               </div>
@@ -1461,7 +1485,7 @@ const ProductDetails = () => {
                             </li>
                             <li>
                               (+)Total RTO Charges:{" "}
-                              <span>{deliveryCostPerUnit * deliveredRTOQty}</span>
+                              <span>{deliveryCostPerUnit * confirmedQty}</span>
                             </li>
                             <li>
                               (+)Total Misc. Charges: <span>{miscCharges}</span>
@@ -1480,8 +1504,8 @@ const ProductDetails = () => {
               </p>
             </div>
           </div>
-        )
-      }
+        );
+      })()}
     </>
 
 

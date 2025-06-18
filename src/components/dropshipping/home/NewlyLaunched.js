@@ -20,10 +20,7 @@ import { ChevronRight, ChevronDown } from "lucide-react"; // Optional: Lucide ic
 import { TbCube } from "react-icons/tb";
 import { GoArrowUpRight } from "react-icons/go";
 import { FiArrowDownLeft } from "react-icons/fi";
-const tabs = [
-  { key: "notmy", label: "Not Pushed to Shopify" },
-  { key: "my", label: "Pushed to Shopify" },
-];
+
 
 const NewlyLaunched = () => {
   const [shipCost, setShipCost] = useState([]);
@@ -35,6 +32,11 @@ const NewlyLaunched = () => {
     adSpends: '',
     miscCharges: '',
   });
+  const tabs = [
+    { key: "notmy", label: "Not Pushed to Shopify" },
+    { key: "my", label: "Pushed to Shopify" },
+  ];
+
 
   const [errors, setErrors] = useState({});
   const [showResult, setShowResult] = useState(false);
@@ -246,8 +248,9 @@ const NewlyLaunched = () => {
   );
 };
 
-const Section = ({ title, form, showResult, setForm,type, errors, setShowResult, setErrors, products, shopifyStores, calculateData, openCalculator, setOpenCalculator, setcalculateData, shipCost, setShipCost, setActiveTab, fetchProduct, activeTab }) => {
+const Section = ({ title, form, showResult, setForm, type, errors, setShowResult, setErrors, products, shopifyStores, calculateData, openCalculator, setOpenCalculator, setcalculateData, shipCost, setShipCost, setActiveTab, fetchProduct, activeTab }) => {
 
+  const [activeModal, setActiveModal] = useState("");
 
   const [openSection, setOpenSection] = useState(null);
 
@@ -283,6 +286,8 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
     return Object.keys(newErrors).length === 0;
   };
   // Safely parsed values
+
+
   const dropPrice = parseFloat(form.dropPrice) || 0;
 
   const totalOrderQty = parseFloat(form.totalOrderQty) || 0;
@@ -344,6 +349,7 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
   const [inventoryData, setInventoryData] = useState({
     supplierProductId: "",
     id: '',
+    modal: 'Selfship',
     variant: [],
     isVarientExists: '',
     shopifyApp: '',
@@ -358,7 +364,20 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
       return;
     }
 
-    // Otherwise, update specific variant
+
+    // Special handling for radio button field (e.g., 'selected')
+    if (field === 'selected') {
+      setInventoryData((prevData) => ({
+        ...prevData,
+        variant: prevData.variant.map((v) => ({
+          ...v,
+          selected: v.id === id, // true for selected one, false for all others
+        })),
+      }));
+      return;
+    }
+
+    // Standard field update
     setInventoryData((prevData) => ({
       ...prevData,
       variant: prevData.variant.map((v) =>
@@ -374,7 +393,25 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
     }));
   };
 
+  const groupedByModal = inventoryData.variant.reduce((acc, curr) => {
+    const modal = curr.variant.modal || "Unknown";
+    if (!acc[modal]) acc[modal] = [];
+    acc[modal].push(curr);
+    return acc;
+  }, {});
 
+  const modalNames = Object.keys(groupedByModal);
+  const totalModals = modalNames.length;
+
+  const getVariantData = (v) => ({
+    id: v?.id || v?.variant?.id,
+    name: v?.variant?.name || v?.supplierProductVariant?.variant?.name || "NIL",
+    modal: v?.variant?.modal || v?.supplierProductVariant?.variant?.modal || "Unknown",
+    color: v?.variant?.color || v?.supplierProductVariant?.variant?.color || "NIL",
+    image: (v?.variant?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
+    suggested_price: v?.price || v?.suggested_price,
+    full: v,
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -403,14 +440,38 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
         }
       });
 
-
       const form = new FormData();
-      const simplifiedVariants = inventoryData.variant.map((v) => ({
-        variantId: v.id || v.variantId,
-        stock: v.dropStock || 100,
-        price: v.dropPrice,
-        status: v.Dropstatus || true
-      }));
+      let simplifiedVariants;
+      if (
+        totalModals === 2 &&
+        modalNames.every((modal) => groupedByModal[modal].length === 1)
+      ) {
+        const selectedModal = inventoryData.modal;
+
+        // Filter variant list to just the one matching selected modal
+        const selectedVariantEntry = inventoryData.variant.find(
+          (v) => v.variant?.modal === selectedModal
+        );
+
+        if (selectedVariantEntry) {
+          simplifiedVariants = [
+            {
+              variantId: selectedVariantEntry.id,
+              price: selectedVariantEntry.price,
+            },
+          ];
+        } else {
+          simplifiedVariants = []; // No valid variant found
+        }
+      }
+
+      else {
+        simplifiedVariants = inventoryData.variant.map((v) => ({
+          variantId: v.id || v.variantId,
+          price: v.dropPrice,
+        }));
+      }
+
 
       form.append('supplierProductId', inventoryData.supplierProductId);
       form.append('shopifyApp', inventoryData.shopifyApp);
@@ -453,6 +514,7 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
             productId: "",
             variant: [],
             id: '',
+            modal: 'Selfship',
             shopifyApp: ''
           });
           setShowPopup(false);
@@ -478,7 +540,7 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
 
   console.log('inventory', inventoryData)
 
-
+  console.log('showVariantPopup', showVariantPopup)
   return (
     <>
 
@@ -512,7 +574,7 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
               className="bg-white focus-within:z-10 rounded-xl group overflow-hidden cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02] outline-none"
             >
               {/* FLIP CARD */}
-              <div onClick={() => viewProduct(product.id)} className="relative z-50  md:h-[200px] h-[150px] perspective">
+              <div onClick={() => viewProduct(product.id)} className={`relative md:h-[200px] h-[150px] perspective ${showVariantPopup === true ? 'z-20' : 'z-40'}`}>
                 <div className="relative overflow-hidden w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                   {/* FRONT */}
                   <Image
@@ -588,6 +650,7 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
                         variant: product.variants,
                         isVarientExists: product?.product?.isVarientExists,
                         shopifyApp: "",
+                        modal: 'Selfship',
                       });
                     }}
                     className="w-full py-2 px-4 md:text-sm  text-xs text-white rounded-md  bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
@@ -782,7 +845,7 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
 
       {showPopup && (
         <div className="fixed inset-0 bg-black/70 flex justify-end z-50">
-          <div className="w-full max-w-md h-full bg-white shadow-xl relative overflow-y-auto">
+          <div className="w-full max-w-md h-full bg-white shadow-xl z-50 relative overflow-y-auto">
             {/* Close Button */}
             <button
               onClick={() => setShowPopup(false)}
@@ -795,138 +858,503 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
             <div className="p-5 border-b">
               <h2 className="text-xl font-semibold">Push To Shopify</h2>
             </div>
+            <form onSubmit={handleSubmit}>
+              <div className="p-5 space-y-6">
+                <div className='flex justify-between'>
+                  <div className="flex items-center gap-2"><Store /> <label className="block text-sm font-semibold mb-1">Store</label></div>
 
-            <div className="p-5 space-y-6">
-              {/* Product Loop */}
-              {inventoryData.variant?.map((v, idx) => {
-                const variantInfo = { ...(v.variant || {}), ...v };
-                const imageUrls = variantInfo.image
-                  ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
-                  : [];
-
-                return (
-                  <div key={variantInfo.id || idx} className="space-y-5 border p-4 rounded-lg shadow-sm">
-                    {/* Product Info */}
-                    <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-                      <Image
-                        src={imageUrls[0] || 'https://placehold.co/80x80?text=Image'}
-                        alt="Product"
-                        width={64}
-                        height={64}
-                        className="rounded border object-cover"
-                      />
-                      <div>
-                        <p className="text-sm font-medium leading-5 line-clamp-2">
-                          {variantInfo.name || 'Stainless Steel Cable Lock Ties'}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                          Modal: <span className="font-semibold text-[#4C4C4C]">
-                            {variantInfo.modal || 'C2445129'}
-                          </span>
-                          <ClipboardCopy
-                            className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
-                            onClick={() => navigator.clipboard.writeText(variantInfo.modal || '')}
-                          />
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Store Selector */}
-                    <div className='flex justify-between'>
-                      <div className="flex items-center gap-2"><Store /> <label className="block text-sm font-semibold mb-1">Store</label></div>
-
-                      <select
-                        className=" border border-[#E0E2E7] p-2 rounded-md"
-                        name="shopifyApp"
-                        id="shopifyApp"
-                        onChange={(e) =>
-                          handleVariantChange(null, 'shopifyApp', e.target.value)
-                        }
-                        value={inventoryData.shopifyApp || ''}
-                      >
-                        <option value="">Select Store</option>
-                        {shopifyStores.map((item, index) => (
-                          <option value={item.id} key={index}>
-                            {item.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Pricing Section */}
-                    <div className="border-t pt-4 space-y-3">
-                      <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                        Pricing
-                      </div>
-
-
-
-                      <div className="flex items-center gap-2">
-                        <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
-                          Set Your Selling Price (₹)
-                          <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
-                        </div>
-                        <input
-                          type="number"
-                          value={variantInfo.dropPrice || ''}
-                          onChange={(e) =>
-                            handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)
-                          }
-                          className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
-                        />
-
-                      </div>
-                      <div onClick={() => {
-                        setcalculateData(variantInfo)
-                        setOpenCalculator(true)
-                      }} className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer">
-                        <FaCalculator className="text-purple-700 mr-2 text-2xl" />
-                        <span className="text-black underline font-semibold text-sm">
-                          Calculate <br /> Expected Profit
-                        </span>
-                      </div>
-
-
-                      <p className="text-sm font-semibold">
-                        Shipowl Price <span className="float-right">₹{variantInfo.price || 294}</span>
-                      </p>
-                      <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
-                        Including GST & Shipping Charges
-                        <HelpCircle className="w-3.5 h-3.5" />
-                      </p>
-
-                      <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
-                        Your Margin <span className="float-right">₹{variantInfo.dropPrice - variantInfo.price || 0}</span>
-                      </div>
-                    </div>
-
-                    {/* RTO/RVP Note */}
-                    <div className="text-xs text-gray-600 border-t pt-3">
-                      RTO & RVP charges are applicable and vary depending on the product weight.{' '}
-                      <span className="font-semibold underline cursor-pointer">View charges for this product</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Footer */}
-            <div className=" bottom-0 left-0 right-0 p-4 border-t bg-white flex items-center justify-between">
-              <button
-                onClick={handleSubmit}
-                className="w-full flex items-center justify-center gap-2 bg-black text-white py-2 rounded text-sm font-semibold hover:bg-gray-900"
-              >
-                <Upload className="w-4 h-4" />
-                Push To Shopify
-              </button>
-
-              {/* Help Icon Circle */}
-              <div className="absolute bottom-5 right-5">
-                <div className="w-6 h-6 rounded-full border border-black flex items-center justify-center text-black text-xs cursor-pointer">
-                  <HelpCircle className="w-4 h-4" />
+                  <select
+                    className=" border border-[#E0E2E7] p-2 rounded-md"
+                    name="shopifyApp"
+                    id="shopifyApp"
+                    onChange={(e) =>
+                      handleVariantChange(null, 'shopifyApp', e.target.value)
+                    }
+                    value={inventoryData.shopifyApp || ''}
+                  >
+                    <option value="">Select Store</option>
+                    {shopifyStores.map((item, index) => (
+                      <option value={item.id} key={index}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
+                {(() => {
+
+
+
+                  // CASE 1: 1 modal, 1 variant
+                  // Assuming this is inside a React component render
+                  if (totalModals === 1 && groupedByModal[modalNames[0]].length === 1) {
+                    const variant = getVariantData(groupedByModal[modalNames[0]][0]);
+                    return (
+                      <div className="p-4  gap-4 rounded-lg border border-gray-300 bg-white text-left">
+                        <div className="text-gray-800 font-medium mb-2">Price: ₹{variant.suggested_price}</div>
+
+                        <div key={variant.id} className="space-y-5 border p-4 rounded-lg shadow-sm">
+                          {/* Product Info */}
+                          <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
+                            <Image
+                              src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                              alt="Product"
+                              width={64}
+                              height={64}
+                              className="rounded border object-cover"
+                            />
+                            <div>
+                              <p className="text-sm font-medium leading-5 line-clamp-2">
+                                {variant.name || 'Stainless Steel Cable Lock Ties'}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                Modal:{" "}
+                                <span className="font-semibold text-[#4C4C4C]">
+                                  {variant.modal || 'C2445129'}
+                                </span>
+                                <ClipboardCopy
+                                  className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
+                                  onClick={() => navigator.clipboard.writeText(variant.modal || '')}
+                                />
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Pricing Section */}
+                          <div className="border-t pt-4 space-y-3">
+                            <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                              Pricing
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
+                                Set Your Selling Price (₹)
+                                <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
+                              </div>
+                              <input
+                                type="number"
+                                value={variant.full?.dropPrice || ''}
+                                onChange={(e) =>
+                                  handleVariantChange(variant.id, 'dropPrice', e.target.value)
+                                }
+                                className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+                              />
+                            </div>
+
+                            <div
+                              onClick={() => {
+                                setcalculateData(variant.full);
+                                setOpenCalculator(true);
+                              }}
+                              className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
+                            >
+                              <FaCalculator className="text-purple-700 mr-2 text-2xl" />
+                              <span className="text-black underline font-semibold text-sm">
+                                Calculate <br /> Expected Profit
+                              </span>
+                            </div>
+
+                            <p className="text-sm font-semibold">
+                              Shipowl Price
+                              <span className="float-right">₹{variant.suggested_price || 0}</span>
+                            </p>
+                            <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
+                              Including GST & Shipping Charges
+                              <HelpCircle className="w-3.5 h-3.5" />
+                            </p>
+
+                            <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
+                              Your Margin{" "}
+                              <span className="float-right">
+                                ₹
+                                ₹{(variant.full?.dropPrice) - (variant.suggested_price)}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* RTO/RVP Note */}
+                          <div className="text-xs text-gray-600 border-t pt-3">
+                            RTO & RVP charges are applicable and vary depending on the product weight.{" "}
+                            <span className="font-semibold underline cursor-pointer">
+                              View charges for this product
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+
+                  // CASE 2: 1 modal, multiple variants
+                  if (totalModals === 1 && groupedByModal[modalNames[0]].length > 1) {
+                    return (
+                      <div className="space-y-6">
+                        {groupedByModal[modalNames[0]].map((item, idx) => {
+                          const variant = getVariantData(item);
+                          return (
+                            <div key={variant.id || idx} className="space-y-5 border p-4 rounded-lg shadow-sm">
+                              {/* Product Info */}
+                              <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
+                                <Image
+                                  src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                                  alt="Product"
+                                  width={64}
+                                  height={64}
+                                  className="rounded border object-cover"
+                                />
+                                <div>
+                                  <p className="text-sm font-medium leading-5 line-clamp-2">
+                                    {variant.name || 'Stainless Steel Cable Lock Ties'}
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                    Modal:
+                                    <span className="font-semibold text-[#4C4C4C]">
+                                      {variant.modal || 'C2445129'}
+                                    </span>
+                                    <ClipboardCopy
+                                      className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
+                                      onClick={() => navigator.clipboard.writeText(variant.modal || '')}
+                                    />
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Pricing Section */}
+                              <div className="border-t pt-4 space-y-3">
+                                <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                  Pricing
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
+                                    Set Your Selling Price (₹)
+                                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
+                                  </div>
+                                  <input
+                                    type="number"
+                                    value={variant.full?.dropPrice || ''}
+                                    onChange={(e) =>
+                                      handleVariantChange(variant.id, 'dropPrice', e.target.value)
+                                    }
+                                    className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+                                  />
+                                </div>
+
+                                <div
+                                  onClick={() => {
+                                    setcalculateData(variant.full);
+                                    setOpenCalculator(true);
+                                  }}
+                                  className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
+                                >
+                                  <FaCalculator className="text-purple-700 mr-2 text-2xl" />
+                                  <span className="text-black underline font-semibold text-sm">
+                                    Calculate <br /> Expected Profit
+                                  </span>
+                                </div>
+
+                                <p className="text-sm font-semibold">
+                                  Shipowl Price
+                                  <span className="float-right">₹{variant.suggested_price || 0}</span>
+                                </p>
+                                <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
+                                  Including GST & Shipping Charges
+                                  <HelpCircle className="w-3.5 h-3.5" />
+                                </p>
+
+                                <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
+                                  Your Margin
+                                  <span className="float-right">
+                                    ₹{(variant.full?.dropPrice) - (variant.suggested_price)}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* RTO/RVP Note */}
+                              <div className="text-xs text-gray-600 border-t pt-3">
+                                RTO & RVP charges are applicable and vary depending on the product weight.{' '}
+                                <span className="font-semibold underline cursor-pointer">
+                                  View charges for this product
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  }
+
+                  // CASE 3: 2 modals with 1 variant each (radio button)
+                  if (totalModals === 2 && modalNames.every(modal => groupedByModal[modal].length === 1)) {
+                    return (
+                      <div className="space-y-4">
+                        {modalNames.map((modal, index) => {
+                          const variant = getVariantData(groupedByModal[modal][0]);
+                          const isSelected = variant.id;
+
+                          return (
+                            <label key={variant.id || index} className="flex flex-col gap-3 cursor-pointer border rounded-lg p-4">
+                              <div className="flex items-center gap-3">
+                                <input
+                                  type="radio"
+                                  name="modal"
+                                  value={modal}
+                                  required
+                                  checked={inventoryData.modal === modal }
+                                  onChange={(e) => {
+                                    handleVariantChange(null, 'modal', e.target.value);
+                                  }
+                                  }
+                                />
+
+                                <span className="text-gray-800 font-medium">{modal}</span>
+                                {isSelected && (
+                                  <span className="ml-2 text-green-600 font-semibold">
+                                    ₹{variant.suggested_price}
+                                  </span>
+                                )}
+                              </div>
+
+                              {isSelected && (
+                                <div className="space-y-5">
+                                  {/* Product Info */}
+                                  <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
+                                    <Image
+                                      src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                                      alt="Product"
+                                      width={64}
+                                      height={64}
+                                      className="rounded border object-cover"
+                                    />
+                                    <div>
+                                      <p className="text-sm font-medium leading-5 line-clamp-2">
+                                        {variant.name || 'Stainless Steel Cable Lock Ties'}
+                                      </p>
+                                      <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                        Modal:
+                                        <span className="font-semibold text-[#4C4C4C]">
+                                          {variant.modal || 'C2445129'}
+                                        </span>
+                                        <ClipboardCopy
+                                          className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
+                                          onClick={() => navigator.clipboard.writeText(variant.modal || '')}
+                                        />
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Pricing Section */}
+                                  <div className="border-t pt-4 space-y-3">
+                                    <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                      Pricing
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
+                                        Set Your Selling Price (₹)
+                                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
+                                      </div>
+                                      <input
+                                        type="number"
+                                        value={variant.full?.dropPrice || ''}
+                                        onChange={(e) =>
+                                          handleVariantChange(variant.id, 'dropPrice', e.target.value)
+                                        }
+                                        className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+                                      />
+                                    </div>
+
+                                    <div
+                                      onClick={() => {
+                                        setcalculateData(variant.full);
+                                        setOpenCalculator(true);
+                                      }}
+                                      className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
+                                    >
+                                      <FaCalculator className="text-purple-700 mr-2 text-2xl" />
+                                      <span className="text-black underline font-semibold text-sm">
+                                        Calculate <br /> Expected Profit
+                                      </span>
+                                    </div>
+
+                                    <p className="text-sm font-semibold">
+                                      Shipowl Price
+                                      <span className="float-right">₹{variant.suggested_price || 0}</span>
+                                    </p>
+                                    <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
+                                      Including GST & Shipping Charges
+                                      <HelpCircle className="w-3.5 h-3.5" />
+                                    </p>
+
+                                    <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
+                                      Your Margin
+                                      <span className="float-right">
+                                        ₹{(variant.full?.dropPrice) - (variant.suggested_price)}                                    </span>
+                                    </div>
+                                  </div>
+
+                                  {/* RTO/RVP Note */}
+                                  <div className="text-xs text-gray-600 border-t pt-3">
+                                    RTO & RVP charges are applicable and vary depending on the product weight.{' '}
+                                    <span className="font-semibold underline cursor-pointer">
+                                      View charges for this product
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    );
+                  }
+
+
+                  // CASE 4: Multiple modals with multiple variants → TABS
+                  if (totalModals > 1 && modalNames.some(modal => groupedByModal[modal].length > 1)) {
+                    return (
+                      <>
+                        {/* Tabs */}
+                        <div className="flex gap-3 mb-4 border-b pb-2">
+                          {modalNames.map((modal, index) => (
+                            <button
+                              key={index}
+                              className={`px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 ${activeModal === modal
+                                ? "border-orange-600 text-orange-600"
+                                : "border-transparent text-gray-600 hover:text-orange-500"
+                                }`}
+                              onClick={() => {
+                                const sorted = groupedByModal[modal]
+                                  .map(getVariantData)
+                                  .sort((a, b) => a.price - b.price);
+                                setActiveModal(modal);
+
+                              }}
+                            >
+                              {modal}
+                            </button>
+                          ))}
+                        </div>
+
+
+                        <div className="grid grid-cols-1 gap-4">
+                          {(groupedByModal[activeModal] || [])
+                            .map(getVariantData)
+                            .sort((a, b) => a.suggested_price - b.suggested_price)
+                            .map((variant, index) => {
+                              return (
+                                <div key={variant.id || index} className="space-y-5 border p-4 rounded-lg shadow-sm">
+                                  {/* Product Info */}
+                                  <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
+                                    <Image
+                                      src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                                      alt={variant.name || 'Product Image'}
+                                      width={64}
+                                      height={64}
+                                      className="rounded border object-cover"
+                                    />
+                                    <div>
+                                      <p className="text-sm font-medium leading-5 line-clamp-2">
+                                        {variant.name || 'Stainless Steel Cable Lock Ties'}
+                                      </p>
+                                      <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                        Modal: <span className="font-semibold text-[#4C4C4C]">{variant.modal || 'N/A'}</span>
+                                        <ClipboardCopy
+                                          className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
+                                          onClick={() => navigator.clipboard.writeText(variant.modal || '')}
+                                        />
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Pricing Section */}
+                                  <div className="border-t pt-4 space-y-3">
+                                    <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                      Pricing
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
+                                        Set Your Selling Price (₹)
+                                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
+                                      </div>
+                                      <input
+                                        type="number"
+                                        value={variant.dropPrice || ''}
+                                        onChange={(e) =>
+                                          handleVariantChange(variant.id, 'dropPrice', e.target.value)
+                                        }
+                                        className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+                                      />
+                                    </div>
+
+                                    <div
+                                      onClick={() => {
+                                        setcalculateData(variant);
+                                        setOpenCalculator(true);
+                                      }}
+                                      className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
+                                    >
+                                      <FaCalculator className="text-purple-700 mr-2 text-2xl" />
+                                      <span className="text-black underline font-semibold text-sm">
+                                        Calculate <br /> Expected Profit
+                                      </span>
+                                    </div>
+
+                                    <p className="text-sm font-semibold">
+                                      Shipowl Price <span className="float-right">₹{variant.suggested_price || 0}</span>
+                                    </p>
+                                    <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
+                                      Including GST & Shipping Charges
+                                      <HelpCircle className="w-3.5 h-3.5" />
+                                    </p>
+
+                                    <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
+                                      Your Margin{' '}
+                                      <span className="float-right">
+                                        ₹{(variant.full?.dropPrice) - (variant.suggested_price)}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* RTO/RVP Note */}
+                                  <div className="text-xs text-gray-600 border-t pt-3">
+                                    RTO & RVP charges are applicable and vary depending on the product weight.{' '}
+                                    <span className="font-semibold underline cursor-pointer">
+                                      View charges for this product
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                        </div>
+
+                      </>
+                    );
+                  }
+
+                  // Default fallback if no variants found
+                  return <p className="text-gray-500">No variants available</p>;
+
+                })()}
+
+
               </div>
-            </div>
+
+              {/* Footer */}
+              <div className=" bottom-0 left-0 right-0 p-4 border-t bg-white flex items-center justify-between">
+                <button
+                  onClick={handleSubmit}
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2 bg-black text-white py-2 rounded text-sm font-semibold hover:bg-gray-900"
+                >
+                  <Upload className="w-4 h-4" />
+                  Push To Shopify
+                </button>
+
+
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -1173,8 +1601,8 @@ const Section = ({ title, form, showResult, setForm,type, errors, setShowResult,
       )}
 
       {showVariantPopup && selectedProduct && (
-        <div className="fixed  px-6 md:px-0  inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white border border-orange-500 p-6 rounded-lg w-full max-w-4xl shadow-xl relative">
+        <div className="fixed  px-6 md:px-0  inset-0 bg-[#000000b0] bg-opacity-40 flex z-50 items-center justify-center ">
+          <div className="bg-white border border-orange-500 p-6 rounded-lg w-full z-50 max-w-4xl shadow-xl relative">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-gray-800">Variant Details</h2>
