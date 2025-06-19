@@ -17,6 +17,37 @@ export default function SupplierMiddleWareProvider({ children }) {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const [isSupplierStaff, setIsSupplierStaff] = useState(null);
+    const [extractedPermissions, setExtractedPermissions] = useState([]);
+    const checkSupplierRole = () => {
+        try {
+            const shippingData = JSON.parse(localStorage.getItem("shippingData"));
+            if (shippingData?.admin?.role === "supplier_staff") {
+                setIsSupplierStaff(true);
+            }
+        } catch (err) {
+            console.error("Error reading shippingdata:", err);
+            setIsSupplierStaff(false);
+        }
+
+        try {
+            const rawPermissions = JSON.parse(localStorage.getItem("supplierPermissions")) || [];
+            const permissions = [];
+            rawPermissions.forEach((perm) => {
+                if (perm.permission) {
+                    permissions.push({
+                        panel: perm.permission.panel,
+                        module: perm.permission.module,
+                        action: perm.permission.action,
+                        status: perm.permission.status,
+                    });
+                }
+            });
+            setExtractedPermissions(permissions);
+        } catch (err) {
+            console.error("Error parsing permissions:", err);
+        }
+    }
     const verifySupplierAuth = useCallback(async () => {
         setLoading(true);
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
@@ -73,7 +104,7 @@ export default function SupplierMiddleWareProvider({ children }) {
 
 
     return (
-        <SupplierMiddleWareContext.Provider value={{ supplierApi, setSupplierApi, verifySupplierAuth, error, loading }}>
+        <SupplierMiddleWareContext.Provider value={{ isSupplierStaff, extractedPermissions, checkSupplierRole, supplierApi, setSupplierApi, verifySupplierAuth, error, loading }}>
             {children}
         </SupplierMiddleWareContext.Provider>
     );

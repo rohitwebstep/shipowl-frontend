@@ -356,7 +356,7 @@ export default function Update() {
         )}
         {errors.profilePicture && <p className="text-red-500 text-sm">{errors.profilePicture}</p>}
       </div>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {formFields.map(({ label, name, type, required }) => (
           <div key={name}>
             <label className="block text-[#232323] font-bold mb-1">

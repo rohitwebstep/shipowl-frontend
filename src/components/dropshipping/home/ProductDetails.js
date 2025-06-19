@@ -1208,67 +1208,48 @@ const ProductDetails = () => {
         const adSpends = parseFloat(form.adSpends) || 0;
         const miscCharges = parseFloat(form.miscCharges) || 0;
 
-        const deliveryRTOPercentage = 100 - deliveryPercentage;
-        const productPrice = selectedVariant?.price || 0;
-        const deliveryCostPerUnit = shipCost || 75;
 
         const confirmedQty = Math.round(totalOrderQty * (confirmOrderPercentage / 100));
         const deliveredQty = Math.round(confirmedQty * (deliveryPercentage / 100));
         const deliveredRTOQty = confirmedQty - deliveredQty;
         const cancelledOrders = totalOrderQty - confirmedQty;
 
-        const productCostForDelivered = deliveredQty * productPrice;
-        const revenueFromDelivered = deliveredQty * sellingPrice;
-        const totalShippingCost = confirmedQty * deliveryCostPerUnit;
-        const totalAddSpend = adSpends * totalOrderQty;
 
-        const perOrderMargin = sellingPrice - productPrice;
-        const finalEarnings = perOrderMargin * deliveredQty;
-        const totalExpenses = totalShippingCost + totalAddSpend + miscCharges;
-        const finalMargin = finalEarnings - totalExpenses;
-        const profitPerOrder = totalOrderQty ? finalMargin / totalOrderQty : 0;   //profit 
-
-
-        //new calculation acc to shipowl modal
-        const shipOwlPrice = selectedVariant?.price;
-
+        const shipOwlPrice = selectedVariant?.price || 0;
+        const deliveryCostPerUnit = shipCost || 75;
+        let codCollected = 0;
+        let prepaidProductCost = 0;
+        let shippingCost = 0;
+        let totalAddSpend = adSpends * totalOrderQty;
+        let totalExpenses = 0;
+        let shippingCharges = 0;
+        let finalEarnings = 0;
+        let finalMargin = 0;
+        let profitPerOrder = 0;
+        let perOrderMargin = 0;
         const variantsModal = selectedVariant?.variant?.modal || selectedVariant?.supplierProductVariant?.variant?.modal
-        //COD Collected
-        const CodCollected = sellingPrice * confirmOrderPercentage;
-        //ProductCost
-        const ProductCost = shipOwlPrice * deliveredQty;
-        //Shipping Cost
-        const shippingCost = deliveryCostPerUnit * totalOrderQty;
-        //Total Deduction
-        const totalDeduction = ProductCost + shippingCost;
-        //Remitted to Dropshipper
-        const finalAmout = CodCollected - totalDeduction;
-
-
-        //calulation by selfship
-
-
-
-        // Prepaid Product Cost
-        const prePaidCost = shipOwlPrice * totalOrderQty;
-        //Shipping Deduction:
-        const shippingDeduction = deliveryCostPerUnit * confirmOrderPercentage;
-        //Total Prepaid
-        const totalPrepaid = prePaidCost;
-        //COD Collected
-        const selfshipCodCollected = sellingPrice * deliveredQty;
-        //Shipping Cost (₹75 x 100)
-        const selfShipShippingCost = deliveryCostPerUnit * totalOrderQty;
-        //Total Deduction
-        const selfShipTotalDeduction = selfShipShippingCost;
-        //Remitted to Dropshipper
-        const selfshipTotalPrice = selfshipCodCollected - selfShipTotalDeduction;
-
 
         if (variantsModal.toLowerCase() === 'selfship') {
-
+          prepaidProductCost = shipOwlPrice * confirmedQty;
+          shippingCost = deliveryCostPerUnit * confirmedQty;
+          codCollected = sellingPrice * deliveredQty;
+          perOrderMargin = sellingPrice - shipOwlPrice;
+          finalEarnings = perOrderMargin * deliveredQty;
+          shippingCharges = deliveryCostPerUnit * confirmedQty;
+          totalExpenses = prepaidProductCost + totalAddSpend + miscCharges + shippingCharges;
+          finalMargin = codCollected - shippingCharges;
+          profitPerOrder = totalOrderQty ? finalMargin / totalOrderQty : 0;
         }
+
         if (variantsModal.toLowerCase() === 'shipowl') {
+          codCollected = sellingPrice * deliveredQty;
+          prepaidProductCost = shipOwlPrice * deliveredQty;
+          shippingCost = deliveryCostPerUnit * confirmedQty;
+          perOrderMargin = sellingPrice - shipOwlPrice;
+          finalEarnings = perOrderMargin * deliveredQty;
+          shippingCharges = deliveryCostPerUnit * confirmedQty;
+          totalExpenses = prepaidProductCost + totalAddSpend + shippingCharges - miscCharges;
+          finalMargin = codCollected - totalExpenses;
 
         }
         // 2. Return your JSX
@@ -1370,10 +1351,10 @@ const ProductDetails = () => {
                 {/* Results Side */}
                 <div>
                   <div className={`p-4 rounded-md ${showResult ? (finalMargin < 0 ? 'bg-red-50' : 'bg-green-50') : 'bg-gray-100'}`}>
-                    <ResultItem label="Net Profit" value={`₹${finalMargin.toFixed(2)}`} isVisible={showResult} />
+                    <ResultItem label="Net Profit" value={`₹${finalMargin}`} isVisible={showResult} />
                     <p className='text-xs'>Total Earnings - Total Spends</p>
                     <hr className='my-4' />
-                    <ResultItem label="Net Profit (Per Order)" value={`₹${profitPerOrder.toFixed(2)}`} isVisible={showResult} />
+                    <ResultItem label="Net Profit (Per Order)" value={`₹${finalMargin / totalOrderQty}`} isVisible={showResult} />
                     <p className='text-xs'>Net Profit / Expected Orders</p>
                   </div>
 
@@ -1448,7 +1429,7 @@ const ProductDetails = () => {
                           <ul>
                             <li>
 
-                              Margin Per Order: <span>{sellingPrice > 0 ? sellingPrice - productPrice : '-'}</span>
+                              Margin Per Order: <span>{sellingPrice > 0 ? sellingPrice - shipOwlPrice : '-'}</span>
                             </li>
                             <li>
                               Delivered Orders: <span>{deliveredQty}</span>
@@ -1483,13 +1464,19 @@ const ProductDetails = () => {
                       {openSection === "expenses" && (
                         <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
                           <ul>
+
+                            <li>
+                              Product Cost: <span>{prepaidProductCost}</span>
+                            </li>
+
+
                             <li>
                               Total Ad Spends: <span>{totalAddSpend}</span>
                             </li>
                             <li>
-                              (+)Total RTO Charges:{" "}
-                              <span>{deliveryCostPerUnit * confirmedQty}</span>
+                              Shipping Charges: <span>{shippingCharges}</span>
                             </li>
+
                             <li>
                               (+)Total Misc. Charges: <span>{miscCharges}</span>
                             </li>

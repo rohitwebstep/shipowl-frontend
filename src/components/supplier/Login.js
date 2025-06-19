@@ -105,29 +105,39 @@ export default function Login() {
             const result = await response.json();
             const { token, admin } = result;
 
-            const shippingData = {
-                project: {
-                    name: "Shipping OWL",
-                    environment: "production",
-                    active_panel: "supplier",
-                },
-                supplier: {
-                    id: admin.id,
-                    name: admin.name,
-                    email: admin.email,
-                    role: admin.role,
-                },
-                session: {
-                    is_authenticated: true,
-                    last_active_at: new Date().toISOString(),
-                },
-                security: {
-                    token: token,
-                },
-            };
+            if (admin) {
+                const shippingData = {
+                    project: {
+                        name: "Shipping OWL",
+                        environment: "production",
+                        active_panel: "supplier",
+                    },
+                    supplier: {
+                        id: admin.id,
+                        name: admin.name,
+                        email: admin.email,
+                        role: admin.role,
+                    },
+                    session: {
+                        is_authenticated: true,
+                        last_active_at: new Date().toISOString(),
+                    },
+                    security: {
+                        token: token,
+                    },
+                };
 
+                localStorage.setItem("shippingData", JSON.stringify(shippingData));
 
-            localStorage.setItem("shippingData", JSON.stringify(shippingData));
+                if (admin.role === "supplier_staff" && Array.isArray(result.assignedPermissions)) {
+                    localStorage.setItem("supplierPermissions", JSON.stringify(result.assignedPermissions));
+                } else {
+                    localStorage.removeItem("supplierPermissions");
+                }
+            } else {
+                console.error("No admin object found in response.");
+            }
+
 
             // ✅ Show success alert before redirect
             await Swal.fire({

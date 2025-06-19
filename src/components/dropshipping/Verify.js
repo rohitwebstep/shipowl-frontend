@@ -23,7 +23,7 @@ export default function Verify() {
     const raw = JSON.stringify({ token });
 
     const requestOptions = {
-      method: "PATCH",
+      method: "PUT",
       headers: myHeaders,
       body: raw,
       redirect: "follow",

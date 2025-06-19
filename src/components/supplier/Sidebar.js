@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,13 +23,20 @@ import { BiSolidCategory } from "react-icons/bi";
 import { TbBrandBinance } from "react-icons/tb";
 
 import logo from "@/app/images/Shipowllogo.png";
+import { useSupplier } from "./middleware/SupplierMiddleWareContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null);
+  const { isSupplierStaff, extractedPermissions, checkSupplierRole } = useSupplier();
+  const actions = ['View Listing', 'Update', 'Create', 'Listing', 'View', 'Soft Delete', 'Permanent Delete', 'Restore', 'Trash Listing', 'Bank Account Change Request View Listing', 'Bank Account Change Request Review'];
 
-  
+  const hasPermission = (module, actionList) => {
+    return extractedPermissions.some(
+      (perm) => perm.module === module && actionList.includes(perm.action) && perm.status === true
+    );
+  };
   const menuItems = [
     { name: "Dashboard", icon: Home, href: "/supplier" },
     { name: "Inventory", icon: ShoppingCart, href: "/supplier/inventory" },
@@ -48,6 +55,9 @@ export default function Sidebar() {
     { name: "Payment (In progress)", icon: CreditCard, href: "/supplier/payment" },
     { name: "Terms & Condition (In progress)", icon: BadgeDollarSign, href: "/supplier/terms" },
   ];
+  useEffect(()=>{
+    checkSupplierRole();
+  },[checkSupplierRole])
 
   return (
     <>

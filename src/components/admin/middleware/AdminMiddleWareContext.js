@@ -20,6 +20,37 @@ export default function AdminMiddleWareProvider({ children }) {
     const [suppliers, setSuppliers] = useState([]);
     const [isAdminStaff, setIsAdminStaff] = useState(null);
     const [extractedPermissions, setExtractedPermissions] = useState([]);
+     const checkAdminRole = () => {
+        try {
+            const shippingData = JSON.parse(localStorage.getItem("shippingData"));
+            console.log('shippingData', shippingData)
+            if (shippingData?.admin?.role === "admin_staff") {
+                setIsAdminStaff(true);
+            }
+        } catch (err) {
+            console.error("Error reading shippingdata:", err);
+            setIsAdminStaff(false);
+        }
+
+        try {
+            const rawPermissions = JSON.parse(localStorage.getItem("permissions")) || [];
+            const permissions = [];
+            rawPermissions.forEach((perm) => {
+                if (perm.permission) {
+                    permissions.push({
+                        panel: perm.permission.panel,
+                        module: perm.permission.module,
+                        action: perm.permission.action,
+                        status: perm.permission.status,
+                    });
+                }
+            });
+            setExtractedPermissions(permissions);
+        } catch (err) {
+            console.error("Error parsing permissions:", err);
+        }
+    }
+
 
     const verifyAdminAuth = useCallback(async () => {
         setLoading(true);
@@ -65,38 +96,8 @@ export default function AdminMiddleWareProvider({ children }) {
         }
     }, [router]);
 
-    const checkAdminRole = () => {
-        try {
-            const shippingData = JSON.parse(localStorage.getItem("shippingData"));
-            console.log('shippingData', shippingData)
-            if (shippingData?.admin?.role === "admin_staff") {
-                setIsAdminStaff(true);
-            }
-        } catch (err) {
-            console.error("Error reading shippingdata:", err);
-            setIsAdminStaff(false);
-        }
-
-        try {
-            const rawPermissions = JSON.parse(localStorage.getItem("permissions")) || [];
-            const permissions = [];
-            rawPermissions.forEach((perm) => {
-                if (perm.permission) {
-                    permissions.push({
-                        panel: perm.permission.panel,
-                        module: perm.permission.module,
-                        action: perm.permission.action,
-                        status: perm.permission.status,
-                    });
-                }
-            });
-            setExtractedPermissions(permissions);
-        } catch (err) {
-            console.error("Error parsing permissions:", err);
-        }
-    }
-
-    console.log('extractedPermissions',extractedPermissions)
+   
+  
     const fetchSupplier = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
