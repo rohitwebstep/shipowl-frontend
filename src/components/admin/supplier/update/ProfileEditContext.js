@@ -151,9 +151,7 @@ const ProfileEditProvider = ({ children }) => {
     const hasAadhar = !!formData.aadharNumber?.trim();
 
     if (hasGST ) {
-      if (!hasCompanyPAN) {
-        newErrors.companyPanNumber = requiredFields.companyPanNumber;
-      }
+    
       if (!hasGST) {
         newErrors.gstNumber = requiredFields.gstNumber;
       }
