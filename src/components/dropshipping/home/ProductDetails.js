@@ -810,17 +810,7 @@ const ProductDetails = () => {
 
               <p className="pt-5 text-[18px] font-bold">Desciption</p>
 
-              <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
-                  {/* Close Button */}
-                  <button
-                    onClick={() => setOpenDescriptionId(null)}
-                    className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
-                  >
-                    &times;
-                  </button>
-
-                  {/* HTML Description Content */}
+           
                   {productDetails.description ? (
                     <div
                       className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
@@ -829,8 +819,7 @@ const ProductDetails = () => {
                   ) : (
                     <p className="text-gray-500">NIL</p>
                   )}
-                </div>
-              </div>
+             
 
 
               <p className="pt-2 text-[18px] font-bold border-t mt-3 border-[#E0E2E7]">Platform Assurance</p>

@@ -587,9 +587,9 @@ export default function My() {
 
                     <div className="grid lg:grid-cols-4 xl:grid-cols-5 md:grid-cols-2 gap-6">
                         {products.map((product) => {
-                            const variant = product?.product?.variants;
                             const variantsImage = product?.variants || [];
-                            const imageUrl = variantsImage[0]?.variant?.image || "/default-image.jpg"; // fallback
+                            const imageString = variantsImage[0]?.variant?.image || "";
+                            const imageUrl = imageString.split(",")[0]?.trim() || "/default-image.jpg";
                             const productName = product?.product?.name || "NIL";
 
                             const getPriceDisplay = (variants) => {
