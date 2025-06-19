@@ -10,7 +10,9 @@ import 'swiper/css';
 import Image from "next/image";
 import 'swiper/css/navigation';
 import { useAdmin } from '../middleware/AdminMiddleWareContext'
+import { useImageURL } from "@/components/ImageURLContext";
 export default function Update() {
+    const { fetchImages } = useImageURL();
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -379,7 +381,7 @@ export default function Update() {
 
                                                     {/* Image */}
                                                     <Image
-                                                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                                                        src={fetchImages(img)}
                                                         alt={`Image ${index + 1}`}
                                                         width={500}
                                                         height={500}

@@ -20,6 +20,7 @@ import { ChevronRight, ChevronDown } from "lucide-react"; // Optional: Lucide ic
 import { TbCube } from "react-icons/tb";
 import { GoArrowUpRight } from "react-icons/go";
 import { FiArrowDownLeft } from "react-icons/fi";
+import { useImageURL } from "@/components/ImageURLContext";
 
 
 const NewlyLaunched = () => {
@@ -249,12 +250,9 @@ const NewlyLaunched = () => {
 };
 
 const Section = ({ title, form, showResult, setForm, type, errors, setShowResult, setErrors, products, shopifyStores, calculateData, openCalculator, setOpenCalculator, setcalculateData, shipCost, setShipCost, setActiveTab, fetchProduct, activeTab }) => {
-
+  const { fetchImages } = useImageURL();
   const [activeModal, setActiveModal] = useState("");
-
-
   const [openSection, setOpenSection] = useState(null);
-
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
   }; const handleChange = (key, value) => {
@@ -636,7 +634,10 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
         {products.map((product, index) => {
 
           const productName = product?.product?.name || "NIL";
-
+          const variant = product.variants || product?.variants?.supplierProductVariant;
+          const imageUrls = variant.image
+            ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
+            : [];
           return (
             <div
               key={index}
@@ -648,7 +649,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                 <div className="relative overflow-hidden w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                   {/* FRONT */}
                   <Image
-                    src={productimg}
+                    src={fetchImages(imageUrls)}
                     alt={productName}
                     height={200}
                     width={100}
@@ -812,7 +813,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                           {/* Product Info */}
                           <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
                             <Image
-                              src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                             src={fetchImages(variant.image)}
                               alt="Product"
                               width={64}
                               height={64}
@@ -933,7 +934,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                               {/* Product Info */}
                               <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
                                 <Image
-                                  src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                                   src={fetchImages(variant.image)}
                                   alt="Product"
                                   width={64}
                                   height={64}
@@ -1052,7 +1053,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                   {/* Product Info */}
                                   <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
                                     <Image
-                                      src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                                        src={fetchImages(variant.image)}
                                       alt="Product"
                                       width={64}
                                       height={64}
@@ -1208,7 +1209,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                 {/* Product Info */}
                                 <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
                                   <Image
-                                    src={variant.image || 'https://placehold.co/80x80?text=Image'}
+                               src={fetchImages(variant.image)}
                                     alt={variant.name || 'Product Image'}
                                     width={64}
                                     height={64}
@@ -1355,7 +1356,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
               <div className="flex gap-6 mt-4 mb-6">
                 {calculateData?.image ? (
                   <Image
-                    src={calculateData.image.split(",")[0] || null}
+                     src={fetchImages(calculateData.image.split(",")[0] || null)}
                     alt={calculateData?.name || "Product Image"}
                     width={100}
                     height={100}
@@ -1607,7 +1608,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                       <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
                         {imageUrls.length > 0 ? (
                           <img
-                            src={`https://placehold.co/600x400?text=${idx + 1}`}
+                            src={fetchImages(imageUrls)}
                             alt={`variant-img-${idx}`}
                             className="h-full w-full object-cover p-3 rounded-md"
                           />

@@ -10,10 +10,11 @@ import Image from "next/image";
 import 'swiper/css/navigation';
 import Swal from "sweetalert2";
 import { useRouter, useSearchParams } from 'next/navigation';
-
+import { useImageURL } from "@/components/ImageURLContext";
 export default function ShippingDetails() {
   const { formData, files, setFiles, validateForm2, setFormData, shippingErrors, fileFields, videoFields, setActiveTab } = useContext(ProductContextEdit);
   const [loading, setLoading] = useState(null);
+  const { fetchImages } = useImageURL();
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -292,9 +293,7 @@ export default function ShippingDetails() {
                         </button>
 
                         <Image
-                          src={`https://placehold.co/600x400?text=${index + 1}`
-
-                          }
+                          src={fetchImages(file)}
                           alt={`Image ${index + 1}`}
                           width={500}
                           height={500}

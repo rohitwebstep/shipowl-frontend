@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -11,16 +11,18 @@ import 'swiper/css/navigation';
 import { useSearchParams } from 'next/navigation';
 import HashLoader from "react-spinners/HashLoader";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
-
+import { useImageURL } from "@/components/ImageURLContext";
 export default function Update() {
+    const { fetchImages } = useImageURL();
     const router = useRouter();
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         status: false,
         image: ""
     });
-
+    
     const [validationErrors, setValidationErrors] = useState({});
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -48,7 +50,7 @@ export default function Update() {
         if (!formData.name || formData.name.trim() === '') {
             errors.name = 'brand name is required.';
         }
-       
+
         if ((!files || files.length === 0) && (!formData.image || formData.image.trim() === '')) {
             errors.image = 'At least one brand image is required.';
         }
@@ -340,7 +342,7 @@ export default function Update() {
 
                                 <div>
                                     <label htmlFor="description" className="font-bold block text-[#232323]">
-                                        Brand Description 
+                                        Brand Description
                                     </label>
                                     <input
                                         type="text"
@@ -351,7 +353,7 @@ export default function Update() {
                                         className={`text-[#718EBF] border w-full border-[#DFEAF2] rounded-md p-3 mt-2 font-bold ${validationErrors.description ? "border-red-500" : "border-[#E0E5F2]"
                                             }`}
                                     />
-                                   
+
                                 </div>
                             </div>
 
@@ -406,7 +408,7 @@ export default function Update() {
 
                                                     {/* Image */}
                                                     <Image
-                                                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                                                        src={fetchImages(img)}
                                                         alt={`Image ${index + 1}`}
                                                         width={500}
                                                         height={500}

@@ -14,6 +14,8 @@ import 'swiper/css/navigation';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
 import { BadgePlus, Trash2, RotateCcw, Pencil } from "lucide-react";
+import { useImageURL } from "@/components/ImageURLContext";
+
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
@@ -23,6 +25,7 @@ export default function List() {
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/category", "categories");
+    const { fetchImages } = useImageURL();
 
     const handleCheckboxChange = (id) => {
         setSelected((prev) =>
@@ -252,8 +255,7 @@ export default function List() {
                                                                     {item.image?.split(",").map((img, index) => (
                                                                         <SwiperSlide key={index}>
                                                                             <Image
-                                                                                src={`https://placehold.co/600x400?text=${index + 1}`}
-                                                                                alt={`Image ${index + 1}`}
+                                                                                src={fetchImages(img)} alt={`Image ${index + 1}`}
                                                                                 width={40}
                                                                                 height={40}
                                                                                 className="me-3 object-cover rounded"

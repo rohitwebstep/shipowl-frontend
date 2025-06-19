@@ -10,7 +10,9 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import Image from 'next/image';
 import Swal from "sweetalert2";
+import { useImageURL } from "@/components/ImageURLContext";
 export default function VariantDetails() {
+  const { fetchImages } = useImageURL();
   const { formData, setFormData, setActiveTab } = useContext(ProductContextEdit);
   const [loading, setLoading] = useState(null);
   const numericFields = ['suggested_price'];
@@ -392,9 +394,7 @@ export default function VariantDetails() {
                                   </button>
 
                                   <Image
-                                    src={`https://placehold.co/600x400?text=${index + 1}`
-
-                                    }
+                                    src={fetchImages(file)}
                                     alt={`Image ${index + 1}`}
                                     width={500}
                                     height={500}

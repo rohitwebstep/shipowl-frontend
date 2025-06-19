@@ -57,7 +57,7 @@ export default function Sidebar() {
   ];
   useEffect(()=>{
     checkSupplierRole();
-  },[checkSupplierRole])
+  },[])
 
   return (
     <>

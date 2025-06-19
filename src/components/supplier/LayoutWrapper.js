@@ -12,6 +12,8 @@ import { BrandProvider } from "./brand/BrandContext";
 import { ProductProviderEdit } from "./products/ProductContextEdit";
 import { ProductProvider } from "./addproducts/ProductContext";
 import { HashLoader } from "react-spinners";
+import { ImageURLProvider } from "../ImageURLContext";
+
 function LayoutWrapperInner({ children }) {
   const pathname = usePathname();
   const isAuthPage =
@@ -27,31 +29,33 @@ function LayoutWrapperInner({ children }) {
   return (
     <div className="main">
       <div className="container">
-        <SupplierMiddleWareProvider>
-          <div className={`${!isAuthPage ? "lg:flex" : ""} `}>
-            {!isAuthPage && (
-              <div className="xl:w-[18.5%] lg:w-[23%] w-full p-2 leftbar">
-                <Sidebar />
-              </div>
-            )}
-            <div className={`px-3 mt-20 lg:mt-0  lg-px-0 ${isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[73%]"}`}>
-              {!isAuthPage && <Header />}
-              <div className="xl:p-3 md:pt-4 md:px-0">
-                <ProductProviderEdit>
-                  <ProductProvider>
-                    <ApiProvider>
-                      <CategoryProvider>
-                        <BrandProvider>
-                          <ProfileProvider>{children}</ProfileProvider>
-                        </BrandProvider>
-                      </CategoryProvider>
-                    </ApiProvider>
-                  </ProductProvider>
-                </ProductProviderEdit>
+        <ImageURLProvider>
+          <SupplierMiddleWareProvider>
+            <div className={`${!isAuthPage ? "lg:flex" : ""} `}>
+              {!isAuthPage && (
+                <div className="xl:w-[18.5%] lg:w-[23%] w-full p-2 leftbar">
+                  <Sidebar />
+                </div>
+              )}
+              <div className={`px-3 mt-20 lg:mt-0  lg-px-0 ${isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[73%]"}`}>
+                {!isAuthPage && <Header />}
+                <div className="xl:p-3 md:pt-4 md:px-0">
+                  <ProductProviderEdit>
+                    <ProductProvider>
+                      <ApiProvider>
+                        <CategoryProvider>
+                          <BrandProvider>
+                            <ProfileProvider>{children}</ProfileProvider>
+                          </BrandProvider>
+                        </CategoryProvider>
+                      </ApiProvider>
+                    </ProductProvider>
+                  </ProductProviderEdit>
+                </div>
               </div>
             </div>
-          </div>
-        </SupplierMiddleWareProvider>
+          </SupplierMiddleWareProvider>
+        </ImageURLProvider>
       </div>
     </div>
   );

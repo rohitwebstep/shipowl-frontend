@@ -8,6 +8,8 @@ import DropshipperMiddleWareProvider from "./middleware/DropshipperMiddleWareCon
 import { DropshipperProfileProvider } from "./dropshipper/update/DropshipperProfileContext";
 import { ProfileProvider } from "../admin/supplier/ProfileContext";
 import { HashLoader } from "react-spinners";
+import { ImageURLProvider } from "../ImageURLContext";
+
 function LayoutWrapperInner({ children }) {
     const pathname = usePathname();
     const isAuthPage = pathname == "/dropshipping/shopify/success/" || pathname == "/dropshipping/shopify/connecting/" || pathname == "/dropshipping/shopify/failed/" || pathname === '/dropshipping/auth/login/' || pathname === '/dropshipping/auth/password/forget/' || pathname === '/dropshipping/auth/password/reset/' || pathname === '/dropshipping/auth/register/' || pathname === '/dropshipping/auth/register/verify/';
@@ -21,20 +23,20 @@ function LayoutWrapperInner({ children }) {
                             <Sidebar />
                         </div>
                     )}
-
-                    <DropshipperMiddleWareProvider>
-                        <div className={`px-3 mt-20 lg:mt-0  lg-px-0 ${isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[73%]"}`}>
-                            {!isAuthPage && <Header />}
-                            <div className="md:p-7 xl:p-3 md:pt-0">
-                                <ProfileProvider>
-                                    <DropshipperProfileProvider>
-                                        {children}
-                                    </DropshipperProfileProvider>
-                                </ProfileProvider>
+                    <ImageURLProvider>
+                        <DropshipperMiddleWareProvider>
+                            <div className={`px-3 mt-20 lg:mt-0  lg-px-0 ${isAuthPage ? "w-full" : "main-outlet xl:w-[81.5%] lg:w-[73%]"}`}>
+                                {!isAuthPage && <Header />}
+                                <div className="md:p-7 xl:p-3 md:pt-0">
+                                    <ProfileProvider>
+                                        <DropshipperProfileProvider>
+                                            {children}
+                                        </DropshipperProfileProvider>
+                                    </ProfileProvider>
+                                </div>
                             </div>
-                        </div>
-                    </DropshipperMiddleWareProvider>
-
+                        </DropshipperMiddleWareProvider>
+                    </ImageURLProvider>
                 </div>
             </div>
         </div>

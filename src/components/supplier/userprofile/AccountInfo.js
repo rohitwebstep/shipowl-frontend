@@ -9,8 +9,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
-
+import { useImageURL } from "@/components/ImageURLContext";
 const AccountInfo = () => {
+  const { fetchImages } = useImageURL();
   const { formData, setFormData, files } = useContext(ProfileContext);
   const [errors, setErrors] = useState([{}]);
   const [loading, setLoading] = useState(false);
@@ -220,7 +221,7 @@ const AccountInfo = () => {
             continue;
           }
 
-        
+
           else if (key === 'bankAccounts') {
             value.forEach((bank, bankIndex) => {
               const file = bank['cancelledChequeImage'];
@@ -328,8 +329,8 @@ const AccountInfo = () => {
                 value={account[name]}
                 onChange={(e) => handleChange(index, e)}
                 className={`w-full p-3 border rounded-lg font-bold ${errors[index]?.[name]
-                    ? 'border-red-500 text-red-500'
-                    : 'border-[#DFEAF2] text-[#718EBF]'
+                  ? 'border-red-500 text-red-500'
+                  : 'border-[#DFEAF2] text-[#718EBF]'
                   }`}
               />
               {errors[index]?.[name] && (
@@ -348,8 +349,8 @@ const AccountInfo = () => {
               value={account.accountType}
               onChange={(e) => handleChange(index, e)}
               className={`w-full p-3 border rounded-lg font-bold ${errors[index]?.accountType
-                  ? 'border-red-500 text-red-500'
-                  : 'border-[#DFEAF2] text-[#718EBF]'
+                ? 'border-red-500 text-red-500'
+                : 'border-[#DFEAF2] text-[#718EBF]'
                 }`}
             >
               <option value="">Select Type</option>
@@ -404,7 +405,7 @@ const AccountInfo = () => {
                         ✕
                       </button>
                       <Image
-                        src={`https://placehold.co/600x400?text=${imgIndex + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${imgIndex + 1}`}
                         width={500}
                         height={500}

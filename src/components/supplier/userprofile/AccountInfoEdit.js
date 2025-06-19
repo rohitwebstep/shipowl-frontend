@@ -9,7 +9,9 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation'
 import { HashLoader } from 'react-spinners';
+import { useImageURL } from "@/components/ImageURLContext";
 const AccountInfoEdit = () => {
+    const { fetchImages } = useImageURL();
     const [accountErrors, setAccountErrors] = useState([{}]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -486,7 +488,7 @@ const AccountInfoEdit = () => {
                                             ✕
                                         </button>
                                         <Image
-                                            src={`https://placehold.co/600x400?text=${imgIndex + 1}` || img.trim()}
+                                            src={fetchImages(img)}
                                             alt={`Image ${imgIndex + 1}`}
                                             width={500}
                                             height={500}

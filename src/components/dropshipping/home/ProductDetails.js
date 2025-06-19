@@ -30,12 +30,14 @@ import { FiArrowDownLeft } from "react-icons/fi";
 import { RiResetRightLine } from "react-icons/ri";
 import { RxCross1 } from "react-icons/rx";
 import { ChevronRight, ChevronDown } from "lucide-react"; // Optional: Lucide icons
+import { useImageURL } from "@/components/ImageURLContext";
 
 const tabs = [
   { key: "notmy", label: "Not Pushed to Shopify" },
   { key: "my", label: "Pushed to Shopify" },
 ];
 const ProductDetails = () => {
+  const { fetchImages } = useImageURL();
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
@@ -421,7 +423,8 @@ const ProductDetails = () => {
               <div className="rounded-lg bg-white border border-[#E0E2E7] p-4">
                 <div className="rounded-lg p-4 w-full">
                   <Image
-                    src={productimg || selectedImage}
+
+                    src={fetchImages(selectedImage)}
                     alt="Product Image"
                     width={320}
                     height={320}
@@ -439,7 +442,7 @@ const ProductDetails = () => {
                   {images.map((image, index) => (
                     <SwiperSlide key={index}>
                       <Image
-                        src={productimg || image}
+                        src={fetchImages(image)}
                         alt={`Thumbnail ${index + 1}`}
                         width={80}
                         height={80}
@@ -496,14 +499,7 @@ const ProductDetails = () => {
                     </div>
                   </div>
 
-                  <div className="bg-yellow-100 p-2 rounded-md mt-3 flex items-center cursor-pointer">
-                    <span className="bg-pink-500 text-white rounded-full px-2 py-1 mr-2">
-                      💰
-                    </span>
-                    <span className="font-semibold underline">
-                      Get upto ₹124 discount per order
-                    </span>
-                  </div>
+
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4 mt-4 text-gray-700 text-sm">
@@ -588,7 +584,7 @@ const ProductDetails = () => {
                                 <div className="flex gap-3">
                                   <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
                                     <Image
-                                      src={productimg || variant.image}
+                                      src={fetchImages(variant.image)}
                                       alt={variant.name}
                                       width={140}
                                       height={140}
@@ -688,7 +684,7 @@ const ProductDetails = () => {
                                   <div className="flex gap-3">
                                     <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
                                       <Image
-                                        src={productimg || variant.image}
+                                        src={fetchImages(variant.image)}
                                         alt={variant.name}
                                         width={140}
                                         height={140}
@@ -813,40 +809,29 @@ const ProductDetails = () => {
               </div>
 
               <p className="pt-5 text-[18px] font-bold">Desciption</p>
-              <p className=" text-[#858D9D] text-[16px]">
-                <span>
+
+              <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
+                <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
+                  {/* Close Button */}
                   <button
-                    onClick={() => setOpenDescriptionId(productDetails.id)}
-                    className="text-blue-600"
+                    onClick={() => setOpenDescriptionId(null)}
+                    className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
                   >
-                    View Description
+                    &times;
                   </button>
 
-                </span>
-              </p>
-              {openDescriptionId === productDetails.id && (
-                <div className="fixed p-4 inset-0 z-50 m-auto  flex items-center justify-center bg-black/50">
-                  <div className="bg-white w-4xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative shadow-lg popup-boxes">
-                    {/* Close Button */}
-                    <button
-                      onClick={() => setOpenDescriptionId(null)}
-                      className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-xl"
-                    >
-                      &times;
-                    </button>
-
-                    {/* HTML Description Content */}
-                    {productDetails.description ? (
-                      <div
-                        className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                        dangerouslySetInnerHTML={{ __html: productDetails.description }}
-                      />
-                    ) : (
-                      <p className="text-gray-500">NIL</p>
-                    )}
-                  </div>
+                  {/* HTML Description Content */}
+                  {productDetails.description ? (
+                    <div
+                      className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                      dangerouslySetInnerHTML={{ __html: productDetails.description }}
+                    />
+                  ) : (
+                    <p className="text-gray-500">NIL</p>
+                  )}
                 </div>
-              )}
+              </div>
+
 
               <p className="pt-2 text-[18px] font-bold border-t mt-3 border-[#E0E2E7]">Platform Assurance</p>
               <div className="xl:grid lg:grid-cols-4 flex my-5 md:my-0 overflow-auto gap-8">
@@ -938,7 +923,7 @@ const ProductDetails = () => {
                 {relatedProducts.map((item, index) => {
                   const product = item.product || {};
                   const variants = item.variants || [];
-
+                  const variantImg = variants[0]?.varinat?.image;
                   const prices = variants.map(v => v.price).filter(p => typeof p === "number");
                   const lowestPrice = prices.length > 0 ? Math.min(...prices) : "-";
                   const productName = product.name || "Unnamed Product";
@@ -955,7 +940,7 @@ const ProductDetails = () => {
                           <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                             {/* FRONT */}
                             <Image
-                              src={productimg}
+                              src={fetchImages(variantImg)}
                               alt={productName}
                               height={200}
                               width={100}
@@ -1087,7 +1072,7 @@ const ProductDetails = () => {
                                         key={i}
                                         height={100}
                                         width={100}
-                                        src={`https://placehold.co/600x400?text=${i + 1}`}
+                                        src={fetchImages(url)}
                                         alt={variantInfo.name || 'NIL'}
                                         className="shrink-0 border border-[#E0E2E7] shadow "
                                       />
@@ -1280,11 +1265,13 @@ const ProductDetails = () => {
               {/* Info Bar */}
               <div className="flex gap-6 mt-4 mb-6">
                 <Image
-                  src={
+
+                  src={fetchImages(
                     selectedVariant?.variant?.image
                       ? selectedVariant.variant.image.split(",")[0]
-                      : 'https://placehold.co/600x400'
-                  }
+                      : "https://placehold.co/600x400"
+                  )}
+
                   alt='Invalid Image'
                   height={50}
                   width={50}

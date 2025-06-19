@@ -13,8 +13,10 @@ import { useAdminActions } from '@/components/commonfunctions/MainContext';
 import Image from 'next/image';
 import { ProductContext } from '../addproducts/ProductContext';
 import { Trash2, RotateCcw, Pencil } from "lucide-react";
+import { useImageURL } from "@/components/ImageURLContext";
 
 const ProductTable = () => {
+    const { fetchImages } = useImageURL();
     const { setActiveTab } = useContext(ProductContextEdit);
     const { setActiveTabs } = useContext(ProductContext)
     const [showVariantPopup, setShowVariantPopup] = useState(false);
@@ -540,7 +542,7 @@ const ProductTable = () => {
                                                                         key={i}
                                                                         height={100}
                                                                         width={100}
-                                                                        src={url}
+                                                                        src={fetchImages(url)}
                                                                         alt={variant.name || 'NIL'}
                                                                         className="shrink-0 rounded border"
                                                                     />

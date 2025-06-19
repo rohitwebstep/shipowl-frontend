@@ -9,7 +9,9 @@ import Swal from 'sweetalert2';
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import { X, FileText, Tag, Truck, Pencil, RotateCcw, Trash2, Eye } from "lucide-react"; // Icons
 import { FaEye } from "react-icons/fa";
+import { useImageURL } from "@/components/ImageURLContext";
 export default function My() {
+    const { fetchImages } = useImageURL();
     const { verifySupplierAuth } = useSupplier();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(null);
@@ -585,9 +587,9 @@ export default function My() {
 
                     <div className="grid lg:grid-cols-4 xl:grid-cols-5 md:grid-cols-2 gap-6">
                         {products.map((product) => {
-                            const variant = product?.product?.variants?.[0];
-                            const imageUrl =
-                                variant?.image?.split(",")?.[0]?.trim() || productimg;
+                            const variant = product?.product?.variants;
+                            const variantsImage = product?.variants || [];
+                            const imageUrl = variantsImage[0]?.variant?.image || "/default-image.jpg"; // fallback
                             const productName = product?.product?.name || "NIL";
 
                             const getPriceDisplay = (variants) => {
@@ -639,7 +641,7 @@ export default function My() {
                                         <div onClick={() => viewProduct(product.id)} className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                                             {/* FRONT */}
                                             <Image
-                                                src={imageUrl}
+                                                src={fetchImages(imageUrl)}
                                                 alt={productName}
                                                 height={200}
                                                 width={100}
@@ -822,7 +824,7 @@ export default function My() {
                                                                                 key={i}
                                                                                 height={100}
                                                                                 width={100}
-                                                                                src={`https://placehold.co/600x400?text=${i + 1}`}
+                                                                                src={fetchImages(url)}
                                                                                 alt={variant.name || 'NIL'}
                                                                                 className="h-full w-full "
                                                                             />
@@ -938,7 +940,7 @@ export default function My() {
 
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">                                    {selectedProduct.variants?.map((v, idx) => {
-                                    
+
                                     const variant = v.variant || v;
                                     const variants = v;
                                     const isExists = selectedProduct?.product?.isVarientExists;
@@ -958,7 +960,7 @@ export default function My() {
                                                             key={i}
                                                             height={100}
                                                             width={100}
-                                                            src={`https://placehold.co/600x400?text=${i + 1}` || url}
+                                                            src={fetchImages(url)}
                                                             alt={variant.name || 'NIL'}
                                                             className="h-full w-full "
                                                         />

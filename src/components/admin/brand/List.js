@@ -14,15 +14,17 @@ import 'swiper/css/navigation';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useAdminActions } from "@/components/commonfunctions/MainContext";
 import { BadgePlus, Trash2, RotateCcw, Pencil } from "lucide-react";
-
+import { useImageURL } from "@/components/ImageURLContext";
 export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isTrashed, setIsTrashed] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState([]);
     const [brandData, setBrandData] = useState([]);
+    const {fetchImages} = useImageURL();
     const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
+
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("admin/brand", "brands");
 
     const handleCheckboxChange = (id) => {
@@ -250,10 +252,10 @@ export default function List() {
                                                                 {item.image?.split(',').map((img, index) => (
                                                                     <SwiperSlide key={index}>
                                                                         <Image
-                                                                            src={`https://placehold.co/600x400?text=${index + 1}`}
+                                                                            src={fetchImages(img)}
                                                                             alt={`Image ${index + 1}`}
-                                                                            width={40}
-                                                                            height={40}
+                                                                            width={100}
+                                                                            height={100}
                                                                             className="me-3 object-cover rounded"
                                                                         />
                                                                     </SwiperSlide>

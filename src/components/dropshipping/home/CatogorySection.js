@@ -4,8 +4,10 @@ import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import { HashLoader } from 'react-spinners';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
+import { useImageURL } from "@/components/ImageURLContext";
 const CategorySection = () => {
+  const { fetchImages } = useImageURL();
+
   const [categoryData, setCategoryData] = useState([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -113,7 +115,8 @@ const CategorySection = () => {
                   <div className='cursor-pointer' onClick={() => catProducts(category.id)}>
                     <div className="md:w-[134px] md:h-[132px] w-[100px] h-[100px] rounded-full overflow-hidden border-4 border-white relative shadow-md hover:shadow-xl transition-shadow duration-300">
                       <Image
-                        src={`https://placehold.co/600x400?text=Category ${index + 1}`}
+                        src={fetchImages(category?.image?.split(',')[0])}
+
 
                         alt={category.name}
                         layout="fill"
@@ -124,7 +127,7 @@ const CategorySection = () => {
                       {category.name}
                     </p>
                   </div>
-                </div>
+                </div>       
               ))}
             </div>
 

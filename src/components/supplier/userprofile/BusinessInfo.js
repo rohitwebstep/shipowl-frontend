@@ -10,8 +10,9 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Select from 'react-select';
-
+import { useImageURL } from "@/components/ImageURLContext";
 const BusinessInfo = () => {
+  const { fetchImages } = useImageURL();
   const { formData, requiredFields, businessErrors, validateBusiness, setBusinessErrors, files, setFiles, setFormData, stateData, cityData, setCityData, setStateData, setActiveTab, countryData } = useContext(ProfileContext);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -260,7 +261,7 @@ const BusinessInfo = () => {
         }
       }
       for (const key in formData) {
-       if (formData[key] !== null && formData[key] !== '') {
+        if (formData[key] !== null && formData[key] !== '') {
           form.append(key, formData[key]);
         }
       }
@@ -409,21 +410,21 @@ const BusinessInfo = () => {
       </div>
 
       {/* Billing Address */}
-    
+
 
       {/* Pincode, State, City */}
       <div className="grid lg:grid-cols-3 py-5 gap-4">
-          <div>
-        {renderLabel('Company Billing Address', 'billingAddress')}
-        <input
-          type="text"
-          name="billingAddress"
-          value={formData.billingAddress}
-          onChange={handleChange}
-          className={inputClasses('billingAddress')}
-        />
-        {renderError('billingAddress')}
-      </div>
+        <div>
+          {renderLabel('Company Billing Address', 'billingAddress')}
+          <input
+            type="text"
+            name="billingAddress"
+            value={formData.billingAddress}
+            onChange={handleChange}
+            className={inputClasses('billingAddress')}
+          />
+          {renderError('billingAddress')}
+        </div>
         <div>
           {renderLabel('Pincode', 'billingPincode')}
           <input
@@ -481,7 +482,7 @@ const BusinessInfo = () => {
           />
           {renderError('billingCity')}
         </div>
-       
+
 
         <div>
           {renderLabel('Form of Client’s Entity', 'clientEntryType')}
@@ -491,7 +492,7 @@ const BusinessInfo = () => {
             onChange={handleChange}
             className={inputClasses('clientEntryType')}
           >
-           <option value="">Select</option>
+            <option value="">Select</option>
             <option value="Private Limited (Pvt Ltd)">Private Limited (Pvt Ltd)</option>
             <option value="Public Limited (Ltd)">Public Limited (Ltd)</option>
             <option value="Limited Liability Partnership (LLP)">Limited Liability Partnership (LLP)</option>
@@ -594,7 +595,7 @@ const BusinessInfo = () => {
 
                   {/* Image */}
                   <Image
-                    src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                    src={fetchImages(img)}
                     alt={`Image ${index + 1}`}
                     width={500}
                     height={500}
@@ -658,7 +659,7 @@ const BusinessInfo = () => {
                       </button>
                       {/* Image */}
                       <Image
-                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}
@@ -669,7 +670,7 @@ const BusinessInfo = () => {
                 </Swiper>
               </div>    </div>
           )}
-  {renderError('panCardImage')}
+          {renderError('panCardImage')}
 
         </div>
 
@@ -683,8 +684,8 @@ const BusinessInfo = () => {
             onChange={handleChange}
             className={inputClasses('aadharCardImage')}
           />
-            <div className="mt-2">
-          <div className="py-6">
+          <div className="mt-2">
+            <div className="py-6">
               {formData?.aadharCardImage?.length > 0 && (
 
                 <Swiper
@@ -721,7 +722,7 @@ const BusinessInfo = () => {
                       </button>
                       {/* Image */}
                       <Image
-                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}
@@ -731,7 +732,7 @@ const BusinessInfo = () => {
                   ))}
                 </Swiper>
               )}
-               {renderError('aadharCardImage')}
+              {renderError('aadharCardImage')}
             </div>
           </div>
         </div>
@@ -808,7 +809,7 @@ const BusinessInfo = () => {
                       </button>
                       {/* Image */}
                       <Image
-                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}
@@ -872,7 +873,7 @@ const BusinessInfo = () => {
                       </button>
                       {/* Image */}
                       <Image
-                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}

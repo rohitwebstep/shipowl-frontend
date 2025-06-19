@@ -13,8 +13,9 @@ const tabs = [
   { key: "need-to-raise", label: "Need to Raise" },
   { key: "dispute", label: "Dispute" },
 ];
-
+import { useImageURL } from "@/components/ImageURLContext";
 import useScannerDetection from '../useScannerDetection';
+const { fetchImages } = useImageURL();
 // import { RiFileEditFill } from "react-icons/ri";
 // import { IoCloudDownloadOutline } from "react-icons/io5";
 // import { RxCrossCircled } from "react-icons/rx";
@@ -619,7 +620,7 @@ export default function RTO() {
                               {variantImages.map((imgUrl, imgIdx) => (
                                 <img
                                   key={imgIdx}
-                                  src={"https://placehold.co/400" || imgUrl.trim()}
+                                  src={fetchImages(imgUrl)}
                                   alt={`Variant ${imgIdx}`}
                                   className="h-12 w-12 object-cover rounded-full border border-[#DFEAF2]"
                                 />
@@ -811,7 +812,7 @@ export default function RTO() {
                           .map((imgUrl, imgIdx) => (
                             <img
                               key={imgIdx}
-                              src={`https://placehold.co/400` || imgUrl.trim()}
+                              src={fetchImages(imgUrl)}
                               alt={`Variant ${idx}`}
                               className="h-24 w-24 object-cover rounded border border-[#DFEAF2]"
                             />
@@ -954,7 +955,7 @@ export default function RTO() {
                   {selectedDisputeItem.packingGallery.replace(/"/g, '').split(',').map((img, index) => (
                     <img
                       key={index}
-                      src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                      src={fetchImages(img)}
                       alt={`Packing ${index}`}
                       className="w-full h-32 object-cover rounded border"
                     />
@@ -971,7 +972,7 @@ export default function RTO() {
                   {selectedDisputeItem.unboxingGallery.replace(/"/g, '').split(',').map((img, index) => (
                     <img
                       key={index}
-                      src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                      src={fetchImages(img)}
                       alt={`Unboxing ${index}`}
                       className="w-full h-32 object-cover rounded border"
                     />

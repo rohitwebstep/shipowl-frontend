@@ -6,7 +6,9 @@ import HashLoader from "react-spinners/HashLoader";
 import React, { useState, useCallback, useEffect, useContext } from "react";
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import { ProfileContext } from './ProfileContext';
+import { useImageURL } from "@/components/ImageURLContext";
 const ProfileList = () => {
+    const { fetchImages } = useImageURL();
     const [suppliers, setSuppliers] = useState([]);
     const { verifySupplierAuth } = useSupplier();
     const [cityData, setCityData] = useState([]);
@@ -198,7 +200,7 @@ const ProfileList = () => {
                     <div className="space-y-2 text-[#2B3674]">
                         <p><strong>Name:</strong> {suppliers.name || '-'}</p>
                         <p><strong>Email:</strong> {suppliers.email || '-'}</p>
-                      
+
                         <p><strong>Permanent Address:</strong> {suppliers.permanentAddress || '-'}</p>
                         <p><strong>State:</strong> {stateData.find(s => s.id === suppliers.permanentStateId)?.name || '-'}</p>
                         <p><strong>City:</strong> {cityData.find(c => c.id === suppliers.permanentCityId)?.name || '-'}</p>
@@ -238,7 +240,8 @@ const ProfileList = () => {
                                             .map((img, idx) => (
                                                 <img
                                                     key={idx}
-                                                    src={`https://placehold.co/600x400?text=${idx + 1}` || img.trim()}
+                                                    src={fetchImages(img)}
+
                                                     alt={`Cancelled Cheque ${idx + 1}`}
                                                     className="w-24 h-24 object-cover border rounded"
                                                     onClick={() => window.open(img.trim(), "_blank")}
