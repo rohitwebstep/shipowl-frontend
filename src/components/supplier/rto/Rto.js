@@ -15,7 +15,6 @@ const tabs = [
 ];
 import { useImageURL } from "@/components/ImageURLContext";
 import useScannerDetection from '../useScannerDetection';
-const { fetchImages } = useImageURL();
 // import { RiFileEditFill } from "react-icons/ri";
 // import { IoCloudDownloadOutline } from "react-icons/io5";
 // import { RxCrossCircled } from "react-icons/rx";
@@ -29,6 +28,7 @@ import Image from 'next/image';
 import { HashLoader } from 'react-spinners';
 export default function RTO() {
   const [activeTab, setActiveTab] = useState('warehouse-collected');
+  const { fetchImages } = useImageURL();
 
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState(null);
