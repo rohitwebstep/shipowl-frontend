@@ -216,7 +216,8 @@ export default function NewProducts() {
         {productsRequest.length > 0 ? (
           <div className="grid lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-1 gap-6">
             {productsRequest.map((product) => {
-              const imageUrl = product.variants[0]?.variant?.image || "/placeholder.png"; // Fallback
+            const imageUrl = product.variants?.[0]?.image?.split(',') || [];
+
               const productName = product.name || "Unnamed Product";
 
               const getPriceDisplay = (variants) => {
@@ -271,7 +272,7 @@ export default function NewProducts() {
                     >
                       {/* FRONT */}
                       <Image
-                        src={fetchImages(imageUrl)}
+                        src={fetchImages(imageUrl[0])}
                         alt={productName}
                         height={200}
                         width={100}

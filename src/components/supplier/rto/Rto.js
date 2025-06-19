@@ -617,17 +617,19 @@ export default function RTO() {
                         <td className="p-3 px-5 whitespace-nowrap">
                           <div className='flex items-center gap-3'>
                             <div className="flex gap-2 flex-wrap">
-                              {variantImages.map((imgUrl, imgIdx) => (
+                              
                                 <img
                                   key={imgIdx}
-                                  src={fetchImages(imgUrl)}
-                                  alt={`Variant ${imgIdx}`}
+                                  src={fetchImages(variantImages[0])}
+                                  alt={`Variant`}
                                   className="h-12 w-12 object-cover rounded-full border border-[#DFEAF2]"
                                 />
-                              ))}
+                             
                             </div>
                             <div onClick={() => handleViewVariant(order, order.items)} className="mt-2 cursor-pointer text-sm text-gray-600">
-                              +{order.items.length} more products
+                              {order.items.length > 1 &&
+                                (<span>  +{order.items.length} more products</span>
+                                )}
                             </div>
                           </div>
                         </td>

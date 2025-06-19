@@ -634,10 +634,11 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
         {products.map((product, index) => {
 
           const productName = product?.product?.name || "NIL";
-          const variant = product.variants || product?.variants?.supplierProductVariant;
-          const imageUrls = variant.image
-            ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-            : [];
+          const variants = product?.variants || product?.variants?.supplierProductVariant || [];
+          const firstVariantImageString = variants[0]?.variant?.image || "";
+          const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";
+
+
           return (
             <div
               key={index}
@@ -649,7 +650,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                 <div className="relative overflow-hidden w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                   {/* FRONT */}
                   <Image
-                    src={fetchImages(imageUrls)}
+                    src={fetchImages(imageUrl)}
                     alt={productName}
                     height={200}
                     width={100}
@@ -813,7 +814,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                           {/* Product Info */}
                           <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
                             <Image
-                             src={fetchImages(variant.image)}
+                              src={fetchImages(variant.image)}
                               alt="Product"
                               width={64}
                               height={64}
@@ -934,7 +935,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                               {/* Product Info */}
                               <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
                                 <Image
-                                   src={fetchImages(variant.image)}
+                                  src={fetchImages(variant.image)}
                                   alt="Product"
                                   width={64}
                                   height={64}
@@ -1053,7 +1054,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                   {/* Product Info */}
                                   <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
                                     <Image
-                                        src={fetchImages(variant.image)}
+                                      src={fetchImages(variant.image)}
                                       alt="Product"
                                       width={64}
                                       height={64}
@@ -1209,7 +1210,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                 {/* Product Info */}
                                 <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
                                   <Image
-                               src={fetchImages(variant.image)}
+                                    src={fetchImages(variant.image)}
                                     alt={variant.name || 'Product Image'}
                                     width={64}
                                     height={64}
@@ -1356,7 +1357,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
               <div className="flex gap-6 mt-4 mb-6">
                 {calculateData?.image ? (
                   <Image
-                     src={fetchImages(calculateData.image.split(",")[0] || null)}
+                    src={fetchImages(calculateData.image.split(",")[0] || null)}
                     alt={calculateData?.name || "Product Image"}
                     width={100}
                     height={100}
@@ -1592,10 +1593,8 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                       ...v
                     };
                   }
-
+                  console.log('variant', variant)
                   const imageUrls = variant.image
-                    ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-                    : [];
 
                   const isExists = selectedProduct?.product?.isVarientExists;
 
@@ -1606,15 +1605,16 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                     >
                       {/* Image */}
                       <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
-                        {imageUrls.length > 0 ? (
+                        {imageUrls?.length > 0 ? (
                           <img
-                            src={fetchImages(imageUrls)}
+                            src={fetchImages(imageUrls.split(','))}
                             alt={`variant-img-${idx}`}
                             className="h-full w-full object-cover p-3 rounded-md"
                           />
                         ) : (
-                          <span className="text-gray-400  text-xl font-bold">{idx + 1}</span>
+                          <span className="text-gray-400 text-xl font-bold">{idx + 1}</span>
                         )}
+
                       </div>
 
                       {/* Text Info */}

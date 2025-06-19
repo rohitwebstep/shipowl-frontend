@@ -57,7 +57,15 @@ const ProductDetails = () => {
   const [otherSuppliers, setOtherSuppliers] = useState([]);
   const images = selectedVariant?.variant?.image?.split(",") || selectedVariant?.supplierProductVariant?.variant?.image?.split(",") || [];
   const [shopifyStores, setShopifyStores] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(images[0] || "");
+  const [selectedImage, setSelectedImage] = useState("");
+    useEffect(() => {
+      const images =
+        selectedVariant?.variant?.image?.split(",") ||
+        selectedVariant?.image?.split(",") ||
+        [];
+  
+      setSelectedImage(images[0] ?? "");
+    }, [selectedVariant]);
   const [categoryId, setCategoryId] = useState('');
   const [variantDetails, setVariantDetails] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -413,6 +421,7 @@ const ProductDetails = () => {
       router.push(`/dropshipping/product/?id=${id}`);
     }
   };
+  console.log('selectedImage',selectedImage)
   return (
     <>
       {productDetails && Object.keys(productDetails).length > 0 ? (

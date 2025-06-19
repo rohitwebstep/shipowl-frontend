@@ -59,7 +59,18 @@ const ProductDetails = () => {
   const [otherSuppliers, setOtherSuppliers] = useState([]);
   const images = selectedVariant?.variant?.image?.split(",") || selectedVariant?.image?.split(",") || [];
   const [shopifyStores, setShopifyStores] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(images[0] || "");
+
+  const [selectedImage, setSelectedImage] = useState("");
+
+  // This will update selectedImage when selectedVariant changes
+  useEffect(() => {
+    const images =
+      selectedVariant?.variant?.image?.split(",") ||
+      selectedVariant?.image?.split(",") ||
+      [];
+
+    setSelectedImage(images[0] ?? "");
+  }, [selectedVariant]);
   const [categoryId, setCategoryId] = useState('');
   const [variantDetails, setVariantDetails] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -70,7 +81,8 @@ const ProductDetails = () => {
     id: '',
     isVarientExists: '',
   });
-
+  console.log('images - ', images)
+  console.log('images[0] - ', images[0])
 
 
   const [form, setForm] = useState({
@@ -424,7 +436,7 @@ const ProductDetails = () => {
       router.push(`/supplier/product/?id=${id}`);
     }
   };
-  console.log('selectedVariant', selectedVariant)
+  console.log('selectedImage', selectedImage)
   return (
     <>
       {productDetails && Object.keys(productDetails).length > 0 ? (
@@ -478,7 +490,7 @@ const ProductDetails = () => {
               <p className="text-gray-600">
                 Sold: <span className="text-black">1,316 </span> | Rating: ⭐
                 <span className="text-black"> {selectedVariant?.variant?.stock || selectedVariant?.stock} </span> | Stock:
-                <span className="text-black"> 25 </span> 
+                <span className="text-black"> 25 </span>
               </p>
 
               <div className="md:flex justify-between pb-3 pt-2">
@@ -579,55 +591,55 @@ const ProductDetails = () => {
                   if (totalModals === 1 && groupedByModal[modalNames[0]].length > 1) {
                     return (
                       <>
-                   
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        {groupedByModal[modalNames[0]]
-                          .map(getVariantData)
-                          .sort((a, b) => a.suggested_price - b.suggested_price)
-                          .map((variant, index) => {
-                            const isSelected = selectedVariant?.id === variant.id;
 
-                            return (
-                              <div
-                                key={index}
-                                onClick={() => handleVariantClick(variant.full)}
-                                className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
-                                  ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
-                                  : "border-gray-300 hover:shadow-lg bg-white"
-                                  }`}
-                              >
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          {groupedByModal[modalNames[0]]
+                            .map(getVariantData)
+                            .sort((a, b) => a.suggested_price - b.suggested_price)
+                            .map((variant, index) => {
+                              const isSelected = selectedVariant?.id === variant.id;
+
+                              return (
+                                <div
+                                  key={index}
+                                  onClick={() => handleVariantClick(variant.full)}
+                                  className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
+                                    ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
+                                    : "border-gray-300 hover:shadow-lg bg-white"
+                                    }`}
+                                >
 
 
-                                <div className="flex gap-3">
-                                  <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
-                                    <Image
+                                  <div className="flex gap-3">
+                                    <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
+                                      <Image
 
-                                      src={fetchImages(variant.image)}
-                                      alt={variant.name}
-                                      width={140}
-                                      height={140}
-                                      className="object-cover w-full h-full"
-                                    />
-                                  </div>
-                                  <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
-                                    <div>
-                                      Name: <span className="font-medium">{variant.name}</span>
+                                        src={fetchImages(variant.image)}
+                                        alt={variant.name}
+                                        width={140}
+                                        height={140}
+                                        className="object-cover w-full h-full"
+                                      />
                                     </div>
-                                    <div>
-                                      Color: <span className="font-medium">{variant.color}</span>
-                                    </div>
-                                    <div>
-                                      Modal: <span className="font-medium">{variant.modal}</span>
-                                    </div>
-                                    <div className="text-green-600 font-semibold">
-                                      Price: ₹{variant.suggested_price}
+                                    <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
+                                      <div>
+                                        Name: <span className="font-medium">{variant.name}</span>
+                                      </div>
+                                      <div>
+                                        Color: <span className="font-medium">{variant.color}</span>
+                                      </div>
+                                      <div>
+                                        Modal: <span className="font-medium">{variant.modal}</span>
+                                      </div>
+                                      <div className="text-green-600 font-semibold">
+                                        Price: ₹{variant.suggested_price}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            );
-                          })}
-                      </div>
+                              );
+                            })}
+                        </div>
                       </>
                     );
                   }
@@ -816,17 +828,17 @@ const ProductDetails = () => {
 
               <p className="pt-5 text-[18px] font-bold">Desciption</p>
 
-             
-                  {/* HTML Description Content */}
-                  {productDetails.description ? (
-                    <div
-                      className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                      dangerouslySetInnerHTML={{ __html: productDetails.description }}
-                    />
-                  ) : (
-                    <p className="text-gray-500">NIL</p>
-                  )}
-            
+
+              {/* HTML Description Content */}
+              {productDetails.description ? (
+                <div
+                  className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                  dangerouslySetInnerHTML={{ __html: productDetails.description }}
+                />
+              ) : (
+                <p className="text-gray-500">NIL</p>
+              )}
+
 
               <p className="pt-2 text-[18px] font-bold border-t mt-3 border-[#E0E2E7]">Platform Assurance</p>
               <div className="xl:grid lg:grid-cols-4 flex my-5 md:my-0 overflow-auto gap-8">
