@@ -16,7 +16,7 @@ import { DropshipperProfileContext } from './DropshipperProfileContext';
 const Dropshipper = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [dropshippers, setDropshippers] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -51,6 +51,7 @@ const Dropshipper = () => {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
+            await checkAdminRole();
             await fetchAll(setDropshippers, setLoading);
             setLoading(false);
         };
@@ -100,6 +101,59 @@ const Dropshipper = () => {
         );
     }
 
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Dropshipper" &&
+                perm.action === "Trash Listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Dropshipper" &&
+                perm.action === "Create" &&
+                perm.status === true
+        )
+        : true;
+
+    const canDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Dropshipper" &&
+                perm.action === "Permanent Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canEdit = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Dropshipper" &&
+                perm.action === "Update" &&
+                perm.status === true
+        )
+        : true;
+    const canSoftDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Dropshipper" &&
+                perm.action === "Soft Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canRestore = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Dropshipper" &&
+                perm.action === "Restore" &&
+                perm.status === true
+        )
+        : true;
+
     return (
 
         <div className="bg-white rounded-3xl p-5">
@@ -122,16 +176,20 @@ const Dropshipper = () => {
                         )}
                     </button>
                     <div className="flex justify-end gap-2">
-                        <button onClick={setActiveTab('account_details')} className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
-                            <Link href="/admin/dropshipper/create">Add New</Link>
-                        </button>
+                        {canAdd && (
+                            <button onClick={setActiveTab('account_details')} className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
+                                <Link href="/admin/dropshipper/create">Add New</Link>
+                            </button>
+                        )}
+                        {canViewTrashed && (
 
-                        <button
-                            className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
-                            onClick={handleToggleTrash}
-                        >
-                            {isTrashed ? "Dropshipper Listing (Simple)" : "Trashed Dropshipper"}
-                        </button>
+                            <button
+                                className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
+                                onClick={handleToggleTrash}
+                            >
+                                {isTrashed ? "Dropshipper Listing (Simple)" : "Trashed Dropshipper"}
+                            </button>
+                        )}
                     </div>
 
                 </div>
@@ -219,17 +277,17 @@ const Dropshipper = () => {
                                             <td className="p-3 px-4 text-center">
                                                 <div className="flex gap-2"> {isTrashed ? (
                                                     <>
-                                                        <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />
-                                                        <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />
+                                                        {canRestore && (<MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />)}
+                                                        {canDelete && (<AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />)}
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <MdModeEdit onClick={() => {
+                                                        {canEdit && (<MdModeEdit onClick={() => {
                                                             router.push(`/admin/dropshipper/update?id=${item.id}`);
                                                             setActiveTab('account_details');
                                                         }
-                                                        } className="cursor-pointer text-3xl" />
-                                                        <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                        } className="cursor-pointer text-3xl" />)}
+                                                        {canSoftDelete && (<AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />)}
                                                     </>
                                                 )}</div>
                                             </td>

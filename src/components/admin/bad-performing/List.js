@@ -16,16 +16,70 @@ export default function List() {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
 
-    const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("bad-pincode", "goodPincodes");
 
-    // Initial Auth + fetch
+
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
+
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Bad Pincode" &&
+                perm.action === "Trash Listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Bad Pincode" &&
+                perm.action === "Create" &&
+                perm.status === true
+        )
+        : true;
+
+    const canDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Bad Pincode" &&
+                perm.action === "Permanent Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canEdit = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Bad Pincode" &&
+                perm.action === "Update" &&
+                perm.status === true
+        )
+        : true;
+    const canSoftDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Bad Pincode" &&
+                perm.action === "Soft Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canRestore = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Bad Pincode" &&
+                perm.action === "Restore" &&
+                perm.status === true
+        )
+        : true;
     useEffect(() => {
         verifyAdminAuth();
+        checkAdminRole();
         fetchAll(setData, setLoading);
     }, []);
-      const handleToggleTrash = async () => {
+    const handleToggleTrash = async () => {
         setIsTrashed((prev) => !prev);
         if (!isTrashed) {
             await fetchTrashed(setData, setLoading);
@@ -73,8 +127,6 @@ export default function List() {
         }
     }, [data, loading]);
 
-  
-
     if (loading) {
         return (
             <div className="flex items-center justify-center h-[80vh]">
@@ -104,15 +156,16 @@ export default function List() {
                         )}
                     </button>
                     <div className="flex justify-start gap-5 items-end">
-                        <button
+                        {canViewTrashed && <button
                             className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                             onClick={handleToggleTrash}
                         >
                             {isTrashed ? "Bad Pincodes Listing (Simple)" : "Trashed Pincodes"}
-                        </button>
-                        <button className="bg-[#4285F4] text-white rounded-md p-3 px-8">
+                        </button>}
+
+                        {canAdd && <button className="bg-[#4285F4] text-white rounded-md p-3 px-8">
                             <Link href="/admin/bad-pincodes/create">Add New</Link>
-                        </button>
+                        </button>}
                     </div>
                 </div>
             </div>
@@ -136,13 +189,13 @@ export default function List() {
 
                                         <div className="flex justify-center gap-2">{isTrashed ? (
                                             <>
-                                                <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />
-                                                <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />
+                                                {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
+                                                {canDelete && <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />}
                                             </>
                                         ) : (
                                             <>
-                                                <MdModeEdit onClick={() => router.push(`/admin/bad-pincodes/update?id=${item.id}`)} className="cursor-pointer text-3xl" />
-                                                <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                {canEdit && <MdModeEdit onClick={() => router.push(`/admin/bad-pincodes/update?id=${item.id}`)} className="cursor-pointer text-3xl" />}
+                                                {canSoftDelete && <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />}
                                             </>
                                         )}</div>
                                     </td>

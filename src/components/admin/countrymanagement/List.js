@@ -5,7 +5,6 @@ import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
 import { AiOutlineDelete } from "react-icons/ai";
-import Image from "next/image";
 import HashLoader from "react-spinners/HashLoader";
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
 import { useRouter } from "next/navigation";
@@ -19,7 +18,7 @@ export default function List() {
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState([]);
     const [countryData, setCountryData] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
 
     const handleCheckboxChange = (id) => {
@@ -141,6 +140,7 @@ export default function List() {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
+            await checkAdminRole();
             await fetchcountry();
             setLoading(false);
         };
@@ -174,7 +174,7 @@ export default function List() {
                     searching: true,
                     destroy: true,
                 });
-                
+
                 // Reinitialize DataTable with new data
 
                 return () => {
@@ -472,6 +472,59 @@ export default function List() {
         }
     };
 
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Country" &&
+                perm.action === "Trash Listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Country" &&
+                perm.action === "Create" &&
+                perm.status === true
+        )
+        : true;
+
+    const canDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Country" &&
+                perm.action === "Permanent Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canEdit = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Country" &&
+                perm.action === "Update" &&
+                perm.status === true
+        )
+        : true;
+    const canSoftDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Country" &&
+                perm.action === "Soft Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canRestore = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Country" &&
+                perm.action === "Restore" &&
+                perm.status === true
+        )
+        : true;
+
     return (
         <div className="">
             {loading ? (
@@ -505,7 +558,7 @@ export default function List() {
                                 )}
                             </button>
                             <div className="flex justify-end gap-2">
-                                <button
+                                {canViewTrashed && <button
                                     className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                     onClick={async () => {
                                         if (isTrashed) {
@@ -518,13 +571,15 @@ export default function List() {
                                     }}
                                 >
                                     {isTrashed ? "Country Listing (Simple)" : "Trashed Country"}
-                                </button>
-                                <button
-                                  
-                                    className="bg-[#4285F4] text-white rounded-md p-2 px-4"
-                                >
-                                    <Link href="/admin/country/create">Add country</Link>
-                                </button>
+                                </button>}
+                                {
+                                    canAdd && <button
+                                        className="bg-[#4285F4] text-white rounded-md p-2 px-4"
+                                    >
+                                        <Link href="/admin/country/create">Add country</Link>
+                                    </button>
+                                }
+
                             </div>
                         </div>
                     </div>
@@ -567,18 +622,18 @@ export default function List() {
                                             <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.phonecode}</td>
                                             <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.currency}</td>
                                             <td className="p-2 bg-transparent text-start whitespace-nowrap px-5 border-0">{item.nationality}</td>
-                                           
+
                                             <td className="p-2 bg-transparent text-start px-5 text-[#8F9BBA] border-0">
                                                 <div className="flex justify-center gap-2">
                                                     {isTrashed ? (
                                                         <>
-                                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
+                                                            {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
+                                                            {canDelete && <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
-                                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                                            {canEdit && <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
+                                                            {canSoftDelete && <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />}
                                                         </>
                                                     )}
                                                 </div>

@@ -3,10 +3,24 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { HashLoader } from "react-spinners";
+import { useAdmin } from "./middleware/AdminMiddleWareContext";
 function OrderPermission() {
     const router = useRouter();
     const [permissions, setPermission] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
+
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+    const canEdit = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Supplier Order Permission" &&
+                perm.action === "Update" &&
+                perm.status === true
+        )
+        : true;
 
     const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -48,6 +62,8 @@ function OrderPermission() {
     }, [fetchProtected]);
 
     useEffect(() => {
+        verifyAdminAuth();
+        checkAdminRole();
         fetchPermission();
     }, [fetchPermission]);
     const handleSubmit = async () => {
@@ -103,58 +119,59 @@ function OrderPermission() {
 
             ) : (
                 <div>
-{permissions.length>0 ? (
-permissions.map((perm) => (
-                        <div key={perm.id} className="mb-6 w-6/12 bg-white rounded-md p-4">
-                            <h4 className="font-semibold mb-2">Permission ID: {perm.id}</h4>
-                            <table className="w-full border rounded-md border-[#E0E5F2] mb-4">
-                                <thead className="bg-gray-100">
-                                    <tr>
-                                        <th className="border px-4 border-[#E0E5F2] py-2">Permission</th>
-                                        <th className="border px-4 border-[#E0E5F2] py-2 text-center">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {Object.entries(perm)
-                                        .filter(([key]) => key !== "id") // skip id field
-                                        .map(([key, value]) => (
-                                            <tr key={key}>
-                                                <td className="border border-[#E0E5F2] px-4 py-2 capitalize">{key}</td>
-                                                <td className="border border-[#E0E5F2] px-4 py-2 text-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={value === true}
-                                                        onChange={(e) => {
-                                                            // Update only the changed permission field for this permission object
-                                                            const updatedPermissions = permissions.map((p) => {
-                                                                if (p.id === perm.id) {
-                                                                    return {
-                                                                        ...p,
-                                                                        [key]: e.target.checked,
-                                                                    };
-                                                                }
-                                                                return p;
-                                                            });
-                                                            setPermission(updatedPermissions);
-                                                        }}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        ))}
-                                </tbody>
-                            </table>
-                            <button
-                                onClick={handleSubmit}
-                                className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                            >
-                                Save Changes
-                            </button>
-                        </div>
-                    ))
-):(
-    <p className="text-center">No Permissions Found</p>
-)}
-                    
+                    {permissions.length > 0 ? (
+                        permissions.map((perm) => (
+                            <div key={perm.id} className="mb-6 w-6/12 bg-white rounded-md p-4">
+                                <h4 className="font-semibold mb-2">Permission ID: {perm.id}</h4>
+                                <table className="w-full border rounded-md border-[#E0E5F2] mb-4">
+                                    <thead className="bg-gray-100">
+                                        <tr>
+                                            <th className="border px-4 border-[#E0E5F2] py-2">Permission</th>
+                                            <th className="border px-4 border-[#E0E5F2] py-2 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {Object.entries(perm)
+                                            .filter(([key]) => key !== "id") // skip id field
+                                            .map(([key, value]) => (
+                                                <tr key={key}>
+                                                    <td className="border border-[#E0E5F2] px-4 py-2 capitalize">{key}</td>
+                                                    <td className="border border-[#E0E5F2] px-4 py-2 text-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            disabled={canEdit}
+                                                            checked={value === true}
+                                                            onChange={(e) => {
+                                                                // Update only the changed permission field for this permission object
+                                                                const updatedPermissions = permissions.map((p) => {
+                                                                    if (p.id === perm.id) {
+                                                                        return {
+                                                                            ...p,
+                                                                            [key]: e.target.checked,
+                                                                        };
+                                                                    }
+                                                                    return p;
+                                                                });
+                                                                setPermission(updatedPermissions);
+                                                            }}
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                                <button
+                                    onClick={handleSubmit}
+                                    className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center">No Permissions Found</p>
+                    )}
+
 
                 </div>
             )}

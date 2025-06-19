@@ -181,16 +181,16 @@ const ProductTable = () => {
     const canViewTrashed = shouldCheckPermissions
         ? extractedPermissions.some(
             (perm) =>
-                perm.module === "product" &&
-                perm.action === "trash-listing" &&
+                perm.module === "Product" &&
+                perm.action === "Trash Listing" &&
                 perm.status === true
         )
         : true;
     const canAdd = shouldCheckPermissions
         ? extractedPermissions.some(
             (perm) =>
-                perm.module === "product" &&
-                perm.action === "create" &&
+                perm.module === "Product" &&
+                perm.action === "Create" &&
                 perm.status === true
         )
         : true;
@@ -370,32 +370,32 @@ const ProductTable = () => {
                                         const canDelete = shouldCheckPermissions
                                             ? extractedPermissions.some(
                                                 (perm) =>
-                                                    perm.module === "product" &&
-                                                    perm.action === "permanent-delete" &&
+                                                    perm.module === "Product" &&
+                                                    perm.action === "Permanent Delete" &&
                                                     perm.status === true
                                             )
                                             : true;
                                         const canEdit = shouldCheckPermissions
                                             ? extractedPermissions.some(
                                                 (perm) =>
-                                                    perm.module === "product" &&
-                                                    perm.action === "update" &&
+                                                    perm.module === "Product" &&
+                                                    perm.action === "Update" &&
                                                     perm.status === true
                                             )
                                             : true;
                                         const canSoftDelete = shouldCheckPermissions
                                             ? extractedPermissions.some(
                                                 (perm) =>
-                                                    perm.module === "product" &&
-                                                    perm.action === "soft-delete" &&
+                                                    perm.module === "Product" &&
+                                                    perm.action === "Soft Delete" &&
                                                     perm.status === true
                                             )
                                             : true;
                                         const canRestore = shouldCheckPermissions
                                             ? extractedPermissions.some(
                                                 (perm) =>
-                                                    perm.module === "product" &&
-                                                    perm.action === "restore" &&
+                                                    perm.module === "Product" &&
+                                                    perm.action === "Restore" &&
                                                     perm.status === true
                                             )
                                             : true;

@@ -107,16 +107,16 @@ export default function List() {
     const canViewTrashed = shouldCheckPermissions
         ? extractedPermissions.some(
             (perm) =>
-                perm.module === "category" &&
-                perm.action === "trash-listing" &&
+                perm.module === "Category" &&
+                perm.action === "Trash Listing" &&
                 perm.status === true
         )
         : true;
     const canAdd = shouldCheckPermissions
         ? extractedPermissions.some(
             (perm) =>
-                perm.module === "category" &&
-                perm.action === "create" &&
+                perm.module === "Category" &&
+                perm.action === "Create" &&
                 perm.status === true
         )
         : true;
@@ -192,32 +192,32 @@ export default function List() {
                                         const canDelete = shouldCheckPermissions
                                             ? extractedPermissions.some(
                                                 (perm) =>
-                                                    perm.module === "category" &&
-                                                    perm.action === "permanent-delete" &&
+                                                    perm.module === "Category" &&
+                                                    perm.action === "Permanent Delete" &&
                                                     perm.status === true
                                             )
                                             : true;
                                         const canEdit = shouldCheckPermissions
                                             ? extractedPermissions.some(
                                                 (perm) =>
-                                                    perm.module === "category" &&
-                                                    perm.action === "update" &&
+                                                    perm.module === "Category" &&
+                                                    perm.action === "Update" &&
                                                     perm.status === true
                                             )
                                             : true;
                                         const canSoftDelete = shouldCheckPermissions
                                             ? extractedPermissions.some(
                                                 (perm) =>
-                                                    perm.module === "category" &&
-                                                    perm.action === "soft-delete" &&
+                                                    perm.module === "Category" &&
+                                                    perm.action === "Soft Delete" &&
                                                     perm.status === true
                                             )
                                             : true;
                                         const canRestore = shouldCheckPermissions
                                             ? extractedPermissions.some(
                                                 (perm) =>
-                                                    perm.module === "category" &&
-                                                    perm.action === "restore" &&
+                                                    perm.module === "Category" &&
+                                                    perm.action === "Restore" &&
                                                     perm.status === true
                                             )
                                             : true;

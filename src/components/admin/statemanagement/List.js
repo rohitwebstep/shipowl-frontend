@@ -1,5 +1,5 @@
 "use client";
-import {useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { MdModeEdit, MdRestoreFromTrash } from "react-icons/md";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
@@ -18,14 +18,9 @@ export default function List() {
     const [selected, setSelected] = useState([]);
     const [stateData, setStateData] = useState([]);
     const [country, setCountry] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
 
-    const handleCheckboxChange = (id) => {
-        setSelected((prev) =>
-            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-        );
-    };
+
 
     const fetchState = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -138,11 +133,68 @@ export default function List() {
         }
     }, [router, setStateData]);
 
+
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
+
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "State" &&
+                perm.action === "Trash Listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "State" &&
+                perm.action === "Create" &&
+                perm.status === true
+        )
+        : true;
+
+    const canDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "State" &&
+                perm.action === "Permanent Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canEdit = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "State" &&
+                perm.action === "Update" &&
+                perm.status === true
+        )
+        : true;
+    const canSoftDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "State" &&
+                perm.action === "Soft Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canRestore = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "State" &&
+                perm.action === "Restore" &&
+                perm.status === true
+        )
+        : true;
+
     useEffect(() => {
         const fetchData = async () => {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
+            await checkAdminRole();
             await fetchState();
             setLoading(false);
         };
@@ -478,6 +530,7 @@ export default function List() {
                         <h2 className="md:text-2xl font-bold text-[#2B3674]">
                             {isTrashed ? "Trashed State List" : "State List"}
                         </h2>
+
                         <div className="flex gap-3 flex-wrap items-center">
                             <button
                                 onClick={() => setIsPopupOpen((prev) => !prev)}
@@ -499,7 +552,7 @@ export default function List() {
                                 )}
                             </button>
                             <div className="flex justify-end gap-2">
-                                <button
+                                {canViewTrashed && <button
                                     className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                     onClick={async () => {
                                         if (isTrashed) {
@@ -512,78 +565,76 @@ export default function List() {
                                     }}
                                 >
                                     {isTrashed ? "state Listing (Simple)" : "Trashed state"}
-                                </button>
-                                <button
-                                  
-                                    className="bg-[#4285F4] text-white rounded-md p-2 px-4"
-                                >
+                                </button>}
+                                {canAdd && <button className="bg-[#4285F4] text-white rounded-md p-2 px-4" >
                                     <Link href="/admin/state/create">Add state</Link>
                                 </button>
+                                }
                             </div>
                         </div>
                     </div>
 
                     {stateData.length > 0 ? (
-  <div className="overflow-x-auto w-full relative">
-    <table  className="display main-tables w-full" id="statetable">
-      <thead>
-        <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-          <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">State Name</th>
-          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">ISO 2 CODE</th>
-          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
-          <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Type</th>
-          <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {stateData.map((item, index) => (
-          <tr key={index} className="bg-white border-b border-[#E9EDF7] hover:bg-gray-50">
-            <td className="px-6 py-4">{item.name}</td>
-            <td className="px-6 py-4">{item.iso2}</td>
-            <td className="px-6 py-4">
-  {
-    (() => {
-      const filtered = country.filter((c) => {
-        const match = c.id === item.countryId;
-        return match;
-      });
+                        <div className="overflow-x-auto w-full relative">
+                            <table className="display main-tables w-full" id="statetable">
+                                <thead>
+                                    <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
+                                        <th className="p-2 whitespace-nowrap pe-5 text-left uppercase">State Name</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">ISO 2 CODE</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Country</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Type</th>
+                                        <th className="p-2 whitespace-nowrap px-5 text-center uppercase">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {stateData.map((item, index) => (
+                                        <tr key={index} className="bg-white border-b border-[#E9EDF7] hover:bg-gray-50">
+                                            <td className="px-6 py-4">{item.name}</td>
+                                            <td className="px-6 py-4">{item.iso2}</td>
+                                            <td className="px-6 py-4">
+                                                {
+                                                    (() => {
+                                                        const filtered = country.filter((c) => {
+                                                            const match = c.id === item.countryId;
+                                                            return match;
+                                                        });
 
 
-      const names = filtered.map((c) => {
-        return c.name;
-      });
-      return names.join(', ');
-    })()
-  }
-</td>
+                                                        const names = filtered.map((c) => {
+                                                            return c.name;
+                                                        });
+                                                        return names.join(', ');
+                                                    })()
+                                                }
+                                            </td>
 
 
 
-            <td className="px-6 py-4">{item.type}</td>
-               <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
-                <div className="flex justify-center gap-2">
-                    {isTrashed ? (
-                        <>
-                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
-                        </>
+                                            <td className="px-6 py-4">{item.type}</td>
+                                            <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
+                                                <div className="flex justify-center gap-2">
+                                                    {isTrashed ? (
+                                                        <>
+                                                            {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
+                                                            {canDelete && <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            {canEdit && <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
+                                                            {canSoftDelete && <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />}
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     ) : (
-                        <>
-                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
-                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
-                        </>
-                    )}
-                </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-                    ) : (
-                    <div className="text-center py-20 text-[#A3AED0] text-lg font-medium">
-                        No State found.
-                    </div>
+                        <div className="text-center py-20 text-[#A3AED0] text-lg font-medium">
+                            No State found.
+                        </div>
                     )}
 
                 </div>

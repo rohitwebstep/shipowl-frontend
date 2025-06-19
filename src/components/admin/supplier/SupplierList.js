@@ -16,7 +16,6 @@ import { ProfileContext } from './ProfileContext';
 const SupplierList = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
     const [isTrashed, setIsTrashed] = useState(false);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -106,12 +105,67 @@ const SupplierList = () => {
 
 
 
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
+
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Supplier" &&
+                perm.action === "Trash Listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Supplier" &&
+                perm.action === "Create" &&
+                perm.status === true
+        )
+        : true;
+
+    const canDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Supplier" &&
+                perm.action === "Permanent Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canEdit = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Supplier" &&
+                perm.action === "Update" &&
+                perm.status === true
+        )
+        : true;
+    const canSoftDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Supplier" &&
+                perm.action === "Soft Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canRestore = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Supplier" &&
+                perm.action === "Restore" &&
+                perm.status === true
+        )
+        : true;
 
     useEffect(() => {
         const fetchData = async () => {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
+            await checkAdminRole();
             await fetchAll(setSuppliers, setLoading);
             setLoading(false);
         };
@@ -191,16 +245,18 @@ const SupplierList = () => {
                         )}
                     </button>
                     <div className="flex justify-end gap-2">
-                        <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
+                        {canAdd && <button className="bg-[#F98F5C] text-white px-4 py-2 rounded-lg text-sm">
                             <Link href="/admin/supplier/create">Add New</Link>
                         </button>
+                        }
 
-                        <button
+                        {canViewTrashed && <button
                             className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                             onClick={handleToggleTrash}
                         >
                             {isTrashed ? "Supplier Listing (Simple)" : "Trashed Supplier"}
                         </button>
+                        }
                     </div>
 
                 </div>
@@ -335,7 +391,7 @@ const SupplierList = () => {
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
                                                 <button
                                                     className='bg-orange-500 rounded-md text-white p-3'
-                                                    onClick={()=>checkReporting(item.id)}
+                                                    onClick={() => checkReporting(item.id)}
                                                 >
                                                     View Reporting
                                                 </button>
@@ -345,17 +401,18 @@ const SupplierList = () => {
                                             <td className="p-3 px-4 text-center">
                                                 <div className="flex gap-2"> {isTrashed ? (
                                                     <>
-                                                        <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />
-                                                        <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />
+                                                        {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
+                                                        {canDelete && <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />}
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <MdModeEdit onClick={() => {
+                                                        {canEdit && <MdModeEdit onClick={() => {
                                                             router.push(`/admin/supplier/update?id=${item.id}`);
                                                             setActiveSubTab('product-details');
                                                         }
                                                         } className="cursor-pointer text-3xl" />
-                                                        <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                        }
+                                                        {canSoftDelete && <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />}
                                                     </>
                                                 )}</div>
                                             </td>

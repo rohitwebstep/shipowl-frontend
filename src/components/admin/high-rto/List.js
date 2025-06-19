@@ -18,9 +18,64 @@ export default function List() {
     const [stateData, setStateData] = useState([]);
     const [cityData, setCityData] = useState([]);
     const [countryData, setCountryData] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
     const { fetchAll, fetchTrashed, softDelete, restore, destroy } = useAdminActions("high-rto", "highRtos");
+
+
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
+
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "High RTO" &&
+                perm.action === "Trash Listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "High RTO" &&
+                perm.action === "Create" &&
+                perm.status === true
+        )
+        : true;
+
+    const canDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "High RTO" &&
+                perm.action === "Permanent Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canEdit = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "High RTO" &&
+                perm.action === "Update" &&
+                perm.status === true
+        )
+        : true;
+    const canSoftDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "High RTO" &&
+                perm.action === "Soft Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canRestore = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "High RTO" &&
+                perm.action === "Restore" &&
+                perm.status === true
+        )
+        : true;
 
     const fetchCity = useCallback(async () => {
         try {
@@ -55,21 +110,22 @@ export default function List() {
 
 
     // Initial Auth + fetch
-  useEffect(() => {
-    const fetchInitialData = async () => {
-        await verifyAdminAuth();
-        await fetchAll(setData, setLoading);
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            await verifyAdminAuth();
+            await checkAdminRole();
+            await fetchAll(setData, setLoading);
 
-        // Fetch all countries, states, and cities unconditionally
-        await Promise.all([
-            fetchCountry(),
-            fetchState(),
-            fetchCity()
-        ]);
-    };
+            // Fetch all countries, states, and cities unconditionally
+            await Promise.all([
+                fetchCountry(),
+                fetchState(),
+                fetchCity()
+            ]);
+        };
 
-    fetchInitialData();
-}, [fetchAll, fetchCity, fetchState, fetchCountry]);
+        fetchInitialData();
+    }, [fetchAll, fetchCity, fetchState, fetchCountry]);
 
 
     const handleToggleTrash = async () => {
@@ -121,15 +177,17 @@ export default function List() {
                 <h2 className="text-2xl font-bold text-[#2B3674]">High Rto List</h2>
                 <div className="flex gap-3 flex-wrap items-center">
                     <div className="flex justify-start gap-5 items-end">
-                        <button
+                        {canViewTrashed && <button
                             className={`p-3 text-white rounded-md ${isTrashed ? "bg-green-500" : "bg-red-500"}`}
                             onClick={handleToggleTrash}
                         >
                             {isTrashed ? "Bad Pincodes Listing (Simple)" : "Trashed Pincodes"}
                         </button>
-                        <Link href="/admin/high-rto/create">
+                        }
+                        {canAdd && <Link href="/admin/high-rto/create">
                             <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'>Add New</button>
                         </Link>
+                        }
                     </div>
                     <button
                         onClick={() => setIsPopupOpen(prev => !prev)}
@@ -178,13 +236,13 @@ export default function List() {
                                         <div className="flex justify-end gap-2">
                                             {isTrashed ? (
                                                 <>
-                                                    <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />
-                                                    <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />
+                                                    {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
+                                                    {canDelete && <AiOutlineDelete onClick={() => handleDestroy(item.id)} className="cursor-pointer text-3xl" />}
                                                 </>
                                             ) : (
                                                 <>
-                                                    <MdModeEdit onClick={() => router.push(`/admin/high-rto/update?id=${item.id}`)} className="cursor-pointer text-3xl" />
-                                                    <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />
+                                                    {canEdit && <MdModeEdit onClick={() => router.push(`/admin/high-rto/update?id=${item.id}`)} className="cursor-pointer text-3xl" />}
+                                                    {canSoftDelete && <AiOutlineDelete onClick={() => handleSoftDelete(item.id)} className="cursor-pointer text-3xl" />}
                                                 </>
                                             )}
                                         </div>

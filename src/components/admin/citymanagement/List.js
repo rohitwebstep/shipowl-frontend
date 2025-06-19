@@ -20,7 +20,7 @@ export default function List() {
     const [cityData, setCityData] = useState([]);
     const [stateData, setStateData] = useState([]);
     const [countryData, setCountryData] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
     const router = useRouter();
 
     const handleCheckboxChange = (id) => {
@@ -32,19 +32,19 @@ export default function List() {
 
     const fetchCity = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    
+
         if (adminData?.project?.active_panel !== "admin") {
             localStorage.removeItem("shippingData");
             router.push("/admin/auth/login");
             return;
         }
-    
+
         const admintoken = adminData?.security?.token;
         if (!admintoken) {
             router.push("/admin/auth/login");
             return;
         }
-    
+
         try {
             setLoading(true);
             const response = await fetch(
@@ -57,9 +57,9 @@ export default function List() {
                     },
                 }
             );
-    
+
             const result = await response.json();
-    
+
             if (!response.ok) {
                 Swal.fire({
                     icon: "error",
@@ -68,7 +68,7 @@ export default function List() {
                 });
                 throw new Error(result.message || result.error || "Something Wrong!");
             }
-    
+
             setCityData(result?.cities || []);
             setCountryData(result?.countries || []);
             setStateData(result?.states || []);
@@ -78,7 +78,7 @@ export default function List() {
             setLoading(false);
         }
     }, [router]);
-    
+
     const trashCity = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -138,6 +138,7 @@ export default function List() {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
+            await checkAdminRole();
             await fetchCity();
             setLoading(false);
         };
@@ -460,7 +461,25 @@ export default function List() {
         table.button('.buttons-csv').trigger();
     };
 
-   
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "City" &&
+                perm.action === "Trash Listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "City" &&
+                perm.action === "Create" &&
+                perm.status === true
+        )
+        : true;
+
 
     return (
         <div className="">
@@ -495,25 +514,30 @@ export default function List() {
                                 )}
                             </button>
                             <div className="flex justify-end gap-2">
-                                <button
-                                    className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
-                                    onClick={async () => {
-                                        if (isTrashed) {
-                                            setIsTrashed(false);
-                                            await fetchCity();
-                                        } else {
-                                            setIsTrashed(true);
-                                            await trashCity();
-                                        }
-                                    }}
-                                >
-                                    {isTrashed ? "City Listing (Simple)" : "Trashed City"}
-                                </button>
-                                <button
-                                    className="bg-[#4285F4] text-white rounded-md p-2 px-4"
-                                >
-                                    <Link href="/admin/city/create">Add City</Link>
-                                </button>
+                                {canViewTrashed && (
+                                    <button
+                                        className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
+                                        onClick={async () => {
+                                            if (isTrashed) {
+                                                setIsTrashed(false);
+                                                await fetchCity();
+                                            } else {
+                                                setIsTrashed(true);
+                                                await trashCity();
+                                            }
+                                        }}
+                                    >
+                                        {isTrashed ? "City Listing (Simple)" : "Trashed City"}
+                                    </button>
+
+                                )}
+                                {canAdd && (
+                                    <button
+                                        className="bg-[#4285F4] text-white rounded-md p-2 px-4"
+                                    >
+                                        <Link href="/admin/city/create">Add City</Link>
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -530,74 +554,109 @@ export default function List() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {cityData.map((item) => (
-                                        <tr key={item.id} className="bg-transparent border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                            <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
-                                                <div className="flex items-center">
-                                                    <label className="flex items-center cursor-pointer me-2">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selected.includes(item.id)}
-                                                            onChange={() => handleCheckboxChange(item.id)}
-                                                            className="peer hidden"
-                                                        />
-                                                        <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
-                                                            <FaCheck className="peer-checked:block text-white w-3 h-3" />
-                                                        </div>
-                                                    </label>
-                                                    {item.name}
-                                                </div>
-                                            </td>
-                                           
-                                            <td className="px-6 py-4">
-                                            {
-                                                (() => {
-                                                const filtered = stateData.filter((c) => {
-                                                    const match = c.id === item.stateId;
-                                                    return match;
-                                                });
+                                    {cityData.map((item) => {
+                                        const canDelete = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "City" &&
+                                                    perm.action === "Permanent Delete" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        const canEdit = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "City" &&
+                                                    perm.action === "Update" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        const canSoftDelete = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "City" &&
+                                                    perm.action === "Soft Delete" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        const canRestore = shouldCheckPermissions
+                                            ? extractedPermissions.some(
+                                                (perm) =>
+                                                    perm.module === "City" &&
+                                                    perm.action === "Restore" &&
+                                                    perm.status === true
+                                            )
+                                            : true;
+                                        return (
+                                            <tr key={item.id} className="bg-transparent border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
+                                                <td className="p-2 bg-transparent whitespace-nowrap border-0 pe-5">
+                                                    <div className="flex items-center">
+                                                        <label className="flex items-center cursor-pointer me-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selected.includes(item.id)}
+                                                                onChange={() => handleCheckboxChange(item.id)}
+                                                                className="peer hidden"
+                                                            />
+                                                            <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                                                <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                                                            </div>
+                                                        </label>
+                                                        {item.name}
+                                                    </div>
+                                                </td>
+
+                                                <td className="px-6 py-4">
+                                                    {
+                                                        (() => {
+                                                            const filtered = stateData.filter((c) => {
+                                                                const match = c.id === item.stateId;
+                                                                return match;
+                                                            });
 
 
-                                                const names = filtered.map((c) => {
-                                                    return c.name;
-                                                });
-                                                return names.join(', ');
-                                                })()
-                                            }
-                                            </td>  
-                                            <td className="px-6 py-4">
-                                            {
-                                                (() => {
-                                                const filtered = countryData.filter((c) => {
-                                                    const match = c.id === item.countryId;
-                                                    return match;
-                                                });
+                                                            const names = filtered.map((c) => {
+                                                                return c.name;
+                                                            });
+                                                            return names.join(', ');
+                                                        })()
+                                                    }
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {
+                                                        (() => {
+                                                            const filtered = countryData.filter((c) => {
+                                                                const match = c.id === item.countryId;
+                                                                return match;
+                                                            });
 
 
-                                                const names = filtered.map((c) => {
-                                                    return c.name;
-                                                });
-                                                return names.join(', ');
-                                                })()
-                                            }
-                                            </td>  
-                                            <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
-                                                <div className="flex justify-center gap-2">
-                                                    {isTrashed ? (
-                                                        <>
-                                                            <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                                            <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
-                                                            <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                            const names = filtered.map((c) => {
+                                                                return c.name;
+                                                            });
+                                                            return names.join(', ');
+                                                        })()
+                                                    }
+                                                </td>
+                                                <td className="p-2 bg-transparent px-5 text-[#8F9BBA] border-0">
+                                                    <div className="flex justify-center gap-2">
+                                                        {isTrashed ? (
+                                                            <>
+                                                                {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
+                                                                {canDelete && <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                {canEdit && <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
+                                                                {canSoftDelete && <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />}
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                         </div>

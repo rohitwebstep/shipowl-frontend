@@ -4,11 +4,26 @@ import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { HashLoader } from "react-spinners";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
+import { useAdmin } from "../middleware/AdminMiddleWareContext";
 
 function List() {
     const router = useRouter();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
+
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+    const canAction = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Supplier" &&
+                perm.action === "Bank Account Change Request Review" &&
+                perm.status === true
+        )
+        : true;
 
     const fetchRequests = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -63,6 +78,8 @@ function List() {
     }, [router]);
 
     useEffect(() => {
+        verifyAdminAuth();
+        checkAdminRole();
         fetchRequests();
     }, [fetchRequests]);
 
@@ -162,12 +179,14 @@ function List() {
                                     <td className="p-2 bg-transparent whitespace-nowrap text-left  border-0">{req.ifscCode}</td>
                                     <td className="p-2 bg-transparent whitespace-nowrap text-center  border-0 space-x-2">
                                         <button
+                                            disabled={canAction}
                                             className="bg-green-500 text-white px-3 py-1 rounded"
                                             onClick={() => handleAction(req.id, "accept")}
                                         >
                                             Approve
                                         </button>
                                         <button
+                                            disabled={canAction}
                                             className="bg-red-500 text-white px-3 py-1 rounded"
                                             onClick={() => handleAction(req.id, "reject")}
                                         >

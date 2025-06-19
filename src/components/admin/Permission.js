@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { HashLoader } from "react-spinners";
+import { useAdmin } from "./middleware/AdminMiddleWareContext";
 
 function Permission() {
   const router = useRouter();
@@ -10,6 +11,22 @@ function Permission() {
   const [loading, setLoading] = useState(false);
   const uniquePanels = [...new Set(permissions.map((p) => p.panel))];
   const [selectedPanel, setSelectedPanel] = useState(null);
+
+
+  const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
+
+  const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+  const canEdit = shouldCheckPermissions
+    ? extractedPermissions.some(
+      (perm) =>
+        perm.module === "Global Permission" &&
+        perm.action === "Update" &&
+        perm.status === true
+    )
+    : true;
+
   const fetchProtected = useCallback(async (url, setter, key, setLoading) => {
     const adminData = JSON.parse(localStorage.getItem("shippingData"));
     const token = adminData?.security?.token;
@@ -51,6 +68,8 @@ function Permission() {
   }, [fetchProtected]);
 
   useEffect(() => {
+    verifyAdminAuth();
+    checkAdminRole();
     fetchPermission();
   }, [fetchPermission]);
   const openModal = (panel) => setSelectedPanel(panel);
@@ -100,6 +119,7 @@ function Permission() {
       Swal.fire("Error", err.message, "error");
     }
   };
+
 
 
   return (
@@ -162,6 +182,7 @@ function Permission() {
                               <td className=" border border-[#E0E5F2] px-2 py-1 text-center">
                                 <input
                                   type="checkbox"
+                                  disabled={canEdit}
                                   checked={item.status === true}
                                   onChange={(e) => {
                                     const updatedPermissions = permissions.map((perm) =>

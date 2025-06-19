@@ -27,7 +27,7 @@ export default function Sidebar() {
     }));
   };
 
-  const actions = ['View Listing', 'Update', 'Create', 'Listing', 'View', 'Soft Delete', 'Restore', 'Trash Listing', 'Bank Account Change Request View Listing', 'Bank Account Change Request Review'];
+  const actions = ['View Listing', 'Update', 'Create', 'Listing', 'View', 'Soft Delete','Permanent Delete', 'Restore', 'Trash Listing', 'Bank Account Change Request View Listing', 'Bank Account Change Request Review'];
 
   const hasPermission = (module, actionList) => {
     return extractedPermissions.some(

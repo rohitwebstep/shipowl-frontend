@@ -253,7 +253,6 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
   const [activeModal, setActiveModal] = useState("");
 
 
-
   const [openSection, setOpenSection] = useState(null);
 
   const toggleSection = (section) => {
@@ -433,6 +432,23 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
     return getVariantData(minPriceItem).id;
   });
 
+  useEffect(() => {
+    if (
+      totalModals === 1 &&
+      groupedByModal?.[modalNames[0]]?.length > 1 &&
+      !activeVariantId // only set it if not already set
+    ) {
+      const variants = groupedByModal[modalNames[0]].map(getVariantData);
+      const minVariant = variants.reduce((min, curr) =>
+        curr.suggested_price < min.suggested_price ? curr : min,
+        variants[0]
+      );
+      setActiveVariantId(minVariant?.id || null);
+    }
+  }, [groupedByModal, modalNames, totalModals, activeVariantId]);
+
+
+  console.log('inventoryData', inventoryData)
 
 
   const handleSubmit = async (e) => {
@@ -470,7 +486,6 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
       ) {
         const selectedModal = inventoryData.modal;
 
-        // Filter variant list to just the one matching selected modal
         const selectedVariantEntry = inventoryData.variant.find(
           (v) => v.variant?.modal === selectedModal
         );
@@ -479,20 +494,55 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
           simplifiedVariants = [
             {
               variantId: selectedVariantEntry.id,
-              price: selectedVariantEntry.price,
+              price: selectedVariantEntry.dropPrice,
             },
           ];
         } else {
-          simplifiedVariants = []; // No valid variant found
+          simplifiedVariants = [];
         }
-      }
+      } else if (
+        totalModals > 1 &&
+        modalNames.some((modal) => groupedByModal[modal]?.length > 1)
+      ) {
+        const selectedVariantEntry = inventoryData.variant.find(
+          (v) => v.id === activeVariantId
+        );
 
-      else {
+        if (selectedVariantEntry) {
+          simplifiedVariants = [
+            {
+              variantId: selectedVariantEntry.id,
+              price: selectedVariantEntry.dropPrice,
+            },
+          ];
+        } else {
+          simplifiedVariants = [];
+        }
+      } else if (
+        totalModals === 1 &&
+        groupedByModal[modalNames[0]]?.length > 1
+      ) {
+        const selectedVariantEntry = inventoryData.variant.find(
+          (v) => v.id === activeVariantId
+        );
+
+        if (selectedVariantEntry) {
+          simplifiedVariants = [
+            {
+              variantId: selectedVariantEntry.id,
+              price: selectedVariantEntry.dropPrice,
+            },
+          ];
+        } else {
+          simplifiedVariants = [];
+        }
+      } else {
         simplifiedVariants = inventoryData.variant.map((v) => ({
           variantId: v.id || v.variantId,
           price: v.dropPrice,
         }));
       }
+
 
 
       form.append('supplierProductId', inventoryData.supplierProductId);
@@ -558,6 +608,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
       setLoading(false);
     }
   };
+
 
 
   return (
@@ -705,162 +756,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
 
 
       </div>
-      {/* {showPopup && (
-        <div className="fixed px-6 md:px-0 inset-0 bg-[#000000b0] bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white z-50 border border-orange-500 p-6 rounded-lg w-full max-w-5xl shadow-xl relative">
-            <h2 className="text-xl font-semibold mb-4">Push To Shopify</h2>
 
-            {(() => {
-              const varinatExists = inventoryData?.isVarientExists ? 'yes' : 'no';
-              const isExists = varinatExists === "yes";
-              return (
-                <>
-                  <div className="mb-2">
-                    <select
-                      className="w-full mt-1 border border-[#E0E2E7] shadow p-2 rounded-md"
-                      name="shopifyApp"
-                      id="shopifyApp"
-                      onChange={(e) =>
-                        handleVariantChange(null, 'shopifyApp', e.target.value)
-                      }
-                      value={inventoryData.shopifyApp || ''}
-                    >
-                      <option value="">Select Store</option>
-                      {shopifyStores.map((item, index) => (
-                        <option value={item.id} key={index}>
-                          {item.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                    {inventoryData.variant?.map((v, idx) => {
-                      const variantInfo = {
-                        ...(v.variant || {}),
-                        ...v,
-                      };
-
-                      const imageUrls = variantInfo.image
-                        ? variantInfo.image.split(',').map((img) => img.trim()).filter(Boolean)
-                        : [];
-
-                      return (
-                        <div
-                          key={variantInfo.id || idx}
-                          className="relative bg-white border border-[#E0E2E7] shadow rounded-lg p-4  hover:shadow-lg transition group"
-                        >
-                          <div className="flex items-center gap-4 mb-4">
-                            <div className="flex gap-2 overflow-x-auto max-w-[120px]">
-                              {imageUrls.length > 0 ? (
-                                imageUrls.map((url, i) => (
-                                  <Image
-                                    key={i}
-                                    height={100}
-                                    width={100}
-                                    src={`https://placehold.co/600x400?text=${idx + 1}`}
-                                    alt={variantInfo.name || 'NIL'}
-                                    className="shrink-0 border border-[#E0E2E7] shadow "
-                                  />
-                                ))
-                              ) : (
-                                <Image
-                                  height={40}
-                                  width={40}
-                                  src="https://placehold.co/600x400"
-                                  alt="Placeholder"
-                                  className="rounded shrink-0"
-                                />
-                              )}
-                            </div>
-                            <div>
-                              <p className="font-semibold">Model: {variantInfo.modal || 'NIL'}</p>
-                              {isExists && (
-                                <>
-                                  <p>Name: {variantInfo.name || 'NIL'}</p>
-                                  <p>SKU: {variantInfo.sku || 'NIL'}</p>
-                                  <p>Color: {variantInfo.color || 'NIL'}</p>
-                                </>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="space-y-3">
-                            <input
-                              type="number"
-                              placeholder="Stock"
-                              name="dropStock"
-                              className="w-full border border-[#E0E2E7] shadow rounded p-2"
-                              value={variantInfo.dropStock || ''}
-                              onChange={(e) => handleVariantChange(variantInfo.id, 'dropStock', e.target.value)}
-                            />
-                            <input
-                              type="number"
-                              placeholder="Price"
-                              name="dropPrice"
-                              className="w-full border border-[#E0E2E7] shadow rounded p-2"
-                              value={variantInfo.dropPrice || ''}
-                              onChange={(e) => handleVariantChange(variantInfo.id, 'dropPrice', e.target.value)}
-                            />
-
-                            <label className="flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                name="Dropstatus"
-                                className="sr-only"
-                                checked={!!variantInfo.Dropstatus}
-                                onChange={(e) => handleVariantChange(variantInfo.id, 'Dropstatus', e.target.checked)}
-                              />
-                              <div
-                                className={`relative w-10 h-5  transition ${variantInfo.Dropstatus ? 'bg-orange-500' : 'bg-gray-300'}`}
-                              >
-                                <div
-                                  className={`absolute top-1 left-1 w-3 h-3 bg-white  transition ${variantInfo.Dropstatus ? 'translate-x-5' : ''
-                                    }`}
-                                ></div>
-                              </div>
-                              <span className="ml-2 text-sm">{variantInfo.Dropstatus ? 'Active' : 'Inactive'}</span>
-                            </label>
-                          </div>
-
-
-
-                        </div>
-                      );
-                    })}
-                  </div>
-
-
-                  <div className="flex justify-end space-x-3 mt-6">
-                    <button
-                      onClick={() => setShowPopup(false)}
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
-                    >
-                      <X size={16} />
-                      Cancel
-                    </button>
-
-                    <button
-                      onClick={handleSubmit}
-                      className="flex items-center gap-2 px-4 py-2 bg-[#F98F5C] text-white rounded hover:bg-[#e97b45] transition-colors"
-                    >
-                      <Send size={16} />
-                      Submit
-                    </button>
-                  </div>
-                </>
-              );
-
-            })()}
-
-            <button
-              onClick={() => setShowPopup(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      )} */}
 
       {showPopup && (
         <div className="fixed inset-0 bg-black/70 flex justify-end z-50">
@@ -985,7 +881,9 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                             <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
                               Your Margin{" "}
                               <span className="float-right">
-                                ₹{(variant.full?.dropPrice) - (variant.suggested_price)}
+                                {variant.full?.dropPrice != null && variant.suggested_price != null && (
+                                  <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
+                                )}
                               </span>
                             </div>
                           </div>
@@ -1018,8 +916,8 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                               type="button"
                               onClick={() => setActiveVariantId(variant.id)}
                               className={`px-4 py-1  text-sm font-medium border transition ${activeVariantId === variant.id
-                                ? "bg-blue-600 text-white border-blue-600"
-                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                ? "  border-blue-600"
+                                : " text-gray-700 border-gray-300 hover:bg-gray-100"
                                 }`}
                             >
                               {variant.name || 'Variant'}
@@ -1100,7 +998,9 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                 <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
                                   Your Margin
                                   <span className="float-right">
-                                    ₹{(variant.full?.dropPrice || 0) - (variant.suggested_price || 0)}
+                                    {variant.full?.dropPrice != null && variant.suggested_price != null && (
+                                      <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
+                                    )}
                                   </span>
                                 </div>
                               </div>
@@ -1186,6 +1086,9 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                         Set Your Selling Price (₹)
                                         <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
                                       </div>
+
+
+
                                       <input
                                         type="number"
                                         value={variant.full?.dropPrice || ''}
@@ -1221,8 +1124,11 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                     <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
                                       Your Margin
                                       <span className="float-right">
-                                        ₹{(variant.full?.dropPrice || 0) - (variant.suggested_price || 0)}
+                                        {variant.full?.dropPrice != null && variant.suggested_price != null && (
+                                          <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
+                                        )}
                                       </span>
+
                                     </div>
                                   </div>
 
@@ -1284,8 +1190,8 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                               type="button"
                               onClick={() => setActiveVariantId(variant.id)}
                               className={`px-4 py-1  text-sm font-medium border transition ${activeVariantId === variant.id
-                                ? "bg-blue-600 text-white border-blue-600"
-                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                                ? "  border-blue-600"
+                                : " text-gray-700 border-gray-300 hover:bg-gray-100"
                                 }`}
                             >
                               {variant.name || 'Variant'}
@@ -1365,7 +1271,9 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
                                   <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
                                     Your Margin{' '}
                                     <span className="float-right">
-                                      ₹{(variant.full?.dropPrice || 0) - (variant.suggested_price || 0)}
+                                      {variant.full?.dropPrice != null && variant.suggested_price != null && (
+                                        <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
+                                      )}
                                     </span>
                                   </div>
                                 </div>

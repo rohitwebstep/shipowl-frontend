@@ -15,7 +15,6 @@ export default function List() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
-    const { verifyAdminAuth } = useAdmin();
     const router = useRouter();
     const fetchUsers = useCallback(async () => {
         const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -118,12 +117,67 @@ export default function List() {
         }
     }, [router, setData]);
 
+    const { verifyAdminAuth, isAdminStaff, checkAdminRole, extractedPermissions } = useAdmin();
+
+    const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
+
+
+    const canViewTrashed = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Sub User" &&
+                perm.action === "Trash Listing" &&
+                perm.status === true
+        )
+        : true;
+    const canAdd = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Sub User" &&
+                perm.action === "Create" &&
+                perm.status === true
+        )
+        : true;
+
+    const canDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Sub User" &&
+                perm.action === "Permanent Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canEdit = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Sub User" &&
+                perm.action === "Update" &&
+                perm.status === true
+        )
+        : true;
+    const canSoftDelete = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Sub User" &&
+                perm.action === "Soft Delete" &&
+                perm.status === true
+        )
+        : true;
+    const canRestore = shouldCheckPermissions
+        ? extractedPermissions.some(
+            (perm) =>
+                perm.module === "Sub User" &&
+                perm.action === "Restore" &&
+                perm.status === true
+        )
+        : true;
 
     useEffect(() => {
         const fetchData = async () => {
             setIsTrashed(false);
             setLoading(true);
             await verifyAdminAuth();
+            await checkAdminRole();
             await fetchUsers();
             setLoading(false);
         };
@@ -424,7 +478,7 @@ export default function List() {
                             )}
                         </button>
                         <div className="flex justify-start gap-5 items-end">
-                            <button
+                            {canViewTrashed && <button
                                 className={`p-3 text-white rounded-md ${isTrashed ? 'bg-green-500' : 'bg-red-500'}`}
                                 onClick={async () => {
                                     if (isTrashed) {
@@ -437,8 +491,8 @@ export default function List() {
                                 }}
                             >
                                 {isTrashed ? "Subuser Listing (Simple)" : "Trashed Subuser"}
-                            </button>
-                            <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/sub-user/create">Add New</Link></button>
+                            </button>}
+                            {canAdd && <button className='bg-[#4285F4] text-white rounded-md p-3 px-8'><Link href="/admin/sub-user/create">Add New</Link></button>}
                         </div>
                     </div>
                 </div>
@@ -457,7 +511,7 @@ export default function List() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.map((item,index) => (
+                                {data.map((item, index) => (
                                     <tr key={item.id} className="border-b capitalize border-[#E9EDF7] text-[#2B3674] font-semibold">
 
                                         <td className="p-2 whitespace-nowrap text-left px-5">{index + 1}</td>
@@ -470,13 +524,13 @@ export default function List() {
 
                                             <div className="flex justify-end gap-2">{isTrashed ? (
                                                 <>
-                                                    <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />
-                                                    <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />
+                                                    {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item)} className="cursor-pointer text-3xl text-green-500" />}
+                                                    {canDelete && <AiOutlineDelete onClick={() => handlePermanentDelete(item)} className="cursor-pointer text-3xl" />}
                                                 </>
                                             ) : (
                                                 <>
-                                                    <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />
-                                                    <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />
+                                                    {canEdit && <MdModeEdit onClick={() => handleEditItem(item)} className="cursor-pointer text-3xl" />}
+                                                    {canSoftDelete && <AiOutlineDelete onClick={() => handleDelete(item)} className="cursor-pointer text-3xl" />}
                                                 </>
                                             )}</div>
 
