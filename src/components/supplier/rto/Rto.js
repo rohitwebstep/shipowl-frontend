@@ -619,7 +619,6 @@ export default function RTO() {
                             <div className="flex gap-2 flex-wrap">
                               
                                 <img
-                                  key={imgIdx}
                                   src={fetchImages(variantImages[0])}
                                   alt={`Variant`}
                                   className="h-12 w-12 object-cover rounded-full border border-[#DFEAF2]"

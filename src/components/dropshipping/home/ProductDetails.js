@@ -58,14 +58,14 @@ const ProductDetails = () => {
   const images = selectedVariant?.variant?.image?.split(",") || selectedVariant?.supplierProductVariant?.variant?.image?.split(",") || [];
   const [shopifyStores, setShopifyStores] = useState([]);
   const [selectedImage, setSelectedImage] = useState("");
-    useEffect(() => {
-      const images =
-        selectedVariant?.variant?.image?.split(",") ||
-        selectedVariant?.image?.split(",") ||
-        [];
-  
-      setSelectedImage(images[0] ?? "");
-    }, [selectedVariant]);
+  useEffect(() => {
+    const images =
+      selectedVariant?.variant?.image?.split(",") ||
+      selectedVariant?.image?.split(",") ||
+      [];
+
+    setSelectedImage(images[0] ?? "");
+  }, [selectedVariant]);
   const [categoryId, setCategoryId] = useState('');
   const [variantDetails, setVariantDetails] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -421,7 +421,7 @@ const ProductDetails = () => {
       router.push(`/dropshipping/product/?id=${id}`);
     }
   };
-  console.log('selectedImage',selectedImage)
+  console.log('selectedImage', selectedImage)
   return (
     <>
       {productDetails && Object.keys(productDetails).length > 0 ? (
@@ -538,7 +538,15 @@ const ProductDetails = () => {
                 </div>
               </div>
 
-              <h3 className="mt-4 font-bold text-[18px] pb-2">Variants</h3>
+              {
+                totalModals === 1 && groupedByModal[modalNames[0]].length === 1 ? null : (
+                  totalModals === 2 && modalNames.every(modal => groupedByModal[modal].length === 1) ? (
+                    <h3 className="mt-4 font-bold text-[18px] pb-2">Modals</h3>
+                  ) : (
+                    <h3 className="mt-4 font-bold text-[18px] pb-2">Variants</h3>
+                  )
+                )
+              }
               <div className="">
                 {(() => {
                   const groupedByModal = variantDetails.reduce((acc, curr) => {
@@ -723,42 +731,47 @@ const ProductDetails = () => {
 
               <div className="mt-4 border-t border-[#E0E2E7] pt-0">
                 <div className="flex gap-6 flex-wrap">
-                  <div>
-                    <h3 className="text-[18px] pt-5 font-bold">Color Variant</h3>
-                    <div className="flex flex-wrap gap-3 mt-2">
-                      {[
-                        ...new Set(
-                          variantDetails.map((item) => {
+                  {
+                    totalModals === 1 && groupedByModal[modalNames[0]].length === 1 ? null : (
+                      <div>
+                        <h3 className="text-[18px] pt-5 font-bold">Color Variant</h3>
+                        <div className="flex flex-wrap gap-3 mt-2">
+                          {[
+                            ...new Set(
+                              variantDetails.map((item) => {
+                                const color =
+                                  type === "notmy"
+                                    ? item?.variant?.color
+                                    : item?.supplierProductVariant?.variant?.color;
+                                return color?.trim().toLowerCase();
+                              }).filter(Boolean)
+                            ),
+                          ].map((color, index) => (
+                            <button
+                              key={index}
+                              style={{ backgroundColor: color }}
+                              className="px-4 py-2 text-white rounded-md mb-2"
+                            >
+                              <span className="capitalize">{color}</span>
+                            </button>
+                          ))}
+
+                          {variantDetails.every((item) => {
                             const color =
                               type === "notmy"
                                 ? item?.variant?.color
                                 : item?.supplierProductVariant?.variant?.color;
-                            return color?.trim().toLowerCase();
-                          }).filter(Boolean)
-                        ),
-                      ].map((color, index) => (
-                        <button
-                          key={index}
-                          style={{ backgroundColor: color }}
-                          className="px-4 py-2 text-white rounded-md mb-2"
-                        >
-                          <span className="capitalize">{color}</span>
-                        </button>
-                      ))}
+                            return !color;
+                          }) && (
+                              <div className="px-4 py-2 bg-gray-300 text-black rounded-md mb-2">
+                                <span>No Color Found</span>
+                              </div>
+                            )}
+                        </div>
+                      </div>
+                    )
+                  }
 
-                      {variantDetails.every((item) => {
-                        const color =
-                          type === "notmy"
-                            ? item?.variant?.color
-                            : item?.supplierProductVariant?.variant?.color;
-                        return !color;
-                      }) && (
-                          <div className="px-4 py-2 bg-gray-300 text-black rounded-md mb-2">
-                            <span>No Color Found</span>
-                          </div>
-                        )}
-                    </div>
-                  </div>
 
                   <div className="">
                     <h3 className=" text-[18px] pt-5 font-bold">Product Tags</h3>
@@ -819,16 +832,16 @@ const ProductDetails = () => {
 
               <p className="pt-5 text-[18px] font-bold">Desciption</p>
 
-           
-                  {productDetails.description ? (
-                    <div
-                      className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                      dangerouslySetInnerHTML={{ __html: productDetails.description }}
-                    />
-                  ) : (
-                    <p className="text-gray-500">NIL</p>
-                  )}
-             
+
+              {productDetails.description ? (
+                <div
+                  className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                  dangerouslySetInnerHTML={{ __html: productDetails.description }}
+                />
+              ) : (
+                <p className="text-gray-500">NIL</p>
+              )}
+
 
 
               <p className="pt-2 text-[18px] font-bold border-t mt-3 border-[#E0E2E7]">Platform Assurance</p>

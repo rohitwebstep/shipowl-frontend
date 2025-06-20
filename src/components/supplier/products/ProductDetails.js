@@ -81,8 +81,7 @@ const ProductDetails = () => {
     id: '',
     isVarientExists: '',
   });
-  console.log('images - ', images)
-  console.log('images[0] - ', images[0])
+
 
 
   const [form, setForm] = useState({
@@ -416,6 +415,27 @@ const ProductDetails = () => {
   const handleVariantClick = (variant) => {
     setSelectedVariant(variant);
   };
+
+
+  const groupedByModal = variantDetails.reduce((acc, curr) => {
+    const modal = curr?.modal || curr?.variant?.modal || "Unknown";
+    if (!acc[modal]) acc[modal] = [];
+    acc[modal].push(curr);
+    return acc;
+  }, {});
+
+  const modalNames = Object.keys(groupedByModal);
+  const totalModals = modalNames.length;
+
+  const getVariantData = (v) => ({
+    id: v?.id || v?.variant?.id,
+    name: v?.name || v?.variant?.name || "NIL",
+    modal: v?.modal || v?.variant?.modal || "Unknown",
+    color: v?.color || v?.variant?.color || "NIL",
+    image: (v?.image || v?.variant?.image || "").split(",")[0],
+    suggested_price: v?.price || v?.suggested_price,
+    full: v,
+  });
   useEffect(() => {
     fetchProductDetails();
   }, [fetchProductDetails]);
@@ -552,38 +572,25 @@ const ProductDetails = () => {
                   </div>
                 </div>
               </div>
+              {
+                totalModals === 1 && groupedByModal[modalNames[0]].length === 1 ? null : (
+                  totalModals === 2 && modalNames.every(modal => groupedByModal[modal].length === 1) ? (
+                    <h3 className="mt-4 font-bold text-[18px] pb-2">Modals</h3>
+                  ) : (
+                    <h3 className="mt-4 font-bold text-[18px] pb-2">Variants</h3>
+                  )
+                )
+              }
 
-              <h3 className="mt-4 font-bold text-[18px] pb-2">Variants</h3>
               <div className="">
                 {(() => {
-                  const groupedByModal = variantDetails.reduce((acc, curr) => {
-                    const modal = curr?.modal || curr?.variant?.modal || "Unknown";
-                    if (!acc[modal]) acc[modal] = [];
-                    acc[modal].push(curr);
-                    return acc;
-                  }, {});
 
-                  const modalNames = Object.keys(groupedByModal);
-                  const totalModals = modalNames.length;
-
-                  const getVariantData = (v) => ({
-                    id: v?.id || v?.variant?.id,
-                    name: v?.name || v?.variant?.name || "NIL",
-                    modal: v?.modal || v?.variant?.modal || "Unknown",
-                    color: v?.color || v?.variant?.color || "NIL",
-                    image: (v?.image || v?.variant?.image || "").split(",")[0],
-                    suggested_price: v?.price || v?.suggested_price,
-                    full: v,
-                  });
 
                   // CASE 1: 1 modal, 1 variant
                   if (totalModals === 1 && groupedByModal[modalNames[0]].length === 1) {
                     const variant = getVariantData(groupedByModal[modalNames[0]][0]);
                     return (
-                      <div className="p-4 rounded-lg border border-gray-300 bg-white text-left">
-                        <div className="text-gray-800 font-medium">Price:</div>
-                        <div className="text-green-600 font-bold text-xl">₹{variant.suggested_price}</div>
-                      </div>
+                      null
                     );
                   }
 
@@ -744,33 +751,45 @@ const ProductDetails = () => {
               </div>
               <div className="mt-4 border-t border-[#E0E2E7] pt-0">
                 <div className="flex gap-6">
-                  <div>
-                    <h3 className="text-[18px] pt-5 font-bold">Color Variant</h3>
-                    <div className="flex flex-wrap gap-3 mt-2">
-                      {[
-                        ...new Set(
-                          variantDetails.map((item) => {
-                            const color = type === "notmy" ? item?.color : item?.variant?.color
-                            return color?.trim().toLowerCase();
-                          }).filter(Boolean)
-                        ),
-                      ].map((color, index) => (
-                        <button
-                          key={index}
-                          style={{ backgroundColor: color }}
-                          className="px-4 py-2 text-white rounded-md mb-2"
-                        >
-                          <span className="capitalize">{color}</span>
-                        </button>
-                      ))}
+                  {
+                    totalModals === 1 && groupedByModal[modalNames[0]]?.length === 1 ? null : (
+                      <div>
+                        <h3 className="text-[18px] pt-5 font-bold">Color Variant</h3>
+                        <div className="flex flex-wrap gap-3 mt-2">
+                          {
+                            (() => {
+                              const colors = [
+                                ...new Set(
+                                  variantDetails
+                                    .map((item) => {
+                                      const color = type === "notmy" ? item?.color : item?.variant?.color;
+                                      return color?.trim().toLowerCase();
+                                    })
+                                    .filter(Boolean)
+                                ),
+                              ];
 
-                      {variantDetails.every((item) => {
-                        const color = type === "notmy" ? item?.color : item?.color
-                        return !color;
-                      })
-                      }
-                    </div>
-                  </div>
+                              return colors.length > 0 ? (
+                                colors.map((color, index) => (
+                                  <button
+                                    key={index}
+                                    style={{ backgroundColor: color }}
+                                    className="px-4 py-2 text-white rounded-md mb-2"
+                                  >
+                                    <span className="capitalize">{color}</span>
+                                  </button>
+                                ))
+                              ) : (
+                                <span className="text-gray-500 italic">No color found</span>
+                              );
+                            })()
+                          }
+                        </div>
+                      </div>
+                    )
+                  }
+
+
 
                   <div className="">
                     <h3 className=" text-[18px] pt-5 font-bold">Product Tags</h3>
@@ -900,7 +919,7 @@ const ProductDetails = () => {
             </div>
 
 
-          </div>
+          </div >
 
 
           <section className="py-5">
@@ -1033,141 +1052,143 @@ const ProductDetails = () => {
 
 
 
-          {showPopup && (
-            <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
-              <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
-                <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
+          {
+            showPopup && (
+              <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+                <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
+                  <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
 
-                {(() => {
-                  const varinatExists = inventoryData?.isVarientExists ? "yes" : "no";
-                  const isExists = varinatExists === "yes";
+                  {(() => {
+                    const varinatExists = inventoryData?.isVarientExists ? "yes" : "no";
+                    const isExists = varinatExists === "yes";
 
-                  return (
-                    <>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
-                        {inventoryData.variant?.map((variant, idx) => {
-                          const imageUrls = variant.image
-                            ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-                            : [];
+                    return (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
+                          {inventoryData.variant?.map((variant, idx) => {
+                            const imageUrls = variant.image
+                              ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
+                              : [];
 
-                          return (
-                            <div
-                              key={variant.id || idx}
-                              className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
-                            >
-                              <div className='flex gap-2'>
-                                {/* Image Preview */}
-                                <div className="md:min-w-4/12 h-20 rounded-lg flex items-center justify-center overflow-hidden">
-                                  {imageUrls.length > 0 ? (
-                                    <img
-                                      src={fetchImages(imageUrls)}
-                                      alt={variant.name || "Variant Image"}
-                                      className="h-full object-cover"
-                                    />
-                                  ) : (
-                                    <img
-                                      src="https://placehold.co/600x400"
-                                      alt="Placeholder"
-                                      className="h-full object-cover"
-                                    />
-                                  )}
+                            return (
+                              <div
+                                key={variant.id || idx}
+                                className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
+                              >
+                                <div className='flex gap-2'>
+                                  {/* Image Preview */}
+                                  <div className="md:min-w-4/12 h-20 rounded-lg flex items-center justify-center overflow-hidden">
+                                    {imageUrls.length > 0 ? (
+                                      <img
+                                        src={fetchImages(imageUrls)}
+                                        alt={variant.name || "Variant Image"}
+                                        className="h-full object-cover"
+                                      />
+                                    ) : (
+                                      <img
+                                        src="https://placehold.co/600x400"
+                                        alt="Placeholder"
+                                        className="h-full object-cover"
+                                      />
+                                    )}
+                                  </div>
+
+                                  <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
+                                    <p><span className="font-semibold">Modal:</span> {variant.modal || "NIL"}</p>
+                                    <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
+                                    {isExists && (
+                                      <>
+                                        <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
+                                        <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
+                                        <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
 
-                                <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
-                                  <p><span className="font-semibold">Modal:</span> {variant.modal || "NIL"}</p>
-                                  <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
-                                  {isExists && (
-                                    <>
-                                      <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
-                                      <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
-                                      <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Input Fields */}
-                              <div className="flex flex-col space-y-2">
-                                <input
-                                  type="number"
-                                  placeholder="Stock"
-                                  name="stock"
-                                  className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
-                                  value={variant.stock || ""}
-                                  onChange={(e) =>
-                                    handleVariantChange(variant.id, "stock", e.target.value)
-                                  }
-                                />
-                                <input
-                                  type="number"
-                                  placeholder="Price"
-                                  name="price"
-                                  className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
-                                  value={variant.price || ""}
-                                  onChange={(e) =>
-                                    handleVariantChange(variant.id, "price", e.target.value)
-                                  }
-                                />
-                              </div>
-
-                              {/* Status Switch */}
-                              <div className="flex items-center justify-between mt-2">
-                                <span className="text-sm font-medium">Add to List:</span>
-                                <label className="relative inline-flex items-center cursor-pointer">
+                                {/* Input Fields */}
+                                <div className="flex flex-col space-y-2">
                                   <input
-                                    type="checkbox"
-                                    checked={variant.status || false}
+                                    type="number"
+                                    placeholder="Stock"
+                                    name="stock"
+                                    className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
+                                    value={variant.stock || ""}
                                     onChange={(e) =>
-                                      handleVariantChange(variant.id, "status", e.target.checked)
+                                      handleVariantChange(variant.id, "stock", e.target.value)
                                     }
-                                    className="sr-only peer"
                                   />
-                                  <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-orange-500 transition-all"></div>
-                                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transform transition-all"></div>
-                                </label>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                                  <input
+                                    type="number"
+                                    placeholder="Price"
+                                    name="price"
+                                    className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
+                                    value={variant.price || ""}
+                                    onChange={(e) =>
+                                      handleVariantChange(variant.id, "price", e.target.value)
+                                    }
+                                  />
+                                </div>
 
-                      {/* Footer Buttons */}
-                      <div className="flex justify-end space-x-3 mt-6">
+                                {/* Status Switch */}
+                                <div className="flex items-center justify-between mt-2">
+                                  <span className="text-sm font-medium">Add to List:</span>
+                                  <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={variant.status || false}
+                                      onChange={(e) =>
+                                        handleVariantChange(variant.id, "status", e.target.checked)
+                                      }
+                                      className="sr-only peer"
+                                    />
+                                    <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-orange-500 transition-all"></div>
+                                    <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transform transition-all"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Footer Buttons */}
+                        <div className="flex justify-end space-x-3 mt-6">
+                          <button
+                            onClick={() => setShowPopup(false)}
+                            className="flex items-center gap-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded transition"
+                          >
+                            <span>Cancel</span>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={(e) => handleSubmit(e)}
+                            className="flex items-center gap-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
+                          >
+                            <span>Submit</span>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Close Button */}
                         <button
                           onClick={() => setShowPopup(false)}
-                          className="flex items-center gap-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded transition"
+                          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl"
                         >
-                          <span>Cancel</span>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
+                          ×
                         </button>
-                        <button
-                          onClick={(e) => handleSubmit(e)}
-                          className="flex items-center gap-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
-                        >
-                          <span>Submit</span>
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        </button>
-                      </div>
-
-                      {/* Close Button */}
-                      <button
-                        onClick={() => setShowPopup(false)}
-                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl"
-                      >
-                        ×
-                      </button>
-                    </>
-                  );
-                })()}
+                      </>
+                    );
+                  })()}
+                </div>
               </div>
-            </div>
-          )}
+            )
+          }
 
-        </div>
+        </div >
       ) : (
         <p className="text-center font-bold text-3xl mt-8"> Product Not Found</p>
       )}
