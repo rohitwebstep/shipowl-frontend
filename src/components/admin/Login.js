@@ -61,18 +61,17 @@ export default function Login() {
                 body: JSON.stringify({ email, password }),
             });
 
+            const result = await response.json();
+
             if (!response.ok) {
-                const errorMessage = await response.json();
-                Swal.fire({
+                await Swal.fire({
                     icon: "error",
                     title: "Login Failed",
-                    text: errorMessage.message || errorMessage.error || "An error occurred",
+                    text: result.message || result.error || "An error occurred",
                 });
-                Swal.close()
-                throw new Error(errorMessage.message || errorMessage.error || "Login failed");
+                throw new Error(result.message || result.error || "Login failed");
             }
 
-            const result = await response.json();
             const { token, admin, assignedPermissions } = result;
 
             if (!token || !admin) {
@@ -101,6 +100,7 @@ export default function Login() {
             } else {
                 localStorage.removeItem("permissions");
             }
+
             localStorage.setItem("shippingData", JSON.stringify(shippingData));
 
             // ✅ Show success alert
@@ -129,6 +129,7 @@ export default function Login() {
             setLoading(false);
         }
     };
+
 
 
     return (

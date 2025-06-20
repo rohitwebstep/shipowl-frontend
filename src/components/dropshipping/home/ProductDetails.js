@@ -406,24 +406,24 @@ const ProductDetails = () => {
   }, [fetchProductDetails]);
 
   const groupedByModal = variantDetails.reduce((acc, curr) => {
-                    const modal = curr?.modal || curr?.variant?.modal || curr?.supplierProductVariant?.variant?.modal || "Unknown";
-                    if (!acc[modal]) acc[modal] = [];
-                    acc[modal].push(curr);
-                    return acc;
-                  }, {});
+    const modal = curr?.modal || curr?.variant?.modal || curr?.supplierProductVariant?.variant?.modal || "Unknown";
+    if (!acc[modal]) acc[modal] = [];
+    acc[modal].push(curr);
+    return acc;
+  }, {});
 
-                  const modalNames = Object.keys(groupedByModal);
-                  const totalModals = modalNames.length;
+  const modalNames = Object.keys(groupedByModal);
+  const totalModals = modalNames.length;
 
-                  const getVariantData = (v) => ({
-                    id: v?.id || v?.variant?.id,
-                    name: v?.variant?.name || v?.supplierProductVariant?.variant?.name || "NIL",
-                    modal: v?.variant?.modal || v?.supplierProductVariant?.variant?.modal || "Unknown",
-                    color: v?.variant?.color || v?.supplierProductVariant?.variant?.color || "NIL",
-                    image: (v?.variant?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
-                    suggested_price: v?.price || v?.suggested_price,
-                    full: v,
-                  });
+  const getVariantData = (v) => ({
+    id: v?.id || v?.variant?.id,
+    name: v?.variant?.name || v?.supplierProductVariant?.variant?.name || "NIL",
+    modal: v?.variant?.modal || v?.supplierProductVariant?.variant?.modal || "Unknown",
+    color: v?.variant?.color || v?.supplierProductVariant?.variant?.color || "NIL",
+    image: (v?.variant?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
+    suggested_price: v?.price || v?.suggested_price,
+    full: v,
+  });
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -439,7 +439,6 @@ const ProductDetails = () => {
       router.push(`/dropshipping/product/?id=${id}`);
     }
   };
-  console.log('selectedImage', selectedImage)
   return (
     <>
       {productDetails && Object.keys(productDetails).length > 0 ? (
@@ -567,7 +566,7 @@ const ProductDetails = () => {
               }
               <div className="">
                 {(() => {
-                
+
 
                   // CASE 1: 1 modal, 1 variant
                   if (totalModals === 1 && groupedByModal[modalNames[0]].length === 1) {

@@ -168,11 +168,11 @@ export default function VariantDetails() {
             <>
               <span className="text-[#A3AED0] whitespace-nowrap">Variant Name</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Color</span>
-              </>
+            </>
           )}
           {formData.isVarientExists && (
             <>
-             <span className="text-[#A3AED0] whitespace-nowrap">SKU</span>
+              <span className="text-[#A3AED0] whitespace-nowrap">SKU</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Suggested Price</span>
               <span className="text-[#A3AED0] whitespace-nowrap">Product Link</span>
               <span className="text-[#A3AED0] whitespace-nowrap text-right">Images</span>
@@ -268,7 +268,17 @@ export default function VariantDetails() {
                       <div className="md:flex justify-end">
                         <span className="text-orange-500 font-semibold lg:hidden block">Images</span>
                         <div className="relative border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
-                          <ImageIcon className="w-8 h-8 text-gray-400" />
+                          {(() => {
+                            const imageKey = `variant_images_${index}`;
+                            const files = formData[imageKey] || [];
+                            return files.length > 0 ? (
+                              <span className="text-[10px] text-center text-gray-600">
+                                {files.map((file, i) => file.name || `File ${i + 1}`).join(', ')}
+                              </span>
+                            ) : (
+                              <ImageIcon className="w-8 h-8 text-gray-400 overflow-auto" />
+                            );
+                          })()}
                           <input
                             type="file"
                             multiple
@@ -277,6 +287,7 @@ export default function VariantDetails() {
                           />
                         </div>
                       </div>
+
                     </>
                   )}
 
