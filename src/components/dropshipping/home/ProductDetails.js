@@ -1001,10 +1001,15 @@ export default function ProductDetails() {
 
             </div>
 
-            <div className="flex flex-col shadow-md border border-gray-300 md:flex-row justify-center items-stretch gap-4 z-50 bg-white p-5 rounded-md fixed left-0 bottom-0 w-full">
-              <div className="flex gap-3 justify-center ">
+            <div
+              className="flex flex-col shadow-md border border-gray-300 md:flex-row justify-center items-stretch gap-4 z-50 bg-white p-5 rounded-md fixed left-0 bottom-0 w-full animate-[slideUp_0.4s_ease-out]"
+              style={{
+                animationFillMode: 'both',
+              }}
+            >
+              <div className="flex gap-3 justify-center">
                 {/* Push to Shopify */}
-                {type === "notmy" ? (
+                {type === 'notmy' ? (
                   <button
                     onClick={() => {
                       setShowPopup(true);
@@ -1017,35 +1022,35 @@ export default function ProductDetails() {
                         shopfyApp: '',
                       });
                     }}
-                    className="py-2 px-4 flex gap-2 items-center text-white rounded-md md:text-sm  text-xs  bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out"
+                    className="py-2 px-4 flex gap-2 items-center text-white rounded-md md:text-sm text-xs bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out hover:scale-[1.02]"
                   >
-                    <ArrowUpRight />  Push To Shopify
+                    <ArrowUpRight /> Push To Shopify
                   </button>
                 ) : (
                   <button
                     onClick={() => handleEdit(product.id)}
-                    className="py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
+                    className="py-2 px-4 mt-2 text-white rounded-md md:text-sm text-xs bg-black hover:bg-gray-800 transition duration-300 ease-in-out hover:scale-[1.02]"
                   >
                     Edit From Shopify
                   </button>
                 )}
-
-
-                {/* Info Box */}
-                <div className="flex items-center justify-between gap-3 bg-gray-100 px-4 py-3 rounded-md flex-1 text-sm text-gray-700">
-                  <div className="flex items-center gap-2">
-                    <ArrowLeft size={16} />
-                    <span>
-                      RTO & RVP charges are applicable and vary depending on the product weight.{' '}
-                      <a href="#" className="underline text-black hover:text-orange-600 transition">
-                        View charges for this product
-                      </a>
-                    </span>
-                  </div>
-                  <ChevronDown className="text-gray-500" size={16} />
-                </div>
               </div>
+
+              {/* Inline keyframes */}
+              <style jsx>{`
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  `}</style>
             </div>
+
 
           </div>
         </div>

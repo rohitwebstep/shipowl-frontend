@@ -8,28 +8,13 @@ import Image from 'next/image';
 import { Navigation } from 'swiper/modules';
 import Swal from 'sweetalert2';
 import { HashLoader } from 'react-spinners';
-import productimg from '@/app/assets/product1.png';
-import gift from '@/app/assets/gift.png';
-import ship from '@/app/assets/delivery.png';
-import img1 from '@/app/assets/quality.png';
-import img2 from '@/app/assets/free-delivery.png';
-import img3 from '@/app/assets/cod.png';
-import img4 from '@/app/assets/return.png';
-import { X, Send } from "lucide-react"; // Lucide icons
-import { FaCalculator } from "react-icons/fa";
-import { BsBoxSeam, BsTruck } from "react-icons/bs";
-import { AiOutlineInfoCircle } from "react-icons/ai";
-import { MdInventory, MdKeyboardArrowDown } from "react-icons/md";
-import { GiWeight } from "react-icons/gi";
-import { HiShieldCheck } from "react-icons/hi";
+
 import { LuArrowUpRight } from "react-icons/lu";
-import { IoIosReturnLeft } from "react-icons/io";
-import { TbCube } from "react-icons/tb";
-import { GoArrowUpRight } from "react-icons/go";
-import { FiArrowDownLeft } from "react-icons/fi";
-import { RiResetRightLine } from "react-icons/ri";
-import { RxCross1 } from "react-icons/rx";
-import { ChevronRight, ChevronDown } from "lucide-react"; // Optional: Lucide icons
+
+import { FaTags } from "react-icons/fa";
+
+import { Package, Boxes, Archive, Star, Tag, Truck, Weight, Banknote, ShieldCheck, RotateCcw, ArrowUpRight, ArrowLeft, Store, ChevronDown } from 'lucide-react';
+
 import { useImageURL } from "@/components/ImageURLContext";
 const tabs = [
   { key: "notmy", label: "Not Listed Products" },
@@ -45,7 +30,6 @@ const ProductDetails = () => {
   // Dynamic images setup
   const [openSection, setOpenSection] = useState(null);
   const [shipCost, setShipCost] = useState([]);
-  const [openDescriptionId, setOpenDescriptionId] = useState(null);
 
   const [activeModal, setActiveModal] = useState('Shipowl');
 
@@ -81,7 +65,19 @@ const ProductDetails = () => {
     id: '',
     isVarientExists: '',
   });
-
+  const stats = [{ label: "Units Sold", value: "200", icon: <Package className="w-7 h-7 text-orange-500" />, },
+  { label: "Delivery Rate", value: "180", icon: <Truck className="w-7 h-7 text-orange-500" />, },
+  { label: "Product GST", value: "18%", icon: <Boxes className="w-7 h-7 text-orange-500" />, },
+  { label: "Inventory", value: "400", icon: <Archive className="w-7 h-7 text-orange-500" />, },
+  { label: "Weight", value: `${productDetails?.weight} GM`, icon: <Weight className="w-7 h-7 text-orange-500" />, },
+  { label: "Supplier Score", value: "4/5", icon: <ShieldCheck className="w-7 h-7 text-orange-500" />, },
+  ];
+  const features = [
+    { icon: <Truck className="w-10 h-10 text-gray-600" />, text: 'Free Shipping' },
+    { icon: <Banknote className="w-10 h-10 text-gray-600" />, text: 'Quality Assured Products' },
+    { icon: <ShieldCheck className="w-10 h-10 text-gray-600" />, text: 'Cash On Delivery' },
+    { icon: <RotateCcw className="w-10 h-10 text-gray-600" />, text: '5 Days Easy Return' },
+  ];
 
 
   const [form, setForm] = useState({
@@ -141,33 +137,6 @@ const ProductDetails = () => {
     setShowResult(false);
   };
 
-  // Safely parsed values
-  const sellingPrice = parseFloat(form.sellingPrice) || 0;
-  const totalOrderQty = parseFloat(form.totalOrderQty) || 0;
-  const confirmOrderPercentage = parseFloat(form.confirmOrderPercentage) || 0;
-  const deliveryPercentage = parseFloat(form.deliveryPercentage) || 0;
-  const deliveryRTOPercentage = 100 - deliveryPercentage;
-  const adSpends = parseFloat(form.adSpends) || 0;
-  const miscCharges = parseFloat(form.miscCharges) || 0;
-  const productPrice = selectedVariant?.price;
-  const deliveryCostPerUnit = shipCost;
-  const confirmedQtyrAW = totalOrderQty * (confirmOrderPercentage / 100);
-  const confirmedQty = Math.round(confirmedQtyrAW);
-  const deliveredQtyRaw = confirmedQty * (deliveryPercentage / 100);
-  const deliveredQty = Math.round(deliveredQtyRaw);
-  // Calculate Delivered RTO Quantity
-  const deliveredRTOQty = confirmedQty - deliveredQty;
-  // Cost Calculations
-  const productCostForDelivered = deliveredQty * productPrice;
-  const revenueFromDelivered = deliveredQty * sellingPrice;
-  const totalRTODeliveryCost = deliveredRTOQty * deliveryCostPerUnit;
-  // Final Margin Calculation
-  const totalAddSpend = adSpends * totalOrderQty; //order*adSpends
-  const perOrderMargin = sellingPrice - productPrice;
-  const finalEarnings = perOrderMargin * deliveredQty;
-  const totalExpenses = totalRTODeliveryCost + totalAddSpend + miscCharges;
-  const finalMargin = finalEarnings - totalExpenses; //total earning-totalspend
-  const profitPerOrder = finalMargin / totalOrderQty;
   const fetchProductDetails = useCallback(async () => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -257,6 +226,13 @@ const ProductDetails = () => {
 
 
   };
+  const [ordersGiven, setOrdersGiven] = useState(100);
+  const productPrice = selectedVariant?.price || 'N/A';
+  const shippingCost = shipCost || 75;
+
+  const prepaidProductCost = productPrice * ordersGiven;
+  const shippingDeduction = shippingCost * ordersGiven;
+  const totalPrepaid = prepaidProductCost;
   // Fetch related products by category
   const fetchRelatedProducts = useCallback(async (catid, tab) => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -440,7 +416,7 @@ const ProductDetails = () => {
     fetchProductDetails();
   }, [fetchProductDetails]);
 
-
+  console.log('selectedVariant', selectedVariant)
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -459,20 +435,20 @@ const ProductDetails = () => {
   console.log('selectedImage', selectedImage)
   return (
     <>
-      {productDetails && Object.keys(productDetails).length > 0 ? (
-        <div>
-          <div className="container mx-auto  gap-4 justify-between  rounded-lg flex flex-col md:flex-row">
-            {/* Image Slider */}
+      <section className="productsingal-page pb-[100px]">
+        <div className="container">
+
+          <div className="mx-auto  gap-4 justify-between  rounded-lg flex flex-col md:flex-row">
             <div className="w-full md:w-4/12">
               <div className="rounded-lg bg-white border border-[#E0E2E7] p-4">
-                <div className="rounded-lg p-4 w-full">
+                <div className="rounded-lg w-full">
                   <Image
 
                     src={fetchImages(selectedImage)}
                     alt="Product Image"
                     width={320}
                     height={320}
-                    className="w-full h-100  object-cover rounded-lg"
+                    className="w-full h-100 object-cover rounded-lg"
                   />
                 </div>
 
@@ -487,7 +463,6 @@ const ProductDetails = () => {
                     <SwiperSlide key={index}>
                       <Image
                         src={fetchImages(image)}
-
                         alt={`Thumbnail ${index + 1}`}
                         width={80}
                         height={80}
@@ -500,700 +475,741 @@ const ProductDetails = () => {
                 </Swiper>
               </div>
             </div>
-
-
             <div className="w-full md:w-8/12 bg-white rounded-lg border border-[#E0E2E7] p-6">
-              <h2 className="text-3xl font-bold text-[#2C3454] pb-4 capitalize">
-                {productDetails?.name}
-              </h2>
-
-              <p className="text-gray-600">
-                Sold: <span className="text-black">1,316 </span> | Rating: ⭐
-                <span className="text-black"> {selectedVariant?.variant?.stock || selectedVariant?.stock} </span> | Stock:
-                <span className="text-black"> 25 </span>
-              </p>
-
-              <div className="md:flex justify-between pb-3 pt-2">
-                <p className="text-[#858D9D]">
-                  C-Code: <span className="text-black">#302012</span>
+              <div className="product-details">
+                <h2 className='capitalize text-3xl font-medium'>{productDetails?.name || 'N/A'}</h2>
+                <p className="text-gray-600 mt-4">
+                  Sold: <span className="text-black">1,316 </span> | Rating: ⭐
+                  <span className="text-black"> 123 </span> | Stock:
+                  <span className="text-black"> {selectedVariant?.stock || 'N/A'} </span>
                 </p>
-                <p className="text-[#858D9D]">
-                  Created: <span className="text-black">{productDetails?.createdAt ? new Date(productDetails.createdAt).toLocaleDateString() : 'Not Available'}</span>
-                </p>
+                <div className="md:flex justify-between pb-3 pt-2">
+                  <p className="text-black">
+                    SKU Code: <span className="text-black">#{productDetails?.main_sku || 'N/A'}</span>
+                  </p>
+                  <p className="text-black">
+                    Created: <span className="text-black">12-04-2024</span>
+                  </p>
+                </div>
+                <p className='font-bold text-2xl'>₹ {selectedVariant?.suggested_price || selectedVariant?.price || 'N/A'}</p>
+
+
+              </div>
+              <div className="grid grid-cols-1 mt-4 sm:grid-cols-2 md:grid-cols-3 border border-[#D9D9D9]  rounded-lg  bg-white">
+                {stats.map((stat, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex items-start gap-3 p-3 border-[#D9D9D9] 
+         ${[0, 1, 2].includes(idx) ? 'md:pl-4 md:border-b' : ''} 
+         ${[0, 1, 3, 4].includes(idx) ? 'border-r' : ''} 
+       
+         ${idx === 5 ? 'border-r-0' : ''}
+       `}
+                  >
+
+
+                    <span className='text-xl'>{stat.icon}</span>
+                    <div>
+                      <p className="text-gray-500 ">{stat.label}:</p>
+                      <p className="text-indigo-900 font-semibold">{stat.value}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <div className="xl:flex gap-3 items-start justify-between">
-                <div>
-                  <div className="md:flex gap-3 items-end">
-                    <div>
-                      <h2 className="text-2xl font-bold">₹{selectedVariant?.price || selectedVariant?.suggested_price}</h2>
-                      <p className="text-gray-500 flex items-center text-sm">
-                        <a href="#" className="underline text-sm">
-                          Including GST & Shipping Charges
-                        </a>
-                        <AiOutlineInfoCircle className="ml-1" />
-                      </p>
+              <div className="variants-box mt-5">
+
+                <div className=" p-4 border-gray-200 bg-[#F1F5F9] rounded-md">
+                  <div>
+                    {
+                      totalModals === 1 && groupedByModal[modalNames[0]].length === 1 || totalModals === 1 && groupedByModal[modalNames[0]].length > 1 ? null : (
+                        totalModals === 2 && modalNames.every(model => groupedByModal[model].length === 1) ? (
+                          <h3 className="mt-4 font-bold text-[18px] pb-2">Modals</h3>
+                        ) : (
+                          <h3 className="mt-4 font-bold text-[18px] pb-2">Variants</h3>
+                        )
+                      )
+                    }
+                    <div className="">
+                      {(() => {
+                        if (totalModals === 1 && groupedByModal[modalNames[0]].length === 1) {
+                          const variant = getVariantData(groupedByModal[modalNames[0]][0]);
+                          return (
+                            <>
+                              <p>This product is available in the <strong>{modalNames[0]}</strong> model.</p>
+                            </>
+                          );
+                        }
+
+
+
+                        // CASE 2: 1 model, multiple variants
+                        if (totalModals === 1 && groupedByModal[modalNames[0]].length > 1) {
+                          return (
+                            <>
+                              <h3 className="text-xl font-semibold text-gray-800 mb-4"> Model: {modalNames[0]}</h3>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                {groupedByModal[modalNames[0]]
+                                  .map(getVariantData)
+                                  .sort((a, b) => a.suggested_price - b.suggested_price)
+                                  .map((variant, index) => {
+                                    const isSelected = selectedVariant?.id === variant.id;
+
+                                    return (
+                                      <div
+                                        key={index}
+                                        onClick={() => handleVariantClick(variant.full)}
+                                        className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
+                                          ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
+                                          : "border-gray-300 hover:shadow-lg bg-white"
+                                          }`}
+                                      >
+
+                                        <div className="">
+                                          <div className="bg-[#F7F5F5] overflow-hidden p-5 flex justify-center items-center rounded-lg mb-4 mx-auto">
+                                            <Image
+                                              src={fetchImages(variant.image)}
+                                              alt={variant.name}
+                                              width={140}
+                                              height={140}
+                                              className="object-cover w-full h-full"
+                                            />
+                                          </div>
+                                          <div className=" text-gray-700 space-y-1 text-left">
+                                            <div>Name: <span className="font-medium">{variant.name}</span></div>
+                                            <div className="flex items-center gap-1 text-sm text-gray-700">
+                                              <span>{variant?.rating || 4.3}</span>
+                                              <div className="flex gap-[1px] text-orange-500">
+                                                {Array.from({ length: 5 }).map((_, i) => (
+                                                  <Star
+                                                    key={i}
+                                                    className={`w-4 h-4 fill-current ${i < Math.round(variant?.rating || 4.3)
+                                                      ? 'fill-orange-500'
+                                                      : 'fill-gray-300'
+                                                      }`}
+                                                  />
+                                                ))}
+                                              </div>
+                                              <span className="ml-1 text-gray-500">4,800</span>
+                                            </div>
+                                            <div>Color: <span className="font-medium">{variant.color}</span></div>
+                                            <div className="text-green-600 font-semibold">Price: ₹{variant.suggested_price}</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            </>
+                          );
+                        }
+
+
+                        if (totalModals === 2 && modalNames.every(model => groupedByModal[model].length === 1)) {
+                          return (
+                            <div className="mb-4 flex items-center gap-4">
+                              {modalNames.map((model, index) => {
+                                const variant = getVariantData(groupedByModal[model][0]);
+                                const isSelected = selectedVariant?.id === variant.id;
+                                return (
+                                  <label key={index} className="flex items-center gap-3 cursor-pointer">
+                                    <input
+                                      type="radio"
+                                      name="model"
+                                      value={model}
+                                      checked={isSelected}
+                                      onChange={() => handleVariantClick(variant.full)}
+                                    />
+                                    <span className="text-gray-800 font-medium">{model}</span>
+
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          );
+                        }
+
+                        // CASE 3: Multiple modals with multiple variants → TABS
+                        if (totalModals > 1 && modalNames.some(model => groupedByModal[model].length > 1)) {
+                          return (
+                            <>
+                              {/* Tabs */}
+                              <div className="flex gap-3 mb-4 border-b ">
+                                {modalNames.map((model, index) => (
+                                  <button
+                                    key={index}
+                                    className={`px-8 uppercase py-2 rounded-t-lg text-sm text-black font-medium border-b-2 border-orange-500 ${activeModal === model
+                                      ? "border-orange-500 bg-orange-500 text-white"
+                                      : "border-transparent hover:text-white hover:bg-orange-500"
+                                      }`}
+                                    onClick={() => {
+                                      const sorted = groupedByModal[model]
+                                        .map(getVariantData)
+                                        .sort((a, b) => a.price - b.price);
+                                      setActiveModal(model);
+                                      setSelectedVariant(sorted[0].full);
+                                    }}
+                                  >
+                                    {model}
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Variant Cards */}
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                {(groupedByModal[activeModal] || [])
+                                  .map(getVariantData)
+                                  .sort((a, b) => a.suggested_price - b.suggested_price)
+                                  .map((variant, index) => {
+                                    const isSelected = selectedVariant?.id === variant.id;
+                                    return (
+                                      <div
+                                        key={index}
+                                        onClick={() => handleVariantClick(variant.full)}
+                                        className={`px-4 py-3 rounded-lg border border-[#D1D5DC] transition-shadow-md duration-300 cursor-pointer ${isSelected
+                                          ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
+                                          : "border-gray-300 hover:shadow-lg bg-white"
+                                          }`}
+                                      >
+                                        <div className="">
+                                          <div className="bg-[#F7F5F5] overflow-hidden p-5 flex justify-center items-center rounded-lg mb-4 mx-auto">
+                                            <Image
+                                              src={fetchImages(variant.image)}
+                                              alt={variant.name}
+                                              width={140}
+                                              height={140}
+                                              className="object-cover w-full h-full"
+                                            />
+                                          </div>
+                                          <div className=" text-gray-700 space-y-1 text-left">
+                                            <div>Name: <span className="font-medium">{variant.name}</span></div>
+                                            <div className="flex items-center gap-1 text-sm text-gray-700">
+                                              <span>{variant?.rating || 4.3}</span>
+                                              <div className="flex gap-[1px] text-orange-500">
+                                                {Array.from({ length: 5 }).map((_, i) => (
+                                                  <Star
+                                                    key={i}
+                                                    className={`w-4 h-4 fill-current ${i < Math.round(variant?.rating || 4.3)
+                                                      ? 'fill-orange-500'
+                                                      : 'fill-gray-300'
+                                                      }`}
+                                                  />
+                                                ))}
+                                              </div>
+                                              <span className="ml-1 text-gray-500">4,800</span>
+                                            </div>
+                                            <div>Color: <span className="font-medium">{variant.color}</span></div>
+                                            <div className="text-green-600 font-semibold">Price: ₹{variant.suggested_price}</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            </>
+                          );
+                        }
+
+                        return <div>No variant available.</div>;
+                      })()}
                     </div>
-
-                    {/* <div onClick={() => setOpenCalculator(true)} className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer">
-                      <FaCalculator className="text-purple-700 mr-2 text-2xl" />
-                      <span className="text-black underline font-semibold text-sm">
-                        Calculate <br /> Expected Profit
-                      </span>
-                    </div> */}
                   </div>
 
-
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4 mt-4 text-gray-700 text-sm">
-                  <div className="flex items-center">
-                    <BsBoxSeam className="mr-2 text-green-600" /> Units Sold:
-                    <strong className="ml-1"></strong>
-                  </div>
-                  <div className="flex items-center">
-                    <BsTruck className="mr-2 text-blue-600" /> Delivery Rate: --
-                  </div>
-                  <div className="flex items-center">
-                    <MdInventory className="mr-2 text-green-600" /> Inventory:
-                    <strong className="ml-1"></strong>
-                  </div>
-                  <div className="flex items-center">
-                    <GiWeight className="mr-2 text-brown-600" /> Weight:
-                    <strong className="ml-1">{productDetails?.weight} g</strong>
-                  </div>
-                  <div className="flex items-center">
-                    <HiShieldCheck className="mr-2 text-blue-600" /> Supplier Score:
-                    <strong className="ml-1">4/5</strong>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="mr-2 text-purple-600">📦</span> Product GST:
-                    <strong className="ml-1">18%</strong>
-                  </div>
                 </div>
               </div>
               {
                 totalModals === 1 && groupedByModal[modalNames[0]].length === 1 ? null : (
-                  totalModals === 2 && modalNames.every(model => groupedByModal[model].length === 1) ? (
-                    <h3 className="mt-4 font-bold text-[18px] pb-2">Modals</h3>
-                  ) : (
-                    <h3 className="mt-4 font-bold text-[18px] pb-2">Variants</h3>
-                  )
+                  <div>
+                    <h3 className="text-[20px] pt-5 font-bold">Color: {selectedVariant?.variant?.color || selectedVariant?.color || 'N/A'}</h3>
+                    <div className="flex flex-wrap gap-3 mt-2">
+                      {[
+                        ...new Set(
+                          variantDetails.map((item) => {
+                            const color =
+                              type === "notmy"
+                                ? item?.color
+                                : item?.variant?.color;
+                            return color?.trim().toLowerCase();
+                          }).filter(Boolean)
+                        ),
+                      ].map((color, index) => (
+                        <button
+                          key={index}
+                          style={{ backgroundColor: color }}
+                          className="px-4 py-2 text-white h-10 w-10  mb-2"
+                        >
+
+                        </button>
+                      ))}
+
+                      {variantDetails.every((item) => {
+                        const color =
+                          type === "notmy"
+                            ? item?.color
+                            : item?.variant?.color;
+                        return !color;
+                      }) && (
+                          <div className="px-4 py-2 bg-gray-300 text-black rounded-md mb-2">
+                            <span>No Color Found</span>
+                          </div>
+                        )}
+                    </div>
+                  </div>
                 )
               }
 
-              <div className="">
-                {(() => {
-
-
-                  // CASE 1: 1 model, 1 variant
-                  if (totalModals === 1 && groupedByModal[modalNames[0]].length === 1) {
-                    const variant = getVariantData(groupedByModal[modalNames[0]][0]);
-                    return (
-                      null
-                    );
-                  }
-
-                  // CASE 2: 1 model, multiple variants
-                  if (totalModals === 1 && groupedByModal[modalNames[0]].length > 1) {
-                    return (
-                      <>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          {groupedByModal[modalNames[0]]
-                            .map(getVariantData)
-                            .sort((a, b) => a.suggested_price - b.suggested_price)
-                            .map((variant, index) => {
-                              const isSelected = selectedVariant?.id === variant.id;
-
-                              return (
-                                <div
-                                  key={index}
-                                  onClick={() => handleVariantClick(variant.full)}
-                                  className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
-                                    ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
-                                    : "border-gray-300 hover:shadow-lg bg-white"
-                                    }`}
-                                >
-
-
-                                  <div className="flex gap-3">
-                                    <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
-                                      <Image
-
-                                        src={fetchImages(variant.image)}
-                                        alt={variant.name}
-                                        width={140}
-                                        height={140}
-                                        className="object-cover w-full h-full"
-                                      />
-                                    </div>
-                                    <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
-                                      <div>
-                                        Name: <span className="font-medium">{variant.name}</span>
-                                      </div>
-                                      <div>
-                                        Color: <span className="font-medium">{variant.color}</span>
-                                      </div>
-                                      <div>
-                                        Model: <span className="font-medium">{variant.model}</span>
-                                      </div>
-                                      <div className="text-green-600 font-semibold">
-                                        Price: ₹{variant.suggested_price}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </>
-                    );
-                  }
-
-
-                  if (totalModals === 2 && modalNames.every(model => groupedByModal[model].length === 1)) {
-                    return (
-                      <div className="space-y-4">
-                        {modalNames.map((model, index) => {
-                          const variant = getVariantData(groupedByModal[model][0]);
-                          const isSelected = selectedVariant?.id === variant.id;
-                          return (
-                            <label key={index} className="flex items-center gap-3 cursor-pointer">
-                              <input
-                                type="radio"
-                                name="model"
-                                value={model}
-                                checked={isSelected}
-                                onChange={() => handleVariantClick(variant.full)}
-                              />
-                              <span className="text-gray-800 font-medium">{model}</span>
-                              {isSelected && (
-                                <span className="ml-2 text-green-600 font-semibold">
-                                  ₹{variant.suggested_price}
-                                </span>
-                              )}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    );
-                  }
-
-                  // CASE 3: Multiple modals with multiple variants → TABS
-                  if (totalModals > 1 && modalNames.some(model => groupedByModal[model].length > 1)) {
-                    return (
-                      <>
-                        {/* Tabs */}
-                        <div className="flex gap-3 mb-4 border-b pb-2">
-                          {modalNames.map((model, index) => (
-                            <button
-                              key={index}
-                              className={`px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 ${activeModal === model
-                                ? "border-orange-600 text-orange-600"
-                                : "border-transparent text-gray-600 hover:text-orange-500"
-                                }`}
-                              onClick={() => {
-                                const sorted = groupedByModal[model]
-                                  .map(getVariantData)
-                                  .sort((a, b) => a.suggested_price - b.suggested_price);
-                                setActiveModal(model);
-                                setSelectedVariant(sorted[0].full);
-                              }}
-                            >
-                              {model}
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Variant Cards */}
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          {(groupedByModal[activeModal] || [])
-                            .map(getVariantData)
-                            .sort((a, b) => a.suggested_price - b.suggested_price)
-                            .map((variant, index) => {
-                              const isSelected = selectedVariant?.id === variant.id;
-                              return (
-                                <div
-                                  key={index}
-                                  onClick={() => handleVariantClick(variant.full)}
-                                  className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${isSelected
-                                    ? "border-dotted border-2 border-orange-600 shadow-md bg-orange-50"
-                                    : "border-gray-300 hover:shadow-lg bg-white"
-                                    }`}
-                                >
-                                  <div className="flex gap-3">
-                                    <div className="md:w-4/12 w-40 overflow-hidden rounded-lg mb-4 mx-auto">
-                                      <Image
-                                        src={fetchImages(variant.image)}
-                                        alt={variant.name}
-                                        width={140}
-                                        height={140}
-                                        className="object-cover w-full h-full"
-                                      />
-                                    </div>
-                                    <div className="text-sm md:w-8/12 text-gray-700 space-y-1 text-left">
-                                      <div>Name: <span className="font-medium">{variant.name}</span></div>
-                                      <div>Color: <span className="font-medium">{variant.color}</span></div>
-                                      <div className="text-green-600 font-semibold">Price: ₹{variant.suggested_price}</div>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                        </div>
-                      </>
-                    );
-                  }
-
-                  return <div>No variant available.</div>;
-                })()}
-              </div>
-              <div className="mt-4 border-t border-[#E0E2E7] pt-0">
-                <div className="flex gap-6">
-                  {
-                    totalModals === 1 && groupedByModal[modalNames[0]]?.length === 1 ? null : (
-                      <div>
-                        <h3 className="text-[18px] pt-5 font-bold">Color Variant</h3>
-                        <div className="flex flex-wrap gap-3 mt-2">
-                          {
-                            (() => {
-                              const colors = [
-                                ...new Set(
-                                  variantDetails
-                                    .map((item) => {
-                                      const color = type === "notmy" ? item?.color : item?.variant?.color;
-                                      return color?.trim().toLowerCase();
-                                    })
-                                    .filter(Boolean)
-                                ),
-                              ];
-
-                              return colors.length > 0 ? (
-                                colors.map((color, index) => (
-                                  <button
-                                    key={index}
-                                    style={{ backgroundColor: color }}
-                                    className="px-4 py-2 text-white rounded-md mb-2"
-                                  >
-                                    <span className="capitalize">{color}</span>
-                                  </button>
-                                ))
-                              ) : (
-                                <span className="text-gray-500 italic">No color found</span>
-                              );
-                            })()
-                          }
-                        </div>
-                      </div>
-                    )
-                  }
-
-
-
-                  <div className="">
-                    <h3 className=" text-[18px] pt-5 font-bold">Product Tags</h3>
-                    <div className="flex flex-wrap gap-3 mt-2">
-                      {(() => {
-                        try {
-                          const tags = JSON.parse(productDetails?.tags || '[]');
-                          if (Array.isArray(tags)) {
-                            return tags.map((tag, index) => (
-                              <button
-                                key={index}
-                                className="px-4 py-2 text-white capitalize bg-blue-400 rounded-md mb-2"
-                              >
-                                <span>{tag}</span>
-                              </button>
-                            ));
-                          }
-                        } catch (err) {
-                          console.warn('Invalid tags JSON:', productDetails?.tags);
-                          return (
-                            <span className="text-sm text-gray-500">No valid tags found</span>
-                          );
-                        }
-                      })()}
-                    </div>
-                  </div>
-                  {/* {otherSuppliers.length > 0 && (
-                    <div className="">
-                      <h3 className=" text-[18px] pt-5 font-bold">Other Suppliers</h3>
-                      {otherSuppliers.map((sup, index) => {
-                        // Find the variant with the lowest price
-                        const lowestPriceVariant = sup.variants.reduce((min, v) =>
-                          v.price < min.price ? v : min
-                        );
-
-                        return (
-                          <div onClick={() => viewProduct(sup?.id)} key={index} className="mb-4 p-3 border-dotted  border-2 border-orange-600 shadow-md bg-orange-50  rounded">
-                            <div>
-                              <strong>Supplier ID:</strong> {sup?.supplier?.uniqueId || 'NIL'}
-                            </div>
-
-                            <div>
-                              <strong> Price:</strong> ₹{lowestPriceVariant.price}
-                            </div>
-
-                          </div>
-                        );
-                      })}
-
-                    </div>
-                  )} */}
-
-                </div>
-              </div>
-
-              <p className="pt-5 text-[18px] font-bold">Desciption</p>
-
-
-              {/* HTML Description Content */}
-              {productDetails.description ? (
-                <div
-                  className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
-                  dangerouslySetInnerHTML={{ __html: productDetails.description }}
-                />
-              ) : (
-                <p className="text-gray-500">NIL</p>
-              )}
-
-
-              <p className="pt-2 text-[18px] font-bold border-t mt-3 border-[#E0E2E7]">Platform Assurance</p>
-              <div className="xl:grid lg:grid-cols-4 flex my-5 md:my-0 overflow-auto gap-8">
-                <div className="col">
-                  <Image src={img1} alt="" className="md:p-3 max-w-[150px] xl:max-w-full lg:w-full" />
-                </div>
-                <div className="col">
-                  <Image src={img2} alt="" className="md:p-3 max-w-[150px] xl:max-w-full lg:w-full" />
-                </div>
-                <div className="col">
-                  <Image src={img3} alt="" className="md:p-3 max-w-[150px] xl:max-w-full lg:w-full" />
-                </div>
-                <div className="col">
-                  <Image src={img4} alt="" className="md:p-3 max-w-[150px] xl:max-w-full lg:w-full" />
-                </div>
-              </div>
-
-              <div className='border-t mt-3 border-[#E0E2E7] pt-2'>
-                <h3 className="text-[18px] font-bold">Weight & Dimension:</h3>
-                <p className="text-black font-medium pt-2">
-                  {productDetails?.weight}kg / {productDetails?.package_length} CM, {productDetails?.package_width} CM, {productDetails?.package_height} CM <span className="text-gray-500">(H,L,W)</span>
-                </p>
-
-                <div className="mt-4 grid md:grid-cols-2 border-t border-[#E0E2E7] pt-4 items-stretch gap-3">
-                  {type === "notmy" ? (
-                    <button onClick={() => {
-                      setShowPopup(true);
-                      setInventoryData({
-                        productId: productDetails.id,
-                        id: productDetails.id,
-                        variant: variantDetails,
-                        isVarientExists: productDetails?.isVarientExists,
-                      });
-                    }} className="bg-orange-500 text-white px-6 py-3 text-xl flex items-center justify-center w-full sm:w-autofont-semibold">
-                      <LuArrowUpRight className="mr-2" /> Add To List
-                    </button>
-
-                  ) :
-                    (
-                      <button className="bg-black text-white px-6 py-3 text-xl flex items-center justify-center w-full sm:w-autofont-semibold">
-                        <LuArrowUpRight className="mr-2" />  Edit
-                      </button>
-                    )}
-
-
-                  <div className="bg-gray-100 p-3 rounded-md gap-2 flex items-start w-full sm:w-auto text-sm text-gray-600">
-                    <IoIosReturnLeft className="text-5xl text-gray-500" />
-                    <p className="text-sm">
-                      RTO & RVP charges are applicable and vary depending on the product
-                      weight.{" "}
-                      <a href="#" className="text-black underline font-semibold">
-                        View charges for this product
-                      </a>
-                    </p>
-                    <MdKeyboardArrowDown className="text-5xl text-gray-500" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-          </div >
-
-
-          <section className="py-5">
-            <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`md:px-6 px-2 py-2 font-medium md:text-xl border-b-2 transition-all duration-300 ease-in-out
-          ${activeTab === tab.key
-                      ? "border-orange-500 text-orange-600"
-                      : "border-transparent text-gray-500 hover:text-orange-600"
-                    }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <h4 className="text-2xl text-black mb-3 font-semibold">From different sellers</h4>
-
-            {relatedProducts.length === 0 ? (
-              <p className="text-center font-bold text-3xl mt-8">No Related Products Found</p>
-            ) : (
-              <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 md:gap-6 gap-2 xl:gap-10">
-                {relatedProducts.map((item, index) => {
-
-                  const product = type == "notmy" ? item : item.product || {};
-                  const variants = item.variants || [];
-
-                  const prices = variants
-                    .map(v => type === "notmy" ? v.suggested_price : v.price)
-                    .filter(p => typeof p === "number");
-                  console.log('prices', prices)
-                  console.log('variants', variants)
-                  const lowestPrice = prices.length > 0 ? Math.min(...prices) : "-";
-                  const productName = product.name || "Unnamed Product";
-
-
-
-                  return (
-                    <div
-                      key={index}
-                      tabIndex={0} // Enables focus for mobile tap
-                      className="bg-white relative overflow-hidden rounded-xl group cursor-pointer shadow-md transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] outline-none"
-                    >
-                      <div className="p-3">
-                        {/* FLIP CARD */}
-                        <div className="relative md:h-[200px] h-[100px] perspective">
-                          <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
-                            {/* FRONT */}
-                            <Image
-                              src={fetchImages(item.variants[0]?.image)}
-                              alt={productName}
-                              height={200}
-                              width={100}
-                              className="w-full h-full  object-cover backface-hidden"
-                            />
-                            {/* BACK */}
-                            <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
-                              <span className="text-sm">Back View</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* PRICE & NAME */}
-                        <div className="flex justify-between items-center mt-3">
-                          <p className="text-lg font-extrabold font-lato text-[#2C3454]">
-                            ₹{lowestPrice !== "-" ? lowestPrice : "-"}
-                          </p>
-                        </div>
-                        <p className="text-[13px] text-[#7A7A7A] font-lato font-semibold mt-1 hover:text-black transition-colors duration-300">
-                          {productName}
-                        </p>
-
-                        {/* FOOTER */}
-                        <div className="flex items-center border-t pt-3 group-hover:pb-16 mt-5 border-[#EDEDED] justify-between text-sm text-gray-600">
-                          <div className="flex items-center gap-1">
-                            <Image src={gift} className="w-5" alt="Gift" />
-                            <span className="font-lato text-[#2C3454] font-bold">MOQ: -</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Image src={ship} className="w-5" alt="Shipping" />
-                            <span className="font-lato text-[#2C3454] font-bold">Rating: -</span>
-                          </div>
-                        </div>
-
-                        {/* SLIDE-IN BUTTON PANEL */}
-                        <div
-                          className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 border border-gray-100 shadow
-                       opacity-0 translate-y-4 pointer-events-none overflow-hidden
-                       group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
-                       group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto
-                       transition-all duration-300"
-                        >
-                          {activeTab === "notmy" && (
-                            <button
-                              onClick={() => {
-                                setShowPopup(true);
-                                setInventoryData({
-                                  supplierProductId: product.id,
-                                  id: product.id,
-                                  variant: item.variants,
-                                  isVarientExists: product?.isVarientExists,
-                                });
-                              }}
-                              className="py-2 px-4 text-white rounded-md md:text-sm  text-xs w-full bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out"
-                            >
-                              Push To Shopify
-                            </button>
-                          )}
-
-                          {activeTab === "my" && (
-                            <button
-                              onClick={() => handleEdit(product.id)}
-                              className="py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs w-full bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
-                            >
-                              Edit From Shopify
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-            )}
-          </section>
-
-
-
-          {
-            showPopup && (
-              <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
-                <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
-                  <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
-
+              <div className="mt-4">
+                <div className="flex flex-wrap items-center gap-3 mt-2">
+                  <h3 className=" text-[20px] flex gap-2 items-center font-bold"><FaTags /> Tags</h3>
                   {(() => {
-                    const varinatExists = inventoryData?.isVarientExists ? "yes" : "no";
-                    const isExists = varinatExists === "yes";
-
-                    return (
-                      <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
-                          {inventoryData.variant?.map((variant, idx) => {
-                            const imageUrls = variant.image
-                              ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
-                              : [];
-
-                            return (
-                              <div
-                                key={variant.id || idx}
-                                className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
-                              >
-                                <div className='flex gap-2'>
-                                  {/* Image Preview */}
-                                  <div className="md:min-w-4/12 h-20 rounded-lg flex items-center justify-center overflow-hidden">
-                                    {imageUrls.length > 0 ? (
-                                      <img
-                                        src={fetchImages(imageUrls)}
-                                        alt={variant.name || "Variant Image"}
-                                        className="h-full object-cover"
-                                      />
-                                    ) : (
-                                      <img
-                                        src="https://placehold.co/600x400"
-                                        alt="Placeholder"
-                                        className="h-full object-cover"
-                                      />
-                                    )}
-                                  </div>
-
-                                  <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
-                                    <p><span className="font-semibold">Model:</span> {variant.model || "NIL"}</p>
-                                    <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
-                                    {isExists && (
-                                      <>
-                                        <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
-                                        <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
-                                        <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Input Fields */}
-                                <div className="flex flex-col space-y-2">
-                                  <input
-                                    type="number"
-                                    placeholder="Stock"
-                                    name="stock"
-                                    className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
-                                    value={variant.stock || ""}
-                                    onChange={(e) =>
-                                      handleVariantChange(variant.id, "stock", e.target.value)
-                                    }
-                                  />
-                                  <input
-                                    type="number"
-                                    placeholder="Price"
-                                    name="price"
-                                    className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
-                                    value={variant.price || ""}
-                                    onChange={(e) =>
-                                      handleVariantChange(variant.id, "price", e.target.value)
-                                    }
-                                  />
-                                </div>
-
-                                {/* Status Switch */}
-                                <div className="flex items-center justify-between mt-2">
-                                  <span className="text-sm font-medium">Add to List:</span>
-                                  <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                      type="checkbox"
-                                      checked={variant.status || false}
-                                      onChange={(e) =>
-                                        handleVariantChange(variant.id, "status", e.target.checked)
-                                      }
-                                      className="sr-only peer"
-                                    />
-                                    <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-orange-500 transition-all"></div>
-                                    <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transform transition-all"></div>
-                                  </label>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {/* Footer Buttons */}
-                        <div className="flex justify-end space-x-3 mt-6">
-                          <button
-                            onClick={() => setShowPopup(false)}
-                            className="flex items-center gap-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded transition"
-                          >
-                            <span>Cancel</span>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                          <button
-                            onClick={(e) => handleSubmit(e)}
-                            className="flex items-center gap-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
-                          >
-                            <span>Submit</span>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                            </svg>
-                          </button>
-                        </div>
-
-                        {/* Close Button */}
-                        <button
-                          onClick={() => setShowPopup(false)}
-                          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl"
-                        >
-                          ×
-                        </button>
-                      </>
-                    );
+                    try {
+                      const tags = JSON.parse(productDetails?.tags || '[]');
+                      if (Array.isArray(tags)) {
+                        return tags.map((tag, index) => (<span key={index} className="text-lg"># {tag}</span>
+                        ));
+                      }
+                    } catch (err) {
+                      return (
+                        <span className="text-sm text-gray-500">No valid tags found</span>
+                      );
+                    }
                   })()}
                 </div>
               </div>
-            )
-          }
+              {otherSuppliers.length > 0 && (
+                <>
+                  <h3 className=" text-[18px] pt-5 pb-4 font-bold">Other Suppliers</h3>
+                  <div className="grid grid-cols-2 gap-3 items-start">
+                    {otherSuppliers.map((sup, index) => {
+                      const lowestPriceVariant = sup.variants.reduce((min, v) =>
+                        v.price < min.price ? v : min
+                      );
+                      const variant = lowestPriceVariant.variant;
 
-        </div >
-      ) : (
-        <p className="text-center font-bold text-3xl mt-8"> Product Not Found</p>
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => viewProduct(sup?.id)}
+                          className="relative border-2 border-orange-500 overflow-hidden rounded-md p-3 flex gap-3 bg-white max-w-xl w-full shadow cursor-pointer"
+                        >
+                          {/* Ribbon */}
+                          <div className="absolute -right-10 top-13 -rotate-45 bg-orange-500 text-white text-xs px-8 py-1 font-semibold z-10">
+                            Recommended
+                          </div>
+
+                          {/* Image */}
+                          <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0">
+                            <Image
+                              src={fetchImages(variant?.image || '')}
+                              alt={variant?.name || 'Variant Image'}
+                              width={100}
+                              height={100}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+
+                          {/* Details */}
+                          <div className="flex flex-col justify-center text-sm text-gray-800 w-full space-y-1">
+                            {/* Title */}
+                            <div className="font-medium text-base">
+                              {variant?.name || 'N/A'}
+                            </div>
+
+                            {/* Rating */}
+                            <div className="flex items-center gap-1 text-sm text-gray-700">
+                              <span>{variant?.rating || 4.3}</span>
+                              <div className="flex gap-[1px] text-orange-500">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-4 h-4 fill-current ${i < Math.round(variant?.rating || 4.3)
+                                      ? 'fill-orange-500'
+                                      : 'fill-gray-300'
+                                      }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="ml-1 text-gray-500">4,800</span>
+                            </div>
+
+                            <div>
+                              <strong>Supplier ID:</strong>{" "}
+                              <span className="text-orange-500 font-medium">
+                                {sup?.supplier?.uniqeId || "ADMIN-XXXX"}
+                              </span>
+                            </div>
+
+                            {/* Price */}
+                            <div>
+                              <strong>Price:</strong> ₹{lowestPriceVariant.price}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+
+
+
+                  </div>
+                </>
+              )}
+              <div className="description-box my-5">
+                <p className="text-xl font-bold text-black mb-3">Description</p>
+                {productDetails.description ? (
+                  <div
+                    className="max-w-none prose [&_iframe]:h-[200px] [&_iframe]:max-h-[200px] [&_iframe]:w-full [&_iframe]:aspect-video"
+                    dangerouslySetInnerHTML={{ __html: productDetails.description }}
+                  />
+                ) : (
+                  <p className="text-gray-500">N/A</p>
+                )}
+              </div>
+              <div className="shipping-platform">
+                <div className="border border-[#F5F5F5] rounded-xl p-6 bg-white">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-6 text-center">
+                    {features.map((item, index) => (
+                      <div key={index} className="flex flex-col items-center gap-2">
+                        <span className="text-4xl">  {item.icon}</span>
+                        <p className="text-sm text-gray-800 font-medium pt-3">{item.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-8 space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Weight & Dimension:</h3>
+                  <p className="text-sm text-gray-800 mt-1">
+                    {productDetails?.weight}kg / {productDetails?.package_length} CM, {productDetails?.package_width} CM, {productDetails?.package_height} CM <span className="text-gray-500">(H,L,W)</span>
+
+                  </p>
+                </div>
+
+                <hr className="border-gray-200" />
+
+              </div>
+
+            </div>
+
+            <div className="flex flex-col shadow-md border border-gray-300 md:flex-row justify-center items-stretch gap-4 z-50 bg-white p-5 rounded-md fixed left-0 bottom-0 w-full">
+              <div className="flex gap-3 justify-center ">
+                {/* Push to Shopify */}
+                {type === "notmy" ? (
+                  <button onClick={() => {
+                    setShowPopup(true);
+                    setInventoryData({
+                      productId: productDetails.id,
+                      id: productDetails.id,
+                      variant: variantDetails,
+                      isVarientExists: productDetails?.isVarientExists,
+                    });
+                  }} className="bg-orange-500 text-white px-6 py-3 text-xl flex items-center justify-center sm:w-autofont-semibold">
+                    <LuArrowUpRight className="mr-2" /> Add To List
+                  </button>
+
+                ) :
+                  (
+                    <button className="bg-black text-white px-6 py-3 text-xl flex items-center justify-center sm:w-autofont-semibold">
+                      <LuArrowUpRight className="mr-2" />  Edit
+                    </button>
+                  )}
+
+
+                {/* Info Box */}
+                <div className="flex items-center justify-between gap-3 bg-gray-100 px-4 py-3 rounded-md flex-1 text-sm text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <ArrowLeft size={16} />
+                    <span>
+                      RTO & RVP charges are applicable and vary depending on the product weight.{' '}
+                      <a href="#" className="underline text-black hover:text-orange-600 transition">
+                        View charges for this product
+                      </a>
+                    </span>
+                  </div>
+                  <ChevronDown className="text-gray-500" size={16} />
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+      {showPopup && (
+        <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+          <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
+            <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
+
+            {(() => {
+              const varinatExists = inventoryData?.isVarientExists ? "yes" : "no";
+              const isExists = varinatExists === "yes";
+
+              return (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[70vh] overflow-y-auto pr-1">
+                    {inventoryData.variant?.map((variant, idx) => {
+                      const imageUrls = variant.image
+                        ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
+                        : [];
+
+                      return (
+                        <div
+                          key={variant.id || idx}
+                          className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
+                        >
+                          <div className='flex gap-2'>
+                            {/* Image Preview */}
+                            <div className="md:min-w-4/12 h-20 rounded-lg flex items-center justify-center overflow-hidden">
+                              {imageUrls.length > 0 ? (
+                                <img
+                                  src={fetchImages(imageUrls)}
+                                  alt={variant.name || "Variant Image"}
+                                  className="h-full object-cover"
+                                />
+                              ) : (
+                                <img
+                                  src="https://placehold.co/600x400"
+                                  alt="Placeholder"
+                                  className="h-full object-cover"
+                                />
+                              )}
+                            </div>
+
+                            <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
+                              <p><span className="font-semibold">Model:</span> {variant.model || "NIL"}</p>
+                              <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
+                              {isExists && (
+                                <>
+                                  <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
+                                  <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
+                                  <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
+                                </>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Input Fields */}
+                          <div className="flex flex-col space-y-2">
+                            <input
+                              type="number"
+                              placeholder="Stock"
+                              name="stock"
+                              className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
+                              value={variant.stock || ""}
+                              onChange={(e) =>
+                                handleVariantChange(variant.id, "stock", e.target.value)
+                              }
+                            />
+                            <input
+                              type="number"
+                              placeholder="Price"
+                              name="price"
+                              className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
+                              value={variant.price || ""}
+                              onChange={(e) =>
+                                handleVariantChange(variant.id, "price", e.target.value)
+                              }
+                            />
+                          </div>
+
+                          {/* Status Switch */}
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="text-sm font-medium">Add to List:</span>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={variant.status || false}
+                                onChange={(e) =>
+                                  handleVariantChange(variant.id, "status", e.target.checked)
+                                }
+                                className="sr-only peer"
+                              />
+                              <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-orange-500 transition-all"></div>
+                              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transform transition-all"></div>
+                            </label>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Footer Buttons */}
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <button
+                      onClick={() => setShowPopup(false)}
+                      className="flex items-center gap-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded transition"
+                    >
+                      <span>Cancel</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => handleSubmit(e)}
+                      className="flex items-center gap-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
+                    >
+                      <span>Submit</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setShowPopup(false)}
+                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl"
+                  >
+                    ×
+                  </button>
+                </>
+              );
+
+            })()}
+          </div>
+        </div>
       )}
 
-     
+      <section className="py-5 pb-20">
+        <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`md:px-6 px-2 py-2 font-medium md:text-xl border-b-2 transition-all duration-300 ease-in-out
+                    ${activeTab === tab.key
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-gray-500 hover:text-orange-600"
+                }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <h4 className="text-2xl text-black mb-3 font-semibold">From different sellers</h4>
+
+        {relatedProducts.length === 0 ? (
+          <p className="text-center font-bold text-3xl mt-8">No Related Products Found</p>
+        ) : (
+          <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 md:gap-3 gap-2 xl:gap-10">
+            {relatedProducts.map((item, index) => {
+              const product = type == "notmy" ? item : item.product || {};
+              const variants = item.variants || [];
+
+              const prices = variants
+                .map(v => type === "notmy" ? v.suggested_price : v.price)
+                .filter(p => typeof p === "number");
+              console.log('prices', prices)
+              console.log('variants', variants)
+              const lowestPrice = prices.length > 0 ? Math.min(...prices) : "-";
+              const productName = product.name || "Unnamed Product";
+
+
+              return (
+                <div
+                  key={index}
+                  tabIndex={0} // Enables focus for mobile tap
+                  className="bg-white relative overflow-hidden rounded-xl group cursor-pointer shadow-md transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] outline-none"
+                >
+                  <div className="p-3">
+                    {/* FLIP CARD */}
+                    <div className="relative md:h-[200px] h-[100px] perspective">
+                      <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                        {/* FRONT */}
+                        <Image
+                          src={fetchImages(item?.variants?.[0]?.variant?.image || '')}
+                          alt={product.name}
+                          height={200}
+                          width={100}
+                          className="w-full h-full  object-cover backface-hidden"
+                        />
+                        {/* BACK */}
+                        <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
+                          <span className="text-sm">Back View</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* PRICE & NAME */}
+                    <div className="flex justify-between items-center mt-3">
+                      <p className="text-lg font-extrabold font-lato text-[#2C3454]">
+                        ₹{lowestPrice !== "-" ? lowestPrice : "-"}
+                      </p>
+                    </div>
+                    <p className="text-[13px] text-[#7A7A7A] font-lato font-semibold mt-1 hover:text-black transition-colors duration-300">
+                      {product.name}
+                    </p>
+
+                    <div className="flex items-center gap-2">
+                      <Tag size={16} />
+                      <span>SKU: {product?.main_sku || "-"}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Truck size={16} />
+                      <span>Shipping Time: {product?.shipping_time || "-"}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-gray-700">
+                      <span>{variants?.rating || 4.3}</span>
+                      <div className="flex gap-[1px] text-orange-500">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 fill-current ${i < Math.round(variants?.rating || 4.3)
+                              ? 'fill-orange-500'
+                              : 'fill-gray-300'
+                              }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="ml-1 text-gray-500">4,800</span>
+                    </div>
+
+                    {/* SLIDE-IN BUTTON PANEL */}
+                    <div
+                      className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 border border-gray-100 shadow
+                                 opacity-0 translate-y-4 pointer-events-none overflow-hidden
+                                 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
+                                 group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto
+                                 transition-all duration-300"
+                    >
+                      {activeTab === "notmy" && (
+                        <button
+                          onClick={() => {
+                            setShowPopup(true);
+                            setInventoryData({
+                              supplierProductId: product.id,
+                              id: product.id,
+                              variant: item.variants,
+                              isVarientExists: product?.isVarientExists,
+                            });
+                          }}
+                          className="py-2 px-4 text-white rounded-md md:text-sm  text-xs w-full bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out"
+                        >
+                          Add To List
+                        </button>
+                      )}
+
+                      {activeTab === "my" && (
+                        <button
+                          onClick={() => handleEdit(product.id)}
+                          className="py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
+                        >
+                          Edit List
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+        )}
+      </section>
+
     </>
 
 
@@ -1201,46 +1217,5 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
-function InputField({ label, value, onChange, error, required }) {
-  return (
-    <>
-      <div className='flex justify-between'>
-        <label className="md:w-7/12 block text-sm font-medium mb-1">
-          {label} {required && <span className="text-red-500">*</span>}
-          {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-        </label>
 
-        <input
-          type="number"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={`md:w-5/12 bg-white border px-3 py-[6px] ${error ? 'border-red-500' : 'border-gray-300'}`}
-        />
-      </div>
-    </>
-  );
-}
-
-// Result output component with conditional display
-function ResultItem({ label, value, isVisible, placeholder = '-' }) {
-  const numeric = parseFloat(value?.replace?.(/[₹,]/g, '')) || 0;
-  return (
-    <div className="flex justify-between text-sm w-full">
-      <span className="font-medium text-black">{label}</span>
-      <span className={` font-bold  text-green-800 ${!isVisible ? 'text-gray-400' : numeric < 0 ? 'text-red-800' : 'text-green-800'}`}>
-        {isVisible ? value : placeholder}
-      </span>
-    </div>
-  );
-}
-
-// Info box component
-function ProductInfo({ label, value }) {
-  return (
-    <div className="flex items-center space-x-1 text-sm">
-      <span className="text-gray-500">{label}:</span>
-      <span className="font-medium text-black">{value}</span>
-    </div>
-  );
-}
 

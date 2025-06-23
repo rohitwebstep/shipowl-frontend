@@ -6,7 +6,7 @@ import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import { useEffect, useState, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import { HashLoader } from 'react-spinners';
-import { FileText, Tag, Truck ,Star} from "lucide-react"; // Icons
+import { FileText, Tag, Truck, Star } from "lucide-react"; // Icons
 
 import { useImageURL } from "@/components/ImageURLContext";
 export default function NewProducts() {
@@ -24,7 +24,7 @@ export default function NewProducts() {
     id: '',
     isVarientExists: '',
   });
-
+  let prolist = false;
   const viewProduct = (id) => {
     if (type == "notmy") {
       router.push(`/supplier/product/?id=${id}&type=${type}`);
@@ -235,32 +235,36 @@ export default function NewProducts() {
                 // Case 1: Only 1 model and 1 variant
                 if (modalKeys.length === 1 && modalMap[modalKeys[0]].length === 1) {
                   const price = modalMap[modalKeys[0]][0]?.suggested_price ?? 0;
-                  return <span>₹{price}</span>;
+                  return <span>{modalKeys[0]}: ₹{price}</span>;
                 }
 
                 // Case 2: 1 model, multiple variants
-                if (modalKeys.length === 1 && modalMap[modalKeys[0]].length > 1) {
+                if (modalKeys.length === 1) {
                   const prices = modalMap[modalKeys[0]].map(v => v?.suggested_price ?? 0);
                   const min = Math.min(...prices);
                   const max = Math.max(...prices);
-                  return <span>₹{min} - ₹{max}</span>;
+                  return <span>{modalKeys[0]}: ₹{min} - ₹{max}</span>;
                 }
 
                 // Case 3 or 4: multiple models
-                return modalKeys.map((model, idx) => {
-                  const modelVariants = modalMap[model];
-                  const prices = modelVariants.map(v => v?.suggested_price ?? 0);
-                  const min = Math.min(...prices);
-                  const max = Math.max(...prices);
-                  const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
-                  return (
-                    <span key={model} className='block'>
-                      {model}: {priceLabel}
-                      {idx !== modalKeys.length - 1 && <span className="mx-1"></span>}
-                    </span>
-                  );
-                });
+                return (
+                  <>
+                    {modalKeys.map((model, idx) => {
+                      const prices = modalMap[model].map(v => v?.suggested_price ?? 0);
+                      const min = Math.min(...prices);
+                      const max = Math.max(...prices);
+                      const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
+
+                      return (
+                        <span key={model} className="block text-sm text-gray-800">
+                          {model}: {priceLabel}
+                        </span>
+                      );
+                    })}
+                  </>
+                );
               };
+
 
 
 
@@ -398,6 +402,7 @@ export default function NewProducts() {
           <p className="text-center">No Products Found</p>
         )}
       </div>
+
       {showPopup && (
         <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
@@ -418,11 +423,11 @@ export default function NewProducts() {
                       return (
                         <div
                           key={variant.id || idx}
-                          className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
+                          className="bg-white p-4 rounded-md  border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
                         >
-                          <div className='flex gap-2'>
+                          <div className='flex gap-2 relative'>
                             {/* Image Preview */}
-                            <div className="flex gap-2 overflow-x-auto max-w-[120px] border border-[#E0E2E7] rounded-md p-3shadow bg-white">
+                            <div className="flex gap-2 overflow-x-auto  border border-[#E0E2E7] rounded-md p-3shadow bg-white">
                               {imageUrls.length > 0 ? (
                                 imageUrls.map((url, i) => (
                                   <Image
@@ -444,19 +449,41 @@ export default function NewProducts() {
                                 />
                               )}
                             </div>
+                            <div className="absolute top-0 left-0 bg-orange-500 p-2 text-white ">Suggested Price :{variant.suggested_price}</div>
 
-                            <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
-                              <p><span className="font-semibold">Model:</span> {variant.model || "NIL"}</p>
-                              <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
+
+                          </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="text-sm text-gray-700 w-full  border-gray-100">
+                            <tbody>
+                              <tr className='border border-gray-100'>
+                                <th className="text-left border-gray-100 border p-3 font-semibold ">Model:</th>
+                                <td className='p-3 border border-gray-100'>{variant.model || "NIL"}</td>
+                                <th className="text-left border-gray-100 border p-3 font-semibold ">Name:</th>
+                                <td className='p-3 border border-gray-100'>{variant.name || "NIL"}</td>
+
+
+                              </tr>
+
                               {isExists && (
                                 <>
-                                  <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
-                                  <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
-                                  <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
+                               <tr className='border border-gray-100'>
+
+
+                                    <th className="text-left border-gray-100 border p-3 font-semibold ">SKU:</th>
+                                    <td className='p-3 border border-gray-100'>{variant.sku || "NIL"}</td>
+
+                                    <th className="text-left border-gray-100 border p-3 font-semibold ">Color:</th>
+                                    <td className='p-3 border border-gray-100'>{variant.color || "NIL"}</td>
+                                  </tr>
                                 </>
                               )}
-                            </div>
+
+                            </tbody>
+                          </table>
                           </div>
+
 
                           {/* Input Fields */}
                           <div className="flex flex-col space-y-2">
@@ -543,3 +570,6 @@ export default function NewProducts() {
     </>
   );
 }
+
+
+

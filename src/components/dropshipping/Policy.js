@@ -3,42 +3,151 @@ import React from 'react'
 export default function Policy() {
     return (
         <>
-            <div className='bg-white p-10 rounded-md md:w-9/12 m-auto'>
-                <h3 className='text-4xl mb-5 font-bold '>Privacy Policy</h3>
-                <p>(Last updated on October 2023)</p>
-                <h5 className='text-xl font-bold mt-10 mb-4'>Introduction</h5>
-                <p className="pb-4">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Error, nihil labore? Quaerat magnam eligendi porro, neque error autem accusamus beatae inventore cumque qui quas repudiandae sit, saepe, asperiores tenetur veritatis.
-                </p>
-                <p className="pb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus cumque asperiores deserunt qui sunt est repellat, expedita ipsam illo iste!</p>
-                <p className="pb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde perferendis quo natus doloribus sequi repudiandae placeat maxime adipisci soluta, veritatis corporis qui? Doloribus esse accusamus expedita distinctio sit? Architecto possimus rem perferendis molestiae nam autem repudiandae sunt. Dolorum, tempora officia reprehenderit aspernatur repellendus veniam dicta modi. Quia voluptates ipsam nihil perferendis non aut aliquid vitae, voluptas assumenda commodi minima corporis eos officia delectus. Exercitationem expedita quam voluptas aperiam similique nisi voluptate, omnis veniam dolorem accusamus numquam recusandae quisquam fuga nobis magnam assumenda natus architecto odio sequi? A at vel nesciunt eligendi fugiat hic, perspiciatis eius, eveniet deleniti exercitationem labore voluptate!</p>
-                <p className="pb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam perferendis distinctio sequi itaque officia quasi sapiente incidunt veritatis commodi repellat, doloribus tempore et, possimus rem non deleniti nesciunt consequatur? Consectetur officia illum ad beatae eligendi perferendis amet possimus assumenda maxime harum ab accusantium unde molestiae deleniti, porro vel facere aperiam praesentium laudantium ipsum cum? Minus tempora sequi quibusdam sunt ipsum doloribus, eveniet nulla voluptas vero dolores nihil repudiandae corrupti earum asperiores explicabo quas sed nesciunt similique veniam autem a necessitatibus consequuntur inventore libero. Aliquid nulla quo laboriosam delectus repellendus voluptatem, qui architecto non optio iste quasi. Deserunt incidunt amet pariatur!</p>
-                <h5 className='text-xl font-bold mt-10 mb-4'>USER INFORMATION</h5>
-                <p className="pb-4">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptas molestiae veritatis quo quis, veniam quia dolores maiores accusamus repudiandae itaque sed nisi reprehenderit! Nobis expedita itaque, nisi laborum cumque praesentium voluptates eveniet recusandae. Qui perspiciatis aliquam voluptatem dolorem officiis magnam exercitationem quaerat facere veniam, iusto, facilis animi ut voluptate totam quo velit aperiam, incidunt earum placeat? Ex incidunt enim excepturi veritatis quod! Quas vel voluptas rem ab repudiandae autem id sunt voluptate. Dolorum, quas tempora perspiciatis asperiores suscipit itaque porro ipsam quos odit? Odio architecto repudiandae autem praesentium inventore, necessitatibus, ab animi, sint dolorem porro error ducimus adipisci pariatur enim?                </p>
-                <p className="pb-4">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid minus natus, amet blanditiis iste dolorem aspernatur perferendis aliquam quidem asperiores quas corporis obcaecati assumenda odit. Temporibus eligendi tempora amet, atque quod itaque odit illum quibusdam consectetur maxime nemo, ut, nostrum non saepe praesentium ad! Consequuntur ratione in atque assumenda eligendi.
-                </p>
-                <p className="pb-4">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid minus natus, amet blanditiis iste dolorem aspernatur perferendis aliquam quidem asperiores quas corporis obcaecati assumenda odit. Temporibus eligendi tempora amet, atque quod itaque odit illum quibusdam consectetur maxime nemo, ut, nostrum non saepe praesentium ad! Consequuntur ratione in atque assumenda eligendi.
-                </p>
-                <h5 className='text-xl font-bold mt-10 mb-4'>Introduction</h5>
-                <p className="pb-4">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Error, nihil labore? Quaerat magnam eligendi porro, neque error autem accusamus beatae inventore cumque qui quas repudiandae sit, saepe, asperiores tenetur veritatis.
-                </p>
-                <p className="pb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus cumque asperiores deserunt qui sunt est repellat, expedita ipsam illo iste!</p>
-                <p className="pb-4">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Facilis, aliquid?</p>
-                <p className="pb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam perferendis distinctio sequi itaque officia quasi sapiente incidunt veritatis commodi repellat, doloribus tempore et, possimus rem non deleniti nesciunt consequatur? Consectetur officia illum ad beatae eligendi perferendis amet possimus assumenda maxime harum ab accusantium unde molestiae deleniti, porro vel facere aperiam praesentium laudantium ipsum cum? Minus tempora sequi quibusdam sunt ipsum doloribus, eveniet nulla voluptas vero dolores nihil repudiandae corrupti earum asperiores explicabo quas sed nesciunt similique veniam autem a necessitatibus consequuntur inventore libero. Aliquid nulla quo laboriosam delectus repellendus voluptatem, qui architecto non optio iste quasi. Deserunt incidunt amet pariatur!</p>
-                <h5 className='text-xl font-bold mt-10 mb-4'>USER INFORMATION</h5>
-                <p className="pb-4">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptas molestiae veritatis quo quis, veniam quia dolores maiores accusamus repudiandae itaque sed nisi reprehenderit! Nobis expedita itaque, nisi laborum cumque praesentium voluptates eveniet recusandae. Qui perspiciatis aliquam voluptatem dolorem officiis magnam exercitationem quaerat facere veniam, iusto, facilis animi ut voluptate totam quo velit aperiam, incidunt earum placeat? Ex incidunt enim excepturi veritatis quod! Quas vel voluptas rem ab repudiandae autem id sunt voluptate. Dolorum, quas tempora perspiciatis asperiores suscipit itaque porro ipsam quos odit? Odio architecto repudiandae autem praesentium inventore, necessitatibus, ab animi, sint dolorem porro error ducimus adipisci pariatur enim?                </p>
-                <p className="pb-4">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid minus natus, amet blanditiis iste dolorem aspernatur perferendis aliquam quidem asperiores quas corporis obcaecati assumenda odit. Temporibus eligendi tempora amet, atque quod itaque odit illum quibusdam consectetur maxime nemo, ut, nostrum non saepe praesentium ad! Consequuntur ratione in atque assumenda eligendi.
-                </p>
-                <p className="pb-4">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid minus natus, amet blanditiis iste dolorem aspernatur perferendis aliquam quidem asperiores quas corporis obcaecati assumenda odit. Temporibus eligendi tempora amet, atque quod itaque odit illum quibusdam consectetur maxime nemo, ut, nostrum non saepe praesentium ad! Consequuntur ratione in atque assumenda eligendi.
-                </p>
-            </div>
+            <section className="privacy-policy p-6 bg-white  rounded-md max-w-4xl mx-auto text-gray-800">
+                <header className="mb-8">
+                    <h1 className="text-3xl font-bold mb-2">Privacy Policy</h1>
+                    <p className="text-sm text-gray-500">Last updated: <strong>23/06/2025</strong></p>
+                    <p className="mt-4">
+                        Shipowl (“we,” “us,” “our”) respects your privacy. This policy explains what information we collect, how we use it, and your rights. By using Shipowl services—via website, app, or related services—you agree to this policy. If
+                        you disagree, please do not use Shipowl.
+                    </p>
+                </header>
+
+                <article>
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">1. Who We Are</h2>
+                        <p>Shipowl is operated by Buzwide Technology Private Limited, located at:</p>
+                        <address className="not-italic mt-2">
+                            <strong>Official Business Address:</strong><br />
+                            401, Vishal Astra, 12-A/A, Scheme No. 54<br />
+                            Satya Sai Square, AB Road<br />
+                            Indore, Madhya Pradesh<br />
+                            India
+                        </address>
+                        <p className="mt-2">
+                            “Platform” refers to Shipowl’s website, app, and associated services. “You” means any user, merchant, or customer using Shipowl.
+                        </p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">2. Information We Collect</h2>
+
+                        <h3 className="font-semibold mt-2">A. User-Provided Information</h3>
+                        <ul className="list-disc list-inside">
+                            <li><strong>Account Data:</strong> Name, email, phone, business name/address, and authentication data (e.g., OTP, password)</li>
+                            <li><strong>Order Details:</strong> Your and your customer’s shipping/billing addresses, contact details, and bank info for refunds (if needed)</li>
+                            <li><strong>Permissions:</strong> App access to device storage (with consent) for downloading/storing data</li>
+                        </ul>
+
+                        <h3 className="font-semibold mt-4">B. Automatically Collected Information</h3>
+                        <ul className="list-disc list-inside">
+                            <li><strong>Device & Usage Data:</strong> IP, device type, browser, OS, session logs, app activity</li>
+                            <li><strong>Cookies & Similar Technologies:</strong> To enhance your experience. Disabling cookies may impact functionality.</li>
+                        </ul>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">3. How We Use Your Information</h2>
+                        <ul className="list-disc list-inside">
+                            <li>Verify identity and manage accounts</li>
+                            <li>Enable platform functionality (orders, shipping, refunds)</li>
+                            <li>Communicate (order updates, support, marketing via SMS, email, WhatsApp)</li>
+                            <li>Deliver personalized features and content</li>
+                            <li>Improve services and perform analytics</li>
+                            <li>Maintain security and prevent abuse</li>
+                            <li>Comply with legal obligations</li>
+                            <li>Facilitate advertising, promotions, and surveys</li>
+                        </ul>
+                        <p className="mt-2 text-sm"><em>Note:</em> Marketing updates and WhatsApp messages require your opt-in. You may opt out by replying “STOP.”</p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">4. Information Sharing</h2>
+                        <p>We may share your data with:</p>
+                        <ul className="list-disc list-inside">
+                            <li><strong>Service Providers:</strong> Payment gateways, couriers, logistics partners</li>
+                            <li><strong>Business Affiliates:</strong> Investors, acquirers, or advisors in case of business changes</li>
+                            <li><strong>Support & Maintenance:</strong> IT vendors, chat support services</li>
+                            <li><strong>Authorities:</strong> When legally required</li>
+                        </ul>
+                        <p className="mt-2"><strong>We do not</strong> collect or share data with unrelated third parties for tracking, profiling, or advertising.</p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">5. Payments & Third-Party Links</h2>
+                        <p>
+                            Payments are handled through secure third-party payment gateways. Shipowl does not store card details. Our platform may contain links to external websites (e.g., social networks, payment processors). We are not responsible
+                            for their privacy practices; please review their respective policies.
+                        </p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">6. Data Security & Retention</h2>
+                        <ul className="list-disc list-inside">
+                            <li><strong>Retention:</strong> Device logs—up to 36 months. Account/order data—until deleted by you or as legally required.</li>
+                            <li><strong>Security:</strong> We use industry-standard technical and organizational safeguards.</li>
+                        </ul>
+                        <p className="mt-2"><strong>Limitation:</strong> No online platform is completely secure. You use Shipowl at your own risk.</p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">7. Children & Minors</h2>
+                        <p>Shipowl is not intended for children. If you are under 18, use the platform only with parental or guardian consent.</p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">8. Policy Changes</h2>
+                        <p>
+                            We may update this Privacy Policy from time to time. Changes will be posted here. Continued use after updates means you accept the revised policy.
+                        </p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">9. Your Rights</h2>
+                        <p>You may request:</p>
+                        <ul className="list-disc list-inside">
+                            <li>Access to the personal data we hold</li>
+                            <li>Corrections or deletion of your data</li>
+                            <li>Opting out of communications</li>
+                            <li>Restriction on how your data is used/shared</li>
+                        </ul>
+                        <p className="mt-2">Contact us using the details in Section 12 to make such requests.</p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">10. International Transfers</h2>
+                        <p>
+                            Your data may be processed in India or other countries. We ensure safeguards comply with legal standards for cross-border data transfers.
+                        </p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">11. Legal Disclosures</h2>
+                        <p>
+                            We may disclose your data to comply with applicable laws, legal processes, or to protect the rights and safety of Shipowl or others.
+                        </p>
+                    </section>
+
+                    <section className="mb-6">
+                        <h2 className="text-xl font-semibold mb-2">12. Contact Information</h2>
+                        <address className="not-italic">
+                            <strong>Buzwide Technology Private Limited</strong><br />
+                            401, Vishal Astra, 12-A/A, Scheme No. 54<br />
+                            Satya Sai Square, AB Road<br />
+                            Indore, Madhya Pradesh<br />
+                            India
+                        </address>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-semibold mb-2">13. Integration with Terms</h2>
+                        <p>
+                            This Privacy Policy is part of and incorporated into our Terms of Service. Any conflict will be resolved in favor of the Terms.
+                        </p>
+                    </section>
+                </article>
+            </section>
+
 
         </>
     )

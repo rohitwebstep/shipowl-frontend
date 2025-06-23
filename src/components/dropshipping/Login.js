@@ -28,6 +28,7 @@ export default function Login() {
         if (!supplierData?.project?.active_panel == "dropshipper") {
             localStorage.clear("shippingData");
             router.push("/dropshipping/auth/login");
+            return;
         }
 
         if (token && verifyDropShipperAuth()) {

@@ -1,13 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import productimg from '@/app/assets/product1.png';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { HashLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
-import { X, FileText, Tag, Truck, Pencil, RotateCcw, Trash2, Eye } from "lucide-react"; // Icons
+import { X, FileText, Tag, Truck, Pencil, RotateCcw, Star, Trash2, Eye } from "lucide-react"; // Icons
 import { FaEye } from "react-icons/fa";
 import { useImageURL } from "@/components/ImageURLContext";
 export default function My() {
@@ -585,7 +584,7 @@ export default function My() {
                 <>
 
 
-                    <div className="grid lg:grid-cols-4 xl:grid-cols-5 md:grid-cols-2 gap-6">
+                    <div className="grid lg:grid-cols-4 xl:grid-cols-5 md:grid-cols-2 gap-2">
                         {products.map((product) => {
                             const variantsImage = product?.variants || [];
                             const imageString = variantsImage[0]?.variant?.image || "";
@@ -593,9 +592,8 @@ export default function My() {
                             const productName = product?.product?.name || "NIL";
 
                             const getPriceDisplay = (variants) => {
-                                if (!variants?.length) return "N/A";
+                                if (!variants?.length) return <span>N/A</span>;
 
-                                console.log('variants', variants)
                                 const modalMap = {};
                                 variants.forEach((variant) => {
                                     const model = variant?.variant?.model || "Default";
@@ -607,7 +605,8 @@ export default function My() {
 
                                 // Case 1: Only 1 model and 1 variant
                                 if (modalKeys.length === 1 && modalMap[modalKeys[0]].length === 1) {
-                                    return `₹${modalMap[modalKeys[0]][0].price ?? 0}`;
+                                    const price = modalMap[modalKeys[0]][0].price ?? 0;
+                                    return <span>{modalKeys[0]}: ₹{price}</span>;
                                 }
 
                                 // Case 2: 1 model, multiple variants
@@ -615,26 +614,37 @@ export default function My() {
                                     const prices = modalMap[modalKeys[0]].map(v => v?.price ?? 0);
                                     const min = Math.min(...prices);
                                     const max = Math.max(...prices);
-                                    return `₹${min} - ₹${max}`;
+                                    return <span>{modalKeys[0]}: ₹{min} - ₹{max}</span>;
                                 }
 
                                 // Case 3 or 4: multiple models
-                                return modalKeys.map((model) => {
-                                    const variants = modalMap[model];
-                                    const prices = variants.map(v => v?.price ?? 0);
-                                    const min = Math.min(...prices);
-                                    const max = Math.max(...prices);
-                                    const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
-                                    return `${model}: ${priceLabel}`;
-                                }).join(" | ");
+                                return (
+                                    <>
+                                        {modalKeys.map((model, idx) => {
+                                            const modelVariants = modalMap[model];
+                                            const prices = modelVariants.map(v => v?.price ?? 0);
+                                            const min = Math.min(...prices);
+                                            const max = Math.max(...prices);
+                                            const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
+                                            return (
+                                                <span className='block' key={model}>
+                                                    {model}: {priceLabel}
+                                                    {idx < modalKeys.length - 1 && <span className="mx-1"></span>}
+                                                </span>
+                                            );
+                                        })}
+                                    </>
+                                );
                             };
+
+
 
 
 
                             return (
                                 <div
                                     key={product.id}
-                                    className="group bg-white rounded-2xl overflow-hidden border border-[#B9B9B9] shadow-sm hover:shadow-lg transition-all duration-300 relative"
+                                    className="group flex flex-col justify-between bg-white p-4 overflow-hidden  shadow-sm hover:shadow-md  transition-all duration-300 relative"
                                 >
                                     {/* FLIPPING IMAGE */}
                                     <div className="relative h-[200px] perspective">
@@ -655,14 +665,29 @@ export default function My() {
                                     </div>
 
                                     {/* CONTENT */}
-                                    <div className="p-3 relative ">
-                                        <div className="flex flex-wrap justify-between items-center">
+                                    <div className="py-3 relative ">
+                                        <div className="">
                                             <h2 className="text-lg font-semibold">{productName}</h2>
                                             {product.variants.length > 0 && (
-                                                <p className="text-black font-bold">
+                                                <p className="font-semibold">
                                                     {getPriceDisplay(product.variants)}
                                                 </p>
                                             )}
+                                        </div>
+                                        <div className="flex items-center gap-1 text-sm text-gray-700">
+                                            <span>{product.variants?.rating || 4.3}</span>
+                                            <div className="flex gap-[1px] text-orange-500">
+                                                {Array.from({ length: 5 }).map((_, i) => (
+                                                    <Star
+                                                        key={i}
+                                                        className={`w-4 h-4 fill-current ${i < Math.round(product.variants?.rating || 4.3)
+                                                            ? 'fill-orange-500'
+                                                            : 'fill-gray-300'
+                                                            }`}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <span className="ml-1 text-gray-500">4,800</span>
                                         </div>
 
                                         <div className="mt-2 space-y-1 text-sm text-gray-700">
