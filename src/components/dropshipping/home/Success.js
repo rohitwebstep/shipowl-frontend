@@ -79,7 +79,7 @@ export default function Success() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-white text-center p-4">
         <XCircle className="w-20 h-20 text-red-500 mb-6" />
         <h1 className="text-xl font-semibold text-red-600">Connection Failed</h1>
-        <p className="text-gray-500 mt-2">We couldn't connect your store. Please try again.</p>
+        <p className="text-gray-500 mt-2">We could not connect your store. Please try again.</p>
         <button
           className="bg-red-500 rounded-md p-3 text-white mt-3"
           onClick={() => router.push("/dropshipping/shopify/failed")}
