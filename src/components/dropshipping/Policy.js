@@ -3,7 +3,7 @@ import React from 'react'
 export default function Policy() {
     return (
         <>
-            <div className='bg-white p-10 rounded-md'>
+            <div className='bg-white p-10 rounded-md md:w-9/12 m-auto'>
                 <h3 className='text-4xl mb-5 font-bold '>Privacy Policy</h3>
                 <p>(Last updated on October 2023)</p>
                 <h5 className='text-xl font-bold mt-10 mb-4'>Introduction</h5>
