@@ -423,7 +423,7 @@ export default function ProductDetails() {
         console.log("DEFAULT CASE: push all variants");
 
         simplifiedVariants = inventoryData.variant.map((v) => ({
-          variantId: v.productVariantId || v.productVariantId,
+          variantId: v.id || v.id,
           price: v.dropPrice,
         }));
       }

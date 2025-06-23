@@ -35,8 +35,8 @@ const NewlyLaunched = () => {
   const { fetchImages } = useImageURL();
   const [activeModal, setActiveModal] = useState("");
   const [openSection, setOpenSection] = useState(null);
-    const [activeModalPushToShopify, setActiveModalPushToShopify] = useState('Shipowl');
-  
+  const [activeModalPushToShopify, setActiveModalPushToShopify] = useState('Shipowl');
+
   const [form, setForm] = useState({
     dropPrice: '',
     totalOrderQty: '',
@@ -172,168 +172,167 @@ const NewlyLaunched = () => {
   });
 
 
-   const handleSubmit = async (e) => {
-      e.preventDefault();
-      setLoading(true);
-  
-      const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-      if (dropshipperData?.project?.active_panel !== "dropshipper") {
-        localStorage.clear("shippingData");
-        router.push("/dropshipper/auth/login");
-        return;
-      }
-  
-      const token = dropshipperData?.security?.token;
-      if (!token) {
-        router.push("/dropshipper/auth/login");
-        return;
-      }
-  
-      try {
-        Swal.fire({
-          title: 'Creating Product...',
-          text: 'Please wait while we save your Product.',
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          }
-        });
-  
-        const form = new FormData();
-        let simplifiedVariants = [];
-  
-        console.log("Inventory Data:", inventoryData);
-        console.log("Grouped By Model:", groupedByModalForPushToShopify);
-        console.log("Model Names:", modalNamesForPushToShopify);
-        console.log("Total Modals:", totalModalsForPushToShopify);
-  
-        if (
-          totalModalsForPushToShopify === 2 &&
-          modalNamesForPushToShopify.every((model) => groupedByModalForPushToShopify[model]?.length === 1)
-        ) {
-          console.log("CASE: 2 modals, 1 variant each");
-  
-          const selectedVariant = inventoryData.variant.find((v) => v.selected);
-          console.log("Selected Variant Entry:", selectedVariant);
-  
-          if (selectedVariant) {
-            simplifiedVariants = [{
-              variantId: selectedVariant.id || selectedVariant.variantId,
-              price: selectedVariant.dropPrice,
-            }];
-          }
-  
-        } else if (
-          totalModalsForPushToShopify === 1 &&
-          groupedByModalForPushToShopify[modalNamesForPushToShopify[0]]?.length > 1
-        ) {
-          console.log("CASE: 1 model, multiple variants — push ALL from that model");
-  
-          const model = modalNamesForPushToShopify[0];
-          const variants = groupedByModalForPushToShopify[model];
-  
-          simplifiedVariants = variants.map((v) => ({
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+    if (dropshipperData?.project?.active_panel !== "dropshipper") {
+      localStorage.clear("shippingData");
+      router.push("/dropshipper/auth/login");
+      return;
+    }
+
+    const token = dropshipperData?.security?.token;
+    if (!token) {
+      router.push("/dropshipper/auth/login");
+      return;
+    }
+
+    try {
+      Swal.fire({
+        title: 'Creating Product...',
+        text: 'Please wait while we save your Product.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      const form = new FormData();
+      let simplifiedVariants = [];
+
+      console.log("Inventory Data:", inventoryData);
+      console.log("Grouped By Model:", groupedByModalForPushToShopify);
+      console.log("Model Names:", modalNamesForPushToShopify);
+      console.log("Total Modals:", totalModalsForPushToShopify);
+
+      if (
+        totalModalsForPushToShopify === 2 &&
+        modalNamesForPushToShopify.every((model) => groupedByModalForPushToShopify[model]?.length === 1)
+      ) {
+        console.log("CASE: 2 modals, 1 variant each");
+
+        const selectedVariant = inventoryData.variant.find((v) => v.selected);
+        console.log("Selected Variant Entry:", selectedVariant);
+
+        if (selectedVariant) {
+          simplifiedVariants = [{
+            variantId: selectedVariant.id || selectedVariant.variantId,
+            price: selectedVariant.dropPrice,
+          }];
+        }
+
+      } else if (
+        totalModalsForPushToShopify === 1 &&
+        groupedByModalForPushToShopify[modalNamesForPushToShopify[0]]?.length > 1
+      ) {
+        console.log("CASE: 1 model, multiple variants — push ALL from that model");
+
+        const model = modalNamesForPushToShopify[0];
+        const variants = groupedByModalForPushToShopify[model];
+
+        simplifiedVariants = variants.map((v) => ({
+          variantId: v.id || v.variantId,
+          price: v.dropPrice,
+        }));
+
+        console.log("Variants pushed:", simplifiedVariants);
+
+      } else if (
+        totalModalsForPushToShopify > 1 &&
+        modalNamesForPushToShopify.some((model) => groupedByModalForPushToShopify[model]?.length > 1)
+      ) {
+        console.log("CASE: multiple modals with multiple variants — push all from selected model");
+
+        if (selectedVariant) {
+          const selectedModal =
+            activeModalPushToShopify || "Unknown";
+
+          const modalVariants = groupedByModalForPushToShopify[selectedModal] || [];
+
+          simplifiedVariants = modalVariants.map((v) => ({
             variantId: v.id || v.variantId,
             price: v.dropPrice,
           }));
-  
-          console.log("Variants pushed:", simplifiedVariants);
-  
-        } else if (
-          totalModalsForPushToShopify > 1 &&
-          modalNamesForPushToShopify.some((model) => groupedByModalForPushToShopify[model]?.length > 1)
-        ) {
-          console.log("CASE: multiple modals with multiple variants — push all from selected model");
-  
-          if (selectedVariant) {
-            const selectedModal =
-              activeModalPushToShopify || "Unknown";
-  
-            const modalVariants = groupedByModalForPushToShopify[selectedModal] || [];
-  
-            simplifiedVariants = modalVariants.map((v) => ({
-              variantId: v.id || v.variantId,
-              price: v.dropPrice,
-            }));
-  
-            console.log("Selected Model:", selectedModal);
-            console.log("Variants in Selected Model:", modalVariants);
-          }
-  
-        } else {
-          console.log("DEFAULT CASE: push all variants");
-  
-          simplifiedVariants = inventoryData.variant.map((v) => ({
-            variantId: v.productVariantId || v.productVariantId,
-            price: v.dropPrice,
-          }));
+
+          console.log("Selected Model:", selectedModal);
+          console.log("Variants in Selected Model:", modalVariants);
         }
-  
-        console.log("Final simplifiedVariants to submit:", simplifiedVariants);
-  
-        form.append('supplierProductId', inventoryData.supplierProductId);
-        form.append('shopifyApp', inventoryData.shopifyApp);
-        form.append('variants', JSON.stringify(simplifiedVariants));
-  
-  
-  
-        const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
-  
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: form,
-        });
-  
-        const result = await response.json();
-  
-        Swal.close();
-  
-        if (!response.ok) {
-          Swal.fire({
-            icon: "error",
-            title: "Creation Failed",
-            text: result.message || result.error || "An error occurred",
-          });
-          return;
-        }
-  
-        // On success
-        Swal.fire({
-          icon: "success",
-          title: "Product Created",
-          text: result.message || "The Product has been created successfully!",
-          showConfirmButton: true,
-        }).then((res) => {
-          if (res.isConfirmed) {
-            setInventoryData({
-              productId: "",
-              variant: [],
-              id: '',
-              model: 'Selfship',
-              shopifyApp: ''
-            });
-            setShowPopup(false);
-            fetchProduct('my');
-            setActiveTab('my');
-          }
-        });
-  
-  
-      } catch (error) {
-        console.error("Error:", error);
-        Swal.close();
+
+      } else {
+        console.log("DEFAULT CASE: push all variants");
+
+        simplifiedVariants = inventoryData.variant.map((v) => ({
+          variantId: v.id || v.id, price: v.dropPrice,
+        }));
+      }
+
+      console.log("Final simplifiedVariants to submit:", simplifiedVariants);
+
+      form.append('supplierProductId', inventoryData.supplierProductId);
+      form.append('shopifyApp', inventoryData.shopifyApp);
+      form.append('variants', JSON.stringify(simplifiedVariants));
+
+
+
+      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: form,
+      });
+
+      const result = await response.json();
+
+      Swal.close();
+
+      if (!response.ok) {
         Swal.fire({
           icon: "error",
-          title: "Submission Error",
-          text: error.message || "Something went wrong. Please try again.",
+          title: "Creation Failed",
+          text: result.message || result.error || "An error occurred",
         });
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
+
+      // On success
+      Swal.fire({
+        icon: "success",
+        title: "Product Created",
+        text: result.message || "The Product has been created successfully!",
+        showConfirmButton: true,
+      }).then((res) => {
+        if (res.isConfirmed) {
+          setInventoryData({
+            productId: "",
+            variant: [],
+            id: '',
+            model: 'Selfship',
+            shopifyApp: ''
+          });
+          setShowPopup(false);
+          fetchProduct('my');
+          setActiveTab('my');
+        }
+      });
+
+
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Submission Error",
+        text: error.message || "Something went wrong. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
   const tabs = [
     { key: "notmy", label: "Not Pushed to Shopify" },
     { key: "my", label: "Pushed to Shopify" },
