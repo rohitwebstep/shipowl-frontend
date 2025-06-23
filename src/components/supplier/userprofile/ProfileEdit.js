@@ -1,14 +1,14 @@
 'use client';
-import { useContext, useEffect, useState, useCallback } from 'react';
+import { useContext, useState, useCallback } from 'react';
 import { ProfileContext } from './ProfileContext';
-import profileImg from '@/app/images/editprofile.png';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import { Pencil } from 'lucide-react';
 import Select from 'react-select';
-
+import { useImageURL } from "@/components/ImageURLContext";
 const ProfileEdit = () => {
+  const { fetchImages } = useImageURL();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const {
@@ -191,8 +191,10 @@ const ProfileEdit = () => {
       <div className='md:w-2/12'>
         <div className='relative'>
           <Image
-            src={previewUrl || profileImg}
+            src={fetchImages(formData.profilePicture || previewUrl)}
             alt='Profile image'
+            height={50}
+            width={50}
             className='w-full h-full object-cover rounded-full p-3'
           />
           <input
@@ -287,29 +289,29 @@ const ProfileEdit = () => {
           </div>
 
           {/* City Select */}
+        </div>
+        <div className="relative mt-2">
+          <label className={labelClasses('permanentCity')}>
+            City <span className="text-red-500">*</span>
+          </label>
           <div className="relative">
-            <label className={labelClasses('permanentCity')}>
-              City <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <Select
-                name="permanentCity"
-                value={cityOptions.find(opt => opt.value === formData.permanentCity) || null}
-                onChange={(selected) => handleChange({ target: { name: "permanentCity", value: selected?.value } })}
-                options={cityOptions}
-                placeholder="Select City"
+            <Select
+              name="permanentCity"
+              value={cityOptions.find(opt => opt.value === formData.permanentCity) || null}
+              onChange={(selected) => handleChange({ target: { name: "permanentCity", value: selected?.value } })}
+              options={cityOptions}
+              placeholder="Select City"
 
-              />
-              {loading && (
-                <div className="absolute inset-y-0 right-3 flex items-center">
-                  <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
-                </div>
-              )}
-            </div>
-            {errors.permanentCity && (
-              <p className="text-red-500 text-sm mt-1">{errors.permanentCity}</p>
+            />
+            {loading && (
+              <div className="absolute inset-y-0 right-3 flex items-center">
+                <div className="loader border-t-transparent border-gray-400 border-2 w-5 h-5 rounded-full animate-spin"></div>
+              </div>
             )}
           </div>
+          {errors.permanentCity && (
+            <p className="text-red-500 text-sm mt-1">{errors.permanentCity}</p>
+          )}
         </div>
 
         {/* Buttons */}

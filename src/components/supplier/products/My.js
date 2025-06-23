@@ -526,7 +526,7 @@ export default function My() {
                     price: v.price,
                     sku: v.variant.sku || v.sku,
                     name: v.variant.name || v.name,
-                    modal: v.variant.modal || v.modal,
+                    model: v.variant.model || v.model,
                     color: v.variant.color || v.color,
                     suggested_price: v.price || v.price,
                     status: v.variant.status || v.status,
@@ -598,9 +598,9 @@ export default function My() {
                                 console.log('variants', variants)
                                 const modalMap = {};
                                 variants.forEach((variant) => {
-                                    const modal = variant?.variant?.modal || "Default";
-                                    if (!modalMap[modal]) modalMap[modal] = [];
-                                    modalMap[modal].push(variant);
+                                    const model = variant?.variant?.model || "Default";
+                                    if (!modalMap[model]) modalMap[model] = [];
+                                    modalMap[model].push(variant);
                                 });
 
                                 const modalKeys = Object.keys(modalMap);
@@ -619,13 +619,13 @@ export default function My() {
                                 }
 
                                 // Case 3 or 4: multiple models
-                                return modalKeys.map((modal) => {
-                                    const variants = modalMap[modal];
+                                return modalKeys.map((model) => {
+                                    const variants = modalMap[model];
                                     const prices = variants.map(v => v?.price ?? 0);
                                     const min = Math.min(...prices);
                                     const max = Math.max(...prices);
                                     const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
-                                    return `${modal}: ${priceLabel}`;
+                                    return `${model}: ${priceLabel}`;
                                 }).join(" | ");
                             };
 
@@ -841,7 +841,7 @@ export default function My() {
                                                                 </div>
 
                                                                 <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
-                                                                    <p><span className="font-semibold">Modal:</span> {variant.modal || "NIL"}</p>
+                                                                    <p><span className="font-semibold">Model:</span> {variant.model || "NIL"}</p>
                                                                     {isExists && (
                                                                         <>
                                                                             <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
@@ -977,7 +977,7 @@ export default function My() {
                                             </div>
 
                                             <div>
-                                                <p><span className="font-semibold">Model:</span> {variant.modal || 'NIL'}</p>
+                                                <p><span className="font-semibold">Model:</span> {variant.model || 'NIL'}</p>
 
                                                 <p><span className="font-semibold">Suggested Price:</span> ₹{variants.price ?? 'NIL'}</p>
                                             </div>

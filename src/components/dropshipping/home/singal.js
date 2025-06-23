@@ -31,7 +31,6 @@ export default function ProductDetails() {
   const [activeTab, setActiveTab] = useState('notmy');
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [activeModal, setActiveModal] = useState('Shipowl');
-  const [activeModalPushToShopify, setActiveModalPushToShopify] = useState('Shipowl');
   const images = selectedVariant?.variant?.image?.split(",") || selectedVariant?.supplierProductVariant?.variant?.image?.split(",") || [];
   const [selectedImage, setSelectedImage] = useState("");
   const [showPopup, setShowPopup] = useState(false);
@@ -53,7 +52,9 @@ export default function ProductDetails() {
   }, [selectedVariant]);
 
   const handleVariantChange = (id, field, value) => {
-    // If field is global (e.g., shopifyApp), update it at root level
+    console.log('id, field, value', id, field, value);
+
+    // Global fields (e.g., shopifyApp)
     if (id == null) {
       setInventoryData((prevData) => ({
         ...prevData,
@@ -62,34 +63,51 @@ export default function ProductDetails() {
       return;
     }
 
-
-    // Special handling for radio button field (e.g., 'selected')
-    if (field === 'selected') {
+    // For array of variants (bulk mode)
+    if (Array.isArray(inventoryData.variant)) {
+      if (field === 'selected') {
+        setInventoryData((prevData) => ({
+          ...prevData,
+          variant: prevData.variant.map((v) => ({
+            ...v,
+            selected: v.id === id,
+          })),
+        }));
+      } else {
+        setInventoryData((prevData) => ({
+          ...prevData,
+          variant: prevData.variant.map((v) =>
+            v.id === id
+              ? {
+                ...v,
+                [field]: ['qty', 'shipowl_price', 'dropStock', 'dropPrice'].includes(field)
+                  ? Number(value)
+                  : value,
+              }
+              : v
+          ),
+        }));
+      }
+    }
+    // For single variant object
+    else if (
+      typeof inventoryData.variant === 'object' &&
+      inventoryData.variant !== null &&
+      inventoryData.variant.id === id
+    ) {
       setInventoryData((prevData) => ({
         ...prevData,
-        variant: prevData.variant.map((v) => ({
-          ...v,
-          selected: v.id === id, // true for selected one, false for all others
-        })),
+        variant: {
+          ...prevData.variant,
+          [field]: ['qty', 'shipowl_price', 'dropStock', 'dropPrice'].includes(field)
+            ? Number(value)
+            : value,
+        },
       }));
-      return;
     }
-
-    // Standard field update
-    setInventoryData((prevData) => ({
-      ...prevData,
-      variant: prevData.variant.map((v) =>
-        v.id === id
-          ? {
-            ...v,
-            [field]: ['qty', 'shipowl_price', 'dropStock', 'dropPrice'].includes(field)
-              ? Number(value)
-              : value,
-          }
-          : v
-      ),
-    }));
   };
+
+  console.log('inventoryData', inventoryData)
 
   const stats = [{ label: "Units Sold", value: "200", icon: <Package className="w-7 h-7 text-orange-500" />, },
   { label: "Delivery Rate", value: "180", icon: <Truck className="w-7 h-7 text-orange-500" />, },
@@ -113,6 +131,9 @@ export default function ProductDetails() {
     return acc;
   }, {});
 
+
+
+
   const modalNames = Object.keys(groupedByModal);
   const totalModals = modalNames.length;
 
@@ -129,7 +150,8 @@ export default function ProductDetails() {
   const handleVariantClick = (variant) => {
     setSelectedVariant(variant);
   };
-
+  //model 
+  //calculation
   const [ordersGiven, setOrdersGiven] = useState(100);
   const productPrice = selectedVariant?.price || 'N/A';
   const shippingCost = shipCost || 75;
@@ -176,7 +198,6 @@ export default function ProductDetails() {
       });
 
       setActiveModal(cheapestModal);
-      setActiveModalPushToShopify(cheapestModal);
       setSelectedVariant(cheapestVariant.full);
     }
   }, [showPopup]); // Only runs when popup is shown
@@ -248,6 +269,7 @@ export default function ProductDetails() {
         url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory/${id}`;
       } else {
         url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/${id}`;
+
       }
       const response = await fetch(url, {
         method: "GET",
@@ -308,29 +330,6 @@ export default function ProductDetails() {
     fetchProductDetails();
   }, [fetchProductDetails]);
 
-  const variantsForPush = inventoryData?.variant || [];
-
-  const groupedByModalForPushToShopify = variantsForPush.reduce((acc, curr) => {
-    const model = curr?.model || curr?.variant?.model || curr?.supplierProductVariant?.variant?.model || "Unknown";
-    if (!acc[model]) acc[model] = [];
-    acc[model].push(curr);
-    return acc;
-  }, {});
-
-  const modalNamesForPushToShopify = Object.keys(groupedByModalForPushToShopify);
-  const totalModalsForPushToShopify = modalNamesForPushToShopify.length;
-
-  const getVariantDataForPushToShopify = (v) => ({
-    id: v?.id || v?.variant?.id,
-    name: v?.variant?.name || v?.supplierProductVariant?.variant?.name || "NIL",
-    model: v?.variant?.model || v?.supplierProductVariant?.variant?.model || "Unknown",
-    color: v?.variant?.color || v?.supplierProductVariant?.variant?.color || "NIL",
-    image: (v?.variant?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
-    suggested_price: v?.price || v?.suggested_price,
-    full: v,
-    selected: v?.selected || false
-  });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -359,82 +358,26 @@ export default function ProductDetails() {
       });
 
       const form = new FormData();
-      let simplifiedVariants = [];
 
-      console.log("Inventory Data:", inventoryData);
-      console.log("Grouped By Model:", groupedByModalForPushToShopify);
-      console.log("Model Names:", modalNamesForPushToShopify);
-      console.log("Total Modals:", totalModalsForPushToShopify);
+      // Normalize to array in case variant is a single object
+      const variantList = Array.isArray(inventoryData.variant)
+        ? inventoryData.variant
+        : [inventoryData.variant];
 
-      if (
-        totalModalsForPushToShopify === 2 &&
-        modalNamesForPushToShopify.every((model) => groupedByModalForPushToShopify[model]?.length === 1)
-      ) {
-        console.log("CASE: 2 modals, 1 variant each");
+      const simplifiedVariants = variantList.map((v) => ({
+        variantId: v.id || v.variantId,
+        price: Number(v.dropPrice) || 0,
+      }));
 
-        const selectedVariant = inventoryData.variant.find((v) => v.selected);
-        console.log("Selected Variant Entry:", selectedVariant);
-
-        if (selectedVariant) {
-          simplifiedVariants = [{
-            variantId: selectedVariant.id || selectedVariant.variantId,
-            price: selectedVariant.dropPrice,
-          }];
-        }
-
-      } else if (
-        totalModalsForPushToShopify === 1 &&
-        groupedByModalForPushToShopify[modalNamesForPushToShopify[0]]?.length > 1
-      ) {
-        console.log("CASE: 1 model, multiple variants — push ALL from that model");
-
-        const model = modalNamesForPushToShopify[0];
-        const variants = groupedByModalForPushToShopify[model];
-
-        simplifiedVariants = variants.map((v) => ({
-          variantId: v.id || v.variantId,
-          price: v.dropPrice,
-        }));
-
-        console.log("Variants pushed:", simplifiedVariants);
-
-      } else if (
-        totalModalsForPushToShopify > 1 &&
-        modalNamesForPushToShopify.some((model) => groupedByModalForPushToShopify[model]?.length > 1)
-      ) {
-        console.log("CASE: multiple modals with multiple variants — push all from selected model");
-
-        if (selectedVariant) {
-          const selectedModal =
-            activeModalPushToShopify || "Unknown";
-
-          const modalVariants = groupedByModalForPushToShopify[selectedModal] || [];
-
-          simplifiedVariants = modalVariants.map((v) => ({
-            variantId: v.id || v.variantId,
-            price: v.dropPrice,
-          }));
-
-          console.log("Selected Model:", selectedModal);
-          console.log("Variants in Selected Model:", modalVariants);
-        }
-
-      } else {
-        console.log("DEFAULT CASE: push all variants");
-
-        simplifiedVariants = inventoryData.variant.map((v) => ({
-          variantId: v.productVariantId || v.productVariantId,
-          price: v.dropPrice,
-        }));
+      // Ensure required fields are present
+      if (!inventoryData?.supplierProductId || !inventoryData?.shopifyApp || simplifiedVariants?.length === 0) {
+        throw new Error("Missing required fields: product, store, or variants");
       }
 
-      console.log("Final simplifiedVariants to submit:", simplifiedVariants);
-
-      form.append('supplierProductId', inventoryData.supplierProductId);
-      form.append('shopifyApp', inventoryData.shopifyApp);
-      form.append('variants', JSON.stringify(simplifiedVariants));
-
-
+      // Append form data
+      form.append("supplierProductId", inventoryData.supplierProductId);
+      form.append("shopifyApp", inventoryData.shopifyApp);
+      form.append("variants", JSON.stringify(simplifiedVariants));
 
       const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
 
@@ -447,7 +390,6 @@ export default function ProductDetails() {
       });
 
       const result = await response.json();
-
       Swal.close();
 
       if (!response.ok) {
@@ -463,7 +405,7 @@ export default function ProductDetails() {
       Swal.fire({
         icon: "success",
         title: "Product Created",
-        text: result.message || "The Product has been created successfully!",
+        text: result.message || "The product has been created successfully!",
         showConfirmButton: true,
       }).then((res) => {
         if (res.isConfirmed) {
@@ -475,12 +417,9 @@ export default function ProductDetails() {
             shopifyApp: ''
           });
           setShowPopup(false);
-          fetchProduct('my');
           setActiveTab('my');
         }
       });
-
-
     } catch (error) {
       console.error("Error:", error);
       Swal.close();
@@ -493,7 +432,7 @@ export default function ProductDetails() {
       setLoading(false);
     }
   };
-  console.log('setInventoryData', inventoryData)
+
   return (
     <>
       <section className="productsingal-page pb-[100px]">
@@ -597,12 +536,10 @@ export default function ProductDetails() {
                           const variant = getVariantData(groupedByModal[modalNames[0]][0]);
                           return (
                             <>
-                              <p>This product is available in the <strong>{modalNames[0]}</strong> model.</p>
+
                             </>
                           );
                         }
-
-
 
                         // CASE 2: 1 model, multiple variants
                         if (totalModals === 1 && groupedByModal[modalNames[0]].length > 1) {
@@ -1004,14 +941,16 @@ export default function ProductDetails() {
             <div className="flex flex-col shadow-md border border-gray-300 md:flex-row justify-center items-stretch gap-4 z-50 bg-white p-5 rounded-md fixed left-0 bottom-0 w-full">
               <div className="flex gap-3 justify-center ">
                 {/* Push to Shopify */}
+
+
                 {type === "notmy" ? (
                   <button
                     onClick={() => {
                       setShowPopup(true);
                       setInventoryData({
-                        supplierProductId: id,
+                        supplierProductId: productDetails.id,
                         id: productDetails.id,
-                        variant: variantDetails,
+                        variant: selectedVariant,
                         isVarientExists: productDetails?.isVarientExists,
                         model: '',
                         shopfyApp: '',
@@ -1049,9 +988,10 @@ export default function ProductDetails() {
 
           </div>
         </div>
-      </section>
+      </section >
       {showPopup && (() => {
-
+        const variant = selectedVariant?.variant;
+        console.log('selectedVariant', selectedVariant)
 
         return (
           <div className="fixed inset-0 bg-black/70 flex justify-end z-50">
@@ -1082,136 +1022,88 @@ export default function ProductDetails() {
                       className="border border-[#E0E2E7] p-2 rounded-md"
                       name="shopifyApp"
                       id="shopifyApp"
-                      onChange={(e) => handleVariantChange(null, 'shopifyApp', e.target.value)}
+                      onChange={(e) =>
+                        handleVariantChange(null, 'shopifyApp', e.target.value)
+                      }
                       value={inventoryData.shopifyApp || ''}
                     >
                       <option value="">Select Store</option>
                       {shopifyStores.map((item, index) => (
-                        <option value={item.id} key={index}>{item.name}</option>
+                        <option value={item.id} key={index}>
+                          {item.name}
+                        </option>
                       ))}
                     </select>
                   </div>
 
-                  {/* Variant Cases */}
-                  {(() => {
-                    if (totalModalsForPushToShopify === 1 && groupedByModalForPushToShopify[modalNamesForPushToShopify[0]].length === 1) {
-                      const variant = getVariantDataForPushToShopify(groupedByModalForPushToShopify[modalNamesForPushToShopify[0]][0]);
-                      return (
-                        <VariantCard
-                          variant={variant}
-                          handleVariantChange={handleVariantChange}
-                          fetchImages={fetchImages}
-                        />
-                      );
-                    }
+                  <div key={variant?.id} className="space-y-5 border p-4 rounded-lg shadow-sm">
+                    <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
+                      <Image
+                        src={fetchImages(variant?.image)}
+                        alt="Product"
+                        width={64}
+                        height={64}
+                        className="rounded border object-cover"
+                      />
+                      <div>
+                        <p className="text-sm font-medium leading-5 line-clamp-2">
+                          {variant?.name || 'Stainless Steel Cable Lock Ties'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                          Model:
+                          <span className="font-semibold text-[#4C4C4C]">{variant?.model || 'C2445129'}</span>
+                          <ClipboardCopy
+                            className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
+                            onClick={() => navigator.clipboard.writeText(variant?.model || '')}
+                          />
+                        </p>
+                      </div>
+                    </div>
 
-                    if (totalModalsForPushToShopify === 1) {
-                      return (
-                        <>
-                          <h3 className="text-xl font-semibold text-gray-800 mb-4">Model: {modalNamesForPushToShopify[0]}</h3>
-                          <div className="grid grid-cols-1 gap-4">
-                            {groupedByModalForPushToShopify[modalNamesForPushToShopify[0]]
-                              .map(getVariantDataForPushToShopify)
-                              .sort((a, b) => a.suggested_price - b.suggested_price)
-                              .map((variant, index) => (
-                                <div
-                                  key={index}
-                                  onClick={() => handleVariantChange(variant.id, 'selected', true)}
-                                  className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${variant.selected
-                                    ? 'border-dotted border-2 border-orange-600 shadow-md bg-orange-50'
-                                    : 'border-gray-300 hover:shadow-lg bg-white'
-                                    }`}
-                                >
-                                  <VariantCard
-                                    variant={variant}
-                                    handleVariantChange={handleVariantChange}
-                                    fetchImages={fetchImages}
-                                  />
-                                </div>
-                              ))}
-                          </div>
-                        </>
-                      );
-                    }
+                    {/* Pricing Section */}
+                    <div className="border-t pt-4 space-y-3">
+                      <div className="text-sm font-bold text-gray-700 flex items-center gap-2">Pricing</div>
 
-                    if (totalModalsForPushToShopify === 2 && modalNamesForPushToShopify.every(model => groupedByModalForPushToShopify[model].length === 1)) {
-                      return (
-                        <div className="mb-4 flex flex-col gap-4">
-                          {modalNamesForPushToShopify.map((model, index) => {
-                            const variant = getVariantDataForPushToShopify(groupedByModalForPushToShopify[model][0]);
-                            return (
-                              <label key={index} className="flex flex-col gap-2 cursor-pointer">
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="radio"
-                                    name="model"
-                                    value={model}
-                                    checked={variant.selected}
-                                    onChange={() => handleVariantChange(variant.id, 'selected', true)}
-                                  />
-                                  <span className="text-gray-800 font-medium">{model}</span>
-                                </div>
-                                {variant.selected && (
-                                  <VariantCard
-                                    variant={variant}
-                                    handleVariantChange={handleVariantChange}
-                                    fetchImages={fetchImages}
-                                  />
-                                )}
-                              </label>
-                            );
-                          })}
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
+                          Set Your Selling Price (₹)
+                          <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
                         </div>
-                      );
-                    }
+                        <input
+                          type="number"
+                          value={inventoryData?.variant?.dropPrice ?? ''}
+                          onChange={(e) =>
+                            handleVariantChange(inventoryData?.variant?.id, 'dropPrice', e.target.value)
+                          }
+                          className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+                        />
 
-                    if (totalModalsForPushToShopify > 1 &&
-                      modalNamesForPushToShopify.some((model) => groupedByModalForPushToShopify[model].length > 1)) {
-                      return (
-                        <>
-                          <div className="flex gap-3 mb-4 border-b">
-                            {modalNamesForPushToShopify.map((model, index) => (
-                              <button
-                                key={index}
-                                type="button"
-                                className={`px-8 uppercase py-2 rounded-t-lg text-sm text-black font-medium ${activeModalPushToShopify === model
-                                  ? 'bg-orange-500 text-white border-b-2 border-orange-500'
-                                  : 'border-transparent hover:text-white hover:bg-orange-500'
-                                  }`}
-                                onClick={() => setActiveModalPushToShopify(model)}
-                              >
-                                {model}
-                              </button>
-                            ))}
-                          </div>
+                      </div>
 
-                          <div className="grid grid-cols-1 gap-4">
-                            {(groupedByModalForPushToShopify[activeModalPushToShopify] || [])
-                              .map(getVariantDataForPushToShopify)
-                              .sort((a, b) => a.suggested_price - b.suggested_price)
-                              .map((variant, index) => (
-                                <div
-                                  key={index}
-                                  onClick={() => handleVariantChange(variant.id, 'selected', true)}
-                                  className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${variant.selected
-                                    ? 'border-dotted border-2 border-orange-600 shadow-md bg-orange-50'
-                                    : 'border-gray-300 hover:shadow-lg bg-white'
-                                    }`}
-                                >
-                                  <VariantCard
-                                    variant={variant}
-                                    handleVariantChange={handleVariantChange}
-                                    fetchImages={fetchImages}
-                                  />
-                                </div>
-                              ))}
-                          </div>
-                        </>
-                      );
-                    }
+                      <p className="text-sm font-semibold">
+                        Shipowl Price
+                        <span className="float-right">₹{selectedVariant?.price || 0}</span>
+                      </p>
+                      <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
+                        Including GST & Shipping Charges
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </p>
 
-                    return <div>No variant available.</div>;
-                  })()}
+                      <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
+                        Your Margin
+                        <span className="float-right">
+                          {inventoryData?.variant?.dropPrice != null && selectedVariant?.price != null && (
+                            <>₹{(inventoryData?.variant?.dropPrice || 0) - (selectedVariant?.price || 0)}</>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-gray-600 border-t pt-3">
+                      RTO & RVP charges are applicable and vary depending on the product weight.{" "}
+                      <span className="font-semibold underline cursor-pointer">View charges for this product</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Footer */}
@@ -1228,10 +1120,12 @@ export default function ProductDetails() {
             </div>
           </div>
         );
-      })()}
+      })()
+      }
 
 
-      <section className="py-5 pb-20">
+
+      <section className="py-5">
         <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm">
           {tabs.map((tab) => (
             <button
@@ -1325,7 +1219,7 @@ export default function ProductDetails() {
                           onClick={() => {
                             setShowPopup(true);
                             setInventoryData({
-                              supplierProductId: item.id,
+                              supplierProductId: product.id,
                               id: product.id,
                               variant: item.variants,
                               isVarientExists: product?.isVarientExists,
@@ -1355,77 +1249,11 @@ export default function ProductDetails() {
         )}
       </section>
 
+
+
     </>
   )
 }
-const VariantCard = ({ variant, handleVariantChange, fetchImages }) => {
-  if (!variant) return null;
 
-  return (
-    <div key={variant.id} className="space-y-5 border p-4 rounded-lg shadow-sm">
-      <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-        <Image
-          src={fetchImages(variant.image)}
-          alt="Product"
-          width={64}
-          height={64}
-          className="rounded border object-cover"
-        />
-        <div>
-          <p className="text-sm font-medium leading-5 line-clamp-2">
-            {variant.name || 'Stainless Steel Cable Lock Ties'}
-          </p>
-          <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-            Model:
-            <span className="font-semibold text-[#4C4C4C]">{variant.model || 'C2445129'}</span>
-            <ClipboardCopy
-              className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
-              onClick={() => navigator.clipboard.writeText(variant.model || '')}
-            />
-          </p>
-        </div>
-      </div>
 
-      {/* Pricing Section */}
-      <div className="border-t pt-4 space-y-3">
-        <div className="text-sm font-bold text-gray-700 flex items-center gap-2">Pricing</div>
 
-        <div className="flex items-center gap-2">
-          <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
-            Set Your Selling Price (₹)
-            <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
-          </div>
-          <input
-            type="number"
-            value={variant.full?.dropPrice || ''}
-            onChange={(e) => handleVariantChange(variant.id, 'dropPrice', e.target.value)}
-            className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
-          />
-        </div>
-
-        <p className="text-sm font-semibold">
-          Shipowl Price
-          <span className="float-right">₹{variant.suggested_price || 0}</span>
-        </p>
-        <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
-          Including GST & Shipping Charges
-          <HelpCircle className="w-3.5 h-3.5" />
-        </p>
-
-        <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
-          Your Margin
-          <span className="float-right">
-            {variant.full?.dropPrice != null && variant.suggested_price != null && (
-              <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
-            )}
-          </span>
-        </div>
-      </div>
-
-      <div className="text-xs text-gray-600 border-t pt-3">
-        RTO & RVP charges are applicable and vary depending on the product weight.{" "}
-        <span className="font-semibold underline cursor-pointer">View charges for this product</span>
-      </div>
-    </div>
-  );
-};

@@ -7,6 +7,7 @@ import React, { useState, useCallback, useEffect, useContext } from "react";
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import { ProfileContext } from './ProfileContext';
 import { useImageURL } from "@/components/ImageURLContext";
+import Image from 'next/image';
 const ProfileList = () => {
     const { fetchImages } = useImageURL();
     const [suppliers, setSuppliers] = useState([]);
@@ -197,21 +198,26 @@ const ProfileList = () => {
             <div className="grid gap-6 grid-cols-2 ">
                 <div className="bg-white rounded-2xl p-6 shadow-md">
                     <h3 className="text-2xl font-semibold text-[#2B3674] mb-4">Personal Information</h3>
-                    <div className="space-y-2 text-[#2B3674]">
-                        <p><strong>Name:</strong> {suppliers.name || '-'}</p>
-                        <p><strong>Email:</strong> {suppliers.email || '-'}</p>
-
-                        <p><strong>Permanent Address:</strong> {suppliers.permanentAddress || '-'}</p>
-                        <p><strong>State:</strong> {stateData.find(s => s.id === suppliers.permanentStateId)?.name || '-'}</p>
-                        <p><strong>City:</strong> {cityData.find(c => c.id === suppliers.permanentCityId)?.name || '-'}</p>
-                        <p><strong>Postal Code:</strong> {suppliers.permanentPostalCode || '-'}</p>
+                    <div className='flex gap-4 items-start'>
+                        <div>
+                            <Image src={fetchImages(suppliers.profilePicture)} alt={suppliers.name} height={200} className='rounded-md' width={200} />
+                        </div>
+                        <div className="space-y-2 text-[#2B3674]">
+                            <p><strong>Name:</strong> {suppliers.name || '-'}</p>
+                            <p><strong>Email:</strong> {suppliers.email || '-'}</p>
+                            <p><strong>Permanent Address:</strong> {suppliers.permanentAddress || '-'}</p>
+                            <p><strong>State:</strong> {stateData.find(s => s.id === suppliers.permanentStateId)?.name || '-'}</p>
+                            <p><strong>City:</strong> {cityData.find(c => c.id === suppliers.permanentCityId)?.name || '-'}</p>
+                            <p><strong>Postal Code:</strong> {suppliers.permanentPostalCode || '-'}</p>
+                        </div>
                     </div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-md">
                     <h3 className="text-2xl font-semibold text-[#2B3674] my-4">Company Details</h3>
                     <div className="space-y-2 text-[#2B3674]">
                         <p><strong>Company Name:</strong> {suppliers?.companyDetail?.companyName || '-'}</p>
                         <p><strong>Company PanNumber:</strong> {suppliers?.companyDetail?.companyPanNumber || '-'}</p>
                         <p><strong>Brand Name:</strong> {suppliers?.companyDetail?.brandName || '-'}</p>
-                        <p><strong>Brand Short Name:</strong> {suppliers?.companyDetail?.brandShortName || '-'}</p>
                         <p><strong>Billing Address:</strong> {suppliers?.companyDetail?.billingAddress || '-'}</p>
                         <p><strong>Billing Pincode:</strong> {suppliers?.companyDetail?.billingPincode || '-'}</p>
                         <p><strong>AadharCardHolderName:</strong> {suppliers?.companyDetail?.aadharCardHolderName || '-'}</p>

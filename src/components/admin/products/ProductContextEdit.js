@@ -36,7 +36,7 @@ const ProductProviderEdit = ({ children }) => {
         sku: '',
         product_link: '',
         name: '',
-        modal: '',
+        model: '',
         suggested_price: 0,
         image: null,
       },

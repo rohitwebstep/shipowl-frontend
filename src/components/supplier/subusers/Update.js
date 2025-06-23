@@ -3,14 +3,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
-import Select from "react-select";
 import { HashLoader } from "react-spinners";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import Image from "next/image"; 8
 import 'swiper/css/navigation';
+import dynamic from 'next/dynamic';
+const Select = dynamic(() => import('react-select'), { ssr: false });
+import { useImageURL } from "@/components/ImageURLContext";
 export default function Update() {
+  const { fetchImages } = useImageURL();
   const router = useRouter();
   const [permission, setPermission] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -342,8 +345,7 @@ export default function Update() {
               {formData.image?.split(',').map((img, index) => (
                 <SwiperSlide key={index} className="relative gap-3">
                   <Image
-                    src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
-                    alt={`Image ${index + 1}`}
+                    src={fetchImages(img)} alt={`Image ${index + 1}`}
                     width={500}
                     height={500}
                     className="me-3 p-2 object-cover rounded"
@@ -375,23 +377,23 @@ export default function Update() {
         ))}
 
         {/* Move the Status dropdown outside the loop */}
-       
+
       </div>
-        <div className="">
-          <label className="block text-[#232323] font-bold mb-1">
-            Status
-          </label>
-          <select
-            name="status"
-            value={formData.status || ''}
-            onChange={handleChange}
-            className={`w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]
+      <div className="">
+        <label className="block text-[#232323] font-bold mb-1">
+          Status
+        </label>
+        <select
+          name="status"
+          value={formData.status || ''}
+          onChange={handleChange}
+          className={`w-full p-3 border rounded-lg font-bold border-[#DFEAF2] text-[#718EBF]
                 }`}          >
-            <option value="">Select Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+          <option value="">Select Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
 
 
 
@@ -463,10 +465,10 @@ export default function Update() {
                   </div>
 
                   {/* Permission Checkboxes */}
-                   <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
+                  <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
                     {perms.map((perm) => (
                       <label key={perm.id} className="flex items-center space-x-2">
-                          <input
+                        <input
                           type="checkbox"
                           checked={
                             Array.isArray(formData.permissions)

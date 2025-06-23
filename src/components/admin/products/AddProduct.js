@@ -91,7 +91,7 @@ const AddProduct = () => {
         variants: (products.variants || []).map((variant) => ({
           id: variant.id || '',
           color: variant.color || '',
-          modal: variant.modal || '',
+          model: variant.model || '',
           sku: variant.sku || '',
           name: variant.name || '',
           suggested_price: variant.suggested_price || 0,

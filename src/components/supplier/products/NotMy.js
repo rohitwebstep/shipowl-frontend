@@ -368,7 +368,7 @@ export default function NotMy() {
                             </div>
 
                             <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
-                              <p><span className="font-semibold">Modal:</span> {variant.modal || "NIL"}</p>
+                              <p><span className="font-semibold">Model:</span> {variant.model || "NIL"}</p>
                               {isExists && (
                                 <>
                                   <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>

@@ -26,7 +26,7 @@ export default function CreatePayment() {
             payment_cycle: "JAN - MAY",
             wallet_balance: '₹361',
             payment_amout: '₹161',
-            modal: 'RTO',
+            model: 'RTO',
         },
         {
             id: 2,
@@ -34,7 +34,7 @@ export default function CreatePayment() {
             payment_cycle: "JAN - MAY",
             wallet_balance: '₹361',
             payment_amout: '₹161',
-            modal: 'RTO',
+            model: 'RTO',
         },
         {
             id: 3,
@@ -42,7 +42,7 @@ export default function CreatePayment() {
             payment_cycle: "JAN - MAY",
             wallet_balance: '₹361',
             payment_amout: '₹161',
-            modal: 'Warehouse',
+            model: 'Warehouse',
         },
         {
             id: 4,
@@ -50,7 +50,7 @@ export default function CreatePayment() {
             payment_cycle: "JAN - MAY",
             wallet_balance: '₹361',
             payment_amout: '₹161',
-            modal: 'RTO',
+            model: 'RTO',
         },
         {
             id: 5,
@@ -58,7 +58,7 @@ export default function CreatePayment() {
             payment_cycle: "JAN - MAY",
             wallet_balance: '₹361',
             payment_amout: '₹161',
-            modal: 'Warehouse',
+            model: 'Warehouse',
         },
 
     ];
@@ -205,7 +205,7 @@ export default function CreatePayment() {
                                         {item.payment_amout}</td>
                                     <td className="p-2 px-5 whitespace-nowrap">{item.wallet_balance}</td>
                                     <td className="p-2 px-5 whitespace-nowrap">
-                                        <button className={`rounded-2xl px-4 py-2 w-[130px] text-white ${item.modal == 'RTO' ? "bg-[#5CA4F9]" : "bg-[#01B574]"}`}>{item.modal}</button>
+                                        <button className={`rounded-2xl px-4 py-2 w-[130px] text-white ${item.model == 'RTO' ? "bg-[#5CA4F9]" : "bg-[#01B574]"}`}>{item.model}</button>
 
                                     </td>
 

@@ -7,9 +7,10 @@ import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import { Pencil } from 'lucide-react';
 import Select from 'react-select';
-
+import { useImageURL } from "@/components/ImageURLContext";
 const ProfileEdit = () => {
   const router = useRouter();
+  const {fetchImages} = useImageURL();
   const [loading, setLoading] = useState(false);
   const { formData, validate, errors, setErrors, setFormData, stateData, cityData, setCityData, setStateData, setActiveTab, countryData } = useContext(ProfileEditContext);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -171,7 +172,7 @@ const ProfileEdit = () => {
       <div className='md:w-2/12'>
         <div className="relative">
           <Image
-            src={previewUrl || profileImg}
+             src={fetchImages(formData.profilePicture) || previewUrl}
             alt="Profile image"
 
             className="w-full h-full max-w-[100px] object-cover rounded-full"

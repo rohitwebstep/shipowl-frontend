@@ -131,7 +131,7 @@ const ProfileProvider = ({ children }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-   const validateBusiness = () => {
+  const validateBusiness = () => {
     const newErrors = {};
 
     const alwaysRequiredFields = [
@@ -155,19 +155,22 @@ const ProfileProvider = ({ children }) => {
     const hasGST = !!formData.gstNumber?.trim();
     const hasAadhar = !!formData.aadharNumber?.trim();
 
-    if (hasGST ) {
-    
-      if (!hasGST) {
+
+    // GST section
+    if (hasGST) {
+      if (!formData.gstNumber?.trim()) {
         newErrors.gstNumber = requiredFields.gstNumber;
       }
       if (!formData.panCardHolderName?.trim()) {
         newErrors.panCardHolderName = requiredFields.panCardHolderName;
       }
-      if (!formData.gstDocument) {
+      if (
+        !Array.isArray(files.gstDocument) ||
+        files.gstDocument.length === 0
+      ) {
         newErrors.gstDocument = 'GST Document is required';
       }
     }
-
 
     // Aadhar section
     if (hasAadhar) {
@@ -183,17 +186,27 @@ const ProfileProvider = ({ children }) => {
       if (!formData.panCardHolderName?.trim()) {
         newErrors.panCardHolderName = requiredFields.panCardHolderName;
       }
-      if (!formData.panCardImage) {
+      if (
+        !Array.isArray(files.panCardImage) ||
+        files.panCardImage.length === 0
+      ) {
         newErrors.panCardImage = 'PAN Card Image is required';
       }
-      if (!formData.aadharCardImage) {
+      if (
+        !Array.isArray(files.aadharCardImage) ||
+        files.aadharCardImage.length === 0
+      ) {
         newErrors.aadharCardImage = 'Aadhar Card Image is required';
       }
     }
 
+
+
     setBusinessErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  console.log('files', files?.gstDocument)
+  console.log('formData', formData)
 
   return (
     <ProfileContext.Provider

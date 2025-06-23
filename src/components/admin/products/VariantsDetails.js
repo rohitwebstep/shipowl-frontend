@@ -52,10 +52,10 @@ export default function VariantDetails() {
 
       updatedVariants = isBoth
         ? [
-          { ...baseVariant, modal: 'Shipowl' },
-          { ...baseVariant, modal: 'Selfship' },
+          { ...baseVariant, model: 'Shipowl' },
+          { ...baseVariant, model: 'Selfship' },
         ]
-        : [{ ...baseVariant, modal: formData.list_as }];
+        : [{ ...baseVariant, model: formData.list_as }];
     }
 
     setFormData((prev) => ({
@@ -92,9 +92,9 @@ export default function VariantDetails() {
 
     let updatedVariants = [...formData.variants];
     if (formData.list_as === 'both') {
-      updatedVariants = [...updatedVariants, { ...newVariant, modal: 'Shipowl' }, { ...newVariant, modal: 'Selfship' }];
+      updatedVariants = [...updatedVariants, { ...newVariant, model: 'Shipowl' }, { ...newVariant, model: 'Selfship' }];
     } else {
-      updatedVariants = [...updatedVariants, { ...newVariant, modal: formData.list_as }];
+      updatedVariants = [...updatedVariants, { ...newVariant, model: formData.list_as }];
     }
 
     setFormData({ ...formData, variants: updatedVariants });
@@ -230,7 +230,7 @@ export default function VariantDetails() {
 
         <div className={`mt-5 lg:grid  hidden overflow-auto grid-cols-1 gap-6 items-center justify-between border-b border-[#E9EDF7] pb-2 mb-4 text-gray-600 font-semibold ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}>
           {formData.isVarientExists && (
-            <span className="text-[#A3AED0] whitespace-nowrap">Modal</span>
+            <span className="text-[#A3AED0] whitespace-nowrap">Model</span>
 
           )}
 
@@ -267,7 +267,7 @@ export default function VariantDetails() {
                 >
                   {formData.isVarientExists && (
                     <div>
-                      <input type="text" value={variant.modal} className='uppercase' name="modal" id="modal" readOnly />
+                      <input type="text" value={variant.model} className='uppercase' name="model" id="model" readOnly />
                     </div>
                   )}
 

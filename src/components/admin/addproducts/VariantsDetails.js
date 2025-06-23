@@ -33,11 +33,11 @@ export default function VariantDetails() {
 
       if (formData.list_as === 'both') {
         updatedVariants = [
-          { ...newVariant, modal: 'Shipowl' },
-          { ...newVariant, modal: 'Selfship' },
+          { ...newVariant, model: 'Shipowl' },
+          { ...newVariant, model: 'Selfship' },
         ];
       } else {
-        updatedVariants = [{ ...newVariant, modal: formData.list_as }];
+        updatedVariants = [{ ...newVariant, model: formData.list_as }];
       }
     }
     if (value === 'no') {
@@ -50,11 +50,11 @@ export default function VariantDetails() {
 
       if (formData.list_as === 'both') {
         updatedVariants = [
-          { ...newVariant, modal: 'Shipowl' },
-          { ...newVariant, modal: 'Selfship' },
+          { ...newVariant, model: 'Shipowl' },
+          { ...newVariant, model: 'Selfship' },
         ];
       } else {
-        updatedVariants = [{ ...newVariant, modal: formData.list_as }];
+        updatedVariants = [{ ...newVariant, model: formData.list_as }];
       }
     }
 
@@ -91,9 +91,9 @@ export default function VariantDetails() {
 
     let updatedVariants = [...formData.variants];
     if (formData.list_as === 'both') {
-      updatedVariants = [...updatedVariants, { ...newVariant, modal: 'Shipowl' }, { ...newVariant, modal: 'Selfship' }];
+      updatedVariants = [...updatedVariants, { ...newVariant, model: 'Shipowl' }, { ...newVariant, model: 'Selfship' }];
     } else {
-      updatedVariants = [...updatedVariants, { ...newVariant, modal: formData.list_as }];
+      updatedVariants = [...updatedVariants, { ...newVariant, model: formData.list_as }];
     }
 
     setFormData({ ...formData, variants: updatedVariants });
@@ -160,7 +160,7 @@ export default function VariantDetails() {
 
         <div className={`mt-5 lg:grid  hidden overflow-auto grid-cols-1 gap-6 items-center justify-between border-b border-[#E9EDF7] pb-2 mb-4 text-gray-600 font-semibold ${!showAddButton ? 'lg:grid-cols-5' : 'lg:grid-cols-8'}`}>
           {formData.isVarientExists && (
-            <span className="text-[#A3AED0] whitespace-nowrap">Modal</span>
+            <span className="text-[#A3AED0] whitespace-nowrap">Model</span>
 
           )}
 
@@ -197,7 +197,7 @@ export default function VariantDetails() {
                 >
                   {formData.isVarientExists && (
                     <div>
-                      <input type="text" value={variant.modal} name="modal" id="modal" readOnly />
+                      <input type="text" value={variant.model} name="model" id="model" readOnly />
                     </div>
                   )}
 
@@ -267,7 +267,7 @@ export default function VariantDetails() {
 
                       <div className="md:flex justify-end">
                         <span className="text-orange-500 font-semibold lg:hidden block">Images</span>
-                        <div className="relative border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
+                        <div className="relative overflow-auto border border-[#DFEAF2] rounded-lg p-2 w-16 h-16 flex items-center justify-center">
                           {(() => {
                             const imageKey = `variant_images_${index}`;
                             const files = formData[imageKey] || [];
@@ -282,6 +282,7 @@ export default function VariantDetails() {
                           <input
                             type="file"
                             multiple
+                            accept="image/*"
                             className="absolute opacity-0 w-full h-full cursor-pointer"
                             onChange={(e) => handleFileChange(e, index)}
                           />

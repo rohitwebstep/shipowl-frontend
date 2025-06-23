@@ -9,8 +9,10 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useDropshipper } from "../middleware/DropshipperMiddleWareContext";
-
+import { useImageURL } from "@/components/ImageURLContext";
+import Image from "next/image";
 export default function List() {
+    const { fetchImages } = useImageURL();
     const [isTrashed, setIsTrashed] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -19,13 +21,11 @@ export default function List() {
     const router = useRouter();
     const fetchUsers = useCallback(async () => {
         const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-
         if (dropshipperData?.project?.active_panel !== "dropshipper") {
             localStorage.removeItem("shippingData");
             router.push("/dropshipping/auth/login");
             return;
         }
-
         const dropshippertoken = dropshipperData?.security?.token;
         if (!dropshippertoken) {
             router.push("/dropshipping/auth/login");
@@ -455,9 +455,10 @@ export default function List() {
                                     <th className="p-2 whitespace-nowrap px-5 text-left uppercase">Profile Picture</th>
                                     <th className="p-2 whitespace-nowrap px-5 text-end uppercase flex justify-end">Action</th>
                                 </tr>
+
                             </thead>
                             <tbody>
-                                {data.map((item,index) => (
+                                {data.map((item, index) => (
                                     <tr key={item.id} className="border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
 
                                         <td className="p-2 whitespace-nowrap text-left px-5">{index + 1}</td>
@@ -465,7 +466,9 @@ export default function List() {
                                         <td className="p-2 whitespace-nowrap px-5">{item.email || 'NIL'}</td>
                                         <td className="p-2 whitespace-nowrap px-5">  {item.role ? item.role.replace(/_/g, ' ') : 'NIL'}</td>
                                         <td className="p-2 whitespace-nowrap px-5">{item.phoneNumber || 'NIL'}</td>
-                                        <td className="p-2 whitespace-nowrap px-5"> <img src={item.image} alt={item.name} /></td>
+                                        <td className="p-2 whitespace-nowrap px-5">
+                                            <Image height={50} width={50} src={fetchImages(item.profilePicture)}
+                                                alt={item.name} /></td>
                                         <td className="p-2 px-5 text-[#8F9BBA] text-center">
 
                                             <div className="flex justify-end gap-2">{isTrashed ? (

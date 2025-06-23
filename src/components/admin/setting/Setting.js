@@ -63,7 +63,7 @@ export default function Setting() {
                 value="••••••••"
                 icon={<FiLock />}
                 actionText="Change"
-                onActionClick={() => alert("Password Change Modal")}
+                onActionClick={() => alert("Password Change Model")}
               />
             </div>
           </div>

@@ -241,26 +241,28 @@ export default function List() {
                                                             <div className="w-4 me-2 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
                                                                 <FaCheck className="peer-checked:block text-white w-3 h-3" />
                                                             </div>
-                                                            {item.image && (<Swiper
+                                                            {item.image ? (<Swiper
                                                                 key={item.id}
                                                                 modules={[Navigation]}
                                                                 slidesPerView={1}
                                                                 loop={item.image?.split(',').length > 1}
                                                                 navigation={true}
-                                                                className="mySwiper w-[50px] ms-2"
+                                                                className="mySwiper w-[250px] ms-2"
                                                             >
                                                                 {item.image?.split(',').map((img, index) => (
                                                                     <SwiperSlide key={index}>
                                                                         <Image
                                                                             src={fetchImages(img)}
                                                                             alt={`Image ${index + 1}`}
-                                                                            width={100}
-                                                                            height={100}
-                                                                            className="me-3 object-cover rounded"
+                                                                            width={200}
+                                                                            height={200}
+                                                                            className="me-3 text-center object-cover rounded"
                                                                         />
                                                                     </SwiperSlide>
                                                                 ))}
-                                                            </Swiper>)}
+                                                            </Swiper>):(
+                                                                <p className="text-red-500 me-2">No Images Found</p>
+                                                            )}
 
                                                         </label>
                                                         {item.name}

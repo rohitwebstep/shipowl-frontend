@@ -9,8 +9,10 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useAdmin } from "../middleware/AdminMiddleWareContext";
-
+import { useImageURL } from "@/components/ImageURLContext";
+import Image from "next/image";
 export default function List() {
+    const { fetchImages } = useImageURL();
     const [isTrashed, setIsTrashed] = useState(false);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -519,7 +521,7 @@ export default function List() {
                                         <td className="p-2 whitespace-nowrap px-5">{item.email || 'NIL'}</td>
                                         <td className="p-2 whitespace-nowrap px-5">  {item.role ? item.role.replace(/_/g, ' ') : 'NIL'}</td>
                                         <td className="p-2 whitespace-nowrap px-5">{item.phoneNumber || 'NIL'}</td>
-                                        <td className="p-2 whitespace-nowrap px-5"> <img src={item.image} alt={item.name} /></td>
+                                        <td className="p-2 whitespace-nowrap px-5"><Image height={50} width={50} src={fetchImages(item.profilePicture)} /></td>
                                         <td className="p-2 px-5 text-[#8F9BBA] text-center">
 
                                             <div className="flex justify-end gap-2">{isTrashed ? (

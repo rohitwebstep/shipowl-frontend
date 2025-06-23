@@ -7,9 +7,7 @@ import { useRouter } from 'next/navigation';
 
 export default function ShippingDetails() {
   const { formData, validateForm2, setFormData, shippingErrors, fileFields, setActiveTabs, videoFields } = useContext(ProductContext);
-
   const router = useRouter();
-
   const handleFileChange = (event, key) => {
     const selectedFiles = Array.from(event.target.files);
 
@@ -19,9 +17,6 @@ export default function ShippingDetails() {
       [key]: selectedFiles,
     }));
   };
-
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,9 +51,6 @@ export default function ShippingDetails() {
       };
     });
   };
-
-
-
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -10,13 +10,12 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Select from 'react-select';
-
+import { useImageURL } from "@/components/ImageURLContext";
 const BusinessInfo = () => {
   const { formData, requiredFields, businessErrors, validateBusiness, setBusinessErrors, setFiles, setFormData, stateData, cityData, setCityData, setStateData, setActiveTab, countryData } = useContext(ProfileEditContext);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
-
+  const { fetchImages } = useImageURL();
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -49,8 +48,6 @@ const BusinessInfo = () => {
       [name]: '', // Reset error for the field
     }));
   };
-
-
 
   const fetchState = useCallback(async (id) => {
     const adminData = JSON.parse(localStorage.getItem("shippingData"));
@@ -142,9 +139,8 @@ const BusinessInfo = () => {
   }, [router]);
 
   const searchParams = useSearchParams();
-
-
   const id = searchParams.get("id");
+
   const handleImageDelete = async (index, type) => {
     setLoading(true);
 
@@ -219,11 +215,8 @@ const BusinessInfo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateBusiness()) return;
-
     setLoading(true);
-
     const adminData = JSON.parse(localStorage.getItem("shippingData"));
     if (!adminData?.project?.active_panel === "admin") {
       localStorage.clear("shippingData");
@@ -347,6 +340,8 @@ const BusinessInfo = () => {
       setLoading(false);
     }
   };
+
+
   const labelClasses = (field) => "block text-[#232323] font-bold mb-1";
   const inputClasses = (field) =>
     `w-full p-3 border rounded-lg font-bold ${businessErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'} text-[#718EBF]`;
@@ -598,7 +593,7 @@ const BusinessInfo = () => {
 
                   {/* Image */}
                   <Image
-                    src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                    src={fetchImages(img)}
                     alt={`Image ${index + 1}`}
                     width={500}
                     height={500}
@@ -662,7 +657,7 @@ const BusinessInfo = () => {
                       </button>
                       {/* Image */}
                       <Image
-                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}
@@ -726,7 +721,7 @@ const BusinessInfo = () => {
                       </button>
                       {/* Image */}
                       <Image
-                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}
@@ -812,7 +807,7 @@ const BusinessInfo = () => {
                       </button>
                       {/* Image */}
                       <Image
-                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}
@@ -876,7 +871,7 @@ const BusinessInfo = () => {
                       </button>
                       {/* Image */}
                       <Image
-                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}

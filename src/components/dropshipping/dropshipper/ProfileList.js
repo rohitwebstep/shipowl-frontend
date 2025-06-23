@@ -4,9 +4,11 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
 import React, { useState, useCallback, useEffect } from "react";
-
+import Image from 'next/image';
 import { useDropshipper } from '../middleware/DropshipperMiddleWareContext';
+import { useImageURL } from "@/components/ImageURLContext";
 const ProfileList = () => {
+    const { fetchImages } = useImageURL();
     const [suppliers, setSuppliers] = useState([]);
     const { verifyDropShipperAuth } = useDropshipper();
     const [cityData, setCityData] = useState([]);
@@ -105,6 +107,9 @@ const ProfileList = () => {
             setLoading(false);
         }
     }, [router]);
+      const handleEditBank = () => {
+        router.push(`/dropshipping/bank/update`);
+    }
 
     const fetchState = useCallback(async () => {
         const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -192,6 +197,8 @@ const ProfileList = () => {
             <div className="bg-white rounded-2xl p-6 shadow-md">
                 <h3 className="text-xl font-semibold text-[#2B3674] mb-4">Personal Information</h3>
                 <div className="space-y-2 text-[#2B3674]">
+                    <Image src={fetchImages(suppliers.profilePicture)}
+                        alt={suppliers.name} height={200} width={200} />
                     <p><strong>Name:</strong> {suppliers.name || '-'}</p>
                     <p><strong>Email:</strong> {suppliers.email || '-'}</p>
                     <p><strong>Website Url:</strong> {suppliers.website || '-'}</p>
@@ -225,6 +232,12 @@ const ProfileList = () => {
                 ) : (
                     <p className="text-[#A3AED0]">No bank account details available.</p>
                 )}
+                <div className="mt-4 text-right">
+                    {!suppliers.bankAccount ? (<button onClick={() => handleEditBank(suppliers.id)} className='bg-orange-500 text-white p-3 rounded-md'> Bank  Account Add Request</button>) : (
+                        <button onClick={() => handleEditBank(suppliers.id)} className='bg-orange-500 text-white p-3 rounded-md'> Bank  AccountUpdate Request</button>
+                    )
+                    }
+                </div>
             </div>
         </div>
 

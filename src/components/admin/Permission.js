@@ -157,7 +157,7 @@ function Permission() {
                 </tbody>
               </table>
 
-              {/* Modal */}
+              {/* Model */}
               {selectedPanel && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
                   <div className="bg-white p-6 rounded-lg max-w-3xl h-[600px] overflow-auto w-full relative">

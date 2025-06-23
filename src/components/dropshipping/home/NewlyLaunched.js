@@ -8,23 +8,35 @@ import Swal from 'sweetalert2';
 import { IoIosArrowForward } from 'react-icons/io';
 import { HashLoader } from 'react-spinners';
 import productimg from '@/app/assets/product1.png';
-import gift from '@/app/assets/gift.png';
-import ship from '@/app/assets/delivery.png';
-import { X, ClipboardCopy, HelpCircle, Upload, Store } from 'lucide-react';
+import { X, ClipboardCopy, HelpCircle, Upload, Store, Star } from 'lucide-react';
 import CategorySection from './CatogorySection'
 import { FaCalculator } from "react-icons/fa";
 import { RiResetRightLine } from "react-icons/ri";
 import { RxCross1 } from "react-icons/rx";
 import { ChevronRight, ChevronDown } from "lucide-react"; // Optional: Lucide icons
-
 import { TbCube } from "react-icons/tb";
 import { GoArrowUpRight } from "react-icons/go";
 import { FiArrowDownLeft } from "react-icons/fi";
 import { useImageURL } from "@/components/ImageURLContext";
-
-
+import { useDropshipper } from '../middleware/DropshipperMiddleWareContext';
 const NewlyLaunched = () => {
+  const router = useRouter();
   const [shipCost, setShipCost] = useState([]);
+  const [showResult, setShowResult] = useState(false);
+  const [openCalculator, setOpenCalculator] = useState(null);
+  const [calculateData, setcalculateData] = useState('');
+  const [selectedVariant, setSelectedVariant] = useState('');
+  const [products, setProducts] = useState([]);
+  const [shopifyStores, setShopifyStores] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('notmy');
+  const [type, setType] = useState(false);
+  const { InputField, ResultItem, ProductInfo } = useDropshipper();
+  const { fetchImages } = useImageURL();
+  const [activeModal, setActiveModal] = useState("");
+  const [openSection, setOpenSection] = useState(null);
+    const [activeModalPushToShopify, setActiveModalPushToShopify] = useState('Shipowl');
+  
   const [form, setForm] = useState({
     dropPrice: '',
     totalOrderQty: '',
@@ -33,229 +45,11 @@ const NewlyLaunched = () => {
     adSpends: '',
     miscCharges: '',
   });
-  const tabs = [
-    { key: "notmy", label: "Not Pushed to Shopify" },
-    { key: "my", label: "Pushed to Shopify" },
-  ];
-
-
   const [errors, setErrors] = useState({});
-  const [showResult, setShowResult] = useState(false);
-  const [openCalculator, setOpenCalculator] = useState(null);
-  const [calculateData, setcalculateData] = useState('');
-  const router = useRouter();
-  const [products, setProducts] = useState([]);
-  const [shopifyStores, setShopifyStores] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('notmy');
-  const [type, setType] = useState(false);
-
-  const fetchProduct = useCallback(async (type) => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.removeItem("shippingData");
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    const dropshippertoken = dropshipperData?.security?.token;
-    if (!dropshippertoken) {
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=${type}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${dropshippertoken}`,
-        },
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        Swal.fire({
-          icon: "error",
-          title: "Something Wrong!",
-          text: result.error || result.message || "Your session has expired. Please log in again.",
-        });
-        throw new Error(result.message || result.error || "Something Wrong!");
-      }
-      setShipCost(result?.shippingCost || []);
-      setProducts(result?.products || []);
-      setShopifyStores(result?.shopifyStores || []);
-      setType(result?.type || '');
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
-
-  useEffect(() => {
-    fetchProduct(activeTab);
-  }, [fetchProduct, activeTab]);
-
-
-  const trashProducts = useCallback(async () => {
-    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
-
-    if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.removeItem("shippingData");
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    const dropshippertoken = dropshipperData?.security?.token;
-    if (!dropshippertoken) {
-      router.push("/dropshipping/auth/login");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory/trashed`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${dropshippertoken}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorMessage = await response.json();
-        Swal.fire({
-          icon: "error",
-          title: "Something Wrong!",
-          text: errorMessage.error || errorMessage.message || "Your session has expired. Please log in again.",
-        });
-        throw new Error(errorMessage.message || errorMessage.error || "Something Wrong!");
-      }
-
-      const result = await response.json();
-      if (result) {
-        setProducts(result?.products || []);
-      }
-    } catch (error) {
-      console.error("Error fetching trashed categories:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [router, setProducts]);
-
-  const viewProduct = (id) => {
-    if (type == "notmy") {
-      router.push(`/dropshipping/product/?id=${id}&type=${type}`);
-    } else {
-
-      router.push(`/dropshipping/product/?id=${id}`);
-    }
-  };
-
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[80vh]">
-        <HashLoader size={60} color="#F97316" loading={true} />
-      </div>
-    );
-  }
-  return (
-    <>
-      <CategorySection />
-      <section className="xl:p-6 pt-6">
-        <div className="container">
-          {/* Tabs shared for both sections */}
-          <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm ">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`md:px-6 py-2 font-medium px-2  md:text-xl border-b-2 transition-all duration-200
-                ${activeTab === tab.key
-                    ? "border-orange-500 text-orange-600"
-                    : "border-transparent text-gray-500 hover:text-orange-600"
-                  }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-
-          {/* Show No Data Found once if no products */}
-          {!loading && products.length === 0 ? (
-            <p className="text-center">No Data Found</p>
-          ) : (
-            <>
-              {/* Newly Launched Section */}
-              <Section
-                title="Newly Launched"
-                products={products}
-                viewProduct={viewProduct}
-                activeTab={activeTab}
-                type={type}
-                setShipCost={setShipCost}
-                form={form}
-                setForm={setForm}
-                setErrors={setErrors}
-                showResult={showResult}
-                setShowResult={setShowResult}
-                errors={errors}
-                setOpenCalculator={setOpenCalculator}
-                openCalculator={openCalculator}
-                setcalculateData={setcalculateData}
-                calculateData={calculateData}
-                shipCost={shipCost}
-                shopifyStores={shopifyStores}
-                trashProducts={trashProducts}
-                fetchProduct={fetchProduct}
-                setActiveTab={setActiveTab}
-              />
-
-              {/* Potential Heros Section */}
-              <Section
-                title="Potential Heros"
-                products={products}
-                viewProduct={viewProduct}
-                activeTab={activeTab}
-                setShipCost={setShipCost}
-                form={form}
-                type={type}
-                setErrors={setErrors}
-                showResult={showResult}
-                setShowResult={setShowResult}
-                errors={errors}
-                setForm={setForm}
-                setOpenCalculator={setOpenCalculator}
-                openCalculator={openCalculator}
-                setcalculateData={setcalculateData}
-                calculateData={calculateData}
-                shipCost={shipCost}
-                shopifyStores={shopifyStores}
-                trashProducts={trashProducts}
-                fetchProduct={fetchProduct}
-                setActiveTab={setActiveTab}
-
-              />
-            </>
-          )}
-        </div>
-      </section>
-    </>
-  );
-};
-
-const Section = ({ title, form, showResult, setForm, type, errors, setShowResult, setErrors, products, shopifyStores, calculateData, openCalculator, setOpenCalculator, setcalculateData, shipCost, setShipCost, setActiveTab, fetchProduct, activeTab }) => {
-  const { fetchImages } = useImageURL();
-  const [activeModal, setActiveModal] = useState("");
-  const [openSection, setOpenSection] = useState(null);
   const toggleSection = (section) => {
     setOpenSection(openSection === section ? null : section);
-  }; const handleChange = (key, value) => {
+  };
+  const handleChange = (key, value) => {
     const updatedForm = { ...form, [key]: value };
     setForm(updatedForm);
 
@@ -284,71 +78,14 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  // Safely parsed values
-
-
-  const dropPrice = parseFloat(form.dropPrice) || 0;
-
-  const totalOrderQty = parseFloat(form.totalOrderQty) || 0;
-
-  const confirmOrderPercentage = parseFloat(form.confirmOrderPercentage) || 0;
-
-  const deliveryPercentage = parseFloat(form.deliveryPercentage) || 0;
-
-  const deliveryRTOPercentage = 100 - deliveryPercentage;
-
-  const adSpends = parseFloat(form.adSpends) || 0;
-
-  const miscCharges = parseFloat(form.miscCharges) || 0;
-
-  const productPrice = calculateData?.price;
-  const deliveryCostPerUnit = shipCost;
-  // Derived Quantities
-  const confirmedQtyrAW = totalOrderQty * (confirmOrderPercentage / 100);
-  const confirmedQty = Math.round(confirmedQtyrAW);
-
-  // Calculate Delivered Quantity and round up if there is a decimal
-  const deliveredQtyRaw = confirmedQty * (deliveryPercentage / 100);
-  const deliveredQty = Math.round(deliveredQtyRaw);
-
-  // Calculate Delivered RTO Quantity
-  const deliveredRTOQty = confirmedQty - deliveredQty;
-
-
-  // Cost Calculations
-
-  const productCostForDelivered = deliveredQty * productPrice;
-
-  const revenueFromDelivered = deliveredQty * dropPrice;
-
-  const totalRTODeliveryCost = deliveredRTOQty * deliveryCostPerUnit;
-
-  // Final Margin Calculation
-  const totalAddSpend = adSpends * totalOrderQty; //order*adSpends
-  const perOrderMargin = dropPrice - productPrice;
-  const finalEarnings = perOrderMargin * deliveredQty;
-  const totalExpenses = totalRTODeliveryCost + totalAddSpend + miscCharges;
-  const finalMargin = finalEarnings - totalExpenses; //total earning-totalspend
-
-
-  const profitPerOrder = finalMargin / totalOrderQty;
   const [showPopup, setShowPopup] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [showVariantPopup, setShowVariantPopup] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const viewProduct = (id) => {
-    if (type == "notmy") {
-      router.push(`/dropshipping/product/?id=${id}&type=${type}`);
-    } else {
 
-      router.push(`/dropshipping/product/?id=${id}`);
-    }
-  };
-  const router = useRouter();
   const [inventoryData, setInventoryData] = useState({
     supplierProductId: "",
     id: '',
-    modal: 'Selfship',
+    model: 'Selfship',
     variant: [],
     isVarientExists: '',
     shopifyApp: '',
@@ -391,36 +128,40 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
       ),
     }));
   };
-  const groupedByModal = inventoryData.variant.reduce((acc, curr) => {
-    const modal = curr.variant.modal || "Unknown";
-    if (!acc[modal]) acc[modal] = [];
-    acc[modal].push(curr);
+  const variantsForPush = inventoryData?.variant || [];
+
+  const groupedByModalForPushToShopify = variantsForPush.reduce((acc, curr) => {
+    const model = curr?.model || curr?.variant?.model || curr?.supplierProductVariant?.variant?.model || "Unknown";
+    if (!acc[model]) acc[model] = [];
+    acc[model].push(curr);
     return acc;
   }, {});
 
-  const modalNames = Object.keys(groupedByModal);
-  const totalModals = modalNames.length;
+  const modalNamesForPushToShopify = Object.keys(groupedByModalForPushToShopify);
+  const totalModalsForPushToShopify = modalNamesForPushToShopify.length;
 
-  const getVariantData = (v) => ({
+  const getVariantDataForPushToShopify = (v) => ({
     id: v?.id || v?.variant?.id,
     name: v?.variant?.name || v?.supplierProductVariant?.variant?.name || "NIL",
-    modal: v?.variant?.modal || v?.supplierProductVariant?.variant?.modal || "Unknown",
+    model: v?.variant?.model || v?.supplierProductVariant?.variant?.model || "Unknown",
     color: v?.variant?.color || v?.supplierProductVariant?.variant?.color || "NIL",
     image: (v?.variant?.image || v?.supplierProductVariant?.variant?.image || "").split(",")[0],
     suggested_price: v?.price || v?.suggested_price,
     full: v,
+    selected: v?.selected || false
   });
+
   const [activeVariantId, setActiveVariantId] = useState(() => {
     if (
-      modalNames.length === 0 ||
+      modalNamesForPushToShopify.length === 0 ||
       !groupedByModal ||
-      !groupedByModal[modalNames[0]] ||
-      groupedByModal[modalNames[0]].length === 0
+      !groupedByModal[modalNamesForPushToShopify[0]] ||
+      groupedByModal[modalNamesForPushToShopify[0]].length === 0
     ) {
       return null;
     }
 
-    const variants = groupedByModal[modalNames[0]];
+    const variants = groupedByModal[modalNamesForPushToShopify[0]];
     const minPriceItem = variants.reduce((min, curr) => {
       const currentVariant = getVariantData(curr);
       const minVariant = getVariantData(min);
@@ -430,899 +171,608 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
     return getVariantData(minPriceItem).id;
   });
 
-  useEffect(() => {
-    if (
-      totalModals === 1 &&
-      groupedByModal?.[modalNames[0]]?.length > 1 &&
-      !activeVariantId // only set it if not already set
-    ) {
-      const variants = groupedByModal[modalNames[0]].map(getVariantData);
-      const minVariant = variants.reduce((min, curr) =>
-        curr.suggested_price < min.suggested_price ? curr : min,
-        variants[0]
-      );
-      setActiveVariantId(minVariant?.id || null);
-    }
-  }, [groupedByModal, modalNames, totalModals, activeVariantId]);
 
+   const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLoading(true);
+  
+      const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+      if (dropshipperData?.project?.active_panel !== "dropshipper") {
+        localStorage.clear("shippingData");
+        router.push("/dropshipper/auth/login");
+        return;
+      }
+  
+      const token = dropshipperData?.security?.token;
+      if (!token) {
+        router.push("/dropshipper/auth/login");
+        return;
+      }
+  
+      try {
+        Swal.fire({
+          title: 'Creating Product...',
+          text: 'Please wait while we save your Product.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+  
+        const form = new FormData();
+        let simplifiedVariants = [];
+  
+        console.log("Inventory Data:", inventoryData);
+        console.log("Grouped By Model:", groupedByModalForPushToShopify);
+        console.log("Model Names:", modalNamesForPushToShopify);
+        console.log("Total Modals:", totalModalsForPushToShopify);
+  
+        if (
+          totalModalsForPushToShopify === 2 &&
+          modalNamesForPushToShopify.every((model) => groupedByModalForPushToShopify[model]?.length === 1)
+        ) {
+          console.log("CASE: 2 modals, 1 variant each");
+  
+          const selectedVariant = inventoryData.variant.find((v) => v.selected);
+          console.log("Selected Variant Entry:", selectedVariant);
+  
+          if (selectedVariant) {
+            simplifiedVariants = [{
+              variantId: selectedVariant.id || selectedVariant.variantId,
+              price: selectedVariant.dropPrice,
+            }];
+          }
+  
+        } else if (
+          totalModalsForPushToShopify === 1 &&
+          groupedByModalForPushToShopify[modalNamesForPushToShopify[0]]?.length > 1
+        ) {
+          console.log("CASE: 1 model, multiple variants — push ALL from that model");
+  
+          const model = modalNamesForPushToShopify[0];
+          const variants = groupedByModalForPushToShopify[model];
+  
+          simplifiedVariants = variants.map((v) => ({
+            variantId: v.id || v.variantId,
+            price: v.dropPrice,
+          }));
+  
+          console.log("Variants pushed:", simplifiedVariants);
+  
+        } else if (
+          totalModalsForPushToShopify > 1 &&
+          modalNamesForPushToShopify.some((model) => groupedByModalForPushToShopify[model]?.length > 1)
+        ) {
+          console.log("CASE: multiple modals with multiple variants — push all from selected model");
+  
+          if (selectedVariant) {
+            const selectedModal =
+              activeModalPushToShopify || "Unknown";
+  
+            const modalVariants = groupedByModalForPushToShopify[selectedModal] || [];
+  
+            simplifiedVariants = modalVariants.map((v) => ({
+              variantId: v.id || v.variantId,
+              price: v.dropPrice,
+            }));
+  
+            console.log("Selected Model:", selectedModal);
+            console.log("Variants in Selected Model:", modalVariants);
+          }
+  
+        } else {
+          console.log("DEFAULT CASE: push all variants");
+  
+          simplifiedVariants = inventoryData.variant.map((v) => ({
+            variantId: v.productVariantId || v.productVariantId,
+            price: v.dropPrice,
+          }));
+        }
+  
+        console.log("Final simplifiedVariants to submit:", simplifiedVariants);
+  
+        form.append('supplierProductId', inventoryData.supplierProductId);
+        form.append('shopifyApp', inventoryData.shopifyApp);
+        form.append('variants', JSON.stringify(simplifiedVariants));
+  
+  
+  
+        const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
+  
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: form,
+        });
+  
+        const result = await response.json();
+  
+        Swal.close();
+  
+        if (!response.ok) {
+          Swal.fire({
+            icon: "error",
+            title: "Creation Failed",
+            text: result.message || result.error || "An error occurred",
+          });
+          return;
+        }
+  
+        // On success
+        Swal.fire({
+          icon: "success",
+          title: "Product Created",
+          text: result.message || "The Product has been created successfully!",
+          showConfirmButton: true,
+        }).then((res) => {
+          if (res.isConfirmed) {
+            setInventoryData({
+              productId: "",
+              variant: [],
+              id: '',
+              model: 'Selfship',
+              shopifyApp: ''
+            });
+            setShowPopup(false);
+            fetchProduct('my');
+            setActiveTab('my');
+          }
+        });
+  
+  
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.close();
+        Swal.fire({
+          icon: "error",
+          title: "Submission Error",
+          text: error.message || "Something went wrong. Please try again.",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+  const tabs = [
+    { key: "notmy", label: "Not Pushed to Shopify" },
+    { key: "my", label: "Pushed to Shopify" },
+  ];
 
-  console.log('inventoryData', inventoryData)
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const fetchProduct = useCallback(async (type) => {
     const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
     if (dropshipperData?.project?.active_panel !== "dropshipper") {
-      localStorage.clear("shippingData");
-      router.push("/dropshipper/auth/login");
+      localStorage.removeItem("shippingData");
+      router.push("/dropshipping/auth/login");
       return;
     }
 
     const token = dropshipperData?.security?.token;
     if (!token) {
-      router.push("/dropshipper/auth/login");
+      router.push("/dropshipping/auth/login");
       return;
     }
 
     try {
-      Swal.fire({
-        title: 'Creating Product...',
-        text: 'Please wait while we save your Product.',
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
+      setLoading(true);
+      const res = await fetch(
+        `https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/inventory?type=${type}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.message || "Something went wrong");
 
-      const form = new FormData();
-      let simplifiedVariants;
-      if (
-        totalModals === 2 &&
-        modalNames.every((modal) => groupedByModal[modal].length === 1)
-      ) {
-        const selectedModal = inventoryData.modal;
-
-        const selectedVariantEntry = inventoryData.variant.find(
-          (v) => v.variant?.modal === selectedModal
-        );
-
-        if (selectedVariantEntry) {
-          simplifiedVariants = [
-            {
-              variantId: selectedVariantEntry.id,
-              price: selectedVariantEntry.dropPrice,
-            },
-          ];
-        } else {
-          simplifiedVariants = [];
-        }
-      } else if (
-        totalModals > 1 &&
-        modalNames.some((modal) => groupedByModal[modal]?.length > 1)
-      ) {
-        const selectedVariantEntry = inventoryData.variant.find(
-          (v) => v.id === activeVariantId
-        );
-
-        if (selectedVariantEntry) {
-          simplifiedVariants = [
-            {
-              variantId: selectedVariantEntry.id,
-              price: selectedVariantEntry.dropPrice,
-            },
-          ];
-        } else {
-          simplifiedVariants = [];
-        }
-      } else if (
-        totalModals === 1 &&
-        groupedByModal[modalNames[0]]?.length > 1
-      ) {
-        const selectedVariantEntry = inventoryData.variant.find(
-          (v) => v.id === activeVariantId
-        );
-
-        if (selectedVariantEntry) {
-          simplifiedVariants = [
-            {
-              variantId: selectedVariantEntry.id,
-              price: selectedVariantEntry.dropPrice,
-            },
-          ];
-        } else {
-          simplifiedVariants = [];
-        }
-      } else {
-        simplifiedVariants = inventoryData.variant.map((v) => ({
-          variantId: v.id || v.variantId,
-          price: v.dropPrice,
-        }));
-      }
-
-
-
-      form.append('supplierProductId', inventoryData.supplierProductId);
-      form.append('shopifyApp', inventoryData.shopifyApp);
-      form.append('variants', JSON.stringify(simplifiedVariants));
-
-
-
-      const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/product/my-inventory";
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: form,
-      });
-
-      const result = await response.json();
-
-      Swal.close();
-
-      if (!response.ok) {
-        Swal.fire({
-          icon: "error",
-          title: "Creation Failed",
-          text: result.message || result.error || "An error occurred",
-        });
-        return;
-      }
-
-      // On success
-      Swal.fire({
-        icon: "success",
-        title: "Product Created",
-        text: result.message || "The Product has been created successfully!",
-        showConfirmButton: true,
-      }).then((res) => {
-        if (res.isConfirmed) {
-          setInventoryData({
-            productId: "",
-            variant: [],
-            id: '',
-            modal: 'Selfship',
-            shopifyApp: ''
-          });
-          setShowPopup(false);
-          fetchProduct('my');
-          setActiveTab('my');
-        }
-      });
-
-
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.close();
+      setShipCost(data?.shippingCost || []);
+      setProducts(data?.products || []);
+      setShopifyStores(data?.shopifyStores || []);
+      setType(data?.type || "");
+    } catch (err) {
       Swal.fire({
         icon: "error",
-        title: "Submission Error",
-        text: error.message || "Something went wrong. Please try again.",
+        title: "Error",
+        text: err.message || "Something went wrong",
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
 
+  useEffect(() => {
+    fetchProduct(activeTab);
+  }, [fetchProduct, activeTab]);
 
+  const viewProduct = (id) => {
+    if (type === "notmy") {
+      router.push(`/dropshipping/product/?id=${id}&type=${type}`);
+    } else {
+      router.push(`/dropshipping/product/?id=${id}`);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <HashLoader size={60} color="#F97316" loading />
+      </div>
+    );
+  }
 
   return (
     <>
-
-      <div className="flex justify-between items-center mb-4 mt-6">
-
-        <h2 className="md:text-[24px] text-lg text-[#F98F5C] font-lato font-bold">{title}</h2>
-        <Link href="/dropshipping/product-list" className="text-[16px] text-[#222222] hover:text-orange-500 flex items-center gap-2 font-lato">
-          View All <IoIosArrowForward className='text-[#F98F5C]' />
-        </Link>
-      </div>
-      <div className="md:w-[293px] border-b-3 border-[#F98F5C] mt-1 mb-4"></div>
-
-
-      <div className="products-grid pb-5 md:pb-0  grid grid-cols-2 xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
-        <div className="grid bg-[#212B36] rounded-xl shadow-xl overflow-hidden cursor-default">
-          <Image src={productimg} alt={`Best of ${title}`} className={`w-full  object-cover ${activeTab == "notmy" ? "md:max-h-[250px] h-[200px]" : "md:max-h-[230px] h-[200px]"}`} />
-          <div className="bg-[#212B36] bg-opacity-50 p-4 px-2 text-center text-white">
-            <p className="text-[16px] font-semibold font-lato">Best of {title}</p>
-            <p className="text-[15px] text-[#F98F5C] font-lato">{products.length} Products</p>
+      <CategorySection />
+      <section className="xl:p-6 pt-6">
+        <div className="container">
+          {/* Tabs */}
+          <div className="flex gap-4 bg-white rounded-md p-4 mb-8 font-lato text-sm">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`md:px-6 py-2 font-medium px-2 md:text-xl border-b-2 transition-all duration-200
+                  ${activeTab === tab.key
+                    ? "border-orange-500 text-orange-600"
+                    : "border-transparent text-gray-500 hover:text-orange-600"
+                  }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
+
+          {/* Section Heading */}
+          <div className="flex justify-between items-center mb-4 mt-6">
+            <h2 className="md:text-[24px] text-lg text-[#F98F5C] font-lato font-bold">
+              {activeTab === "notmy" ? "Newly Launched" : "Pushed Products"}
+            </h2>
+            <Link
+              href="/dropshipping/product-list"
+              className="text-[16px] text-[#222222] hover:text-orange-500 flex items-center gap-2 font-lato"
+            >
+              View All <IoIosArrowForward className="text-[#F98F5C]" />
+            </Link>
+          </div>
+          <div className="md:w-[293px] border-b-3 border-[#F98F5C] mt-1 mb-4"></div>
+
+          {/* Product Grid */}
+          {products.length === 0 ? (
+            <p className="text-center">No Data Found</p>
+          ) : (
+            <div className="products-grid pb-5 md:pb-0 grid grid-cols-2 xl:grid-cols-5 lg:grid-cols-3 gap-4 xl:gap-6 lg:gap-4 mt-4">
+              {/* Special Feature Box */}
+              <div className="grid bg-[#212B36] rounded-xl shadow-xl overflow-hidden cursor-default">
+                <Image
+                  src={productimg}
+                  alt="Best Product"
+                  className={`w-full object-cover ${activeTab === "notmy"
+                    ? "md:max-h-[250px] h-[200px]"
+                    : "md:max-h-[230px] h-[200px]"
+                    }`}
+                />
+                <div className="bg-[#212B36] bg-opacity-50 p-4 px-2 text-center text-white">
+                  <p className="text-[16px] font-semibold font-lato">Best of {activeTab === "notmy" ? "Newly Launched" : "Pushed Products"}</p>
+                  <p className="text-[15px] text-[#F98F5C] font-lato">{products.length} Products</p>
+                </div>
+              </div>
+
+              {products.map((product, index) => {
+
+                const productName = product?.product?.name || "NIL";
+                const variants = product?.variants || product?.variants?.supplierProductVariant || [];
+                const firstVariantImageString = variants[0]?.variant?.image || "";
+                const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";
+
+
+                return (
+                  <div
+                    key={index}
+                    tabIndex={0} // Allows focus via tap on mobile
+                    className="bg-white focus-within:z-10 rounded-xl group overflow-hidden cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02] outline-none"
+                  >
+                    {/* FLIP CARD */}
+                    <div onClick={() => viewProduct(product.id)} className={`relative md:h-[200px] h-[150px] perspective ${showVariantPopup === true ? 'z-20' : 'z-40'}`}>
+                      <div className="relative overflow-hidden w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
+                        {/* FRONT */}
+                        <Image
+                          src={fetchImages(imageUrl)}
+                          alt={productName}
+                          height={200}
+                          width={100}
+                          className="w-full h-full object-cover backface-hidden"
+
+                        />
+                        {/* BACK */}
+                        <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
+                          <span className="text-sm">Back View</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* PRODUCT DETAILS */}
+                    <div className="p-3 group-hover:pb-24 mb-4 relative z-0 bg-white">
+                      <div className="flex justify-between items-center">
+                        <p className="text-black font-bold nunito">
+                          ₹
+                          {product.variants.length === 1
+                            ? product.variants[0]?.price ||
+                            product.variants[0]?.supplierProductVariant?.price ||
+                            0
+                            : Math.min(
+                              ...product.variants.map(
+                                (v) =>
+                                  v?.price ??
+                                  v?.supplierProductVariant?.price ??
+                                  Infinity
+                              )
+                            )}
+                        </p>
+                      </div>
+                      <p className="text-[12px] text-[#ADADAD] capitalize font-lato font-semibold">
+                        {productName}
+                      </p>
+
+                      {/* INFO FOOTER */}
+                      <div className="flex items-center gap-1 text-sm text-gray-700">
+                        <span>{variants?.rating || 4.3}</span>
+                        <div className="flex gap-[1px] text-orange-500">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 fill-current ${i < Math.round(variants?.rating || 4.3)
+                                ? 'fill-orange-500'
+                                : 'fill-gray-300'
+                                }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="ml-1 text-gray-500">4,800</span>
+                      </div>
+                    </div>
+
+                    {/* INVISIBLE FOCUS HELPER (for mobile) */}
+                    <button className="absolute top-0 left-0 w-full h-full opacity-0 z-0" tabIndex={-1} />
+
+                    {/* SLIDE-IN ACTION PANEL */}
+                    <div
+                      className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 border border-gray-100 shadow
+                           opacity-0 translate-y-4 pointer-events-none
+                           group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
+                           focus-within:opacity-100 focus-within:translate-y-0 focus-within:pointer-events-auto
+                           group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto
+                           transition-all duration-300"
+                    >
+                      {activeTab === "notmy" && (
+                        <button
+                          onClick={() => {
+                            setShowPopup(true);
+                            setInventoryData({
+                              supplierProductId: product.id,
+                              id: product.id,
+                              variant: product.variants,
+                              isVarientExists: product?.product?.isVarientExists,
+                              shopifyApp: "",
+                              model: 'Selfship',
+                            });
+                          }}
+                          className="w-full py-2 px-4 md:text-sm  text-xs text-white rounded-md  bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
+                        >
+                          Push To Shopify
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => {
+                          setSelectedProduct(product);
+                          setShowVariantPopup(true);
+                        }}
+                        className="w-full mt-2 py-2 px-4 text-white rounded-md md:text-sm  text-xs bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
+                      >
+                        View Variants
+                      </button>
+
+                      {activeTab === "my" && (
+                        <button
+                          onClick={() => handleEdit(product.id)}
+                          className="w-full py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition-colors duration-200"
+                        >
+                          Edit From Shopify
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {products.map((product, index) => {
-
-          const productName = product?.product?.name || "NIL";
-          const variants = product?.variants || product?.variants?.supplierProductVariant || [];
-          const firstVariantImageString = variants[0]?.variant?.image || "";
-          const imageUrl = firstVariantImageString.split(",")[0]?.trim() || "/default-image.jpg";
+        {showPopup && (() => {
 
 
           return (
-            <div
-              key={index}
-              tabIndex={0} // Allows focus via tap on mobile
-              className="bg-white focus-within:z-10 rounded-xl group overflow-hidden cursor-pointer shadow-sm relative transition-transform duration-300 hover:shadow-lg hover:scale-[1.02] outline-none"
-            >
-              {/* FLIP CARD */}
-              <div onClick={() => viewProduct(product.id)} className={`relative md:h-[200px] h-[150px] perspective ${showVariantPopup === true ? 'z-20' : 'z-40'}`}>
-                <div className="relative overflow-hidden w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
-                  {/* FRONT */}
-                  <Image
-                    src={fetchImages(imageUrl)}
-                    alt={productName}
-                    height={200}
-                    width={100}
-                    className="w-full h-full object-cover backface-hidden"
-
-                  />
-                  {/* BACK */}
-                  <div className="absolute inset-0 bg-black bg-opacity-40 text-white flex items-center justify-center rotate-y-180 backface-hidden">
-                    <span className="text-sm">Back View</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* PRODUCT DETAILS */}
-              <div className="p-3 group-hover:pb-24 mb-4 relative z-0 bg-white">
-                <div className="flex justify-between items-center">
-                  <p className="text-black font-bold nunito">
-                    ₹
-                    {product.variants.length === 1
-                      ? product.variants[0]?.price ||
-                      product.variants[0]?.supplierProductVariant?.price ||
-                      0
-                      : Math.min(
-                        ...product.variants.map(
-                          (v) =>
-                            v?.price ??
-                            v?.supplierProductVariant?.price ??
-                            Infinity
-                        )
-                      )}
-                  </p>
-                </div>
-                <p className="text-[12px] text-[#ADADAD] capitalize font-lato font-semibold">
-                  {productName}
-                </p>
-
-                {/* INFO FOOTER */}
-                <div className="mt-3 pt-2 border-t border-[#EDEDED] flex items-center justify-between text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Image src={gift || "/icons/gift.svg"} className="w-5 h-5" alt="Gift" />
-                    <span className="font-lato text-[#2C3454] font-bold">100-10k</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Image src={ship || "/icons/ship.svg"} className="w-5 h-5" alt="Shipping" />
-                    <span className="font-lato text-[#2C3454] font-bold">4.5</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* INVISIBLE FOCUS HELPER (for mobile) */}
-              <button className="absolute top-0 left-0 w-full h-full opacity-0 z-0" tabIndex={-1} />
-
-              {/* SLIDE-IN ACTION PANEL */}
-              <div
-                className="absolute bottom-0 left-0 w-full p-3 bg-white z-10 border border-gray-100 shadow
-               opacity-0 translate-y-4 pointer-events-none
-               group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto
-               focus-within:opacity-100 focus-within:translate-y-0 focus-within:pointer-events-auto
-               group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto
-               transition-all duration-300"
-              >
-                {activeTab === "notmy" && (
-                  <button
-                    onClick={() => {
-                      setShowPopup(true);
-                      setInventoryData({
-                        supplierProductId: product.id,
-                        id: product.id,
-                        variant: product.variants,
-                        isVarientExists: product?.product?.isVarientExists,
-                        shopifyApp: "",
-                        modal: 'Selfship',
-                      });
-                    }}
-                    className="w-full py-2 px-4 md:text-sm  text-xs text-white rounded-md  bg-[#2B3674] hover:bg-[#1f285a] transition-colors duration-200"
-                  >
-                    Push To Shopify
-                  </button>
-                )}
-
+            <div className="fixed inset-0 bg-black/70 flex justify-end z-50">
+              <div className="w-full max-w-md h-full bg-white shadow-xl z-50 relative overflow-y-auto">
+                {/* Close Button */}
                 <button
-                  onClick={() => {
-                    setSelectedProduct(product);
-                    setShowVariantPopup(true);
-                  }}
-                  className="w-full mt-2 py-2 px-4 text-white rounded-md md:text-sm  text-xs bg-[#3965FF] hover:bg-[#2b50d6] transition-colors duration-200"
+                  onClick={() => setShowPopup(false)}
+                  className="absolute top-3 right-4 text-gray-500 hover:text-black text-2xl font-light"
                 >
-                  View Variants
+                  ×
                 </button>
 
-                {activeTab === "my" && (
-                  <button
-                    onClick={() => handleEdit(product.id)}
-                    className="w-full py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition-colors duration-200"
-                  >
-                    Edit From Shopify
-                  </button>
-                )}
-              </div>
-            </div>
-
-
-          );
-        })}
-
-
-      </div>
-
-
-      {showPopup && (
-        <div className="fixed inset-0 bg-black/70 flex justify-end z-50">
-          <div className="w-full max-w-md h-full bg-white shadow-xl z-50 relative overflow-y-auto">
-            {/* Close Button */}
-            <button
-              onClick={() => setShowPopup(false)}
-              className="absolute top-3 right-4 text-gray-500 hover:text-black text-2xl font-light"
-            >
-              ×
-            </button>
-
-            {/* Header */}
-            <div className="p-5 border-b">
-              <h2 className="text-xl font-semibold">Push To Shopify</h2>
-            </div>
-            <form onSubmit={handleSubmit}>
-              <div className="p-5 space-y-6">
-                <div className='flex justify-between'>
-                  <div className="flex items-center gap-2"><Store /> <label className="block text-sm font-semibold mb-1">Store</label></div>
-
-                  <select
-                    className=" border border-[#E0E2E7] p-2 rounded-md"
-                    name="shopifyApp"
-                    id="shopifyApp"
-                    onChange={(e) =>
-                      handleVariantChange(null, 'shopifyApp', e.target.value)
-                    }
-                    value={inventoryData.shopifyApp || ''}
-                  >
-                    <option value="">Select Store</option>
-                    {shopifyStores.map((item, index) => (
-                      <option value={item.id} key={index}>
-                        {item.name}
-                      </option>
-                    ))}
-                  </select>
+                {/* Header */}
+                <div className="p-5 border-b">
+                  <h2 className="text-xl font-semibold">Push To Shopify</h2>
                 </div>
 
-                {(() => {
-
-
-
-                  // CASE 1: 1 modal, 1 variant
-                  // Assuming this is inside a React component render
-                  if (totalModals === 1 && groupedByModal[modalNames[0]].length === 1) {
-                    const variant = getVariantData(groupedByModal[modalNames[0]][0]);
-                    return (
-                      <div className="p-4  gap-4 rounded-lg border border-gray-300 bg-white text-left">
-                        <div className="text-gray-800 font-medium mb-2">Price: ₹{variant.suggested_price}</div>
-
-                        <div key={variant.id} className="space-y-5 border p-4 rounded-lg shadow-sm">
-                          {/* Product Info */}
-                          <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-                            <Image
-                              src={fetchImages(variant.image)}
-                              alt="Product"
-                              width={64}
-                              height={64}
-                              className="rounded border object-cover"
-                            />
-                            <div>
-                              <p className="text-sm font-medium leading-5 line-clamp-2">
-                                {variant.name || 'Stainless Steel Cable Lock Ties'}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                Modal:{" "}
-                                <span className="font-semibold text-[#4C4C4C]">
-                                  {variant.modal || 'C2445129'}
-                                </span>
-                                <ClipboardCopy
-                                  className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
-                                  onClick={() => navigator.clipboard.writeText(variant.modal || '')}
-                                />
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Pricing Section */}
-                          <div className="border-t pt-4 space-y-3">
-                            <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                              Pricing
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
-                                Set Your Selling Price (₹)
-                                <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
-                              </div>
-                              <input
-                                type="number"
-                                value={variant.full?.dropPrice || ''}
-                                onChange={(e) =>
-                                  handleVariantChange(variant.id, 'dropPrice', e.target.value)
-                                }
-                                className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
-                              />
-                            </div>
-
-                            <div
-                              onClick={() => {
-                                setcalculateData(variant.full);
-                                setOpenCalculator(true);
-                              }}
-                              className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
-                            >
-                              <FaCalculator className="text-purple-700 mr-2 text-2xl" />
-                              <span className="text-black underline font-semibold text-sm">
-                                Calculate <br /> Expected Profit
-                              </span>
-                            </div>
-
-                            <p className="text-sm font-semibold">
-                              Shipowl Price
-                              <span className="float-right">₹{variant.suggested_price || 0}</span>
-                            </p>
-                            <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
-                              Including GST & Shipping Charges
-                              <HelpCircle className="w-3.5 h-3.5" />
-                            </p>
-
-                            <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
-                              Your Margin{" "}
-                              <span className="float-right">
-                                {variant.full?.dropPrice != null && variant.suggested_price != null && (
-                                  <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
-                                )}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* RTO/RVP Note */}
-                          <div className="text-xs text-gray-600 border-t pt-3">
-                            RTO & RVP charges are applicable and vary depending on the product weight.{" "}
-                            <span className="font-semibold underline cursor-pointer">
-                              View charges for this product
-                            </span>
-                          </div>
-                        </div>
+                <form onSubmit={handleSubmit}>
+                  <div className="p-5 space-y-6">
+                    {/* Store Selector */}
+                    <div className="flex justify-between">
+                      <div className="flex items-center gap-2">
+                        <Store />
+                        <label className="block text-sm font-semibold mb-1">Store</label>
                       </div>
-                    );
-                  }
 
+                      <select
+                        className="border border-[#E0E2E7] p-2 rounded-md"
+                        name="shopifyApp"
+                        id="shopifyApp"
+                        onChange={(e) => handleVariantChange(null, 'shopifyApp', e.target.value)}
+                        value={inventoryData.shopifyApp || ''}
+                      >
+                        <option value="">Select Store</option>
+                        {shopifyStores.map((item, index) => (
+                          <option value={item.id} key={index}>{item.name}</option>
+                        ))}
+                      </select>
+                    </div>
 
-                  // CASE 2: 1 modal, multiple variants
+                    {/* Variant Cases */}
+                    {(() => {
+                      if (totalModalsForPushToShopify === 1 && groupedByModalForPushToShopify[modalNamesForPushToShopify[0]].length === 1) {
+                        const variant = getVariantDataForPushToShopify(groupedByModalForPushToShopify[modalNamesForPushToShopify[0]][0]);
+                        return (
+                          <VariantCard
+                            variant={variant}
+                            handleVariantChange={handleVariantChange}
+                            fetchImages={fetchImages}
+                          />
+                        );
+                      }
 
-                  if (totalModals === 1 && groupedByModal[modalNames[0]].length > 1) {
-                    const variants = groupedByModal[modalNames[0]].map(getVariantData);
-
-                    return (
-                      <div className="space-y-6">
-                        {/* Variant Toggle Buttons */}
-                        <div className="flex flex-wrap gap-2">
-                          {variants.map((variant) => (
-                            <button
-                              key={variant.id}
-                              type="button"
-                              onClick={() => setActiveVariantId(variant.id)}
-                              className={`px-4 py-1  text-sm font-medium border transition ${activeVariantId === variant.id
-                                ? "  border-blue-600"
-                                : " text-gray-700 border-gray-300 hover:bg-gray-100"
-                                }`}
-                            >
-                              {variant.name || 'Variant'}
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Selected Variant Display */}
-                        {variants
-                          .filter((v) => v.id === activeVariantId)
-                          .map((variant, idx) => (
-                            <div key={variant.id || idx} className="space-y-5 border p-4 rounded-lg shadow-sm">
-                              {/* Product Info */}
-                              <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-                                <Image
-                                  src={fetchImages(variant.image)}
-                                  alt="Product"
-                                  width={64}
-                                  height={64}
-                                  className="rounded border object-cover"
-                                />
-                                <div>
-                                  <p className="text-sm font-medium leading-5 line-clamp-2">
-                                    {variant.name || 'Stainless Steel Cable Lock Ties'}
-                                  </p>
-                                  <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                    Modal:
-                                    <span className="font-semibold text-[#4C4C4C]">{variant.modal}</span>
-                                    <ClipboardCopy
-                                      className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
-                                      onClick={() => navigator.clipboard.writeText(variant.modal || '')}
-                                    />
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Pricing Section */}
-                              <div className="border-t pt-4 space-y-3">
-                                <div className="text-sm font-bold text-gray-700 flex items-center gap-2">Pricing</div>
-
-                                <div className="flex items-center gap-2">
-                                  <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
-                                    Set Your Selling Price (₹)
-                                    <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
-                                  </div>
-                                  <input
-                                    type="number"
-                                    value={variant.full?.dropPrice || ''}
-                                    onChange={(e) =>
-                                      handleVariantChange(variant.id, 'dropPrice', e.target.value)
-                                    }
-                                    className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
-                                  />
-                                </div>
-
-                                <div
-                                  onClick={() => {
-                                    setcalculateData(variant.full);
-                                    setOpenCalculator(true);
-                                  }}
-                                  className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
-                                >
-                                  <FaCalculator className="text-purple-700 mr-2 text-2xl" />
-                                  <span className="text-black underline font-semibold text-sm">
-                                    Calculate <br /> Expected Profit
-                                  </span>
-                                </div>
-
-                                <p className="text-sm font-semibold">
-                                  Shipowl Price
-                                  <span className="float-right">₹{variant.suggested_price || 0}</span>
-                                </p>
-                                <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
-                                  Including GST & Shipping Charges
-                                  <HelpCircle className="w-3.5 h-3.5" />
-                                </p>
-
-                                <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
-                                  Your Margin
-                                  <span className="float-right">
-                                    {variant.full?.dropPrice != null && variant.suggested_price != null && (
-                                      <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
-                                    )}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* RTO/RVP Note */}
-                              <div className="text-xs text-gray-600 border-t pt-3">
-                                RTO & RVP charges are applicable and vary depending on the product weight.{' '}
-                                <span className="font-semibold underline cursor-pointer">
-                                  View charges for this product
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    );
-                  }
-
-                  // CASE 3: 2 modals with 1 variant each (radio button)
-                  if (totalModals === 2 && modalNames.every(modal => groupedByModal[modal].length === 1)) {
-                    return (
-                      <div className="space-y-4">
-                        {modalNames.map((modal, index) => {
-                          const variant = getVariantData(groupedByModal[modal][0]);
-                          const isSelected = inventoryData.modal === modal;
-
-                          return (
-                            <label key={variant.id || index} className="flex flex-col gap-3 cursor-pointer border rounded-lg p-4">
-                              <div className="flex items-center gap-3">
-                                <input
-                                  type="radio"
-                                  name="modal"
-                                  value={modal}
-                                  required
-                                  checked={isSelected}
-                                  onChange={(e) => {
-                                    handleVariantChange(null, 'modal', e.target.value);
-                                  }}
-                                />
-                                <span className="text-gray-800 font-medium">{modal}</span>
-                                {isSelected && (
-                                  <span className="ml-2 text-green-600 font-semibold">
-                                    ₹{variant.suggested_price}
-                                  </span>
-                                )}
-                              </div>
-
-                              {isSelected && (
-                                <div className="space-y-5">
-                                  {/* Product Info */}
-                                  <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-                                    <Image
-                                      src={fetchImages(variant.image)}
-                                      alt="Product"
-                                      width={64}
-                                      height={64}
-                                      className="rounded border object-cover"
-                                    />
-                                    <div>
-                                      <p className="text-sm font-medium leading-5 line-clamp-2">
-                                        {variant.name || 'Stainless Steel Cable Lock Ties'}
-                                      </p>
-                                      <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                        Modal:
-                                        <span className="font-semibold text-[#4C4C4C]">
-                                          {variant.modal || 'C2445129'}
-                                        </span>
-                                        <ClipboardCopy
-                                          className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
-                                          onClick={() => navigator.clipboard.writeText(variant.modal || '')}
-                                        />
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  {/* Pricing Section */}
-                                  <div className="border-t pt-4 space-y-3">
-                                    <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                                      Pricing
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                      <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
-                                        Set Your Selling Price (₹)
-                                        <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
-                                      </div>
-
-
-
-                                      <input
-                                        type="number"
-                                        value={variant.full?.dropPrice || ''}
-                                        onChange={(e) =>
-                                          handleVariantChange(variant.id, 'dropPrice', e.target.value)
-                                        }
-                                        className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
-                                      />
-                                    </div>
-
-                                    <div
-                                      onClick={() => {
-                                        setcalculateData(variant.full);
-                                        setOpenCalculator(true);
-                                      }}
-                                      className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
-                                    >
-                                      <FaCalculator className="text-purple-700 mr-2 text-2xl" />
-                                      <span className="text-black underline font-semibold text-sm">
-                                        Calculate <br /> Expected Profit
-                                      </span>
-                                    </div>
-
-                                    <p className="text-sm font-semibold">
-                                      Shipowl Price
-                                      <span className="float-right">₹{variant.suggested_price || 0}</span>
-                                    </p>
-                                    <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
-                                      Including GST & Shipping Charges
-                                      <HelpCircle className="w-3.5 h-3.5" />
-                                    </p>
-
-                                    <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
-                                      Your Margin
-                                      <span className="float-right">
-                                        {variant.full?.dropPrice != null && variant.suggested_price != null && (
-                                          <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
-                                        )}
-                                      </span>
-
-                                    </div>
-                                  </div>
-
-                                  {/* RTO/RVP Note */}
-                                  <div className="text-xs text-gray-600 border-t pt-3">
-                                    RTO & RVP charges are applicable and vary depending on the product weight.{' '}
-                                    <span className="font-semibold underline cursor-pointer">
-                                      View charges for this product
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    );
-                  }
-
-
-
-                  // CASE 4: Multiple modals with multiple variants → TABS
-                  if (totalModals > 1 && modalNames.some(modal => groupedByModal[modal]?.length > 1)) {
-                    const variantsInActiveModal = groupedByModal[activeModal]?.map(getVariantData) || [];
-
-                    return (
-                      <>
-                        {/* Modal Tabs */}
-                        <div className="flex gap-3 mb-4 border-b pb-2">
-                          {modalNames.map((modal, index) => (
-                            <button
-                              key={index}
-                              type="button"
-                              className={`px-4 py-2 rounded-t-lg text-sm font-medium border-b-2 ${activeModal === modal
-                                ? "border-orange-600 text-orange-600"
-                                : "border-transparent text-gray-600 hover:text-orange-500"
-                                }`}
-                              onClick={() => {
-                                setActiveModal(modal);
-
-                                const modalVariants = groupedByModal[modal]?.map(getVariantData) || [];
-                                const minVariant = modalVariants.reduce((min, curr) =>
-                                  curr.suggested_price < min.suggested_price ? curr : min,
-                                  modalVariants[0]);
-
-                                setActiveVariantId(minVariant?.id || null);
-                              }}
-                            >
-                              {modal}
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Variant Name Buttons */}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {variantsInActiveModal.map((variant) => (
-                            <button
-                              key={variant.id}
-                              type="button"
-                              onClick={() => setActiveVariantId(variant.id)}
-                              className={`px-4 py-1  text-sm font-medium border transition ${activeVariantId === variant.id
-                                ? "  border-blue-600"
-                                : " text-gray-700 border-gray-300 hover:bg-gray-100"
-                                }`}
-                            >
-                              {variant.name || 'Variant'}
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Selected Variant Details */}
-                        <div className="grid grid-cols-1 gap-4">
-                          {variantsInActiveModal
-                            .filter((variant) => variant.id === activeVariantId)
-                            .map((variant, index) => (
-                              <div key={variant.id || index} className="space-y-5 border p-4 rounded-lg shadow-sm">
-                                {/* Product Info */}
-                                <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
-                                  <Image
-                                    src={fetchImages(variant.image)}
-                                    alt={variant.name || 'Product Image'}
-                                    width={64}
-                                    height={64}
-                                    className="rounded border object-cover"
-                                  />
-                                  <div>
-                                    <p className="text-sm font-medium leading-5 line-clamp-2">
-                                      {variant.name || 'Stainless Steel Cable Lock Ties'}
-                                    </p>
-                                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                                      Modal: <span className="font-semibold text-[#4C4C4C]">{variant.modal || 'N/A'}</span>
-                                      <ClipboardCopy
-                                        className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
-                                        onClick={() => navigator.clipboard.writeText(variant.modal || '')}
-                                      />
-                                    </p>
-                                  </div>
-                                </div>
-
-                                {/* Pricing Section */}
-                                <div className="border-t pt-4 space-y-3">
-                                  <div className="text-sm font-bold text-gray-700 flex items-center gap-2">Pricing</div>
-
-                                  <div className="flex items-center gap-2">
-                                    <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
-                                      Set Your Selling Price (₹)
-                                      <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
-                                    </div>
-                                    <input
-                                      type="number"
-                                      value={variant.full?.dropPrice || ''}
-                                      onChange={(e) =>
-                                        handleVariantChange(variant.id, 'dropPrice', e.target.value)
-                                      }
-                                      className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
-                                    />
-                                  </div>
-
+                      if (totalModalsForPushToShopify === 1) {
+                        return (
+                          <>
+                            <h3 className="text-xl font-semibold text-gray-800 mb-4">Model: {modalNamesForPushToShopify[0]}</h3>
+                            <div className="grid grid-cols-1 gap-4">
+                              {groupedByModalForPushToShopify[modalNamesForPushToShopify[0]]
+                                .map(getVariantDataForPushToShopify)
+                                .sort((a, b) => a.suggested_price - b.suggested_price)
+                                .map((variant, index) => (
                                   <div
-                                    onClick={() => {
-                                      setcalculateData(variant);
-                                      setOpenCalculator(true);
-                                    }}
-                                    className="flex items-center bg-purple-100 p-2 rounded-md mt-3 cursor-pointer"
+                                    key={index}
+                                    onClick={() => handleVariantChange(variant.id, 'selected', true)}
+                                    className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${variant.selected
+                                      ? 'border-dotted border-2 border-orange-600 shadow-md bg-orange-50'
+                                      : 'border-gray-300 hover:shadow-lg bg-white'
+                                      }`}
                                   >
-                                    <FaCalculator className="text-purple-700 mr-2 text-2xl" />
-                                    <span className="text-black underline font-semibold text-sm">
-                                      Calculate <br /> Expected Profit
-                                    </span>
+                                    <VariantCard
+                                      variant={variant}
+                                      handleVariantChange={handleVariantChange}
+                                      fetchImages={fetchImages}
+                                    />
                                   </div>
+                                ))}
+                            </div>
+                          </>
+                        );
+                      }
 
-                                  <p className="text-sm font-semibold">
-                                    Shipowl Price <span className="float-right">₹{variant.suggested_price || 0}</span>
-                                  </p>
-                                  <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
-                                    Including GST & Shipping Charges
-                                    <HelpCircle className="w-3.5 h-3.5" />
-                                  </p>
-
-                                  <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
-                                    Your Margin{' '}
-                                    <span className="float-right">
-                                      {variant.full?.dropPrice != null && variant.suggested_price != null && (
-                                        <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
-                                      )}
-                                    </span>
+                      if (totalModalsForPushToShopify === 2 && modalNamesForPushToShopify.every(model => groupedByModalForPushToShopify[model].length === 1)) {
+                        return (
+                          <div className="mb-4 flex flex-col gap-4">
+                            {modalNamesForPushToShopify.map((model, index) => {
+                              const variant = getVariantDataForPushToShopify(groupedByModalForPushToShopify[model][0]);
+                              return (
+                                <label key={index} className="flex flex-col gap-2 cursor-pointer">
+                                  <div className="flex items-center gap-2">
+                                    <input
+                                      type="radio"
+                                      name="model"
+                                      value={model}
+                                      checked={variant.selected}
+                                      onChange={() => handleVariantChange(variant.id, 'selected', true)}
+                                    />
+                                    <span className="text-gray-800 font-medium">{model}</span>
                                   </div>
-                                </div>
+                                  {variant.selected && (
+                                    <VariantCard
+                                      variant={variant}
+                                      handleVariantChange={handleVariantChange}
+                                      fetchImages={fetchImages}
+                                    />
+                                  )}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        );
+                      }
 
-                                {/* RTO/RVP Note */}
-                                <div className="text-xs text-gray-600 border-t pt-3">
-                                  RTO & RVP charges are applicable and vary depending on the product weight.{' '}
-                                  <span className="font-semibold underline cursor-pointer">
-                                    View charges for this product
-                                  </span>
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      </>
-                    );
-                  }
+                      if (totalModalsForPushToShopify > 1 &&
+                        modalNamesForPushToShopify.some((model) => groupedByModalForPushToShopify[model].length > 1)) {
+                        return (
+                          <>
+                            <div className="flex gap-3 mb-4 border-b">
+                              {modalNamesForPushToShopify.map((model, index) => (
+                                <button
+                                  key={index}
+                                  type="button"
+                                  className={`px-8 uppercase py-2 rounded-t-lg text-sm text-black font-medium ${activeModalPushToShopify === model
+                                    ? 'bg-orange-500 text-white border-b-2 border-orange-500'
+                                    : 'border-transparent hover:text-white hover:bg-orange-500'
+                                    }`}
+                                  onClick={() => setActiveModalPushToShopify(model)}
+                                >
+                                  {model}
+                                </button>
+                              ))}
+                            </div>
 
+                            <div className="grid grid-cols-1 gap-4">
+                              {(groupedByModalForPushToShopify[activeModalPushToShopify] || [])
+                                .map(getVariantDataForPushToShopify)
+                                .sort((a, b) => a.suggested_price - b.suggested_price)
+                                .map((variant, index) => (
+                                  <div
+                                    key={index}
+                                    onClick={() => handleVariantChange(variant.id, 'selected', true)}
+                                    className={`px-4 py-3 rounded-lg border transition-shadow duration-300 cursor-pointer ${variant.selected
+                                      ? 'border-dotted border-2 border-orange-600 shadow-md bg-orange-50'
+                                      : 'border-gray-300 hover:shadow-lg bg-white'
+                                      }`}
+                                  >
+                                    <VariantCard
+                                      variant={variant}
+                                      handleVariantChange={handleVariantChange}
+                                      fetchImages={fetchImages}
+                                    />
+                                  </div>
+                                ))}
+                            </div>
+                          </>
+                        );
+                      }
 
-                  // Default fallback if no variants found
-                  return <p className="text-gray-500">No variants available</p>;
+                      return <div>No variant available.</div>;
+                    })()}
+                  </div>
 
-                })()}
-
-
+                  {/* Footer */}
+                  <div className="bottom-0 left-0 right-0 p-4 border-t bg-white flex items-center justify-between">
+                    <button
+                      type="submit"
+                      className="w-full flex items-center justify-center gap-2 bg-black text-white py-2 rounded text-sm font-semibold hover:bg-gray-900"
+                    >
+                      <Upload className="w-4 h-4" />
+                      Push To Shopify
+                    </button>
+                  </div>
+                </form>
               </div>
+            </div>
+          );
+        })()}
 
-              {/* Footer */}
-              <div className=" bottom-0 left-0 right-0 p-4 border-t bg-white flex items-center justify-between">
-                <button
-                  onClick={handleSubmit}
-                  type="submit"
-                  className="w-full flex items-center justify-center gap-2 bg-black text-white py-2 rounded text-sm font-semibold hover:bg-gray-900"
-                >
-                  <Upload className="w-4 h-4" />
-                  Push To Shopify
-                </button>
-
-
-              </div>
-            </form>
-          </div >
-        </div >
-      )}
-
-      {
-        calculateData && openCalculator && (
+        {calculateData && openCalculator && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white w-full max-w-4xl rounded shadow-lg p-6 max-h-[90vh] overflow-y-auto">
               {/* Header */}
@@ -1562,10 +1012,9 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
             </div>
           </div>
         )
-      }
+        }
 
-      {
-        showVariantPopup && selectedProduct && (
+        {showVariantPopup && selectedProduct && (
           <div className="fixed  px-6 md:px-0  inset-0 bg-[#000000b0] bg-opacity-40 flex z-50 items-center justify-center ">
             <div className="bg-white border border-orange-500 p-6 rounded-lg w-full z-50 max-w-4xl shadow-xl relative">
               {/* Header */}
@@ -1619,7 +1068,7 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
 
                       {/* Text Info */}
                       <div className="text-sm text-gray-700 space-y-1">
-                        <p><span className="font-semibold">Modal:</span> {variant.modal || "—"}</p>
+                        <p><span className="font-semibold">Model:</span> {variant.model || "—"}</p>
                         <p><span className="font-semibold">Suggested Price:</span> {v.price || v?.supplierProductVariant?.price || "—"}</p>
 
                         {isExists && (
@@ -1637,54 +1086,83 @@ const Section = ({ title, form, showResult, setForm, type, errors, setShowResult
 
             </div>
           </div>
-        )
-      }
+        )}
 
+      </section>
     </>
   );
 };
 
 export default NewlyLaunched;
 
-function InputField({ label, value, onChange, error, required }) {
-  return (
-    <>
-      <div className='flex justify-between'>
-        <label className="md:w-7/12 block text-sm font-medium mb-1">
-          {label} {required && <span className="text-red-500">*</span>}
-          {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-        </label>
+const VariantCard = ({ variant, handleVariantChange, fetchImages }) => {
+  if (!variant) return null;
 
-        <input
-          type="number"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={`md:w-5/12 bg-white border px-3 py-[6px] ${error ? 'border-red-500' : 'border-gray-300'}`}
+  return (
+    <div key={variant.id} className="space-y-5 border p-4 rounded-lg shadow-sm">
+      <div className="flex bg-gray-100 rounded-md p-3 items-start gap-3">
+        <Image
+          src={fetchImages(variant.image)}
+          alt="Product"
+          width={64}
+          height={64}
+          className="rounded border object-cover"
         />
+        <div>
+          <p className="text-sm font-medium leading-5 line-clamp-2">
+            {variant.name || 'Stainless Steel Cable Lock Ties'}
+          </p>
+          <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+            Model:
+            <span className="font-semibold text-[#4C4C4C]">{variant.model || 'C2445129'}</span>
+            <ClipboardCopy
+              className="w-4 h-4 text-gray-400 hover:text-black cursor-pointer"
+              onClick={() => navigator.clipboard.writeText(variant.model || '')}
+            />
+          </p>
+        </div>
       </div>
-    </>
-  );
-}
 
-// Result output component with conditional display
-function ResultItem({ label, value, isVisible, placeholder = '-' }) {
-  const numeric = parseFloat(value?.replace?.(/[₹,]/g, '')) || 0;
-  return (
-    <div className="flex justify-between text-sm w-full">
-      <span className="font-medium text-black">{label}</span>
-      <span className={` font-bold  text-green-800 ${!isVisible ? 'text-gray-400' : numeric < 0 ? 'text-red-800' : 'text-green-800'}`}>
-        {isVisible ? value : placeholder}
-      </span>
+      {/* Pricing Section */}
+      <div className="border-t pt-4 space-y-3">
+        <div className="text-sm font-bold text-gray-700 flex items-center gap-2">Pricing</div>
+
+        <div className="flex items-center gap-2">
+          <div className="text-sm font-semibold text-gray-600 md:w-7/12 flex items-center gap-1">
+            Set Your Selling Price (₹)
+            <HelpCircle className="w-4 h-4 text-gray-400 cursor-pointer" />
+          </div>
+          <input
+            type="number"
+            value={variant.full?.dropPrice || ''}
+            onChange={(e) => handleVariantChange(variant.id, 'dropPrice', e.target.value)}
+            className="md:w-5/12 border border-[#E0E2E7] rounded-md p-2"
+          />
+        </div>
+
+        <p className="text-sm font-semibold">
+          Shipowl Price
+          <span className="float-right">₹{variant.suggested_price || 0}</span>
+        </p>
+        <p className="text-xs text-gray-400 -mt-2 flex items-center gap-1">
+          Including GST & Shipping Charges
+          <HelpCircle className="w-3.5 h-3.5" />
+        </p>
+
+        <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm font-semibold">
+          Your Margin
+          <span className="float-right">
+            {variant.full?.dropPrice != null && variant.suggested_price != null && (
+              <>₹{(variant.full.dropPrice || 0) - (variant.suggested_price || 0)}</>
+            )}
+          </span>
+        </div>
+      </div>
+
+      <div className="text-xs text-gray-600 border-t pt-3">
+        RTO & RVP charges are applicable and vary depending on the product weight.{" "}
+        <span className="font-semibold underline cursor-pointer">View charges for this product</span>
+      </div>
     </div>
   );
-}
-
-// Info box component
-function ProductInfo({ label, value }) {
-  return (
-    <div className="flex items-center space-x-1 text-sm">
-      <span className="text-gray-500">{label}:</span>
-      <span className="font-medium text-black">{value}</span>
-    </div>
-  );
-}
+};

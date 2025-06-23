@@ -560,7 +560,7 @@ const ProductTable = () => {
 
                                                         {/* Details */}
                                                         <div className="space-y-2 text-sm text-gray-700">
-                                                            <div><strong>Modal:</strong> {variant.modal || 'NIL'}</div>
+                                                            <div><strong>Model:</strong> {variant.model || 'NIL'}</div>
                                                             <div><strong>Product Link:</strong> {variant.product_link || 'NIL'}</div>
                                                             <div><strong>Suggested Price:</strong> {variant.suggested_price ?? 'NIL'}</div>
                                                             <div><strong>SKU:</strong> {variant.sku || 'NIL'}</div>

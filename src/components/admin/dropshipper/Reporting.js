@@ -229,7 +229,7 @@ function Reporting() {
                             </table>
 
 
-                            {/* Modal */}
+                            {/* Model */}
                             {showModal && (
                                 <div className="fixed inset-0 flex items-center justify-center bg-[#000000ba] bg-opacity-50 z-50">
                                     <div className="bg-white w-full max-w-3xl border-2 border-orange-500 p-6 rounded-md shadow-lg relative">
@@ -258,7 +258,7 @@ function Reporting() {
                                                     </div>
                                                     <p><strong>Name:</strong> {variant.name}</p>
                                                     <p><strong>Color:</strong> {variant.color}</p>
-                                                    <p><strong>Model:</strong> {variant.modal}</p>
+                                                    <p><strong>Model:</strong> {variant.model}</p>
                                                     <p><strong>SKU:</strong> {variant.sku}</p>
                                                     <p><strong>Suggested Price:</strong> ₹{variant.suggested_price}</p>
                                                 </div>

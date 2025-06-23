@@ -6,14 +6,14 @@ import "@pathofdev/react-tag-input/build/index.css"; // Required styles
 import ReactTagInput from "@pathofdev/react-tag-input";
 import { HashLoader } from 'react-spinners';
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
+import dynamic from 'next/dynamic';
+const Select = dynamic(() => import('react-select'), { ssr: false });
 // Dynamically import TinyMCE Editor with SSR disabled
 const Editor = dynamic(() => import('@tinymce/tinymce-react').then(mod => mod.Editor), {
   ssr: false,
 });
-const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function ProductDetails() {
   const {
     fetchCountry,

@@ -398,23 +398,6 @@ const BusinessInfo = () => {
         </div>
 
         <div>
-          {renderLabel('Short Brand Name')}
-          <input
-            type="text"
-            name="brandShortName"
-            value={formData.brandShortName}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
-      </div>
-
-      {/* Billing Address */}
-
-
-      {/* Pincode, State, City */}
-      <div className="grid lg:grid-cols-3 py-5 gap-4">
-        <div>
           {renderLabel('Company Billing Address', 'billingAddress')}
           <input
             type="text"
@@ -463,12 +446,11 @@ const BusinessInfo = () => {
           />
           {renderError('billingState')}
         </div>
-
-
       </div>
 
+
       {/* Business Type, Client Entry Type */}
-      <div className="grid lg:grid-cols-3 gap-4">
+      <div className="grid lg:grid-cols-2 gap-4">
         <div>
           {renderLabel('City', 'billingCity')}
 
@@ -541,71 +523,73 @@ const BusinessInfo = () => {
               {renderError(name)}
             </div>
           ))}
-        </div>
+          {/* Separate file input for "Upload GST Document" */}
+          <div className="">
+            <div className="mb-4">
+              {renderLabel('Upload GST Document', 'gstDocument')}
+              <input
+                type="file"
+                name="gstDocument"
+                multiple
+                accept="image/*"
+                onChange={handleChange}
+                className={inputClasses('gstDocument')}
+              />
+              {renderError('gstDocument')}
+            </div>
 
-        {/* Separate file input for "Upload GST Document" */}
-        <div className="mt-6">
-          <div className="mb-4">
-            {renderLabel('Upload GST Document', 'gstDocument')}
-            <input
-              type="file"
-              name="gstDocument"
-              multiple
-              onChange={handleChange}
-              className={inputClasses('gstDocument')}
-            />
-            {renderError('gstDocument')}
+            {/* File preview for GST Document */}
+            {formData?.gstDocument?.length > 0 && (
+              <Swiper
+                key={formData.id}
+                modules={[Navigation]}
+                slidesPerView={2}
+                loop={formData.gstDocument?.split(',').length > 1}
+                navigation={true}
+                className="mySwiper w-full ms-2"
+              >
+                {formData.gstDocument?.split(',').map((img, index) => (
+                  <SwiperSlide key={index} className="relative gap-3">
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                      onClick={() => {
+                        Swal.fire({
+                          title: 'Are you sure?',
+                          text: `Do you want to delete this image?`,
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#d33',
+                          cancelButtonColor: '#3085d6',
+                          confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+
+                            handleImageDelete(index, 'gstDocument'); // Call your delete function
+                          }
+                        });
+                      }}
+                    >
+                      ✕
+                    </button>
+
+                    {/* Image */}
+                    <Image
+                      src={fetchImages(img)}
+                      alt={`Image ${index + 1}`}
+                      width={500}
+                      height={500}
+                      className="me-3 p-2 object-cover rounded"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
           </div>
-
-          {/* File preview for GST Document */}
-          {formData?.gstDocument?.length > 0 && (
-            <Swiper
-              key={formData.id}
-              modules={[Navigation]}
-              slidesPerView={2}
-              loop={formData.gstDocument?.split(',').length > 1}
-              navigation={true}
-              className="mySwiper w-full ms-2"
-            >
-              {formData.gstDocument?.split(',').map((img, index) => (
-                <SwiperSlide key={index} className="relative gap-3">
-                  {/* Delete Button */}
-                  <button
-                    type="button"
-                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
-                    onClick={() => {
-                      Swal.fire({
-                        title: 'Are you sure?',
-                        text: `Do you want to delete this image?`,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Yes, delete it!'
-                      }).then((result) => {
-                        if (result.isConfirmed) {
-
-                          handleImageDelete(index, 'gstDocument'); // Call your delete function
-                        }
-                      });
-                    }}
-                  >
-                    ✕
-                  </button>
-
-                  {/* Image */}
-                  <Image
-                    src={fetchImages(img)}
-                    alt={`Image ${index + 1}`}
-                    width={500}
-                    height={500}
-                    className="me-3 p-2 object-cover rounded"
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          )}
         </div>
+
+
 
       </div>
 
@@ -618,6 +602,7 @@ const BusinessInfo = () => {
             type="file"
             name="panCardImage"
             multiple
+            accept="image/*"
             onChange={handleChange}
             className={inputClasses('panCardImage')}
           />
@@ -681,6 +666,7 @@ const BusinessInfo = () => {
             type="file"
             name="aadharCardImage"
             multiple
+            accept="image/*"
             onChange={handleChange}
             className={inputClasses('aadharCardImage')}
           />
@@ -768,6 +754,7 @@ const BusinessInfo = () => {
             type="file"
             name="additionalDocumentUpload"
             multiple
+            accept="image/*"
             onChange={handleChange}
             className={inputClasses('additionalDocumentUpload')}
           />
@@ -831,6 +818,7 @@ const BusinessInfo = () => {
             type="file"
             name="documentImage"
             multiple
+            accept="image/*"
             onChange={handleChange}
             className={inputClasses('documentImage')}
           />

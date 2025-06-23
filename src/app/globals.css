@@ -354,10 +354,9 @@ button.dt-paging-button {
     text-align: left;
 }
 .prose  p ,.prose p em{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+ padding: 4px 0;
 }
+
 
 .main-tables thead th,
 .main-tables tbody td {

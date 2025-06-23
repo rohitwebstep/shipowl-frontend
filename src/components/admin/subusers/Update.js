@@ -11,9 +11,11 @@ import 'swiper/css';
 import Image from "next/image";
 import 'swiper/css/navigation';
 import dynamic from 'next/dynamic';
+import { useImageURL } from "@/components/ImageURLContext";
 
 const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function Update() {
+  const { fetchImages } = useImageURL();
   const router = useRouter();
   const [permission, setPermission] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -344,7 +346,7 @@ export default function Update() {
               {formData.image?.split(',').map((img, index) => (
                 <SwiperSlide key={index} className="relative gap-3">
                   <Image
-                    src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                    src={fetchImages(img)}
                     alt={`Image ${index + 1}`}
                     width={500}
                     height={500}
@@ -392,7 +394,7 @@ export default function Update() {
             <option value="inactive">Inactive</option>
           </select>
         </div>
-      
+
       </div>
 
 
@@ -465,7 +467,7 @@ export default function Update() {
                   </div>
 
                   {/* Permission Checkboxes */}
-              <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
+                  <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
                     {perms.map((perm) => (
                       <label key={perm.id} className="flex items-center space-x-2">
                         <input

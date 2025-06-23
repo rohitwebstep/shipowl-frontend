@@ -369,7 +369,7 @@ export default function ManageProducts() {
                 </div>
             </div>
 
-            {/* Inventory Modal */}
+            {/* Inventory Model */}
             {modalType === 'inventory' && (
                 <div className="fixed inset-0 bg-[#0000008c] bg-opacity-40 z-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-xl shadow-lg w-[400px]">

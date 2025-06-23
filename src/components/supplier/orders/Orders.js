@@ -734,7 +734,7 @@ export default function Orders() {
         </tbody>
       </table>
 
-      {/* Note Modal */}
+      {/* Note Model */}
       {isNoteModalOpen && (
         <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">

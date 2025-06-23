@@ -32,7 +32,7 @@ const ProductProvider = ({ children }) => {
       {
         color: '',
         sku: '',
-        modal:'',
+        model:'',
         product_link: '',
         name: '',
         suggested_price: 0,

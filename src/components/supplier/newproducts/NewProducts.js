@@ -226,9 +226,9 @@ export default function NewProducts() {
 
                 const modalMap = {};
                 variants.forEach((variant) => {
-                  const modal = variant.modal || "Default";
-                  if (!modalMap[modal]) modalMap[modal] = [];
-                  modalMap[modal].push(variant);
+                  const model = variant.model || "Default";
+                  if (!modalMap[model]) modalMap[model] = [];
+                  modalMap[model].push(variant);
                 });
 
                 const modalKeys = Object.keys(modalMap);
@@ -247,13 +247,13 @@ export default function NewProducts() {
                 }
 
                 // Case 3 or 4: multiple models
-                return modalKeys.map((modal) => {
-                  const variants = modalMap[modal];
+                return modalKeys.map((model) => {
+                  const variants = modalMap[model];
                   const prices = variants.map(v => v?.suggested_price ?? 0);
                   const min = Math.min(...prices);
                   const max = Math.max(...prices);
                   const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
-                  return `${modal}: ${priceLabel}`;
+                  return `${model}: ${priceLabel}`;
                 }).join(" | ");
               };
 
@@ -288,8 +288,8 @@ export default function NewProducts() {
                   {/* Content */}
                   <div className="p-3 relative">
                     <div className="flex justify-between flex-wrap items-center">
-                      <h2 className="text-lg font-semibold nunito">{productName}</h2>
-                      <p className="text-black font-bold nunito">
+                      <h2 className="text-lg font-semibold capitalize">{productName}</h2>
+                      <p className="text-black font-bold ">
                         {getPriceDisplay(product.variants)}
                       </p>
 
@@ -425,7 +425,7 @@ export default function NewProducts() {
                             </div>
 
                             <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
-                              <p><span className="font-semibold">Modal:</span> {variant.modal || "NIL"}</p>
+                              <p><span className="font-semibold">Model:</span> {variant.model || "NIL"}</p>
                               <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
                               {isExists && (
                                 <>

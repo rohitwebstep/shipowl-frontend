@@ -120,7 +120,7 @@ export default function RTO() {
                                     </div>
                                     <div className="flex gap-2">
                                         <p className=" text-gray-600">Sku: {variant?.sku}</p>
-                                        <p className=" text-gray-600">Modal: {variant?.modal}</p>
+                                        <p className=" text-gray-600">Model: {variant?.model}</p>
                                     </div>
 
 

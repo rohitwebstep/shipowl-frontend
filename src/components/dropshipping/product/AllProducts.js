@@ -406,7 +406,7 @@ export default function Allroducts() {
                                                             )}
                                                         </div>
                                                         <div>
-                                                            <p className="font-semibold">Model: {variantInfo.modal || 'NIL'}</p>
+                                                            <p className="font-semibold">Model: {variantInfo.model || 'NIL'}</p>
                                                             {isExists && (
                                                                 <>
                                                                     <p>Name: {variantInfo.name || 'NIL'}</p>
@@ -546,7 +546,7 @@ export default function Allroducts() {
 
                                         {/* Text Info */}
                                         <div className="text-sm text-gray-700 space-y-1">
-                                            <p><span className="font-semibold">Modal:</span> {variant.modal || "—"}</p>
+                                            <p><span className="font-semibold">Model:</span> {variant.model || "—"}</p>
                                             <p><span className="font-semibold">Suggested Price:</span> {v.price || v?.supplierProductVariant?.price || "—"}</p>
 
                                             {isExists && (

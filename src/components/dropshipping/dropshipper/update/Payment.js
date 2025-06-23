@@ -9,7 +9,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { useImageURL } from "@/components/ImageURLContext";
 const Payment = () => {
+  const { fetchImages } = useImageURL();
   const { formData, setFormData, fetchSupplier, setActiveTab } = useContext(DropshipperProfileContext);
   const [errors, setErrors] = useState({});
   const [files, setFiles] = useState({});
@@ -22,23 +24,23 @@ const Payment = () => {
       </div>
     );
   }
-const handleChange = (e) => {
-  const { name, value, files } = e.target;
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
 
-  if (['panCardImage', 'aadharCardImage', 'gstDocument'].includes(name)) {
-    if (files && files.length > 0) {
-      setFiles((prev) => ({
+    if (['panCardImage', 'aadharCardImage', 'gstDocument'].includes(name)) {
+      if (files && files.length > 0) {
+        setFiles((prev) => ({
+          ...prev,
+          [name]: Array.from(files), // Store all selected files
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
         ...prev,
-        [name]: Array.from(files), // Store all selected files
+        [name]: value,
       }));
     }
-  } else {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-};
+  };
 
   const handleImageDelete = async (index, type) => {
     setLoading(true);
@@ -246,7 +248,7 @@ const handleChange = (e) => {
   };
 
 
-  
+
   return (
     <div className="bg-white lg:p-10 p-3 rounded-tl-none rounded-tr-none rounded-2xl">
       <div>
@@ -265,7 +267,7 @@ const handleChange = (e) => {
                 type="text"
                 name={name}
                 value={formData[name]}
-                onChange={(e) => handleChange( e)}
+                onChange={(e) => handleChange(e)}
                 className={`w-full p-3 border rounded-lg font-bold ${errors[name] ? 'border-red-500' : 'border-[#DFEAF2]'
                   } text-[#718EBF]`}
               />
@@ -283,7 +285,7 @@ const handleChange = (e) => {
                 type="file"
                 name={name}
                 multiple
-                onChange={(e) => handleChange( e)}
+                onChange={(e) => handleChange(e)}
                 className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
               />
 
@@ -320,7 +322,7 @@ const handleChange = (e) => {
                         ✕
                       </button>
                       <Image
-                        src={`https://placehold.co/600x400?text=${index + 1}` || img.trim()}
+                        src={fetchImages(img)}
                         alt={`Image ${index + 1}`}
                         width={500}
                         height={500}

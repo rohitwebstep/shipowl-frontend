@@ -390,7 +390,7 @@ const SupplierList = () => {
                                             </td>
                                             <td className="p-3 px-4 text-left whitespace-nowrap">
                                                 <button
-                                                    className='bg-orange-500 rounded-md text-white p-3'
+                                                    className='bg-orange-500 rounded-md text-white p-2'
                                                     onClick={() => checkReporting(item.id)}
                                                 >
                                                     View Reporting

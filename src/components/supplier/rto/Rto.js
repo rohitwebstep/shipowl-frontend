@@ -821,7 +821,7 @@ export default function RTO() {
                       </div>
                       <p><strong>Name:</strong> {variant.name}</p>
                       <p><strong>Color:</strong> {variant.color}</p>
-                      <p><strong>Model:</strong> {variant.modal}</p>
+                      <p><strong>Model:</strong> {variant.model}</p>
                       <p><strong>SKU:</strong> {variant.sku}</p>
                       <p><strong>Suggested Price:</strong> ₹{variant.suggested_price}</p>
 

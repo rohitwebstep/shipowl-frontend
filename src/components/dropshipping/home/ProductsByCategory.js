@@ -417,7 +417,7 @@ function ProductsByCategory() {
                                   )}
                                 </div>
                                 <div>
-                                  <p className="font-semibold">Model: {variantInfo.modal || 'NIL'}</p>
+                                  <p className="font-semibold">Model: {variantInfo.model || 'NIL'}</p>
                                   {isExists && (
                                     <>
                                       <p>Name: {variantInfo.name || 'NIL'}</p>

@@ -119,7 +119,7 @@ const fetchSupplier = useCallback(async () => {
   } finally {
     setLoading(false);
   }
-}, [router, setFormData, activeTab]);
+}, [router, setFormData]);
 
   const handleTabClick = async (tabId) => {
     if (activeTab === 'profile-edit') {

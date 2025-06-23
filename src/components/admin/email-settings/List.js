@@ -242,7 +242,7 @@ export default function List() {
                         </tbody>
                     </table>
 
-                    {/* Modal */}
+                    {/* Model */}
                     {modalVisible && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                             <div className="bg-white w-[90%] max-w-2xl rounded-lg shadow-lg overflow-y-auto max-h-[90vh] relative">

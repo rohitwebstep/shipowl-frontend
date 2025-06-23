@@ -5,8 +5,10 @@ import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import HashLoader from "react-spinners/HashLoader";
-import Barcode from "react-barcode";
+import { useImageURL } from "@/components/ImageURLContext";
+
 function Reporting() {
+  const { fetchImages } = useImageURL();
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -24,7 +26,7 @@ function Reporting() {
   const [reporting, setReporting] = useState([]);
 
   const [permission, setPermission] = useState([]);
-  
+
   const [fromDate, setFromDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 6);
@@ -416,7 +418,7 @@ function Reporting() {
 
 
 
-              {/* Modal */}
+              {/* Model */}
               {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-[#000000ba] bg-opacity-50 z-50">
                   <div className="bg-white w-full max-w-3xl border-2 border-orange-500 p-6 rounded-md shadow-lg relative">
@@ -437,7 +439,7 @@ function Reporting() {
                               .map((imgUrl, imgIdx) => (
                                 <img
                                   key={imgIdx}
-                                  src={imgUrl.trim()}
+                                  src={fetchImages(imgUrl)}
                                   alt={`Variant ${idx} `}
                                   className="h-24 w-24 object-cover rounded border border-[#DFEAF2]"
                                 />
@@ -445,7 +447,7 @@ function Reporting() {
                           </div>
                           <p><strong>Name:</strong> {variant.name}</p>
                           <p><strong>Color:</strong> {variant.color}</p>
-                          <p><strong>Model:</strong> {variant.modal}</p>
+                          <p><strong>Model:</strong> {variant.model}</p>
                           <p><strong>SKU:</strong> {variant.sku}</p>
                           <p><strong>Suggested Price:</strong> ₹{variant.suggested_price}</p>
                         </div>

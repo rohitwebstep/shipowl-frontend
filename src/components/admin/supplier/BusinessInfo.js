@@ -309,19 +309,9 @@ const BusinessInfo = () => {
   }));
   return (
     <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 md:w-10/12 rounded-tl-none rounded-tr-none rounded-2xl">
-      <div className="grid lg:grid-cols-3 py-5 gap-4">
+      <div className="grid lg:grid-cols-2 py-5 gap-4">
         {/* Company Name, Brand Name, Short Brand Name */}
-        <div>
-          {renderLabel('Registered Company Name', 'companyName')}
-          <input
-            type="text"
-            name="companyName"
-            value={formData.companyName || ''}
-            onChange={handleChange}
-            className={inputClasses('companyName')}
-          />
-          {renderError('companyName')}
-        </div>
+       
 
         <div>
           {renderLabel('Brand Name', 'brandName')}

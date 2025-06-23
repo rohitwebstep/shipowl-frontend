@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import Select from "react-select";
 import { HashLoader } from "react-spinners";
+import dynamic from 'next/dynamic';
+const Select = dynamic(() => import('react-select'), { ssr: false });
 export default function Create() {
   const router = useRouter();
   const [permission, setPermission] = useState([]);
@@ -43,7 +44,7 @@ export default function Create() {
       fetchCity(value);
     }
   };
-   const handlePermissionChange = (permId) => {
+  const handlePermissionChange = (permId) => {
     setFormData((prev) => {
       const currentPermissions = Array.isArray(prev.permissions)
         ? prev.permissions.map(String)
@@ -131,7 +132,7 @@ export default function Create() {
       });
 
       const result = await res.json();
-      if (!res.ok) throw new Error(result.message ||result.error || "Failed to create supplier");
+      if (!res.ok) throw new Error(result.message || result.error || "Failed to create supplier");
 
       Swal.fire("Success", "supplier created Successfuly!", "success");
       // Reset form
@@ -369,10 +370,10 @@ export default function Create() {
                   </div>
 
                   {/* Permission Checkboxes */}
-                 <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
+                  <div className="grid border p-3 border-[#DFEAF2] rounded-md grid-cols-2 lg:grid-cols-4 gap-2 md:grid-cols-3">
                     {perms.map((perm) => (
                       <label key={perm.id} className="flex items-center space-x-2">
-                         <input
+                        <input
                           type="checkbox"
                           checked={
                             Array.isArray(formData.permissions)
