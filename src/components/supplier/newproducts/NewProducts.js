@@ -6,11 +6,11 @@ import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import { useEffect, useState, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import { HashLoader } from 'react-spinners';
-import { FileText, Tag, Truck } from "lucide-react"; // Icons
+import { FileText, Tag, Truck ,Star} from "lucide-react"; // Icons
 
 import { useImageURL } from "@/components/ImageURLContext";
 export default function NewProducts() {
-  const {fetchImages} = useImageURL();
+  const { fetchImages } = useImageURL();
   const { verifySupplierAuth } = useSupplier();
   const [productsRequest, setProductsRequest] = useState([]);
   const [loading, setLoading] = useState(null);
@@ -214,15 +214,14 @@ export default function NewProducts() {
     <>
       <div>
         {productsRequest.length > 0 ? (
-          <div className="grid lg:grid-cols-5 md:grid-cols-2 sm:grid-cols-1 gap-6">
+          <div className="grid xl:grid-cols-5 md:grid-cols-2 sm:grid-cols-1 gap-3">
             {productsRequest.map((product) => {
-            const imageUrl = product.variants?.[0]?.image?.split(',') || [];
+              const imageUrl = product.variants?.[0]?.image?.split(',') || [];
 
               const productName = product.name || "Unnamed Product";
 
               const getPriceDisplay = (variants) => {
-                if (!variants?.length) return "N/A";
-
+                if (!variants?.length) return <span>N/A</span>;
 
                 const modalMap = {};
                 variants.forEach((variant) => {
@@ -235,7 +234,8 @@ export default function NewProducts() {
 
                 // Case 1: Only 1 model and 1 variant
                 if (modalKeys.length === 1 && modalMap[modalKeys[0]].length === 1) {
-                  return `₹${modalMap[modalKeys[0]][0].suggested_price ?? 0}`;
+                  const price = modalMap[modalKeys[0]][0]?.suggested_price ?? 0;
+                  return <span>₹{price}</span>;
                 }
 
                 // Case 2: 1 model, multiple variants
@@ -243,26 +243,32 @@ export default function NewProducts() {
                   const prices = modalMap[modalKeys[0]].map(v => v?.suggested_price ?? 0);
                   const min = Math.min(...prices);
                   const max = Math.max(...prices);
-                  return `₹${min} - ₹${max}`;
+                  return <span>₹{min} - ₹{max}</span>;
                 }
 
                 // Case 3 or 4: multiple models
-                return modalKeys.map((model) => {
-                  const variants = modalMap[model];
-                  const prices = variants.map(v => v?.suggested_price ?? 0);
+                return modalKeys.map((model, idx) => {
+                  const modelVariants = modalMap[model];
+                  const prices = modelVariants.map(v => v?.suggested_price ?? 0);
                   const min = Math.min(...prices);
                   const max = Math.max(...prices);
                   const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
-                  return `${model}: ${priceLabel}`;
-                }).join(" | ");
+                  return (
+                    <span key={model} className='block'>
+                      {model}: {priceLabel}
+                      {idx !== modalKeys.length - 1 && <span className="mx-1"></span>}
+                    </span>
+                  );
+                });
               };
+
 
 
 
               return (
                 <div
                   key={product.id}
-                  className="group bg-white rounded-2xl overflow-hidden border border-[#B9B9B9] shadow-sm hover:shadow-lg transition-all duration-300 relative"
+                  className="group flex flex-col justify-between bg-white p-4 overflow-hidden  shadow-sm hover:shadow-md  transition-all duration-300 relative"
                 >
                   {/* Flip Image Section */}
                   <div className="relative h-[200px] perspective">
@@ -286,13 +292,28 @@ export default function NewProducts() {
                   </div>
 
                   {/* Content */}
-                  <div className="p-3 relative">
-                    <div className="flex justify-between flex-wrap items-center">
-                      <h2 className="text-lg font-semibold capitalize">{productName}</h2>
-                      <p className="text-black font-bold ">
+                  <div className="relative py-3">
+                    <div className="">
+                      <h2 className="text-lg font-semibold capitalize truncate">{productName}</h2>
+                      <p className="font-semibold ">
                         {getPriceDisplay(product.variants)}
                       </p>
 
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-gray-700">
+                      <span>{product.variants?.rating || 4.3}</span>
+                      <div className="flex gap-[1px] text-orange-500">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 fill-current ${i < Math.round(product.variants?.rating || 4.3)
+                              ? 'fill-orange-500'
+                              : 'fill-gray-300'
+                              }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="ml-1 text-gray-500">4,800</span>
                     </div>
 
                     <div className="mt-2 space-y-1 text-sm text-gray-700">
