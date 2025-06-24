@@ -29,7 +29,6 @@ const ProfileEditProvider = ({ children }) => {
     permanentCountry: "",
     companyName: "",
     brandName: "",
-    brandShortName: "",
     billingAddress: "",
     billingPincode: "",
     profilePicture: '',
@@ -83,7 +82,7 @@ const ProfileEditProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/country`, {
+      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/location/country`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

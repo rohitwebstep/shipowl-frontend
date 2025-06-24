@@ -66,7 +66,7 @@ const BusinessInfo = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+        `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -111,7 +111,7 @@ const BusinessInfo = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -167,7 +167,7 @@ const BusinessInfo = () => {
         }
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `https://shipping-owl-vd4s.vercel.app/api/admin/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -238,7 +238,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/admin/supplier/${id}`;
+      const url = `https://shipping-owl-vd4s.vercel.app/api/admin/supplier/${id}`;
       const form = new FormData();
 
       for (const key in formData) {
@@ -372,7 +372,7 @@ const BusinessInfo = () => {
 
   return (
     <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 rounded-tl-none rounded-tr-none rounded-2xl">
-      <div className="grid lg:grid-cols-3 py-5 gap-4">
+      <div className="grid lg:grid-cols-2 py-5 gap-4">
         {/* Company Name, Brand Name, Short Brand Name */}
         <div>
           {renderLabel('Registered Company Name', 'companyName')}
@@ -398,16 +398,7 @@ const BusinessInfo = () => {
           {renderError('brandName')}
         </div>
 
-        <div>
-          {renderLabel('Short Brand Name')}
-          <input
-            type="text"
-            name="brandShortName"
-            value={formData.brandShortName}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
+
       </div>
 
       {/* Billing Address */}

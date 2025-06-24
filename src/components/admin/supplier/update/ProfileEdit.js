@@ -30,7 +30,7 @@ const ProfileEdit = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState || id}/cities`, {
+      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/location/state/${formData?.permanentState || id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ const ProfileEdit = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/location/country/${formData?.permanentCountry || id}/states`,
+        `https://shipping-owl-vd4s.vercel.app/api/location/country/${formData?.permanentCountry || id}/states`,
         {
           method: "GET",
           headers: {

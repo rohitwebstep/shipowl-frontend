@@ -37,7 +37,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff`,
+                `https://shipping-owl-vd4s.vercel.app/api/supplier/staff`,
                 {
                     method: "GET",
                     headers: {
@@ -84,7 +84,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff/trashed`,
+                `https://shipping-owl-vd4s.vercel.app/api/supplier/staff/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -210,7 +210,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff/${item.id}`,
+                `https://shipping-owl-vd4s.vercel.app/api/supplier/staff/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -271,7 +271,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff/${item?.id}/restore`,
+                `https://shipping-owl-vd4s.vercel.app/api/supplier/staff/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -350,7 +350,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/supplier/staff/${item.id}/destroy`,
+                `https://shipping-owl-vd4s.vercel.app/api/supplier/staff/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

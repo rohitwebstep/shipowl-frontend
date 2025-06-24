@@ -32,7 +32,7 @@ const AccountDetails = () => {
 
         try {
             setCityLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/location/state/${id}/cities`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const AccountDetails = () => {
         try {
           setStateLoading(true);
           const response = await fetch(
-            `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+            `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}/states`,
             {
               method: "GET",
               headers: {

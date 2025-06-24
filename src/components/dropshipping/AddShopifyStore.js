@@ -5,11 +5,15 @@ import Swal from 'sweetalert2'
 import { useRouter } from 'next/navigation'
 import { useDropshipper } from './middleware/DropshipperMiddleWareContext'
 import { HashLoader } from "react-spinners";
-
+import { useImageURL } from "@/components/ImageURLContext";
+import Image from 'next/image'
 export default function AddShopifyStore() {
+    const { fetchImages } = useImageURL();
     const router = useRouter();
     const [validationErrors, setValidationErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedShop, setSelectedShop] = useState('');
     const [shopifyStores, setShopifyStores] = useState([]);
     const { verifyDropShipperAuth } = useDropshipper();
     const [formData, setFormData] = useState({
@@ -32,7 +36,7 @@ export default function AddShopifyStore() {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/dropshipper/shopify`, {
+            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/dropshipper/shopify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -124,7 +128,7 @@ export default function AddShopifyStore() {
             form.append('shop', formData.shop);
 
 
-            const url = "https://sleeping-owl-we0m.onrender.com/api/dropshipper/shopify/connect";
+            const url = "https://shipping-owl-vd4s.vercel.app/api/dropshipper/shopify/connect";
 
             const response = await fetch(url, {
                 method: "POST",
@@ -194,6 +198,103 @@ export default function AddShopifyStore() {
             setLoading(false);
         }
     };
+
+    const handleShopSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+        if (dropshipperData?.project?.active_panel !== "dropshipper") {
+            localStorage.clear("shippingData");
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        const token = dropshipperData?.security?.token;
+        if (!token) {
+            router.push("/dropshipping/auth/login");
+            return;
+        }
+
+        try {
+            Swal.fire({
+                title: 'Updating Shoap...',
+                text: 'Please wait while we save your Shoap.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const form = new FormData();
+            form.append('name', selectedShop.name);
+
+            if (selectedShop?.logo instanceof File) {
+                form.append('logo', selectedShop.logo); // Single file
+            }
+
+
+
+            const url = `https://shipping-owl-vd4s.vercel.app/api/dropshipper/shopify/${selectedShop?.id}`;
+
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: form,
+            });
+
+            const result = await response.json(); // Parse the result here
+
+            if (!response.ok) {
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Failed",
+                    text: result.message || result.error || "An error occurred",
+                });
+
+
+               
+            } else {
+                Swal.close();
+                Swal.fire({
+                    icon: "success",
+                    title: "Shop Updated",
+                    text: `The Shop has been Updated successfully!`,
+                    showConfirmButton: true,
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        fetchStores();
+                        setModalOpen(false);
+                        setSelectedShop('');
+
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Submission Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handleChangeShop = (e) => {
+        const { name, value, files } = e.target;
+
+        setSelectedShop((prev) => ({
+            ...prev,
+            [name]: name === 'logo' ? files[0] : value
+        }));
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-[80vh]">
@@ -205,7 +306,7 @@ export default function AddShopifyStore() {
         <section className="">
             <div className="grid grid-cols-2 gap-3">
                 <div className="bg-white rounded-2xl p-5">
-                       <h2 className='text-2xl font-bold pb-4'>Add New Store </h2>
+                    <h2 className='text-2xl font-bold pb-4'>Add New Store </h2>
                     <form onSubmit={handleSubmit}>
                         <div className=" ">
                             <div>
@@ -244,7 +345,9 @@ export default function AddShopifyStore() {
                                 <tr>
                                     <th className=" border border-[#E0E5F2] text-left px-2 py-1">SR</th>
                                     <th className=" border border-[#E0E5F2] text-left px-2 py-1">Name</th>
+                                    <th className=" border border-[#E0E5F2] text-left px-2 py-1">Logo</th>
                                     <th className=" border border-[#E0E5F2] px-2 py-1">Domain</th>
+                                    <th className=" border border-[#E0E5F2] text-left px-2 py-1">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -252,7 +355,15 @@ export default function AddShopifyStore() {
                                     <tr key={item.id} className="border border-[#E0E5F2]">
                                         <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{index + 1}</td>
                                         <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">{item.name || 'NIL'}</td>
+                                        <td className=" border border-[#E0E5F2] px-2 py-1 capitalize">
+                                            <Image src={fetchImages(item.logo)} alt={item.name} height={40} width={40} />
+                                        </td>
                                         <td className=" border border-[#E0E5F2] px-2 py-1 text-center">{item.domain || item.shop}</td>
+                                        <td className=" border border-[#E0E5F2] px-2 py-1 text-center">
+                                            <button onClick={() => {
+                                                setModalOpen(true), setSelectedShop(item)
+                                            }}
+                                                className='bg-green-500 p-2 rounded-md text-white'>Edit Shop</button></td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -263,6 +374,53 @@ export default function AddShopifyStore() {
                     }
                 </div>
             </div>
+            {modalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-md p-6 w-full max-w-md shadow-lg">
+                        <h2 className="text-xl font-semibold mb-4">Edit Shopify Store</h2>
+
+                        {/* Form */}
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Shop Name</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={selectedShop.name}
+                                    onChange={handleChangeShop}
+                                    className="w-full border border-gray-300 rounded px-3 py-2"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Logo</label>
+                                <input
+                                    type="file"
+                                    name="logo"
+                                    onChange={handleChangeShop}
+                                    className="w-full border border-gray-300 rounded px-3 py-2"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-2">
+                                <button
+                                    onClick={() => setModalOpen(false)}
+                                    className="px-4 py-2 rounded bg-gray-300 text-black"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleShopSubmit}
+                                    className="px-4 py-2 rounded bg-green-600 text-white"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </section>
     );
 }

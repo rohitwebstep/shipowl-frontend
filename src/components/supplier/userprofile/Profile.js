@@ -33,7 +33,7 @@ const fetchSupplier = useCallback(async () => {
   try {
     setLoading(true);
 
-    const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/profile`, {
+    const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/supplier/profile`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -91,7 +91,6 @@ const fetchSupplier = useCallback(async () => {
 
       companyName: companyDetail.companyName || "",
       brandName: companyDetail.brandName || "",
-      brandShortName: companyDetail.brandShortName || "",
       billingAddress: companyDetail.billingAddress || "",
       billingPincode: companyDetail.billingPincode || "",
       billingCountry: companyDetail.billingCountryId || "",
@@ -150,7 +149,7 @@ const fetchSupplier = useCallback(async () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${formData?.permanentState || id}/cities`, {
+      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/location/state/${formData?.permanentState || id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -194,7 +193,7 @@ const fetchSupplier = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/location/country/${formData?.permanentCountry || id}/states`,
+        `https://shipping-owl-vd4s.vercel.app/api/location/country/${formData?.permanentCountry || id}/states`,
         {
           method: "GET",
           headers: {

@@ -59,7 +59,7 @@ export default function ShippingDetails() {
         }
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/product/${id}/image/${index}?type=${type}`;
+      const url = `https://shipping-owl-vd4s.vercel.app/api/product/${id}/image/${index}?type=${type}`;
 
       const response = await fetch(url, {
         method: "DELETE",

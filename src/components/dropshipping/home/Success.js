@@ -37,7 +37,7 @@ export default function Success() {
       const form = new FormData();
       form.append("shop", shop);
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/dropshipper/shopify/callback?code=${code}&hmac=${hmac}&host=${host}&shop=${shop}&timestamp=${timestamp}`;
+      const url = `https://shipping-owl-vd4s.vercel.app/api/dropshipper/shopify/callback?code=${code}&hmac=${hmac}&host=${host}&shop=${shop}&timestamp=${timestamp}`;
 
       const response = await fetch(url, {
         method: "GET",

@@ -74,7 +74,7 @@ const BusinessInfo = () => {
     try {
       setStateLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+        `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -119,7 +119,7 @@ const BusinessInfo = () => {
 
     try {
       setCityLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -174,7 +174,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/admin/supplier";
+      const url = "https://shipping-owl-vd4s.vercel.app/api/admin/supplier";
       const form = new FormData();
 
       for (const key in formData) {
@@ -281,12 +281,42 @@ const BusinessInfo = () => {
   const inputClasses = (field) =>
     `w-full p-3 border rounded-lg font-bold ${businessErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'} text-[#718EBF]`;
 
+  const hasGST = !!formData.gstNumber?.trim();
+  const hasAadhar = !!formData.aadharNumber?.trim();
+
+  const requiredFields2 = {
+    ...(hasGST && {
+      gstNumber: true,
+      panCardHolderName: true,
+      gstDocument: true,
+    }),
+    ...(hasAadhar && {
+      aadharNumber: true,
+      companyPanNumber: true,
+      aadharCardHolderName: true,
+      panCardHolderName: true, // shared with GST
+      panCardImage: true,
+      aadharCardImage: true,
+    }),
+    companyName: true,
+    brandName: true,
+    billingAddress: true,
+    billingPincode: true,
+    billingCountry: true,
+    billingState: true,
+    billingCity: true,
+    clientEntryType: true,
+  };
+
+
+
   const renderLabel = (label, field) => (
     <label className={labelClasses(field)}>
       {label}
-      {requiredFields[field] && <span className="text-red-500 ml-1">*</span>}
+      {requiredFields2[field] && <span className="text-red-500 ml-1">*</span>}
     </label>
   );
+
 
   const renderError = (field) =>
     businessErrors[field] && <p className="text-red-500 text-sm mt-1">{businessErrors[field]}</p>;
@@ -309,33 +339,20 @@ const BusinessInfo = () => {
   }));
   return (
     <form onSubmit={handleSubmit} className="bg-white lg:p-10 p-3 md:w-10/12 rounded-tl-none rounded-tr-none rounded-2xl">
-      <div className="grid lg:grid-cols-2 py-5 gap-4">
-        {/* Company Name, Brand Name, Short Brand Name */}
-       
 
-        <div>
-          {renderLabel('Brand Name', 'brandName')}
-          <input
-            type="text"
-            name="brandName"
-            value={formData.brandName || ''}
-            onChange={handleChange}
-            className={inputClasses('brandName')}
-          />
-          {renderError('brandName')}
-        </div>
-
-        <div>
-          {renderLabel('Short Brand Name')}
-          <input
-            type="text"
-            name="brandShortName"
-            value={formData.brandShortName || ''}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg border-[#DFEAF2] text-[#718EBF] font-bold"
-          />
-        </div>
+      <div>
+        {renderLabel('Brand Name', 'brandName')}
+        <input
+          type="text"
+          name="brandName"
+          value={formData.brandName || ''}
+          onChange={handleChange}
+          className={inputClasses('brandName')}
+        />
+        {renderError('brandName')}
       </div>
+
+
 
       {/* Billing Address */}
 
@@ -502,7 +519,7 @@ const BusinessInfo = () => {
               onChange={handleChange}
               className={inputClasses(name)}
             />
-             {renderError(name)}
+            {renderError(name)}
           </div>
         ))}
       </div>

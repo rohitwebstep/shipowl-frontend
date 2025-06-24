@@ -166,9 +166,9 @@ const ProductDetails = () => {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory/${id}`;
+        url = `https://shipping-owl-vd4s.vercel.app/api/supplier/product/inventory/${id}`;
       } else {
-        url = `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${id}`;
+        url = `https://shipping-owl-vd4s.vercel.app/api/supplier/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
@@ -251,7 +251,7 @@ const ProductDetails = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory?category=${catid}&type=${tab}`, {
+      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/supplier/product/inventory?category=${catid}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -316,6 +316,7 @@ const ProductDetails = () => {
       });
 
       const form = new FormData();
+
       const simplifiedVariants = inventoryData.variant
         .filter(v => v.status === true) // Only include variants with status true
         .map(v => ({
@@ -330,7 +331,7 @@ const ProductDetails = () => {
 
 
 
-      const url = isEdit ? `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${id}` : "https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory";
+      const url = isEdit ? `https://shipping-owl-vd4s.vercel.app/api/supplier/product/my-inventory/${id}` : "https://shipping-owl-vd4s.vercel.app/api/supplier/product/my-inventory";
 
       const response = await fetch(url, {
         method: isEdit ? "PUT" : "POST",
@@ -423,6 +424,8 @@ const ProductDetails = () => {
       </div>
     );
   }
+
+  console.log('inventory', inventoryData)
 
   return (
     <>
@@ -1166,11 +1169,14 @@ const ProductDetails = () => {
                           onClick={() => {
                             setShowPopup(true);
                             setInventoryData({
-                              supplierProductId: product.id,
+                              productId: product.id,
                               id: product.id,
                               variant: item.variants,
-                              isVarientExists: product?.isVarientExists,
+                              isVarientExists: productDetails?.isVarientExists,
                             });
+                            setIsEdit(false)
+
+
                           }}
                           className="py-2 px-4 text-white rounded-md md:text-sm  text-xs w-full bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out"
                         >
@@ -1183,10 +1189,10 @@ const ProductDetails = () => {
                           onClick={() => {
                             setShowPopup(true);
                             setInventoryData({
-                              supplierProductId: product.id,
+                              productId: product.id,
                               id: product.id,
                               variant: item.variants,
-                              isVarientExists: product?.isVarientExists,
+                              isVarientExists: productDetails?.isVarientExists,
                             });
                             setIsEdit(true);
                           }} className="py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition duration-300 ease-in-out"

@@ -59,7 +59,7 @@ export default function NewProducts() {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/product/inventory?type=notmy`, {
+      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/supplier/product/inventory?type=notmy`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -153,7 +153,7 @@ export default function NewProducts() {
 
 
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory";
+      const url = "https://shipping-owl-vd4s.vercel.app/api/supplier/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",

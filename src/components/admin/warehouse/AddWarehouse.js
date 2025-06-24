@@ -50,7 +50,7 @@ export default function AddWarehouse() {
         try {
             setLoadingCity(true)
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/state/${id}/cities`,
                 {
                     method: "GET",
                     headers: {
@@ -97,7 +97,7 @@ export default function AddWarehouse() {
         try {
             setLoadingState(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/country/${value}/states`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/country/${value}/states`,
                 {
                     method: "GET",
                     headers: {
@@ -151,7 +151,7 @@ export default function AddWarehouse() {
         try {
             setLoadingCountry(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/country`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/country`,
                 {
                     method: "GET",
                     headers: {
@@ -275,7 +275,7 @@ export default function AddWarehouse() {
                 }
             });
 
-            const url = "https://sleeping-owl-we0m.onrender.com/api/warehouse";
+            const url = "https://shipping-owl-vd4s.vercel.app/api/warehouse";
 
             const form = new FormData();
             for (const key in formData) {

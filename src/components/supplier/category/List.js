@@ -50,7 +50,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/category`,
+                `https://shipping-owl-vd4s.vercel.app/api/admin/category`,
                 {
                     method: "GET",
                     headers: {
@@ -104,7 +104,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/category/trashed`,
+                `https://shipping-owl-vd4s.vercel.app/api/admin/category/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -230,7 +230,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/category/${item.id}`,
+                `https://shipping-owl-vd4s.vercel.app/api/admin/category/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -301,7 +301,7 @@ export default function List() {
 
             const results = await Promise.all(
                 selected.map(id =>
-                    fetch(`https://sleeping-owl-we0m.onrender.com/api/admin/category/${id}`, {
+                    fetch(`https://shipping-owl-vd4s.vercel.app/api/admin/category/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Content-Type": "application/json",
@@ -346,7 +346,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/category/${item?.id}/restore`,
+                `https://shipping-owl-vd4s.vercel.app/api/admin/category/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -425,7 +425,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/admin/category/${item.id}/destroy`,
+                `https://shipping-owl-vd4s.vercel.app/api/admin/category/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

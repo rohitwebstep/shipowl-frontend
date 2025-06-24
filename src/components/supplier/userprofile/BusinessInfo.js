@@ -68,7 +68,7 @@ const BusinessInfo = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/location/country/${id}/states`,
+        `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -113,7 +113,7 @@ const BusinessInfo = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/location/state/${id}/cities`, {
+      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -165,7 +165,7 @@ const BusinessInfo = () => {
         }
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `https://shipping-owl-vd4s.vercel.app/api/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -239,7 +239,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/profile/update`; // Ensure the URL is correct
+      const url = `https://shipping-owl-vd4s.vercel.app/api/supplier/profile/update`; // Ensure the URL is correct
       const form = new FormData();
       for (const key in files) {
         const value = files[key];

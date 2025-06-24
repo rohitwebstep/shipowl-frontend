@@ -127,7 +127,7 @@ export default function RTO() {
       setLoading(true);
 
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/supplier/order/warehouse-collected`,
+        `https://shipping-owl-vd4s.vercel.app/api/supplier/order/warehouse-collected`,
         {
           method: "POST",
           headers: {
@@ -185,7 +185,7 @@ export default function RTO() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://sleeping-owl-we0m.onrender.com/api/supplier/order/${activeTab}?from=${formatDate(
+        `https://shipping-owl-vd4s.vercel.app/api/supplier/order/${activeTab}?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {
@@ -326,7 +326,7 @@ export default function RTO() {
         });
       });
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/supplier/order/${order.id}/rto/${id}/response?status=${status}`;
+      const url = `https://shipping-owl-vd4s.vercel.app/api/supplier/order/${order.id}/rto/${id}/response?status=${status}`;
 
       const response = await fetch(url, {
         method: "POST",

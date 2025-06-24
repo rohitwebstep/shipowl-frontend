@@ -136,7 +136,7 @@ export default function VariantDetails() {
     try {
 
 
-      const url = `https://sleeping-owl-we0m.onrender.com/api/product/${variantId}/image/${index}?type=${type}`;
+      const url = `https://shipping-owl-vd4s.vercel.app/api/product/${variantId}/image/${index}?type=${type}`;
 
       const response = await fetch(url, {
         method: "DELETE",

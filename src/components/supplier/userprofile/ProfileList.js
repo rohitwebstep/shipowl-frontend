@@ -37,7 +37,7 @@ const ProfileList = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/profile`, {
+            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/supplier/profile`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -83,7 +83,7 @@ const ProfileList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/city`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/city`,
                 {
                     method: "GET",
                     headers: {
@@ -130,7 +130,7 @@ const ProfileList = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://sleeping-owl-we0m.onrender.com/api/location/state`,
+                `https://shipping-owl-vd4s.vercel.app/api/location/state`,
                 {
                     method: "GET",
                     headers: {

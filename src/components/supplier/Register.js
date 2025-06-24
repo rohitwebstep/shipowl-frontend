@@ -39,7 +39,6 @@ export default function Register() {
     permanentCountry: "",
     companyName: "",
     brandName: "",
-    brandShortName: "",
     billingAddress: "",
     billingPincode: "",
     billingState: "",
@@ -86,7 +85,6 @@ export default function Register() {
       permanentCountry,
       companyName,
       brandName,
-      brandShortName,
       billingAddress,
       billingPincode,
       billingState,
@@ -110,7 +108,6 @@ export default function Register() {
     if (!permanentCountry) newErrors.permanentCountry = "Country is required";
     if (!companyName.trim()) newErrors.companyName = "Company Name is required";
     if (!brandName.trim()) newErrors.brandName = "Brand Name is required";
-    if (!brandShortName.trim()) newErrors.brandShortName = "Brand Short Name is required";
     if (!billingAddress.trim()) newErrors.billingAddress = "Billing Address is required";
     if (!billingPincode.trim()) newErrors.billingPincode = "Billing Pincode is required";
     if (!billingState.trim()) newErrors.billingState = "Billing State is required";
@@ -139,7 +136,7 @@ export default function Register() {
     }
 
     try {
-      const res = await fetch(`https://sleeping-owl-we0m.onrender.com/api/supplier/auth/registration`, {
+      const res = await fetch(`https://shipping-owl-vd4s.vercel.app/api/supplier/auth/registration`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -174,7 +171,6 @@ export default function Register() {
         permanentCountry: "",
         companyName: "",
         brandName: "",
-        brandShortName: "",
         billingAddress: "",
         billingPincode: "",
         billingState: "",
@@ -211,7 +207,7 @@ export default function Register() {
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "https://sleeping-owl-we0m.onrender.com/api/location/country",
+      "https://shipping-owl-vd4s.vercel.app/api/location/country",
       setCountryData,
       "countries",             // ✅ make sure backend response uses this key
       setLoadingCountries
@@ -220,7 +216,7 @@ export default function Register() {
 
   const fetchState = useCallback((countryId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+      `https://shipping-owl-vd4s.vercel.app/api/location/country/${countryId}/states`,
       setStates,
       "states",         // ⚠️ verify that your API returns a `billingstates` key
       setBillingStateLoading
@@ -229,7 +225,7 @@ export default function Register() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/country/${countryId}/states`,
+      `https://shipping-owl-vd4s.vercel.app/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -238,7 +234,7 @@ export default function Register() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+      `https://shipping-owl-vd4s.vercel.app/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities
@@ -247,7 +243,7 @@ export default function Register() {
 
   const fetchCity2 = useCallback((stateId) => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/state/${stateId}/cities`,
+      `https://shipping-owl-vd4s.vercel.app/api/location/state/${stateId}/cities`,
       setCity,
       "cities",               // ⚠️ This key must match your API response structure
       setBillingCityLoading
@@ -255,7 +251,7 @@ export default function Register() {
   }, [fetchProtected]);
   const fetchContry2 = useCallback(() => {
     fetchProtected(
-      `https://sleeping-owl-we0m.onrender.com/api/location/country`,
+      `https://shipping-owl-vd4s.vercel.app/api/location/country`,
       setCountry,
       "countries",               // ⚠️ This key must match your API response structure
       setBillingCountryLoading
@@ -517,7 +513,7 @@ export default function Register() {
       <div>
         <h3 className="text-sm mb-3 font-bold text-orange-500">Company & Brand Information</h3>
 
-        <div className="grid md:grid-cols-3 gap-3">
+        <div className="grid md:grid-cols-2 gap-3">
           <div>
             <label className="block text-[#232323] font-bold mb-1" htmlFor="companyName">
               Company Name <span className="text-red-600">*</span>
@@ -554,23 +550,7 @@ export default function Register() {
             )}
           </div>
 
-          <div>
-            <label className="block text-[#232323] font-bold mb-1" htmlFor="brandShortName">
-              Brand Short Name <span className="text-red-600">*</span>
-            </label>
-            <input
-              type="text"
-              id="brandShortName"
-              name="brandShortName"
-              value={formData.brandShortName || ''}
-              onChange={handleChange}
-              className={`w-full p-3 border rounded-lg font-bold ${errors.brandShortName ? 'border-red-500 text-red-500' : 'border-[#DFEAF2] text-[#718EBF]'
-                }`}
-            />
-            {errors.brandShortName && (
-              <p className="text-red-600 text-sm">{errors.brandShortName}</p>
-            )}
-          </div>
+        
         </div>
       </div>
       <div className=" ">
