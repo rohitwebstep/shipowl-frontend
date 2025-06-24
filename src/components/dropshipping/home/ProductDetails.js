@@ -16,6 +16,17 @@ const tabs = [
   { key: "my", label: "Pushed to Shopify" },
 ];
 export default function ProductDetails() {
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   const router = useRouter();
   const { fetchImages } = useImageURL();
   const searchParams = useSearchParams();
@@ -43,6 +54,12 @@ export default function ProductDetails() {
     isVarientExists: '',
     shopifyApp: '',
   });
+
+  const [tooltipIndex, setTooltipIndex] = useState(null);
+
+  const handleTooltipToggle = (index) => {
+    setTooltipIndex(prev => (prev === index ? null : index));
+  };
   useEffect(() => {
     const images =
       selectedVariant?.variant?.image?.split(",") ||
@@ -130,14 +147,29 @@ export default function ProductDetails() {
     setSelectedVariant(variant);
   };
 
-  const [ordersGiven, setOrdersGiven] = useState(100);
-  const productPrice = selectedVariant?.price || 'N/A';
-  const shippingCost = shipCost || 75;
+  //calc acc to shipowl 
+  console.log('selectedVariant', selectedVariant)
+  const [ordersGiven, setOrdersGiven] = useState(0);
+  const [sellingPrice, setSellingPrice] = useState(0);
+  const [successRatio, setSuccessRatio] = useState(0);
+  const [adSpend, setAdSpend] = useState(0); // Now used in both models
 
-  const prepaidProductCost = productPrice * ordersGiven;
-  const shippingDeduction = shippingCost * ordersGiven;
-  const totalPrepaid = prepaidProductCost;
-  //calculation
+  const productPrice = Number(selectedVariant?.price || 0);
+  console.log('productPrice', productPrice)
+  const shippingCost = Number(shipCost || 75);
+  const isSelfShip = selectedVariant?.variant?.model.toLowerCase() === "selfship" || selectedVariant?.supplierProductVariant?.variant?.model.toLowerCase() === "selfship";
+
+  const deliveredOrders = Math.round(ordersGiven * (successRatio / 100));
+  const codCollected = sellingPrice * deliveredOrders;
+  const productCost = isSelfShip ? productPrice * ordersGiven : productPrice * deliveredOrders;
+  const totalShipping = shippingCost * ordersGiven;
+  const totalAdSpend = adSpend * ordersGiven;
+
+  // ✅ Now adSpend is included in both models
+  const totalDeduction = (isSelfShip ? 0 : productCost) + totalShipping + totalAdSpend;
+  const remitted = codCollected - totalDeduction;
+
+
 
   const viewProduct = (id) => {
     if (type == "notmy") {
@@ -496,10 +528,10 @@ export default function ProductDetails() {
   console.log('setInventoryData', inventoryData)
   return (
     <>
-      <section className="productsingal-page pb-[100px]">
+      <section className="relative productsingal-page pb-[100px]">
         <div className="container">
 
-          <div className="mx-auto  gap-4 justify-between  rounded-lg flex flex-col md:flex-row">
+          <div className="mx-auto relative gap-4 justify-between  rounded-lg flex flex-col md:flex-row">
             <div className="w-full md:w-4/12">
               <div className="rounded-lg bg-white border border-[#E0E2E7] p-4">
                 <div className="rounded-lg w-full">
@@ -628,7 +660,7 @@ export default function ProductDetails() {
                                       >
 
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden p-5 flex justify-center items-center rounded-lg mb-4 mx-auto">
+                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
                                             <Image
                                               src={fetchImages(variant.image)}
                                               alt={variant.name}
@@ -734,7 +766,7 @@ export default function ProductDetails() {
                                           }`}
                                       >
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden p-5 flex justify-center items-center rounded-lg mb-4 mx-auto">
+                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
                                             <Image
                                               src={fetchImages(variant.image)}
                                               alt={variant.name}
@@ -779,51 +811,130 @@ export default function ProductDetails() {
                   <div className="flex justify-between mt-4">
                     <p className='flex items-center gap-2'>Including GST & Shipping Charges <AiOutlineExclamationCircle className='text-green-500' /></p>
                   </div>
-                  <div className="grid grid-cols-1 mt-2 md:grid-cols-3 gap-0 rounded-lg overflow-hidden border border-gray-200 bg-white ">
-                    <div className="p-4 border-b  md:border-r border-gray-200">
-                      <p className="text-gray-500 mb-1">Product Listed Price:</p>
-                      <p className="font-semibold text-black">₹{productPrice}</p>
+                  <div className="grid grid-cols-1 mt-4 md:grid-cols-3 gap-0 rounded-lg overflow-hidden border border-gray-200 bg-white">
+                    {/* Left Section: Inputs + Scenario */}
+                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 border-r border-gray-200">
+                      <div className="p-4 border-b md:border-r border-gray-200">
+                        <p className="text-gray-500 mb-1">Product Listed Price:</p>
+                        <p className="font-semibold text-black">₹{productPrice}</p>
+                      </div>
+
+                      <div className="p-4 border-b border-gray-200">
+                        <p className="text-gray-500 mb-1">Shipping Cost:</p>
+                        <p className="font-semibold text-black">₹{shippingCost}</p>
+                      </div>
+
+                      <div className="p-4 border-b md:border-r border-gray-200">
+                        <label className="text-gray-500 block mb-1">Orders Given:</label>
+                        <input
+                          type="number"
+                          value={ordersGiven}
+                          onChange={(e) => setOrdersGiven(Number(e.target.value))}
+                          className="border border-gray-300 rounded-md px-3 py-1 w-full"
+                        />
+                      </div>
+
+                      <div className="p-4 border-b border-gray-200">
+                        <label className="text-gray-500 block mb-1">Selling Price ({isSelfShip ? "COD" : "Dropshipper"}):</label>
+                        <input
+                          type="number"
+                          value={sellingPrice}
+                          onChange={(e) => setSellingPrice(Number(e.target.value))}
+                          className="border border-gray-300 rounded-md px-3 py-1 w-full"
+                        />
+                      </div>
+
+                      <div className="p-4 border-b md:border-r border-gray-200">
+                        <label className="text-gray-500 block mb-1">Delivery Ratio (%):</label>
+                        <input
+                          type="number"
+                          value={successRatio}
+                          onChange={(e) => setSuccessRatio(Number(e.target.value))}
+                          className="border border-gray-300 rounded-md px-3 py-1 w-full"
+                        />
+                      </div>
+
+                      <div className="p-4 border-b border-gray-200">
+                        <p className="text-gray-500 mb-1">Delivered Orders:</p>
+                        <p className="font-semibold text-black">{ordersGiven} × {successRatio}% = {deliveredOrders} orders</p>
+                      </div>
+
+
+                      <div className="p-4 border-b md:border-r border-gray-200">
+                        <label className="text-gray-500 block mb-1">Ad Spend per Order:</label>
+                        <input
+                          type="number"
+                          value={adSpend}
+                          onChange={(e) => setAdSpend(Number(e.target.value))}
+                          className="border border-gray-300 rounded-md px-3 py-1 w-full"
+                        />
+                      </div>
+
+
+                      {isSelfShip && (
+                        <>
+                          <div className="p-4 border-b md:border-r border-gray-200">
+                            <p className="text-gray-500 mb-1">Prepaid Product Cost:</p>
+                            <p className="font-semibold text-black">
+
+                              ₹{productPrice} * {ordersGiven} = ₹{productCost.toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="p-4 border-b border-gray-200">
+                            <p className="text-gray-500 mb-1">Shipping Deduction:</p>
+                            <p className="font-semibold text-black">
+                              ₹{shippingCost} * {ordersGiven} = ₹{totalShipping.toLocaleString()}
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
 
-                    <div className="p-4 border-b  md:border-r border-gray-200">
-                      <label className="text-gray-500 block mb-1" htmlFor="ordersGiven">
-                        Orders Given:
-                      </label>
-                      <input
-                        id="ordersGiven"
-                        type="number"
-                        value={ordersGiven}
-                        onChange={(e) => setOrdersGiven(Number(e.target.value))}
-                        className="border border-gray-300 rounded-md px-3 py-1 w-full"
-                      />
-                    </div>
-
-                    <div className="p-4 border-b border-gray-200 ">
-                      <p className="text-gray-500 mb-1">Prepaid Product Cost:</p>
-                      <p className="font-semibold text-black">
-                        ₹{productPrice} X {ordersGiven} = ₹{prepaidProductCost.toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className="p-4 border-b md:border-b-0 md:border-r border-gray-200">
-                      <p className="text-gray-500 mb-1">Shipping Cost:</p>
-                      <p className="font-semibold text-black">₹{shippingCost}</p>
-                    </div>
-
-                    <div className="p-4 border-b md:border-b-0 md:border-r border-gray-200">
-                      <p className="text-gray-500 mb-1">Shipping Deduction:</p>
-                      <p className="font-semibold text-black">
-                        ₹{shippingCost} X {ordersGiven} = ₹{shippingDeduction.toLocaleString()}
-                      </p>
-                    </div>
-
+                    {/* Right Section: Summary */}
                     <div className="p-4">
-                      <p className="text-gray-500 mb-1">Total Prepaid:</p>
-                      <p className="font-semibold text-black">
-                        ₹{totalPrepaid.toLocaleString()} <span className="text-sm text-gray-500">(Via Wallet)</span>
-                      </p>
+                      <p className="text-gray-800 font-semibold mb-2">{isSelfShip ? "📦 Self-ship" : "🚚 Shipowl"} Calculation:</p>
+                      <div className="text-sm text-gray-700 space-y-2">
+                        <div className="flex justify-between">
+                          <span>COD Collected:</span>
+                          <span className="font-medium text-black">₹{codCollected.toLocaleString()}</span>
+                        </div>
+
+                        {!isSelfShip && (
+                          <>
+                            <div className="flex justify-between">
+                              <span>Product Cost:</span>
+                              <span className="font-medium text-black">₹{productCost.toLocaleString()}</span>
+                            </div>
+                          </>
+                        )}
+
+                        <div className="flex justify-between">
+                          <span>Shipping Cost:</span>
+                          <span className="font-medium text-black">₹{totalShipping.toLocaleString()}</span>
+                        </div>
+
+                        {!isSelfShip && (
+                          <div className="flex justify-between">
+                            <span>Ad Spend:</span>
+                            <span className="font-medium text-black">₹{totalAdSpend.toLocaleString()}</span>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between border-t border-gray-200 pt-2">
+                          <span className="font-semibold">Total Deduction</span>
+                          <span className="font-semibold text-black">₹{totalDeduction.toLocaleString()}</span>
+                        </div>
+
+                        <div className="flex justify-between border-t border-gray-300 pt-2 text-green-700">
+                          <span className="font-semibold">Remitted to Dropshipper</span>
+                          <span className="font-bold">₹{remitted.toLocaleString()}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
+
+
+
                 </div>
               </div>
               {
@@ -896,63 +1007,83 @@ export default function ProductDetails() {
                       const variant = lowestPriceVariant.variant;
 
                       return (
-                        <div
-                          key={index}
-                          onClick={() => viewProduct(sup?.id)}
-                          className="relative border-2 border-orange-500 overflow-hidden rounded-md p-3 flex gap-3 bg-white max-w-xl w-full shadow cursor-pointer"
-                        >
-                          {/* Ribbon */}
-                          <div className="absolute -right-10 top-13 -rotate-45 bg-orange-500 text-white text-xs px-8 py-1 font-semibold z-10">
-                            Recommended
-                          </div>
+                        <div key={index} className="relative">
+                          <div
 
-                          {/* Image */}
-                          <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0">
-                            <Image
-                              src={fetchImages(variant?.image || '')}
-                              alt={variant?.name || 'Variant Image'}
-                              width={100}
-                              height={100}
-                              className="object-cover w-full h-full"
-                            />
-                          </div>
 
-                          {/* Details */}
-                          <div className="flex flex-col justify-center text-sm text-gray-800 w-full space-y-1">
-                            {/* Title */}
-                            <div className="font-medium text-base">
-                              {variant?.name || 'N/A'}
+                            className="relative overflow-hidden border-2 border-orange-500  rounded-md p-3 flex gap-3 bg-white max-w-xl w-full shadow cursor-pointer"
+                          >
+                            {/* Ribbon */}
+                            <div className="absolute -right-10 top-13 -rotate-54 z-10">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleTooltipToggle(index);
+                                }}
+                                className="bg-orange-500 text-white text-xs px-8 py-1 font-semibold"
+                              >
+                                Recommended
+                              </button>
+
+                              {/* Tooltip */}
                             </div>
 
-                            {/* Rating */}
-                            <div className="flex items-center gap-1 text-sm text-gray-700">
-                              <span>{variant?.rating || 4.3}</span>
-                              <div className="flex gap-[1px] text-orange-500">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    className={`w-4 h-4 fill-current ${i < Math.round(variant?.rating || 4.3)
-                                      ? 'fill-orange-500'
-                                      : 'fill-gray-300'
-                                      }`}
-                                  />
-                                ))}
+
+                            {/* Image */}
+                            <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0">
+                              <Image
+                                src={fetchImages(variant?.image || '')}
+                                alt={variant?.name || 'Variant Image'}
+                                width={100}
+                                onClick={() => viewProduct(sup?.id)}
+                                height={100}
+                                className="object-cover w-full h-full"
+                              />
+                            </div>
+
+                            {/* Details */}
+                            <div onClick={() => viewProduct(sup?.id)} className="flex flex-col justify-center text-sm text-gray-800 w-full space-y-1">
+                              {/* Title */}
+                              <div className="font-medium text-base">
+                                {variant?.name || 'N/A'}
                               </div>
-                              <span className="ml-1 text-gray-500">4,800</span>
-                            </div>
 
-                            <div>
-                              <strong>Supplier ID:</strong>{" "}
-                              <span className="text-orange-500 font-medium">
-                                {sup?.supplier?.uniqeId || "ADMIN-XXXX"}
-                              </span>
-                            </div>
+                              {/* Rating */}
+                              <div className="flex items-center gap-1 text-sm text-gray-700">
+                                <span>{variant?.rating || 4.3}</span>
+                                <div className="flex gap-[1px] text-orange-500">
+                                  {Array.from({ length: 5 }).map((_, i) => (
+                                    <Star
+                                      key={i}
+                                      className={`w-4 h-4 fill-current ${i < Math.round(variant?.rating || 4.3)
+                                        ? 'fill-orange-500'
+                                        : 'fill-gray-300'
+                                        }`}
+                                    />
+                                  ))}
+                                </div>
+                                <span className="ml-1 text-gray-500">4,800</span>
+                              </div>
 
-                            {/* Price */}
-                            <div>
-                              <strong>Price:</strong> ₹{lowestPriceVariant.price}
+                              <div>
+                                <strong>Supplier ID:</strong>{" "}
+                                <span className="text-orange-500 font-medium">
+                                  {sup?.supplier?.uniqeId || "ADMIN-XXXX"}
+                                </span>
+                              </div>
+
+                              {/* Price */}
+                              <div>
+                                <strong>Price:</strong> ₹{lowestPriceVariant.price}
+                              </div>
                             </div>
                           </div>
+                          {tooltipIndex === index && (
+                            <div className=" absolute -bottom-20 right-0 mt-2 bg-white text-black shadow-lg border rounded px-3 py-2 text-sm w-48 z-20">
+                              This supplier is recommended based on quality and pricing.
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -998,46 +1129,44 @@ export default function ProductDetails() {
                 <hr className="border-gray-200" />
 
               </div>
+              <div
+                className={`flex flex-col rounded-md shadow-md border border-gray-300 md:flex-row justify-center items-stretch right-0 gap-4 z-50 bg-white p-3 left-0 bottom-4 m-auto md:w-6/12 animate-[slideUp_0.4s_ease-out] ${isSticky ? "fixed" : ""
+                  }`}
+                style={{
+                  animationFillMode: 'both',
+                }}
+              >
+                <div className="flex gap-3 justify-center">
+                  {/* Push to Shopify */}
+                  {type === 'notmy' ? (
+                    <button
+                      onClick={() => {
+                        setShowPopup(true);
+                        setInventoryData({
+                          supplierProductId: id,
+                          id: productDetails.id,
+                          variant: variantDetails,
+                          isVarientExists: productDetails?.isVarientExists,
+                          model: '',
+                          shopfyApp: '',
+                        });
+                      }}
+                      className="p-20 py-5 rounded-md flex gap-2 items-center text-white w-full md:text-sm text-xl bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out hover:scale-[1.02]"
+                    >
+                      <ArrowUpRight /> Push To Shopify
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleEdit(product.id)}
+                      className="p-20 py-5 rounded-md mt-2 text-white md:text-sm text-xs bg-black hover:bg-gray-800 transition duration-300 ease-in-out hover:scale-[1.02]"
+                    >
+                      Edit From Shopify
+                    </button>
+                  )}
+                </div>
 
-            </div>
-
-            <div
-              className="flex flex-col shadow-md border border-gray-300 md:flex-row justify-center items-stretch gap-4 z-50 bg-white p-5 rounded-md fixed left-0 bottom-0 w-full animate-[slideUp_0.4s_ease-out]"
-              style={{
-                animationFillMode: 'both',
-              }}
-            >
-              <div className="flex gap-3 justify-center">
-                {/* Push to Shopify */}
-                {type === 'notmy' ? (
-                  <button
-                    onClick={() => {
-                      setShowPopup(true);
-                      setInventoryData({
-                        supplierProductId: id,
-                        id: productDetails.id,
-                        variant: variantDetails,
-                        isVarientExists: productDetails?.isVarientExists,
-                        model: '',
-                        shopfyApp: '',
-                      });
-                    }}
-                    className="py-2 px-4 flex gap-2 items-center text-white rounded-md md:text-sm text-xs bg-[#2B3674] hover:bg-[#1f285a] transition duration-300 ease-in-out hover:scale-[1.02]"
-                  >
-                    <ArrowUpRight /> Push To Shopify
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleEdit(product.id)}
-                    className="py-2 px-4 mt-2 text-white rounded-md md:text-sm text-xs bg-black hover:bg-gray-800 transition duration-300 ease-in-out hover:scale-[1.02]"
-                  >
-                    Edit From Shopify
-                  </button>
-                )}
-              </div>
-
-              {/* Inline keyframes */}
-              <style jsx>{`
+                {/* Inline keyframes */}
+                <style jsx>{`
     @keyframes slideUp {
       from {
         transform: translateY(100%);
@@ -1049,7 +1178,11 @@ export default function ProductDetails() {
       }
     }
   `}</style>
+              </div>
+
             </div>
+
+
 
 
           </div>

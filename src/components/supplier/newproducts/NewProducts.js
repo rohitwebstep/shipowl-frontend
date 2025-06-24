@@ -7,6 +7,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Swal from 'sweetalert2';
 import { HashLoader } from 'react-spinners';
 import { FileText, Tag, Truck, Star } from "lucide-react"; // Icons
+import { MdInventory } from "react-icons/md";
 
 import { useImageURL } from "@/components/ImageURLContext";
 export default function NewProducts() {
@@ -406,7 +407,7 @@ export default function NewProducts() {
       {showPopup && (
         <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
-            <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
+            <h2 className="text-2xl  flex justify-center gap-3 items-center text-center underline font-semibold mb-6 text-orange-500"><MdInventory/> Add To List</h2>
 
             {(() => {
               const varinatExists = inventoryData?.isVarientExists ? "yes" : "no";
@@ -427,7 +428,7 @@ export default function NewProducts() {
                         >
                           <div className='flex gap-2 relative'>
                             {/* Image Preview */}
-                            <div className="flex gap-2 overflow-x-auto  border border-[#E0E2E7] rounded-md p-3shadow bg-white">
+                            <div className="flex items-center gap-2 overflow-x-auto h-[200px] w-full object-cover  border border-[#E0E2E7] rounded-md p-3shadow bg-white">
                               {imageUrls.length > 0 ? (
                                 imageUrls.map((url, i) => (
                                   <Image
@@ -436,77 +437,81 @@ export default function NewProducts() {
                                     width={100}
                                     src={fetchImages(url)}
                                     alt={variant.name || 'NIL'}
-                                    className="h-full w-full "
+                                    className="h-full w-full object-cover"
                                   />
                                 ))
                               ) : (
                                 <Image
                                   height={40}
                                   width={40}
-                                  src="https://placehold.co/600x400"
+                                  src="https://placehold.com/600x400"
                                   alt="Placeholder"
                                   className="rounded shrink-0"
                                 />
                               )}
                             </div>
-                            <div className="absolute top-0 left-0 bg-orange-500 p-2 text-white ">Suggested Price :{variant.suggested_price}</div>
+                            <div className="absolute top-0 left-0 w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant.suggested_price}</div>
 
 
                           </div>
 
-                        <div className="overflow-x-auto">
-                            <table className="text-sm text-gray-700 w-full  border-gray-100">
-                            <tbody>
-                              <tr className='border border-gray-100'>
-                                <th className="text-left border-gray-100 border p-3 font-semibold ">Model:</th>
-                                <td className='p-3 border border-gray-100'>{variant.model || "NIL"}</td>
-                                <th className="text-left border-gray-100 border p-3 font-semibold ">Name:</th>
-                                <td className='p-3 border border-gray-100'>{variant.name || "NIL"}</td>
+                          <div className="overflow-x-auto">
+                            <table className="text-sm text-gray-700 w-full  border-gray-200">
+                              <tbody>
+                                <tr className='border border-gray-200'>
+                                  <th className="text-left border-gray-200 border p-2 font-semibold ">Model:</th>
+                                  <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.model || "NIL"}</td>
+                                  <th className="text-left border-gray-200 border p-2 font-semibold ">Name:</th>
+                                  <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.name || "NIL"}</td>
 
 
-                              </tr>
+                                </tr>
 
-                              {isExists && (
-                                <>
-                               <tr className='border border-gray-100'>
+                                {isExists && (
+                                  <>
+                                    <tr className='border border-gray-200'>
 
 
-                                    <th className="text-left border-gray-100 border p-3 font-semibold ">SKU:</th>
-                                    <td className='p-3 border border-gray-100'>{variant.sku || "NIL"}</td>
+                                      <th className="text-left border-gray-200 border p-2 font-semibold ">SKU:</th>
+                                      <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.sku || "NIL"}</td>
 
-                                    <th className="text-left border-gray-100 border p-3 font-semibold ">Color:</th>
-                                    <td className='p-3 border border-gray-100'>{variant.color || "NIL"}</td>
-                                  </tr>
-                                </>
-                              )}
+                                      <th className="text-left border-gray-200 border p-2 font-semibold ">Color:</th>
+                                      <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.color || "NIL"}</td>
+                                    </tr>
+                                  </>
+                                )}
 
-                            </tbody>
-                          </table>
+                              </tbody>
+                            </table>
                           </div>
 
 
                           {/* Input Fields */}
                           <div className="flex flex-col space-y-2">
-                            <input
-                              type="number"
-                              placeholder="Stock"
-                              name="stock"
-                              className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
-                              value={variant.stock || ""}
-                              onChange={(e) =>
-                                handleVariantChange(variant.id, "stock", e.target.value)
-                              }
-                            />
-                            <input
-                              type="number"
-                              placeholder="Price"
-                              name="price"
-                              className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
-                              value={variant.price || ""}
-                              onChange={(e) =>
-                                handleVariantChange(variant.id, "price", e.target.value)
-                              }
-                            />
+                            <div className="flex items-end gap-2 border-b border-gray-200">
+                              <label>Stock</label>
+                              <input
+                                type="number"
+                                name="stock"
+                                className="px-3 w-full py-2 text-sm"
+                                value={variant.stock || ""}
+                                onChange={(e) =>
+                                  handleVariantChange(variant.id, "stock", e.target.value)
+                                }
+                              />
+                            </div>
+                            <div className="flex items-end gap-2 border-b border-gray-200">
+                              <label>Price</label>
+                              <input
+                                type="number"
+                                name="price"
+                                className="px-3 w-full py-2 text-sm"
+                                value={variant.price || ""}
+                                onChange={(e) =>
+                                  handleVariantChange(variant.id, "price", e.target.value)
+                                }
+                              />
+                            </div>
                           </div>
 
                           {/* Status Switch */}

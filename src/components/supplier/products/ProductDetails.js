@@ -8,13 +8,10 @@ import Image from 'next/image';
 import { Navigation } from 'swiper/modules';
 import Swal from 'sweetalert2';
 import { HashLoader } from 'react-spinners';
-
 import { LuArrowUpRight } from "react-icons/lu";
-
 import { FaTags } from "react-icons/fa";
-
+import { MdInventory } from "react-icons/md";
 import { Package, Boxes, Archive, Star, Tag, Truck, Weight, Banknote, ShieldCheck, RotateCcw, ArrowUpRight, ArrowLeft, Store, ChevronDown } from 'lucide-react';
-
 import { useImageURL } from "@/components/ImageURLContext";
 const tabs = [
   { key: "notmy", label: "Not Listed Products" },
@@ -28,8 +25,21 @@ const ProductDetails = () => {
   const type = searchParams.get('type');
   const [showPopup, setShowPopup] = useState(false);
   // Dynamic images setup
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   const [openSection, setOpenSection] = useState(null);
   const [shipCost, setShipCost] = useState([]);
+  const [isEdit, setIsEdit] = useState(false);
+
 
   const [activeModal, setActiveModal] = useState('Shipowl');
 
@@ -222,18 +232,8 @@ const ProductDetails = () => {
       setLoading(false);
     }
   }, [id, router, activeTab]);
-  const handleEdit = async (item) => {
 
 
-  };
-  const [ordersGiven, setOrdersGiven] = useState(100);
-  const productPrice = selectedVariant?.price || 'N/A';
-  const shippingCost = shipCost || 75;
-
-  const prepaidProductCost = productPrice * ordersGiven;
-  const shippingDeduction = shippingCost * ordersGiven;
-  const totalPrepaid = prepaidProductCost;
-  // Fetch related products by category
   const fetchRelatedProducts = useCallback(async (catid, tab) => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
 
@@ -330,10 +330,10 @@ const ProductDetails = () => {
 
 
 
-      const url = "https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory";
+      const url = isEdit ? `https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory/${id}` : "https://sleeping-owl-we0m.onrender.com/api/supplier/product/my-inventory";
 
       const response = await fetch(url, {
-        method: "POST",
+        method: isEdit ? "PUT" : "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -357,8 +357,8 @@ const ProductDetails = () => {
       // On success
       Swal.fire({
         icon: "success",
-        title: "Product Created",
-        text: "The Product has been created successfully!",
+        title: isEdit ? "Product Updated" : "Product Created",
+        text: `The Product has been ${isEdit ? "Updated" : "Created"} successfully!`,
         showConfirmButton: true,
       }).then((res) => {
         if (res.isConfirmed) {
@@ -368,7 +368,7 @@ const ProductDetails = () => {
             id: '',
           });
           setShowPopup(false);
-          fetchProducts();
+          fetchProductDetails();
         }
       });
 
@@ -416,7 +416,6 @@ const ProductDetails = () => {
     fetchProductDetails();
   }, [fetchProductDetails]);
 
-  console.log('selectedVariant', selectedVariant)
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -424,15 +423,7 @@ const ProductDetails = () => {
       </div>
     );
   }
-  const viewProduct = (id) => {
-    if (type == "notmy") {
-      router.push(`/supplier/product/?id=${id}&type=${type}`);
-    } else {
 
-      router.push(`/supplier/product/?id=${id}`);
-    }
-  };
-  console.log('selectedImage', selectedImage)
   return (
     <>
       <section className="productsingal-page pb-[100px]">
@@ -567,7 +558,7 @@ const ProductDetails = () => {
                                       >
 
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden p-5 flex justify-center items-center rounded-lg mb-4 mx-auto">
+                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
                                             <Image
                                               src={fetchImages(variant.image)}
                                               alt={variant.name}
@@ -673,7 +664,7 @@ const ProductDetails = () => {
                                           }`}
                                       >
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden p-5 flex justify-center items-center rounded-lg mb-4 mx-auto">
+                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
                                             <Image
                                               src={fetchImages(variant.image)}
                                               alt={variant.name}
@@ -766,7 +757,7 @@ const ProductDetails = () => {
                     try {
                       const tags = JSON.parse(productDetails?.tags || '[]');
                       if (Array.isArray(tags)) {
-                        return tags.map((tag, index) => (<span key={index} className="text-lg"># {tag}</span>
+                        return tags.map((tag, index) => (<span key={index} className="text-lg capitalize"># {tag},</span>
                         ));
                       }
                     } catch (err) {
@@ -777,84 +768,7 @@ const ProductDetails = () => {
                   })()}
                 </div>
               </div>
-              {otherSuppliers.length > 0 && (
-                <>
-                  <h3 className=" text-[18px] pt-5 pb-4 font-bold">Other Suppliers</h3>
-                  <div className="grid grid-cols-2 gap-3 items-start">
-                    {otherSuppliers.map((sup, index) => {
-                      const lowestPriceVariant = sup.variants.reduce((min, v) =>
-                        v.price < min.price ? v : min
-                      );
-                      const variant = lowestPriceVariant.variant;
 
-                      return (
-                        <div
-                          key={index}
-                          onClick={() => viewProduct(sup?.id)}
-                          className="relative border-2 border-orange-500 overflow-hidden rounded-md p-3 flex gap-3 bg-white max-w-xl w-full shadow cursor-pointer"
-                        >
-                          {/* Ribbon */}
-                          <div className="absolute -right-10 top-13 -rotate-45 bg-orange-500 text-white text-xs px-8 py-1 font-semibold z-10">
-                            Recommended
-                          </div>
-
-                          {/* Image */}
-                          <div className="w-24 h-24 rounded-md overflow-hidden flex-shrink-0">
-                            <Image
-                              src={fetchImages(variant?.image || '')}
-                              alt={variant?.name || 'Variant Image'}
-                              width={100}
-                              height={100}
-                              className="object-cover w-full h-full"
-                            />
-                          </div>
-
-                          {/* Details */}
-                          <div className="flex flex-col justify-center text-sm text-gray-800 w-full space-y-1">
-                            {/* Title */}
-                            <div className="font-medium text-base">
-                              {variant?.name || 'N/A'}
-                            </div>
-
-                            {/* Rating */}
-                            <div className="flex items-center gap-1 text-sm text-gray-700">
-                              <span>{variant?.rating || 4.3}</span>
-                              <div className="flex gap-[1px] text-orange-500">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                  <Star
-                                    key={i}
-                                    className={`w-4 h-4 fill-current ${i < Math.round(variant?.rating || 4.3)
-                                      ? 'fill-orange-500'
-                                      : 'fill-gray-300'
-                                      }`}
-                                  />
-                                ))}
-                              </div>
-                              <span className="ml-1 text-gray-500">4,800</span>
-                            </div>
-
-                            <div>
-                              <strong>Supplier ID:</strong>{" "}
-                              <span className="text-orange-500 font-medium">
-                                {sup?.supplier?.uniqeId || "ADMIN-XXXX"}
-                              </span>
-                            </div>
-
-                            {/* Price */}
-                            <div>
-                              <strong>Price:</strong> ₹{lowestPriceVariant.price}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-
-
-
-                  </div>
-                </>
-              )}
               <div className="description-box my-5">
                 <p className="text-xl font-bold text-black mb-3">Description</p>
                 {productDetails.description ? (
@@ -890,48 +804,51 @@ const ProductDetails = () => {
                 <hr className="border-gray-200" />
 
               </div>
-
-            </div>
-
-            <div className="flex flex-col shadow-md border border-gray-300 md:flex-row justify-center items-stretch gap-4 z-50 bg-white p-5 rounded-md fixed left-0 bottom-0 w-full">
-              <div className="flex gap-3 justify-center ">
-                {/* Push to Shopify */}
-                {type === "notmy" ? (
-                  <button onClick={() => {
-                    setShowPopup(true);
-                    setInventoryData({
-                      productId: productDetails.id,
-                      id: productDetails.id,
-                      variant: variantDetails,
-                      isVarientExists: productDetails?.isVarientExists,
-                    });
-                  }} className="bg-orange-500 text-white px-6 py-3 text-xl flex items-center justify-center sm:w-autofont-semibold">
-                    <LuArrowUpRight className="mr-2" /> Add To List
-                  </button>
-
-                ) :
-                  (
-                    <button className="bg-black text-white px-6 py-3 text-xl flex items-center justify-center sm:w-autofont-semibold">
-                      <LuArrowUpRight className="mr-2" />  Edit
+              <div
+                className={`flex flex-col rounded-md shadow-md border border-gray-300 md:flex-row justify-center items-stretch right-0 gap-4 z-50 bg-white p-3 left-0 bottom-4 m-auto md:w-6/12 animate-[slideUp_0.4s_ease-out] ${isSticky ? "fixed" : ""
+                  }`}
+                style={{
+                  animationFillMode: 'both',
+                }}
+              >              <div className="flex gap-3 justify-center ">
+                  {/* Push to Shopify */}
+                  {type === "notmy" ? (
+                    <button onClick={() => {
+                      setShowPopup(true);
+                      setInventoryData({
+                        productId: productDetails.id,
+                        id: productDetails.id,
+                        variant: variantDetails,
+                        isVarientExists: productDetails?.isVarientExists,
+                      });
+                    }} className="bg-orange-500 text-white px-20 py-3 rounded-md text-xl flex items-center justify-center sm:w-autofont-semibold">
+                      <LuArrowUpRight className="mr-2" /> Add To List
                     </button>
-                  )}
+
+                  ) :
+                    (
+                      <button onClick={() => {
+                        setShowPopup(true);
+                        setInventoryData({
+                          productId: productDetails.id,
+                          id: productDetails.id,
+                          variant: variantDetails,
+                          isVarientExists: productDetails?.isVarientExists,
+                        });
+                        setIsEdit(true)
+                      }} className="bg-black text-white px-20 rounded-md py-3 text-xl flex items-center justify-center sm:w-autofont-semibold">
+                        <LuArrowUpRight className="mr-2" />  Edit List
+                      </button>
+                    )}
 
 
-                {/* Info Box */}
-                <div className="flex items-center justify-between gap-3 bg-gray-100 px-4 py-3 rounded-md flex-1 text-sm text-gray-700">
-                  <div className="flex items-center gap-2">
-                    <ArrowLeft size={16} />
-                    <span>
-                      RTO & RVP charges are applicable and vary depending on the product weight.{' '}
-                      <a href="#" className="underline text-black hover:text-orange-600 transition">
-                        View charges for this product
-                      </a>
-                    </span>
-                  </div>
-                  <ChevronDown className="text-gray-500" size={16} />
+                  {/* Info Box */}
+
                 </div>
               </div>
+
             </div>
+
 
           </div>
         </div>
@@ -939,7 +856,7 @@ const ProductDetails = () => {
       {showPopup && (
         <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-5xl shadow-xl relative">
-            <h2 className="text-xl font-semibold mb-6">Add to Inventory</h2>
+            <h2 className="text-2xl  flex justify-center gap-3 items-center text-center underline font-semibold mb-6 text-orange-500"><MdInventory /> Add To List</h2>
 
             {(() => {
               const varinatExists = inventoryData?.isVarientExists ? "yes" : "no";
@@ -956,66 +873,97 @@ const ProductDetails = () => {
                       return (
                         <div
                           key={variant.id || idx}
-                          className="bg-white p-4 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
+                          className="bg-white p-4 rounded-md  border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
                         >
-                          <div className='flex gap-2'>
+                          <div className='flex gap-2 relative'>
                             {/* Image Preview */}
-                            <div className="md:min-w-4/12 h-20 rounded-lg flex items-center justify-center overflow-hidden">
+                            <div className="flex items-center gap-2 overflow-x-auto h-[200px] w-full object-cover  border border-[#E0E2E7] rounded-md p-3shadow bg-white">
                               {imageUrls.length > 0 ? (
-                                <img
-                                  src={fetchImages(imageUrls)}
-                                  alt={variant.name || "Variant Image"}
-                                  className="h-full object-cover"
-                                />
+                                imageUrls.map((url, i) => (
+                                  <Image
+                                    key={i}
+                                    height={100}
+                                    width={100}
+                                    src={fetchImages(url)}
+                                    alt={variant.name || 'NIL'}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ))
                               ) : (
-                                <img
-                                  src="https://placehold.co/600x400"
+                                <Image
+                                  height={40}
+                                  width={40}
+                                  src="https://placehold.com/600x400"
                                   alt="Placeholder"
-                                  className="h-full object-cover"
+                                  className="rounded shrink-0"
                                 />
                               )}
                             </div>
-
-                            <div className="text-sm md:w-8/12 text-gray-700 space-y-1">
-                              <p><span className="font-semibold">Model:</span> {variant.model || "NIL"}</p>
-                              <p><span className="font-semibold">Suggested Price:</span> {variant.suggested_price || "NIL"}</p>
-                              {isExists && (
-                                <>
-                                  <p><span className="font-semibold">Name:</span> {variant.name || "NIL"}</p>
-                                  <p><span className="font-semibold">SKU:</span> {variant.sku || "NIL"}</p>
-                                  <p><span className="font-semibold">Color:</span> {variant.color || "NIL"}</p>
-                                </>
-                              )}
-                            </div>
+                            <div className="absolute top-0 left-0 w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant?.suggested_price || variant?.price}</div>
                           </div>
+
+                          <div className="overflow-x-auto">
+                            <table className="text-sm text-gray-700 w-full  border-gray-200">
+                              <tbody>
+                                <tr className='border border-gray-200'>
+                                  <th className="text-left border-gray-200 border p-2 font-semibold ">Model:</th>
+                                  <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.model || variant?.variant?.model || "NIL"}</td>
+                                  <th className="text-left border-gray-200 border p-2 font-semibold ">Name:</th>
+                                  <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.name || variant?.variant?.name || "NIL"}</td>
+
+
+                                </tr>
+
+                                {isExists && (
+                                  <>
+                                    <tr className='border border-gray-200'>
+
+
+                                      <th className="text-left border-gray-200 border p-2 font-semibold ">SKU:</th>
+                                      <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.sku || variant?.variant?.sku || "NIL"}</td>
+
+                                      <th className="text-left border-gray-200 border p-2 font-semibold ">Color:</th>
+                                      <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.color || variant?.variant?.color || "NIL"}</td>
+                                    </tr>
+                                  </>
+                                )}
+
+                              </tbody>
+                            </table>
+                          </div>
+
 
                           {/* Input Fields */}
                           <div className="flex flex-col space-y-2">
-                            <input
-                              type="number"
-                              placeholder="Stock"
-                              name="stock"
-                              className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
-                              value={variant.stock || ""}
-                              onChange={(e) =>
-                                handleVariantChange(variant.id, "stock", e.target.value)
-                              }
-                            />
-                            <input
-                              type="number"
-                              placeholder="Price"
-                              name="price"
-                              className="border border-gray-300 shadow rounded px-3 py-2 text-sm"
-                              value={variant.price || ""}
-                              onChange={(e) =>
-                                handleVariantChange(variant.id, "price", e.target.value)
-                              }
-                            />
+                            <div className="flex items-end gap-2 border-b border-gray-200">
+                              <label>Stock</label>
+                              <input
+                                type="number"
+                                name="stock"
+                                className="px-3 w-full py-2 text-sm"
+                                value={variant.stock || ""}
+                                onChange={(e) =>
+                                  handleVariantChange(variant.id, "stock", e.target.value)
+                                }
+                              />
+                            </div>
+                            <div className="flex items-end gap-2 border-b border-gray-200">
+                              <label>Price</label>
+                              <input
+                                type="number"
+                                name="price"
+                                className="px-3 w-full py-2 text-sm"
+                                value={variant.price || ""}
+                                onChange={(e) =>
+                                  handleVariantChange(variant.id, "price", e.target.value)
+                                }
+                              />
+                            </div>
                           </div>
 
                           {/* Status Switch */}
                           <div className="flex items-center justify-between mt-2">
-                            <span className="text-sm font-medium">Add to List:</span>
+                            <span className="text-sm font-medium">Add To List:</span>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input
                                 type="checkbox"
@@ -1095,16 +1043,54 @@ const ProductDetails = () => {
         ) : (
           <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-2 md:gap-3 gap-2 xl:gap-10">
             {relatedProducts.map((item, index) => {
-              const product = type == "notmy" ? item : item.product || {};
+              const product = type == "notmy" ? item : item || {};
               const variants = item.variants || [];
 
-              const prices = variants
-                .map(v => type === "notmy" ? v.suggested_price : v.price)
-                .filter(p => typeof p === "number");
-              console.log('prices', prices)
-              console.log('variants', variants)
-              const lowestPrice = prices.length > 0 ? Math.min(...prices) : "-";
-              const productName = product.name || "Unnamed Product";
+              const getPriceDisplay = (variants) => {
+                if (!variants?.length) return <span>N/A</span>;
+
+                const modalMap = {};
+                variants.forEach((variant) => {
+                  const model = variant?.variant?.model || variant?.model || "Default";
+                  if (!modalMap[model]) modalMap[model] = [];
+                  modalMap[model].push(variant);
+                });
+
+                const modalKeys = Object.keys(modalMap);
+
+                // Case 1: Only 1 model and 1 variant
+                if (modalKeys.length === 1 && modalMap[modalKeys[0]].length === 1) {
+                  const price = modalMap[modalKeys[0]][0].suggested_price ?? modalMap[modalKeys[0]][0].price ?? 0;
+                  return <span>{modalKeys[0]}: ₹{price}</span>;
+                }
+
+                // Case 2: 1 model, multiple variants
+                if (modalKeys.length === 1 && modalMap[modalKeys[0]].length > 1) {
+                  const prices = modalMap[modalKeys[0]].map(v => v?.suggested_price ?? v?.price ?? 0);
+                  const min = Math.min(...prices);
+                  const max = Math.max(...prices);
+                  return <span>{modalKeys[0]}: ₹{min} - ₹{max}</span>;
+                }
+
+                // Case 3 or 4: multiple models
+                return (
+                  <>
+                    {modalKeys.map((model, idx) => {
+                      const modelVariants = modalMap[model];
+                      const prices = modelVariants.map(v => v?.suggested_price ?? v?.price ?? 0);
+                      const min = Math.min(...prices);
+                      const max = Math.max(...prices);
+                      const priceLabel = (min === max) ? `₹${min}` : `₹${min} - ₹${max}`;
+                      return (
+                        <span className='block' key={model}>
+                          {model}: {priceLabel}
+                          {idx < modalKeys.length - 1 && <span className="mx-1"></span>}
+                        </span>
+                      );
+                    })}
+                  </>
+                );
+              };
 
 
               return (
@@ -1119,7 +1105,7 @@ const ProductDetails = () => {
                       <div className="relative w-full h-full transition-transform duration-500 transform-style-preserve-3d group-hover:rotate-y-180">
                         {/* FRONT */}
                         <Image
-                          src={fetchImages(item?.variants?.[0]?.variant?.image || '')}
+                          src={fetchImages(item?.variants?.[0]?.variant?.image || item?.variants?.[0]?.image || '')}
                           alt={product.name}
                           height={200}
                           width={100}
@@ -1135,7 +1121,7 @@ const ProductDetails = () => {
                     {/* PRICE & NAME */}
                     <div className="flex justify-between items-center mt-3">
                       <p className="text-lg font-extrabold font-lato text-[#2C3454]">
-                        ₹{lowestPrice !== "-" ? lowestPrice : "-"}
+                        {getPriceDisplay(product.variants)}
                       </p>
                     </div>
                     <p className="text-[13px] text-[#7A7A7A] font-lato font-semibold mt-1 hover:text-black transition-colors duration-300">
@@ -1194,8 +1180,16 @@ const ProductDetails = () => {
 
                       {activeTab === "my" && (
                         <button
-                          onClick={() => handleEdit(product.id)}
-                          className="py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
+                          onClick={() => {
+                            setShowPopup(true);
+                            setInventoryData({
+                              supplierProductId: product.id,
+                              id: product.id,
+                              variant: item.variants,
+                              isVarientExists: product?.isVarientExists,
+                            });
+                            setIsEdit(true);
+                          }} className="py-2 px-4 mt-2 text-white rounded-md md:text-sm  text-xs  bg-black hover:bg-gray-800 transition duration-300 ease-in-out"
                         >
                           Edit List
                         </button>

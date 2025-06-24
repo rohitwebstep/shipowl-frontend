@@ -565,7 +565,7 @@ export default function ProductDetails() {
                                       >
 
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden p-5 flex justify-center items-center rounded-lg mb-4 mx-auto">
+                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
                                             <Image
                                               src={fetchImages(variant.image)}
                                               alt={variant.name}
@@ -671,7 +671,7 @@ export default function ProductDetails() {
                                           }`}
                                       >
                                         <div className="">
-                                          <div className="bg-[#F7F5F5] overflow-hidden p-5 flex justify-center items-center rounded-lg mb-4 mx-auto">
+                                          <div className="bg-[#F7F5F5] overflow-hidden flex justify-center items-center rounded mb-4 mx-auto">
                                             <Image
                                               src={fetchImages(variant.image)}
                                               alt={variant.name}
