@@ -125,7 +125,7 @@ export default function Create() {
     });
 
     try {
-      const res = await fetch(`https://shipping-owl-vd4s.vercel.app/api/dropshipper/staff`, {
+      const res = await fetch(`https://shipowl-kd06.onrender.com/api/dropshipper/staff`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -189,7 +189,7 @@ export default function Create() {
   }, [router]);
   const fetchPermission = useCallback(() => {
     fetchProtected(
-      "https://shipping-owl-vd4s.vercel.app/api/dropshipper/staff/meta",
+      "https://shipowl-kd06.onrender.com/api/dropshipper/staff/meta",
       setPermission,
       "staffPermissions",
       setLoadingPermission
@@ -198,7 +198,7 @@ export default function Create() {
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "https://shipping-owl-vd4s.vercel.app/api/location/country",
+      "https://shipowl-kd06.onrender.com/api/location/country",
       setCountryData,
       "countries",
       setLoadingCountries
@@ -207,7 +207,7 @@ export default function Create() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `https://shipping-owl-vd4s.vercel.app/api/location/country/${countryId}/states`,
+      `https://shipowl-kd06.onrender.com/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -216,7 +216,7 @@ export default function Create() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `https://shipping-owl-vd4s.vercel.app/api/location/state/${stateId}/cities`,
+      `https://shipowl-kd06.onrender.com/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities

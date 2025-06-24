@@ -36,7 +36,7 @@ export default function AddShopifyStore() {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/dropshipper/shopify`, {
+            const response = await fetch(`https://shipowl-kd06.onrender.com/api/dropshipper/shopify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -128,7 +128,7 @@ export default function AddShopifyStore() {
             form.append('shop', formData.shop);
 
 
-            const url = "https://shipping-owl-vd4s.vercel.app/api/dropshipper/shopify/connect";
+            const url = "https://shipowl-kd06.onrender.com/api/dropshipper/shopify/connect";
 
             const response = await fetch(url, {
                 method: "POST",
@@ -235,7 +235,7 @@ export default function AddShopifyStore() {
 
 
 
-            const url = `https://shipping-owl-vd4s.vercel.app/api/dropshipper/shopify/${selectedShop?.id}`;
+            const url = `https://shipowl-kd06.onrender.com/api/dropshipper/shopify/${selectedShop?.id}`;
 
             const response = await fetch(url, {
                 method: "PUT",

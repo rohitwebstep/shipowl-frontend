@@ -78,7 +78,7 @@ const Update = () => {
                 form.append('image', file);
             });
 
-            const url = `https://shipping-owl-vd4s.vercel.app/api/product/request/${id}`;
+            const url = `https://shipowl-kd06.onrender.com/api/product/request/${id}`;
 
             const response = await fetch(url, {
                 method: "PUT",
@@ -163,7 +163,7 @@ const Update = () => {
                 }
             });
 
-            const url = `https://shipping-owl-vd4s.vercel.app/api/product/request/my/${id}/image/${index}`;
+            const url = `https://shipowl-kd06.onrender.com/api/product/request/my/${id}/image/${index}`;
 
             const response = await fetch(url, {
                 method: "DELETE",
@@ -228,7 +228,7 @@ const Update = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/my/${id}`,
+                `https://shipowl-kd06.onrender.com/api/product/request/my/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -313,7 +313,7 @@ const Update = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/admin/category`, {
+            const response = await fetch(`https://shipowl-kd06.onrender.com/api/admin/category`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

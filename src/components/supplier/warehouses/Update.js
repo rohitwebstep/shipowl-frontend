@@ -55,7 +55,7 @@ export default function Update() {
 
     try {
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/location/state/${id}/cities`,
+        `https://shipowl-kd06.onrender.com/api/location/state/${id}/cities`,
         {
           method: "GET",
           headers: {
@@ -100,7 +100,7 @@ export default function Update() {
 
     try {
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/location/country/${value}/states`,
+        `https://shipowl-kd06.onrender.com/api/location/country/${value}/states`,
         {
           method: "GET",
           headers: {
@@ -153,7 +153,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/location/country`,
+        `https://shipowl-kd06.onrender.com/api/location/country`,
         {
           method: "GET",
           headers: {
@@ -238,7 +238,7 @@ export default function Update() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/warehouse/${id}`,
+        `https://shipowl-kd06.onrender.com/api/warehouse/${id}`,
         {
           method: "GET",
           headers: {
@@ -320,7 +320,7 @@ export default function Update() {
         }
       });
 
-      const url = `https://shipping-owl-vd4s.vercel.app/api/warehouse/${id}`;
+      const url = `https://shipowl-kd06.onrender.com/api/warehouse/${id}`;
       const form = new FormData();
       for (const key in formData) {
         if (formData[key]) {

@@ -67,7 +67,7 @@ const Payment = () => {
         }
       });
 
-      const url = `https://shipping-owl-vd4s.vercel.app/api/dropshipper/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `https://shipowl-kd06.onrender.com/api/dropshipper/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -151,7 +151,7 @@ const Payment = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      const url = `https://shipping-owl-vd4s.vercel.app/api/dropshipper/profile/update`;
+      const url = `https://shipowl-kd06.onrender.com/api/dropshipper/profile/update`;
       const form = new FormData();
 
       // Append uploaded files (new)

@@ -1,6 +1,6 @@
 postman pass:Lu6Y%CBfArhxd?+
-render url:https://shipping-owl-vd4s.vercel.app/
-localhost url: https://shipping-owl-vd4s.vercel.app/
+render url:https://shipowl-kd06.onrender.com/
+localhost url: https://shipowl-kd06.onrender.com/
 shopify url :webproductstore.myshopify.com:
 
 

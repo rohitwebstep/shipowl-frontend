@@ -4,7 +4,7 @@ const nextConfig = {
   
     images: {
       unoptimized: true,
-      domains: ['https://shipping-owl-vd4s.vercel.app'],
+      domains: ['https://shipowl-kd06.onrender.com'],
     },
   
     reactStrictMode: false,

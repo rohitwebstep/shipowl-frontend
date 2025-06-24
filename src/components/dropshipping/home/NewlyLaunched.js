@@ -151,25 +151,7 @@ const NewlyLaunched = () => {
     selected: v?.selected || false
   });
 
-  const [activeVariantId, setActiveVariantId] = useState(() => {
-    if (
-      modalNamesForPushToShopify.length === 0 ||
-      !groupedByModal ||
-      !groupedByModal[modalNamesForPushToShopify[0]] ||
-      groupedByModal[modalNamesForPushToShopify[0]].length === 0
-    ) {
-      return null;
-    }
 
-    const variants = groupedByModal[modalNamesForPushToShopify[0]];
-    const minPriceItem = variants.reduce((min, curr) => {
-      const currentVariant = getVariantData(curr);
-      const minVariant = getVariantData(min);
-      return currentVariant.suggested_price < minVariant.suggested_price ? curr : min;
-    }, variants[0]);
-
-    return getVariantData(minPriceItem).id;
-  });
 
 
   const handleSubmit = async (e) => {
@@ -202,19 +184,14 @@ const NewlyLaunched = () => {
       const form = new FormData();
       let simplifiedVariants = [];
 
-      console.log("Inventory Data:", inventoryData);
-      console.log("Grouped By Model:", groupedByModalForPushToShopify);
-      console.log("Model Names:", modalNamesForPushToShopify);
-      console.log("Total Modals:", totalModalsForPushToShopify);
+      
 
       if (
         totalModalsForPushToShopify === 2 &&
         modalNamesForPushToShopify.every((model) => groupedByModalForPushToShopify[model]?.length === 1)
       ) {
-        console.log("CASE: 2 modals, 1 variant each");
 
         const selectedVariant = inventoryData.variant.find((v) => v.selected);
-        console.log("Selected Variant Entry:", selectedVariant);
 
         if (selectedVariant) {
           simplifiedVariants = [{
@@ -227,7 +204,6 @@ const NewlyLaunched = () => {
         totalModalsForPushToShopify === 1 &&
         groupedByModalForPushToShopify[modalNamesForPushToShopify[0]]?.length > 1
       ) {
-        console.log("CASE: 1 model, multiple variants — push ALL from that model");
 
         const model = modalNamesForPushToShopify[0];
         const variants = groupedByModalForPushToShopify[model];
@@ -237,7 +213,6 @@ const NewlyLaunched = () => {
           price: v.dropPrice,
         }));
 
-        console.log("Variants pushed:", simplifiedVariants);
 
       } else if (
         totalModalsForPushToShopify > 1 &&
@@ -256,19 +231,15 @@ const NewlyLaunched = () => {
             price: v.dropPrice,
           }));
 
-          console.log("Selected Model:", selectedModal);
-          console.log("Variants in Selected Model:", modalVariants);
         }
 
       } else {
-        console.log("DEFAULT CASE: push all variants");
 
         simplifiedVariants = inventoryData.variant.map((v) => ({
           variantId: v.id || v.id, price: v.dropPrice,
         }));
       }
 
-      console.log("Final simplifiedVariants to submit:", simplifiedVariants);
 
       form.append('supplierProductId', inventoryData.supplierProductId);
       form.append('shopifyApp', inventoryData.shopifyApp);
@@ -276,7 +247,7 @@ const NewlyLaunched = () => {
 
 
 
-      const url = "https://shipping-owl-vd4s.vercel.app/api/dropshipper/product/my-inventory";
+      const url = "https://shipowl-kd06.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",
@@ -355,7 +326,7 @@ const NewlyLaunched = () => {
     try {
       setLoading(true);
       const res = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/dropshipper/product/inventory?type=${type}`,
+        `https://shipowl-kd06.onrender.com/api/dropshipper/product/inventory?type=${type}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -1018,7 +989,7 @@ const NewlyLaunched = () => {
             <div className="bg-white border border-orange-500 p-6 rounded-lg w-full z-50 max-w-4xl shadow-xl relative">
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-800">Variant Details</h2>
+                <h2 className="text-2xl font-bold  text-center text-orange-500">Variant Details</h2>
                 <button
                   onClick={() => setShowVariantPopup(false)}
                   className="text-gray-500 hover:text-gray-800 transition-colors"
@@ -1049,34 +1020,62 @@ const NewlyLaunched = () => {
                   return (
                     <div
                       key={variant.id || idx}
-                      className="bg-white hover:border-orange-500 p-4 rounded-2xl shadow-md hover:shadow-xl border border-gray-200 transition-all duration-300 flex flex-col"
+                      className="bg-white p-4 rounded-md  border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
                     >
-                      {/* Image */}
-                      <div className="w-full h-40 bg-gray-100 rounded-xl flex items-center justify-center mb-4 overflow-hidden">
-                        {imageUrls?.length > 0 ? (
-                          <img
-                            src={fetchImages(imageUrls.split(','))}
-                            alt={`variant-img-${idx}`}
-                            className="h-full w-full object-cover p-3 rounded-md"
-                          />
-                        ) : (
-                          <span className="text-gray-400 text-xl font-bold">{idx + 1}</span>
-                        )}
+                      <div className='flex gap-2 relative'>
+                        {/* Image Preview */}
+                        <div className="flex items-center gap-2 overflow-x-auto h-[200px] w-full object-cover  border border-[#E0E2E7] rounded-md p-3shadow bg-white">
+                          {Array.isArray(imageUrls) && imageUrls.length > 0 ? (
+                            imageUrls.map((url, i) => (
+                              <Image
+                                key={i}
+                                height={100}
+                                width={100}
+                                src={fetchImages(url)}
+                                alt={variant.name || 'NIL'}
+                                className="h-full w-full object-cover"
+                              />
+                            ))
+                          ) : (
+                            <Image
+                              height={40}
+                              width={40}
+                              src="https://placehold.com/600x400"
+                              alt="Placeholder"
+                              className="rounded shrink-0"
+                            />
+                          )}
+
+                        </div>
+                        <div className="absolute top-0 left-0 w-full text-center bg-orange-500 p-2 text-white ">Suggested Price : {v.price || v?.supplierProductVariant?.price || "—"}</div>
+
 
                       </div>
 
-                      {/* Text Info */}
-                      <div className="text-sm text-gray-700 space-y-1">
-                        <p><span className="font-semibold">Model:</span> {variant.model || "—"}</p>
-                        <p><span className="font-semibold">Suggested Price:</span> {v.price || v?.supplierProductVariant?.price || "—"}</p>
+                      <div className="overflow-x-auto">
+                        <table className="text-sm text-gray-700 w-full  border-gray-200">
+                          <tbody>
+                            <tr className='border border-gray-200'>
+                              <th className="text-left border-gray-200 border p-2 font-semibold ">Model:</th>
+                              <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.model || "NIL"}</td>
 
-                        {isExists && (
-                          <>
-                            <p><span className="font-semibold">Name:</span> {variant.name || "—"}</p>
-                            <p><span className="font-semibold">SKU:</span> {variant.sku || "—"}</p>
-                            <p><span className="font-semibold">Color:</span> {variant.color || "—"}</p>
-                          </>
-                        )}
+                              <th className="text-left border-gray-200 border p-2 font-semibold ">Name:</th>
+                              <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.name || "NIL"}</td>
+                            </tr>
+                            {isExists && (
+                              <>
+                                <tr className='border border-gray-200'>
+                                  <th className="text-left border-gray-200 border p-2 font-semibold ">SKU:</th>
+                                  <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.sku || "NIL"}</td>
+
+                                  <th className="text-left border-gray-200 border p-2 font-semibold ">Color:</th>
+                                  <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.color || "NIL"}</td>
+                                </tr>
+                              </>
+                            )}
+
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   );

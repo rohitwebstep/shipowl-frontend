@@ -68,7 +68,7 @@ export default function Update() {
             formdata.append("amount", formData.amount);
             formdata.append("status", formData.status);
 
-            const res = await fetch(`https://shipping-owl-vd4s.vercel.app/api/payment/${id}`, {
+            const res = await fetch(`https://shipowl-kd06.onrender.com/api/payment/${id}`, {
                 method: "PUT",
                 headers: { Authorization: `Bearer ${token}` },
                 body: formdata,
@@ -111,7 +111,7 @@ export default function Update() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/payment/${id}`,
+                `https://shipowl-kd06.onrender.com/api/payment/${id}`,
                 {
                     method: "GET",
                     headers: {

@@ -54,7 +54,7 @@ function Reporting() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/admin/supplier/${id}/payment-report?from=${formatDate(
+        `https://shipowl-kd06.onrender.com/api/admin/supplier/${id}/payment-report?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {

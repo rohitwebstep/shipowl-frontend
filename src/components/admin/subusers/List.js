@@ -36,7 +36,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/admin/staff`,
+                `https://shipowl-kd06.onrender.com/api/admin/staff`,
                 {
                     method: "GET",
                     headers: {
@@ -83,7 +83,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/admin/staff/trashed`,
+                `https://shipowl-kd06.onrender.com/api/admin/staff/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -264,7 +264,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/admin/staff/${item.id}`,
+                `https://shipowl-kd06.onrender.com/api/admin/staff/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -325,7 +325,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/admin/staff/${item?.id}/restore`,
+                `https://shipowl-kd06.onrender.com/api/admin/staff/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -404,7 +404,7 @@ export default function List() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/admin/staff/${item.id}/destroy`,
+                `https://shipowl-kd06.onrender.com/api/admin/staff/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

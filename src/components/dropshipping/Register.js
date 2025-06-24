@@ -110,7 +110,7 @@ export default function Register() {
 
 
     try {
-      const res = await fetch(`https://shipping-owl-vd4s.vercel.app/api/dropshipper/auth/registration`, {
+      const res = await fetch(`https://shipowl-kd06.onrender.com/api/dropshipper/auth/registration`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -175,7 +175,7 @@ export default function Register() {
 
   const fetchCountryAndState = useCallback(() => {
     fetchProtected(
-      "https://shipping-owl-vd4s.vercel.app/api/location/country",
+      "https://shipowl-kd06.onrender.com/api/location/country",
       setCountryData,
       "countries",
       setLoadingCountries
@@ -184,7 +184,7 @@ export default function Register() {
 
   const fetchStateList = useCallback((countryId) => {
     fetchProtected(
-      `https://shipping-owl-vd4s.vercel.app/api/location/country/${countryId}/states`,
+      `https://shipowl-kd06.onrender.com/api/location/country/${countryId}/states`,
       setStateData,
       "states",
       setLoadingStates
@@ -193,7 +193,7 @@ export default function Register() {
 
   const fetchCity = useCallback((stateId) => {
     fetchProtected(
-      `https://shipping-owl-vd4s.vercel.app/api/location/state/${stateId}/cities`,
+      `https://shipowl-kd06.onrender.com/api/location/state/${stateId}/cities`,
       setCityData,
       "cities",
       setLoadingCities

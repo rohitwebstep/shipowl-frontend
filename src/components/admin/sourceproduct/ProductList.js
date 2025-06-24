@@ -35,7 +35,7 @@ export default function ProductList() {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/dropshipper`, {
+            const response = await fetch(`https://shipowl-kd06.onrender.com/api/dropshipper`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export default function ProductList() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request`,
+                `https://shipowl-kd06.onrender.com/api/product/request`,
                 {
                     method: "GET",
                     headers: {
@@ -144,7 +144,7 @@ export default function ProductList() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/trashed`,
+                `https://shipowl-kd06.onrender.com/api/product/request/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -219,7 +219,7 @@ export default function ProductList() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/${item.id}`,
+                `https://shipowl-kd06.onrender.com/api/product/request/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -289,7 +289,7 @@ export default function ProductList() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/${item?.id}/restore`,
+                `https://shipowl-kd06.onrender.com/api/product/request/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -367,7 +367,7 @@ export default function ProductList() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/${item.id}/destroy`,
+                `https://shipowl-kd06.onrender.com/api/product/request/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

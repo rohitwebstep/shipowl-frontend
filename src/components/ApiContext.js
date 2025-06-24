@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 const ApiContext = createContext();
 
 export const ApiProvider = ({ children }) => {
-  const API_URL = "https://shipping-owl-vd4s.vercel.app/api/";
+  const API_URL = "https://shipowl-kd06.onrender.com/api/";
 
   return (
     <ApiContext.Provider value={API_URL}>

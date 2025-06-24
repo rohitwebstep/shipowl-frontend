@@ -48,7 +48,7 @@ function Reporting() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/dropshipper/order/report?from=${formatDate(
+                `https://shipowl-kd06.onrender.com/api/dropshipper/order/report?from=${formatDate(
                     fromDate
                 )}&to=${formatDate(toDate)}`,
                 {

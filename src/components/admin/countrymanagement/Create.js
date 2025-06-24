@@ -83,7 +83,7 @@ export default function Create() {
         form.append(key, formData[key]);
       }
 
-      const url = "https://shipping-owl-vd4s.vercel.app/api/location/country";
+      const url = "https://shipowl-kd06.onrender.com/api/location/country";
 
       const response = await fetch(url, {
         method: "POST",

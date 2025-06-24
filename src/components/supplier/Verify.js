@@ -29,7 +29,7 @@ export default function Verify() {
       redirect: "follow",
     };
 
-    fetch("https://shipping-owl-vd4s.vercel.app/api/supplier/auth/registration/verify", requestOptions)
+    fetch("https://shipowl-kd06.onrender.com/api/supplier/auth/registration/verify", requestOptions)
       .then(async (response) => {
         const text = await response.text();
         setLoading(false);

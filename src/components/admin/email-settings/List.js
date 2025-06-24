@@ -76,7 +76,7 @@ export default function List() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/admin/emails`,
+                `https://shipowl-kd06.onrender.com/api/admin/emails`,
                 {
                     method: "GET",
                     headers: {

@@ -66,7 +66,7 @@ const BusinessInfo = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/location/country/${id}/states`,
+        `https://shipowl-kd06.onrender.com/api/location/country/${id}/states`,
         {
           method: "GET",
           headers: {
@@ -111,7 +111,7 @@ const BusinessInfo = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/location/state/${id}/cities`, {
+      const response = await fetch(`https://shipowl-kd06.onrender.com/api/location/state/${id}/cities`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -167,7 +167,7 @@ const BusinessInfo = () => {
         }
       });
 
-      const url = `https://shipping-owl-vd4s.vercel.app/api/admin/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
+      const url = `https://shipowl-kd06.onrender.com/api/admin/supplier/${formData.id}/company/${formData.companyid}/image/${index}?type=${type}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -238,7 +238,7 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = `https://shipping-owl-vd4s.vercel.app/api/admin/supplier/${id}`;
+      const url = `https://shipowl-kd06.onrender.com/api/admin/supplier/${id}`;
       const form = new FormData();
 
       for (const key in formData) {
@@ -346,10 +346,36 @@ const BusinessInfo = () => {
   const inputClasses = (field) =>
     `w-full p-3 border rounded-lg font-bold ${businessErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'} text-[#718EBF]`;
 
+  const requiredFields2 = {
+    ...(hasGST && {
+      gstNumber: true,
+      panCardHolderName: true,
+      gstDocument: true,
+    }),
+    ...(hasAadhar && {
+      aadharNumber: true,
+      companyPanNumber: true,
+      aadharCardHolderName: true,
+      panCardHolderName: true, // shared with GST
+      panCardImage: true,
+      aadharCardImage: true,
+    }),
+    companyName: true,
+    brandName: true,
+    billingAddress: true,
+    billingPincode: true,
+    billingCountry: true,
+    billingState: true,
+    billingCity: true,
+    clientEntryType: true,
+  };
+
+
+
   const renderLabel = (label, field) => (
     <label className={labelClasses(field)}>
       {label}
-      {requiredFields[field] && <span className="text-red-500 ml-1">*</span>}
+      {requiredFields2[field] && <span className="text-red-500 ml-1">*</span>}
     </label>
   );
 

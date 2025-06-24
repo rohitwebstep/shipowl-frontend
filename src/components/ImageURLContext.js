@@ -21,7 +21,7 @@ export const ImageURLProvider = ({ children }) => {
 
     imagePath = imagePath.replace(/^\/+/, '');
 
-    const finalURL = `https://shipping-owl-vd4s.vercel.app/api/images/tmp/${imagePath}`;
+    const finalURL = `https://shipowl-kd06.onrender.com/api/images/tmp/${imagePath}`;
 
     return finalURL;
   }

@@ -48,7 +48,7 @@ const AddProduct = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/admin/product/${id}`, {
+      const response = await fetch(`https://shipowl-kd06.onrender.com/api/admin/product/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

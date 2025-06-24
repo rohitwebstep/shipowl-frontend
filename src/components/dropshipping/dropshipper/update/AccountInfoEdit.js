@@ -45,7 +45,7 @@ const AccountInfoEdit = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/dropshipper/profile`, {
+            const response = await fetch(`https://shipowl-kd06.onrender.com/api/dropshipper/profile`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -142,7 +142,7 @@ const AccountInfoEdit = () => {
                 didOpen: () => Swal.showLoading(),
             });
 
-            const url = "https://shipping-owl-vd4s.vercel.app/api/dropshipper/profile/bank-account/change-request";
+            const url = "https://shipowl-kd06.onrender.com/api/dropshipper/profile/bank-account/change-request";
             const form = new FormData();
             // Append all formData key-value pairs
             Object.entries(formData).forEach(([key, value]) => {

@@ -62,7 +62,7 @@ export default function SupplierMiddleWareProvider({ children }) {
         };
 
         try {
-            const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/supplier/auth/verify`, {
+            const response = await fetch(`https://shipowl-kd06.onrender.com/api/supplier/auth/verify`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

@@ -60,7 +60,7 @@ function Permission() {
 
   const fetchPermission = useCallback(() => {
     fetchProtected(
-      "https://shipping-owl-vd4s.vercel.app/api/admin/permission",
+      "https://shipowl-kd06.onrender.com/api/admin/permission",
       setPermission,
       "permissions",
       setLoading
@@ -104,7 +104,7 @@ function Permission() {
         redirect: "follow"
       };
 
-      const res = await fetch("https://shipping-owl-vd4s.vercel.app/api/admin/permission", requestOptions);
+      const res = await fetch("https://shipowl-kd06.onrender.com/api/admin/permission", requestOptions);
 
       const result = await res.json();
 

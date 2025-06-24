@@ -33,10 +33,13 @@ export default function RTO() {
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [disputeLevel2, setDisputeLevel2] = useState('');
+  const [disputeOpen, setDisputeOpen] = useState(false);
   const handleViewVariant = (item, variant) => {
     setSelectedVariant(item);
     setShowModal(true);
   };
+
   const [selectedDisputeItem, setSelectedDisputeItem] = useState(null);
   const modalRefNew = useRef(null);
   const [scannedCode, setScannedCode] = useState('');
@@ -45,7 +48,6 @@ export default function RTO() {
   const [isBarCodePopupOpen, setIsBarCodePopupOpen] = useState(false);
   const openBarCodeModal = () => {
     setIsBarCodePopupOpen(true);
-
   }
 
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
@@ -127,7 +129,7 @@ export default function RTO() {
       setLoading(true);
 
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/supplier/order/warehouse-collected`,
+        `https://shipowl-kd06.onrender.com/api/supplier/order/warehouse-collected`,
         {
           method: "POST",
           headers: {
@@ -185,7 +187,7 @@ export default function RTO() {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://shipping-owl-vd4s.vercel.app/api/supplier/order/${activeTab}?from=${formatDate(
+        `https://shipowl-kd06.onrender.com/api/supplier/order/${activeTab}?from=${formatDate(
           fromDate
         )}&to=${formatDate(toDate)}`,
         {
@@ -227,6 +229,68 @@ export default function RTO() {
       setLoading(false);
     }
   }, [router, fromDate, toDate, activeTab]);
+
+
+  const initiateLevel1 = useCallback(async (id) => {
+    const supplierData = JSON.parse(localStorage.getItem("shippingData"));
+
+    if (supplierData?.project?.active_panel !== "supplier") {
+      localStorage.removeItem("shippingData");
+      router.push("/supplier/auth/login");
+      return;
+    }
+
+    const suppliertoken = supplierData?.security?.token;
+    if (!suppliertoken) {
+      router.push("/supplier/auth/login");
+      return;
+    }
+
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `https://shipowl-kd06.onrender.com/api/supplier/order/need-to-raise/${id}/dispute-1`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${suppliertoken}`,
+
+
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong!",
+          customClass: {
+            container: 'custom-swal-zindex'
+          },
+          text:
+            errorMessage.error ||
+            errorMessage.message ||
+            "Your session has expired. Please log in again.",
+        },
+
+        );
+        throw new Error(errorMessage.message || errorMessage.error);
+      }
+
+      const result = await response.json();
+      if (result) {
+        fetchRto();
+      }
+
+    } catch (error) {
+      console.error("Error fetching report:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && orders.length > 0 && !loading) {
@@ -285,7 +349,7 @@ export default function RTO() {
   });
 
 
-  const handleSubmit = async (e, order, id) => {
+  const handleSubmitdispute = async (e, order, id) => {
     e.preventDefault();
     setLoading(true);
 
@@ -326,7 +390,7 @@ export default function RTO() {
         });
       });
 
-      const url = `https://shipping-owl-vd4s.vercel.app/api/supplier/order/${order.id}/rto/${id}/response?status=${status}`;
+      const url = `https://shipowl-kd06.onrender.com/api/supplier/order/${order.id}/rto/${id}/response?status=${status}`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -370,8 +434,6 @@ export default function RTO() {
         }
 
       } else {
-        // Success
-        setValidationErrors({});
         Swal.fire({
           icon: "success",
           title: "Created",
@@ -404,10 +466,110 @@ export default function RTO() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+
+    // Redirect if not supplier
+    if (dropshipperData?.project?.active_panel !== "supplier") {
+      localStorage.removeItem("shippingData");
+      router.push("/supplier/auth/login");
+      return;
+    }
+
+    const token = dropshipperData?.security?.token;
+    if (!token) {
+      router.push("/supplier/auth/login");
+      return;
+    }
+
+    try {
+      // Show loading dialog
+      Swal.fire({
+        title: 'Creating ...',
+        text: 'Please wait while we save your data.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        customClass: {
+          popup: 'custom-swal-zindex'
+        }
+      });
+
+      const formdata = new FormData();
+      Object.entries(files).forEach(([key, fileArray]) => {
+        fileArray.forEach((file) => {
+          formdata.append(key, file, file.name);
+        });
+      });
+      formdata.append("status", status);
+
+
+      const url = `https://shipowl-kd06.onrender.com/api/supplier/order/need-to-raise/${disputeLevel2}/dispute-2`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        body: formdata,
+      });
+
+      const result = await response.json();
+      Swal.close();
+
+      if (!response.ok) {
+        Swal.fire({
+          icon: "error",
+          title: "Creation Failed",
+          text: result.message || result.error || "An error occurred.",
+          customClass: {
+            container: 'custom-swal-zindex'
+          },
+        });
+
+
+      } else {
+        Swal.fire({
+          icon: "success",
+          title: "Created",
+          showConfirmButton: true,
+          customClass: {
+            popup: 'custom-swal-zindex'
+          }
+        }).then((res) => {
+          if (res.isConfirmed) {
+            setFiles({});
+            setDisputeLevel2('');
+            setDisputeOpen(false);
+            fetchRto();
+          }
+        });
+      }
+
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Submission Error",
+        text: error.message || "Something went wrong. Please try again.",
+        customClass: {
+          popup: 'custom-swal-zindex'
+        }
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchRto()
   }, [fetchRto]);
+
   let finalAllowedKeys = [];
 
   if (assignedPermissions && assignedPermissions.length > 0) {
@@ -419,9 +581,6 @@ export default function RTO() {
   }
 
   const hasAnyPermission = (...keys) => keys.some((key) => finalAllowedKeys.includes(key));
-
-
-
   const PermissionField = ({ permissionKey, children }) => {
     const isAllowed = finalAllowedKeys.includes(permissionKey);
 
@@ -617,13 +776,13 @@ export default function RTO() {
                         <td className="p-3 px-5 whitespace-nowrap">
                           <div className='flex items-center gap-3'>
                             <div className="flex gap-2 flex-wrap">
-                              
-                                <img
-                                  src={fetchImages(variantImages[0])}
-                                  alt={`Variant`}
-                                  className="h-12 w-12 object-cover rounded-full border border-[#DFEAF2]"
-                                />
-                             
+
+                              <img
+                                src={fetchImages(variantImages[0])}
+                                alt={`Variant`}
+                                className="h-12 w-12 object-cover rounded-full border border-[#DFEAF2]"
+                              />
+
                             </div>
                             <div onClick={() => handleViewVariant(order, order.items)} className="mt-2 cursor-pointer text-sm text-gray-600">
                               {order.items.length > 1 &&
@@ -750,12 +909,37 @@ export default function RTO() {
 
                         {/* Actions */}
                         <td className="px-4 py-2 text-sm whitespace-nowrap text-center">
-                          <button
+                       <div className="flex gap-2">
+                           <button
                             onClick={() => handleViewVariant(order, order.items)}
                             className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600"
                           >
                             View Variants
                           </button>
+                          {activeTab === "need-to-raise" && (
+                            <>
+                              {!order.disputeLevel ? (
+                                <button onClick={() => initiateLevel1(order.id)} className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
+                                  Initiate Dispute Level 1
+                                </button>
+                              ) : order.disputeLevel === 1 ? (
+                                <button
+                                  onClick={() => {
+                                    setDisputeLevel2(order.id),
+                                      setDisputeOpen(true)
+                                  }}
+                                  className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
+                                  Initiate Dispute Level 2
+                                </button>
+                              ) : (
+                                <button className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
+                                  Both Done
+                                </button>
+                              )}
+                            </>
+                          )}
+                       </div>
+
                         </td>
                       </tr>
                     );
@@ -772,158 +956,154 @@ export default function RTO() {
         </div>
       </>
 
-      {/* {activeTab == "rto" && (
-        <p> Live RTO Count</p>
-      )
-      }
-      {activeTab == "need-to-raise" && (
-        <p>Need To Raise</p>
-      )
-      }
-      {activeTab == "dispute" && (
-        <p>Dispute Orders</p>
-      )
-      } */}
+      {disputeOpen && (
+        <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+          <div className="bg-white p-6 rounded-lg border-orange-500 w-full border max-w-3xl shadow-xl relative">
+
+
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Raise a Dispute</h2>
+              <button onClick={() => { setDisputeOpen(false), setDisputeLevel2('') }} className="text-gray-500 hover:text-black">✕</button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block font-medium mb-1">Status</label>
+                <select
+                  className="w-full border rounded px-3 py-2"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                >
+                  <option value="">Select Status</option>
+                  <option value="wrong item received">Wrong Item Received</option>
+                  <option value="not received">Not Delivered</option>
+
+                </select>
+              </div>
+
+              {status === 'wrong item received' && (
+                <>
+                  <div>
+                    <label className="block font-medium mb-1">Packing Gallery (images/videos)</label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,video/*"
+                      name='packingGallery'
+                      onChange={handleFileChange}
+                      className="w-full border rounded px-3 py-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-medium mb-1">Unboxing Gallery (images/videos)</label>
+                    <input
+                      type="file"
+                      multiple
+                      name='unboxingGallery'
+                      accept="image/*,video/*"
+                      onChange={handleFileChange}
+                      className="w-full border rounded px-3 py-2"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end gap-2">
+              <button onClick={() => { setDisputeOpen(false), setDisputeLevel2('') }} className="px-4 py-2 border rounded">
+                Cancel
+              </button>
+              <button
+                onClick={(e) => handleSubmit(e)} className="px-4 py-2 bg-orange-500 text-white rounded"
+              >
+                Submit Dispute
+              </button>
+            </div>
+          </div>
+        </div>
+
+      )}
 
       {showModal && selectedVariant && (
 
         <div className="fixed inset-0 flex items-center justify-center bg-[#000000ba] bg-opacity-50 z-50">
-          <div className="bg-white w-full max-w-3xl border-2 border-orange-500 p-6 rounded-md shadow-lg relative">
+          <div className="bg-white w-full max-w-5xl border-2 border-orange-500 p-6 rounded-md shadow-lg relative">
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
               onClick={() => setShowModal(false)}
             >
               ✕
             </button>
-            <h2 className="text-xl font-semibold mb-4">Product Variants</h2>
+            <h2 className="text-xl font-semibold mb-4 text-center text-orange-500">Product Variants</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {selectedVariant?.items?.map((item, idx) => {
                 const variant = item.dropshipperVariant?.supplierProductVariant?.variant;
                 if (!variant) return null;
+                const imageUrls = variant.image
+                  ? variant.image.split(",").map((img) => img.trim()).filter(Boolean)
+                  : [];
                 return (
-                  <div key={idx}>
-                    <div
-                      key={idx}
-                      className="border hover:border-orange-400 border-[#DFEAF2] p-4 rounded-md shadow-sm"
-                    >
-                      <div className="flex gap-2 mb-2 overflow-x-auto">
-                        {(variant.image || '')
-                          .split(',')
-                          .filter((img) => img.trim() !== '')
-                          .map((imgUrl, imgIdx) => (
-                            <img
-                              key={imgIdx}
-                              src={fetchImages(imgUrl)}
-                              alt={`Variant ${idx}`}
-                              className="h-24 w-24 object-cover rounded border border-[#DFEAF2]"
+                  <div
+                    key={variant.id || idx}
+                    className="bg-white p-4 rounded-md  border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col space-y-3"
+                  >
+                    <div className='flex gap-2 relative'>
+                      {/* Image Preview */}
+                      <div className="flex items-center gap-2 overflow-x-auto h-[200px] w-full object-cover  border border-[#E0E2E7] rounded-md p-3shadow bg-white">
+                        {imageUrls.length > 0 ? (
+                          imageUrls.map((url, i) => (
+                            <Image
+                              key={i}
+                              height={100}
+                              width={100}
+                              src={fetchImages(url)}
+                              alt={variant.name || 'NIL'}
+                              className="h-full w-full object-cover"
                             />
-                          ))}
+                          ))
+                        ) : (
+                          <Image
+                            height={40}
+                            width={40}
+                            src="https://placehold.com/600x400"
+                            alt="Placeholder"
+                            className="rounded shrink-0"
+                          />
+                        )}
                       </div>
-                      <p><strong>Name:</strong> {variant.name}</p>
-                      <p><strong>Color:</strong> {variant.color}</p>
-                      <p><strong>Model:</strong> {variant.model}</p>
-                      <p><strong>SKU:</strong> {variant.sku}</p>
-                      <p><strong>Suggested Price:</strong> ₹{variant.suggested_price}</p>
-
-                      {item?.supplierRTOResponse && Object.keys(item.supplierRTOResponse).length > 0 ? (
-                        <button
-                          className="px-4 mt-2 py-2 text-white bg-blue-600 rounded"
-                          onClick={() => {
-                            setSelectedDisputeItem(item); // Save clicked dispute item to state
-                            modalRefNew.current?.showModal(); // Open dialog
-                          }}
-                        >
-                          View Dispute
-                        </button>
-
-                      ) : (
-                        selectedVariant?.rtoDelivered &&
-                        (() => {
-                          const rtoDate = new Date(selectedVariant.rtoDeliveredDate);
-                          const now = new Date();
-                          const diffInHours = (now - rtoDate) / (1000 * 60 * 60);
-
-                          if (diffInHours <= 24) {
-                            return (
-                              <button
-                                onClick={() => openModal()}
-                                className="bg-orange-500 text-white p-2 mt-2 px-4 rounded-md"
-                              >
-                                Dispute
-                              </button>
-                            );
-                          }
-                          return null;
-                        })()
-                      )}
-
-
-
+                      <div className="absolute top-0 left-0 w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant.price}</div>
 
 
                     </div>
-                    <dialog ref={modalRef} className="rounded-md w-full m-auto  max-w-md p-6 z-10">
-                      <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">Raise a Dispute</h2>
-                        <button onClick={closeModal} className="text-gray-500 hover:text-black">✕</button>
-                      </div>
 
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block font-medium mb-1">Status</label>
-                          <select
-                            className="w-full border rounded px-3 py-2"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                          >
-                            <option value="">Select Status</option>
-                            <option value="wrong item received">Wrong Item Received</option>
-                            <option value="received">Delivered</option>
-                            <option value="not received">Not Delivered</option>
+                    <div className="overflow-x-auto">
+                      <table className="text-sm text-gray-700 w-full  border-gray-200">
+                        <tbody>
+                          <tr className='border border-gray-200'>
+                            <th className="text-left border-gray-200 border p-2 font-semibold ">Model:</th>
+                            <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.model || "NIL"}</td>
+                            <th className="text-left border-gray-200 border p-2 font-semibold ">Name:</th>
+                            <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.name || "NIL"}</td>
 
-                          </select>
-                        </div>
 
-                        {status === 'wrong item received' && (
-                          <>
-                            <div>
-                              <label className="block font-medium mb-1">Packing Gallery (images/videos)</label>
-                              <input
-                                type="file"
-                                multiple
-                                accept="image/*,video/*"
-                                name='packingGallery'
-                                onChange={handleFileChange}
-                                className="w-full border rounded px-3 py-2"
-                              />
-                            </div>
+                          </tr>
 
-                            <div>
-                              <label className="block font-medium mb-1">Unboxing Gallery (images/videos)</label>
-                              <input
-                                type="file"
-                                multiple
-                                name='unboxingGallery'
-                                accept="image/*,video/*"
-                                onChange={handleFileChange}
-                                className="w-full border rounded px-3 py-2"
-                              />
-                            </div>
-                          </>
-                        )}
-                      </div>
 
-                      <div className="mt-6 flex justify-end gap-2">
-                        <button onClick={closeModal} className="px-4 py-2 border rounded">
-                          Cancel
-                        </button>
-                        <button
-                          onClick={(e) => handleSubmit(e, selectedVariant, variant.id)} className="px-4 py-2 bg-orange-500 text-white rounded"
-                        >
-                          Submit Dispute
-                        </button>
-                      </div>
-                    </dialog>
+                          <tr className='border border-gray-200'>
+
+
+                            <th className="text-left border-gray-200 border p-2 font-semibold ">SKU:</th>
+                            <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.sku || "NIL"}</td>
+
+                            <th className="text-left border-gray-200 border p-2 font-semibold ">Color:</th>
+                            <td className='p-2 border border-gray-200 whitespace-nowrap'>{variant.color || "NIL"}</td>
+                          </tr>
+
+
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 );
               })}
@@ -933,7 +1113,8 @@ export default function RTO() {
           </div>
         </div>
 
-      )}
+      )
+      }
 
 
 
@@ -986,66 +1167,70 @@ export default function RTO() {
       </dialog>
 
 
-      {isBarCodePopupOpen && (
-        <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
-            <button
-              onClick={() => setIsBarCodePopupOpen(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-black"
-            >
-              ✕
-            </button>
-            <h2 className="text-lg font-bold mb-4">Scan Barcode</h2>
-            <div>
-              <p style={scannedCode ? styles.msgSuccess : styles.msgDefault}>{message}</p>
-              <section style={styles.box}>
-                <label style={styles.label}>Scanned Code:</label>
-                <div style={styles.code}>{scannedCode || '___'}</div>
-              </section>
+      {
+        isBarCodePopupOpen && (
+          <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
+              <button
+                onClick={() => setIsBarCodePopupOpen(false)}
+                className="absolute top-2 right-2 text-gray-500 hover:text-black"
+              >
+                ✕
+              </button>
+              <h2 className="text-lg font-bold mb-4">Scan Barcode</h2>
+              <div>
+                <p style={scannedCode ? styles.msgSuccess : styles.msgDefault}>{message}</p>
+                <section style={styles.box}>
+                  <label style={styles.label}>Scanned Code:</label>
+                  <div style={styles.code}>{scannedCode || '___'}</div>
+                </section>
+
+              </div>
 
             </div>
-
           </div>
-        </div>
-      )}
+        )
+      }
 
-      {isNoteModalOpen && (
-        <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
-            <button
-              onClick={() => setIsNoteModalOpen(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-black"
-            >
-              ✕
-            </button>
-            <h2 className="text-lg font-bold mb-4">Order Notes</h2>
-            <textarea
-              className="w-full border p-2 rounded-xl mb-4"
-              rows={4}
-              placeholder="Add your note here..."
-            />
-            <div className="flex justify-end gap-2">
+      {
+        isNoteModalOpen && (
+          <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
               <button
                 onClick={() => setIsNoteModalOpen(false)}
-                className="bg-gray-200 px-4 py-2 rounded-md"
+                className="absolute top-2 right-2 text-gray-500 hover:text-black"
               >
-                Cancel
+                ✕
               </button>
-              <button
-                onClick={() => {
-                  // Submit logic here
-                  setIsNoteModalOpen(false);
-                }}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md"
-              >
-                Save
-              </button>
+              <h2 className="text-lg font-bold mb-4">Order Notes</h2>
+              <textarea
+                className="w-full border p-2 rounded-xl mb-4"
+                rows={4}
+                placeholder="Add your note here..."
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setIsNoteModalOpen(false)}
+                  className="bg-gray-200 px-4 py-2 rounded-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // Submit logic here
+                    setIsNoteModalOpen(false);
+                  }}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-    </div>
+    </div >
   );
 }
 const styles = {

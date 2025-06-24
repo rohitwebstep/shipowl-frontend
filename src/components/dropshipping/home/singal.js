@@ -219,7 +219,7 @@ export default function ProductDetails() {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
+      const response = await fetch(`https://shipowl-kd06.onrender.com/api/dropshipper/product/inventory?category=${catid}&type=${tab}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -266,9 +266,9 @@ export default function ProductDetails() {
       setLoading(true);
       let url;
       if (type === "notmy") {
-        url = `https://shipping-owl-vd4s.vercel.app/api/dropshipper/product/inventory/${id}`;
+        url = `https://shipowl-kd06.onrender.com/api/dropshipper/product/inventory/${id}`;
       } else {
-        url = `https://shipping-owl-vd4s.vercel.app/api/dropshipper/product/my-inventory/${id}`;
+        url = `https://shipowl-kd06.onrender.com/api/dropshipper/product/my-inventory/${id}`;
 
       }
       const response = await fetch(url, {
@@ -379,7 +379,7 @@ export default function ProductDetails() {
       form.append("shopifyApp", inventoryData.shopifyApp);
       form.append("variants", JSON.stringify(simplifiedVariants));
 
-      const url = "https://shipping-owl-vd4s.vercel.app/api/dropshipper/product/my-inventory";
+      const url = "https://shipowl-kd06.onrender.com/api/dropshipper/product/my-inventory";
 
       const response = await fetch(url, {
         method: "POST",

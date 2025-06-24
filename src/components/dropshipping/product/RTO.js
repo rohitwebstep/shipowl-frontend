@@ -29,7 +29,7 @@ export default function RTO() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/dropshipper/product/rto/inventory`,
+                `https://shipowl-kd06.onrender.com/api/dropshipper/product/rto/inventory`,
                 {
                     method: "GET",
                     headers: {

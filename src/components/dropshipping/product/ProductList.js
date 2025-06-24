@@ -33,7 +33,7 @@ export default function ProductList() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/my`,
+                `https://shipowl-kd06.onrender.com/api/product/request/my`,
                 {
                     method: "GET",
                     headers: {
@@ -94,7 +94,7 @@ export default function ProductList() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/my/trashed`,
+                `https://shipowl-kd06.onrender.com/api/product/request/my/trashed`,
                 {
                     method: "GET",
                     headers: {
@@ -169,7 +169,7 @@ export default function ProductList() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/my/${item.id}`,
+                `https://shipowl-kd06.onrender.com/api/product/request/my/${item.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -237,7 +237,7 @@ export default function ProductList() {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/my/${item?.id}/restore`,
+                `https://shipowl-kd06.onrender.com/api/product/request/my/${item?.id}/restore`,
                 {
                     method: "PATCH",
                     headers: {
@@ -315,7 +315,7 @@ export default function ProductList() {
             setLoading(true);
 
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/product/request/my/${item.id}/destroy`,
+                `https://shipowl-kd06.onrender.com/api/product/request/my/${item.id}/destroy`,
                 {
                     method: "DELETE",
                     headers: {

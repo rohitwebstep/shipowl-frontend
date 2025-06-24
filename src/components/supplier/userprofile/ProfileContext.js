@@ -87,7 +87,7 @@ const ProfileProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`https://shipping-owl-vd4s.vercel.app/api/location/country`, {
+      const response = await fetch(`https://shipowl-kd06.onrender.com/api/location/country`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

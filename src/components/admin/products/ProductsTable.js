@@ -93,7 +93,7 @@ const ProductTable = () => {
         try {
             setLoading(true);
             const response = await fetch(
-                `https://shipping-owl-vd4s.vercel.app/api/admin/category`,
+                `https://shipowl-kd06.onrender.com/api/admin/category`,
                 {
                     method: "GET",
                     headers: {
