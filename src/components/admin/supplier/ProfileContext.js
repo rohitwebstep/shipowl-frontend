@@ -35,21 +35,27 @@ const ProfileProvider = ({ children }) => {
     billingCity: "",
     profilePicture: '',
     clientEntryType: "",
+    //COMPANY
     gstNumber: "",
-    companyPanNumber: "",
-    aadharNumber: "",
     gstDocument: "",
+    companyPanNumber: "",
+    companyPanCardName: "",
+    companyPanCardImage: "",
+    //indivisual
+    aadharNumber: "",
     panCardHolderName: "",
     aadharCardHolderName: "",
     panCardImage: "",
     aadharCardImage: "",
+
+
+    //
     additionalDocumentUpload: "",
     documentId: "",
     documentName: "",
     documentImage: "",
-    uploadGstDoc: "",
-    panCardImage: "",
-    aadharCardImage: ""
+
+    //
   });
 
   const requiredFields = {
@@ -61,11 +67,7 @@ const ProfileProvider = ({ children }) => {
     billingState: 'State is required',
     billingCity: 'City is required',
     clientEntryType: 'Client Entry Type is required',
-    gstNumber: 'GST Number is required',
-    companyPanNumber: 'PAN Number is required',
-    aadharNumber: 'Aadhar Number is required',
-    panCardHolderName: 'PAN Card Holder Name is required',
-    aadharCardHolderName: 'Aadhar Card Holder Name is required',
+  
   };
 
   const fetchCountry = useCallback(async () => {
@@ -148,45 +150,74 @@ const ProfileProvider = ({ children }) => {
       }
     });
 
-    // GST/PAN logic
-    const hasGST = !!formData.gstNumber?.trim();
-    const hasAadhar = !!formData.aadharNumber?.trim();
 
-    if (hasGST ) {
-    
-      if (!hasGST) {
-        newErrors.gstNumber = requiredFields.gstNumber;
+
+    const {
+      gstNumber,
+      gstDocument,
+      companyPanNumber,
+      companyPanCardName,
+      companyPanCardImage,
+
+      aadharNumber,
+      panCardHolderName,
+      aadharCardHolderName,
+      panCardImage,
+      aadharCardImage,
+    } = formData;
+
+    const hasGST =
+      !!gstNumber?.trim() ||
+      !!gstDocument ||
+      !!companyPanNumber?.trim() ||
+      !!companyPanCardName?.trim() ||
+      !!companyPanCardImage;
+
+    const hasAadhar =
+      !!aadharNumber?.trim() ||
+      !!panCardHolderName?.trim() ||
+      !!aadharCardHolderName?.trim() ||
+      !!panCardImage ||
+      !!aadharCardImage;
+
+
+    if (hasGST) {
+      if (!gstNumber?.trim()) {
+        newErrors.gstNumber = requiredFields.gstNumber || 'GST Number is required';
       }
-      if (!formData.panCardHolderName?.trim()) {
-        newErrors.panCardHolderName = requiredFields.panCardHolderName;
+      if (!companyPanCardImage?.trim()) {
+        newErrors.companyPanCardImage = requiredFields.companyPanCardImage || 'PAN Card Holder Name is required';
       }
-      if (!formData.gstDocument) {
-        newErrors.gstDocument = 'GST Document is required';
+      if (!gstDocument) {
+        newErrors.gstDocument = requiredFields.gstDocument || 'GST Document is required';
+      }
+      if (!companyPanNumber) {
+        newErrors.companyPanNumber = requiredFields.companyPanNumber || 'Company Pan  is required';
+      }
+      if (!companyPanCardName) {
+        newErrors.companyPanCardName = requiredFields.companyPanCardName || 'Company Pancard Name  is required';
       }
     }
 
-
-    // Aadhar section
     if (hasAadhar) {
-      if (!formData.aadharNumber?.trim()) {
-        newErrors.aadharNumber = requiredFields.aadharNumber;
+      if (!aadharNumber?.trim()) {
+        newErrors.aadharNumber = requiredFields.aadharNumber || 'Aadhar Number is required';
       }
-      if (!formData.companyPanNumber?.trim()) {
-        newErrors.companyPanNumber = requiredFields.companyPanNumber;
+     
+      if (!aadharCardHolderName?.trim()) {
+        newErrors.aadharCardHolderName = requiredFields.aadharCardHolderName || 'Aadhar Card Holder Name is required';
       }
-      if (!formData.aadharCardHolderName?.trim()) {
-        newErrors.aadharCardHolderName = requiredFields.aadharCardHolderName;
+      if (!panCardHolderName?.trim()) {
+        newErrors.panCardHolderName = requiredFields.panCardHolderName || 'PAN Card Holder Name is required';
       }
-      if (!formData.panCardHolderName?.trim()) {
-        newErrors.panCardHolderName = requiredFields.panCardHolderName;
+      if (!panCardImage) {
+        newErrors.panCardImage = requiredFields.panCardImage || 'PAN Card Image is required';
       }
-      if (!formData.panCardImage) {
-        newErrors.panCardImage = 'PAN Card Image is required';
-      }
-      if (!formData.aadharCardImage) {
-        newErrors.aadharCardImage = 'Aadhar Card Image is required';
+      if (!aadharCardImage) {
+        newErrors.aadharCardImage = requiredFields.aadharCardImage || 'Aadhar Card Image is required';
       }
     }
+
 
     setBusinessErrors(newErrors);
     return Object.keys(newErrors).length === 0;

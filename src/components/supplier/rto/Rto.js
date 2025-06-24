@@ -35,12 +35,17 @@ export default function RTO() {
   const [showModal, setShowModal] = useState(false);
   const [disputeLevel2, setDisputeLevel2] = useState('');
   const [disputeOpen, setDisputeOpen] = useState(false);
+  const [viewDispute, setViewDispute] = useState(false);
   const handleViewVariant = (item, variant) => {
     setSelectedVariant(item);
     setShowModal(true);
   };
 
-  const [selectedDisputeItem, setSelectedDisputeItem] = useState(null);
+  const [selectedDisputeItem, setSelectedDisputeItem] = useState({
+    status: '',
+    packingGallery: '',
+    unboxingGallery: '',
+  });
   const modalRefNew = useRef(null);
   const [scannedCode, setScannedCode] = useState('');
   const [message, setMessage] = useState('📷 Please scan a barcode...');
@@ -909,36 +914,43 @@ export default function RTO() {
 
                         {/* Actions */}
                         <td className="px-4 py-2 text-sm whitespace-nowrap text-center">
-                       <div className="flex gap-2">
-                           <button
-                            onClick={() => handleViewVariant(order, order.items)}
-                            className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600"
-                          >
-                            View Variants
-                          </button>
-                          {activeTab === "need-to-raise" && (
-                            <>
-                              {!order.disputeLevel ? (
-                                <button onClick={() => initiateLevel1(order.id)} className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
-                                  Initiate Dispute Level 1
-                                </button>
-                              ) : order.disputeLevel === 1 ? (
-                                <button
-                                  onClick={() => {
-                                    setDisputeLevel2(order.id),
-                                      setDisputeOpen(true)
-                                  }}
-                                  className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
-                                  Initiate Dispute Level 2
-                                </button>
-                              ) : (
-                                <button className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
-                                  Both Done
-                                </button>
-                              )}
-                            </>
-                          )}
-                       </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleViewVariant(order, order.items)}
+                              className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600"
+                            >
+                              View Variants
+                            </button>
+                            {activeTab === "need-to-raise" && (
+                              <>
+                                {!order.disputeLevel ? (
+                                  <button onClick={() => initiateLevel1(order.id)} className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
+                                    Initiate Dispute Level 1
+                                  </button>
+                                ) : order.disputeLevel === 1 ? (
+                                  <button
+                                    onClick={() => {
+                                      setDisputeLevel2(order.id),
+                                        setDisputeOpen(true)
+                                    }}
+                                    className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
+                                    Initiate Dispute Level 2
+                                  </button>
+                                ) : (
+                                  <button onClick={() => {
+                                    setSelectedDisputeItem({
+                                      status: order.supplierRTOResponse || '',
+                                      packingGallery: order.packingGallery || '',
+                                      unboxingGallery: order.unboxingGallery || '',
+                                    }); // Save clicked dispute item to state
+                                    setViewDispute(true)
+                                  }} className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
+                                    View Dispute
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </div>
 
                         </td>
                       </tr>
@@ -1035,7 +1047,7 @@ export default function RTO() {
             >
               ✕
             </button>
-            <h2 className="text-xl font-semibold mb-4 text-center text-orange-500">Product Variants</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-center text-orange-500">Product Variants</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {selectedVariant?.items?.map((item, idx) => {
                 const variant = item.dropshipperVariant?.supplierProductVariant?.variant;
@@ -1117,54 +1129,61 @@ export default function RTO() {
       }
 
 
+      {
+        viewDispute && (
 
+          <div className="fixed inset-0 bg-[#00000087] bg-opacity-40 flex items-center justify-center z-50 overflow-y-auto">
+            <div className="bg-white p-6 max-h[500px] overflow-auto  rounded-lg border-orange-500 w-full border max-w-3xl shadow-xl relative">
 
-      <dialog ref={modalRefNew} className="rounded-md w-full m-auto max-w-2xl p-6 z-50">
-        {selectedDisputeItem && (
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-red-600">
-                Dispute: {selectedDisputeItem?.supplierRTOResponse}
-              </h2>
-              <button onClick={() => modalRefNew.current?.close()} className="text-gray-500 hover:text-black">✕</button>
+              {selectedDisputeItem && (
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-red-600">
+                      Dispute: {selectedDisputeItem?.status}
+                    </h2>
+                    <button onClick={() => setViewDispute(false)} className="text-gray-500 hover:text-black">✕</button>
+                  </div>
+
+                  {/* Packing Gallery */}
+                  {selectedDisputeItem.packingGallery && (
+                    <div className="mb-6">
+                      <p className="text-lg font-semibold mb-2">Packing Gallery</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {selectedDisputeItem.packingGallery.replace(/"/g, '').split(',').map((img, index) => (
+                          <img
+                            key={index}
+                            src={fetchImages(img)}
+                            alt={`Packing ${index}`}
+                            className="w-full h-32 object-cover rounded border"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Unboxing Gallery */}
+                  {selectedDisputeItem.unboxingGallery && (
+                    <div>
+                      <p className="text-lg font-semibold mb-2">Unboxing Gallery</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {selectedDisputeItem.unboxingGallery.replace(/"/g, '').split(',').map((img, index) => (
+                          <img
+                            key={index}
+                            src={fetchImages(img)}
+                            alt={`Unboxing ${index}`}
+                            className="w-full h-32 object-cover rounded border"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-
-            {/* Packing Gallery */}
-            {selectedDisputeItem.packingGallery && (
-              <div className="mb-6">
-                <p className="text-lg font-semibold mb-2">Packing Gallery</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {selectedDisputeItem.packingGallery.replace(/"/g, '').split(',').map((img, index) => (
-                    <img
-                      key={index}
-                      src={fetchImages(img)}
-                      alt={`Packing ${index}`}
-                      className="w-full h-32 object-cover rounded border"
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Unboxing Gallery */}
-            {selectedDisputeItem.unboxingGallery && (
-              <div>
-                <p className="text-lg font-semibold mb-2">Unboxing Gallery</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {selectedDisputeItem.unboxingGallery.replace(/"/g, '').split(',').map((img, index) => (
-                    <img
-                      key={index}
-                      src={fetchImages(img)}
-                      alt={`Unboxing ${index}`}
-                      className="w-full h-32 object-cover rounded border"
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
-        )}
-      </dialog>
+
+        )
+      }
 
 
       {

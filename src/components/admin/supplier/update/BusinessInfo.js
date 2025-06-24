@@ -346,17 +346,47 @@ const BusinessInfo = () => {
   const inputClasses = (field) =>
     `w-full p-3 border rounded-lg font-bold ${businessErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'} text-[#718EBF]`;
 
+  const {
+    gstNumber,
+    gstDocument,
+    companyPanNumber,
+    companyPanCardName,
+    companyPanCardImage,
+
+    aadharNumber,
+    panCardHolderName,
+    aadharCardHolderName,
+    panCardImage,
+    aadharCardImage,
+  } = formData;
+
+  const hasGST =
+    !!gstNumber?.trim() ||
+    !!gstDocument ||
+    !!companyPanNumber?.trim() ||
+    !!companyPanCardName?.trim() ||
+    !!companyPanCardImage;
+
+  const hasAadhar =
+    !!aadharNumber?.trim() ||
+    !!panCardHolderName?.trim() ||
+    !!aadharCardHolderName?.trim() ||
+    !!panCardImage ||
+    !!aadharCardImage;
+
+
   const requiredFields2 = {
     ...(hasGST && {
       gstNumber: true,
-      panCardHolderName: true,
       gstDocument: true,
+      companyPanNumber: true,
+      companyPanCardName: true,
+      companyPanCardImage: true,
     }),
     ...(hasAadhar && {
       aadharNumber: true,
-      companyPanNumber: true,
+      panCardHolderName: true,
       aadharCardHolderName: true,
-      panCardHolderName: true, // shared with GST
       panCardImage: true,
       aadharCardImage: true,
     }),
@@ -370,14 +400,13 @@ const BusinessInfo = () => {
     clientEntryType: true,
   };
 
-
-
   const renderLabel = (label, field) => (
     <label className={labelClasses(field)}>
       {label}
       {requiredFields2[field] && <span className="text-red-500 ml-1">*</span>}
     </label>
   );
+
 
   const renderError = (field) =>
     businessErrors[field] && <p className="text-red-500 text-sm mt-1">{businessErrors[field]}</p>;
@@ -541,9 +570,12 @@ const BusinessInfo = () => {
           {[
             { label: 'GST Number', name: 'gstNumber' },
             { label: 'Company PAN Card ID', name: 'companyPanNumber' },
+            { label: 'Upload GST Document', name: 'gstDocument', type: 'file' },
+            { label: 'Upload Company Pan Card Document', name: 'companyPanCardImage', type: 'file' },
+            { label: 'Company Pan Card Name', name: 'companyPanCardName' },
             { label: 'Aadhar Card ID', name: 'aadharNumber' },
             { label: 'Name on PAN Card', name: 'panCardHolderName' },
-            { label: 'Name Aadhar Card ID', name: 'aadharCardHolderName' }
+            { label: 'Name Aadhar Card ID', name: 'aadharCardHolderName' },
           ].map(({ label, name, type = 'text' }) => (
             <div key={name}>
               {renderLabel(label, name)}

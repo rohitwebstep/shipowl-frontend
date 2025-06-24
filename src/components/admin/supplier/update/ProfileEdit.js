@@ -1,7 +1,6 @@
 'use client';
-import { useContext, useEffect, useState, useCallback } from 'react';
+import { useContext, useState, useCallback } from 'react';
 import { ProfileEditContext } from './ProfileEditContext';
-import profileImg from '@/app/images/editprofile.png';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
@@ -174,7 +173,8 @@ const ProfileEdit = () => {
           <Image
              src={fetchImages(formData.profilePicture) || previewUrl}
             alt="Profile image"
-
+            height={50}
+            width={50}
             className="w-full h-full max-w-[100px] object-cover rounded-full"
           />
 

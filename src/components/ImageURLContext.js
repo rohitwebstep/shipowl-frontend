@@ -10,6 +10,9 @@ export const ImageURLProvider = ({ children }) => {
     if (!url || typeof url !== 'string') {
       return 'https://placehold.co/400';
     }
+    if (url.includes('www.')) {
+      return url;
+    }
 
     const splitPart = url.split('tmp');
 
@@ -21,7 +24,7 @@ export const ImageURLProvider = ({ children }) => {
 
     imagePath = imagePath.replace(/^\/+/, '');
 
-    const finalURL = `https://shipowl-kd06.onrender.com/api/images/tmp/${imagePath}`;
+    const finalURL = `https://sleeping-owl-we0m.onrender.com/api/images/tmp/${imagePath}`;
 
     return finalURL;
   }

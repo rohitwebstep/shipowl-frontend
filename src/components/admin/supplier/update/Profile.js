@@ -87,7 +87,6 @@ export default function Profile() {
         permanentPostalCode: suppliers.permanentPostalCode || "",
         permanentCountry: suppliers.permanentCountryId || "",
         profilePicture: suppliers.profilePicture || "",
-
         companyName: companyDetail.companyName || "",
         brandName: companyDetail.brandName || "",
         billingAddress: companyDetail.billingAddress || "",
@@ -104,6 +103,8 @@ export default function Profile() {
         aadharCardHolderName: companyDetail.aadharCardHolderName || "",
         panCardImage: companyDetail.panCardImage || "",
         aadharCardImage: companyDetail.aadharCardImage || "",
+        companyPanCardName: companyDetail.companyPanCardName || "",
+        companyPanCardImage: companyDetail.companyPanCardImage || "",
         additionalDocumentUpload: companyDetail.additionalDocumentUpload || "",
         documentId: companyDetail.documentId || "",
         documentName: companyDetail.documentName || "",
