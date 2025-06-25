@@ -3,7 +3,6 @@
 import { useContext, useState } from 'react';
 import ProfileEdit from './ProfileEdit';
 import BusinessInfo from './BusinessInfo';
-import AccountInfo from './AccountInfo';
 import { ProfileContext } from './ProfileContext';
 
 export default function Profile() {
@@ -38,7 +37,7 @@ export default function Profile() {
 
   return (
     <>
-   <div className={`flex border-b bg-white pt-5 xl:gap-8 overflow-auto px-4 rounded-tl-2xl rounded-tr-2xl  border-[#F4F5F7] ${activeSubTab == "profile-edit" ? "xl:w-10/12" : "w-full"}`}>
+   <div className={`flex border-b bg-white pt-5 xl:gap-8 overflow-auto px-4 rounded-tl-2xl rounded-tr-2xl  border-[#F4F5F7] ${activeSubTab == "profile-edit" ? "xl:w-10/12" : "xl:w-10/12"}`}>
         {subTabs.map((tab) => (
           <button
             key={tab.id}

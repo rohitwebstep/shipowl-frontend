@@ -163,7 +163,7 @@ export default function ShippingDetails() {
           {videoFields.map(({ label, key }) => (
             <div key={key} className="flex flex-col space-y-2 w-full md:w-[250px]">
               <label className="text-[#232323] font-bold block mb-1">
-                {label}
+                {label} <span className="text-red-500">*</span>
               </label>
 
               <div className="relative border-2 border-dashed border-red-300 rounded-xl p-4 w-full h-36 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 transition">
@@ -181,6 +181,7 @@ export default function ShippingDetails() {
                   className="absolute inset-0 opacity-0 cursor-pointer"
                   onChange={(e) => handleFileChange(e, key)}
                 />
+                 {shippingErrors[key] && <p className="text-red-500 text-sm">{shippingErrors[key]}</p>}
               </div>
             </div>
           ))}

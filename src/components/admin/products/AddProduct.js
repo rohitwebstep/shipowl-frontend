@@ -68,7 +68,6 @@ const AddProduct = () => {
 
       const result = await response.json();
       const products = result?.product || {};
-
       setFormData({
         category: products.categoryId || '',
         name: products.name || '',
@@ -88,17 +87,41 @@ const AddProduct = () => {
         video_url: products.video_url || '',
         list_as: products.list_as || '',
         variant_images_0: '',
-        variants: (products.variants || []).map((variant) => ({
-          id: variant.id || '',
-          color: variant.color || '',
-          model: variant.model || '',
-          sku: variant.sku || '',
-          name: variant.name || '',
-          suggested_price: variant.suggested_price || 0,
-          variant_images: variant.image || '',
-          product_link: variant.product_link || '',
+        variants: (() => {
+          if (Array.isArray(products.variants) && products.variants.length > 0) {
+            return products.variants.map((variant) => ({
+              id: variant.id || '',
+              color: variant.color || '',
+              model: variant.model || '',
+              sku: variant.sku || '',
+              name: variant.name || '',
+              suggested_price: variant.suggested_price || 0,
+              variant_images: variant.image || '',
+              product_link: variant.product_link || '',
+            }));
+          } else {
+            // If no variants present, create fallback
+            const baseVariant = {
+              id: '',
+              color: '',
+              model: '',
+              sku: '',
+              name: '',
+              suggested_price: 0,
+              variant_images: '',
+              product_link: '',
+            };
 
-        })),
+            if (products.list_as === 'both') {
+              return [
+                { ...baseVariant, model: 'Shipowl' },
+                { ...baseVariant, model: 'Selfship' },
+              ];
+            } else {
+              return [{ ...baseVariant, model: products.list_as || '' }];
+            }
+          }
+        })(),
         shipping_time: products.shipping_time || '',
         weight: products.weight || '',
         status: products.status || '',
@@ -114,9 +137,14 @@ const AddProduct = () => {
         hsn_code: products.hsnCode || '',
         tax_rate: products.taxRate || '',
         isVisibleToAll: products.isVisibleToAll,
-        isVarientExists: products.isVarientExists ? "yes" : "no",
-        supplierIds: products.supplierVisibility.map(item => item.supplierId).join(',') || '',
+        isVarientExists: products.isVarientExists ? 'yes' : 'no',
+        supplierIds:
+          Array.isArray(products.supplierVisibility) && products.supplierVisibility.length > 0
+            ? products.supplierVisibility.map((item) => item.supplierId).join(',')
+            : '',
       });
+
+
 
     } catch (error) {
       console.error("Error fetching product:", error);
