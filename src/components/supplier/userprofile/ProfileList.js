@@ -200,7 +200,13 @@ const ProfileList = () => {
                     <h3 className="text-2xl font-semibold text-[#2B3674] mb-4">Personal Information</h3>
                     <div className='flex gap-4 items-start'>
                         <div>
-                            <Image src={fetchImages(suppliers.profilePicture)} alt={suppliers.name} height={200} className='rounded-md' width={200} />
+                            <Image
+                                src={fetchImages(suppliers.profilePicture)}
+                                alt={suppliers.name || "Supplier Profile Picture"}
+                                height={100}
+                                width={200}
+                                className="rounded-md"
+                            />
                         </div>
                         <div className="space-y-2 text-[#2B3674]">
                             <p><strong>Name:</strong> {suppliers.name || '-'}</p>

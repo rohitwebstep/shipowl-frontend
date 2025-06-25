@@ -12,7 +12,7 @@ import 'swiper/css/navigation';
 import Select from 'react-select';
 import { useImageURL } from "@/components/ImageURLContext";
 const BusinessInfo = () => {
-  const { formData, requiredFields, businessErrors, validateBusiness, setBusinessErrors, setFiles, setFormData, stateData, cityData, setCityData, setStateData, setActiveTab, countryData } = useContext(ProfileEditContext);
+  const { formData, businessErrors, validateBusiness, setBusinessErrors, setFiles,files, setFormData, stateData, cityData, setCityData, setStateData, setActiveTab, countryData } = useContext(ProfileEditContext);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { fetchImages } = useImageURL();
@@ -213,133 +213,154 @@ const BusinessInfo = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateBusiness()) return;
-    setLoading(true);
-    const adminData = JSON.parse(localStorage.getItem("shippingData"));
-    if (!adminData?.project?.active_panel === "admin") {
-      localStorage.clear("shippingData");
-      router.push("/admin/auth/login");
-      return;
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validateBusiness()) return;
 
-    const token = adminData?.security?.token;
-    if (!token) {
-      router.push("/admin/auth/login");
-      return;
-    }
+  setLoading(true);
+  const adminData = JSON.parse(localStorage.getItem("shippingData"));
+  if (!adminData?.project?.active_panel === "admin") {
+    localStorage.clear("shippingData");
+    router.push("/admin/auth/login");
+    return;
+  }
 
-    try {
-      Swal.fire({
-        title: 'Updating Supplier...',
-        text: 'Please wait while we save your Supplier.',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
+  const token = adminData?.security?.token;
+  if (!token) {
+    router.push("/admin/auth/login");
+    return;
+  }
 
-      const url = `https://shipowl-kd06.onrender.com/api/admin/supplier/${id}`;
-      const form = new FormData();
+  try {
+    Swal.fire({
+      title: 'Updating Supplier...',
+      text: 'Please wait while we save your Supplier.',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
 
-      for (const key in formData) {
-        const value = formData[key];
+    const url = `https://shipowl-kd06.onrender.com/api/admin/supplier/${id}`;
+    const form = new FormData();
 
-        if (value === null || value === undefined || value === '') continue;
+    // Append all basic formData (excluding files)
+    for (const key in formData) {
+      const value = formData[key];
 
-        if (
-          ['panCardImage', 'gstDocument', 'additionalDocumentUpload', 'documentImage', 'aadharCardImage', 'profilePicture'].includes(key)
-        ) {
-          if (Array.isArray(value)) {
-            value.forEach(file => form.append(key, file, file.name));
-          } else if (value instanceof File) {
-            form.append(key, value, value.name);
-          }
-        } else if (value instanceof FileList) {
-          Array.from(value).forEach(file => form.append(key, file));
+      if (value === null || value === undefined || value === '') continue;
 
-        } else if (Array.isArray(value) || typeof value === 'object') {
+      const isFileKey = [
+        'panCardImage',
+        'companyPanCardImage',
+        'gstDocument',
+        'additionalDocumentUpload',
+        'documentImage',
+        'aadharCardImage',
+        'profilePicture'
+      ].includes(key);
+
+      if (!isFileKey) {
+        if (Array.isArray(value) || typeof value === 'object') {
           form.append(key, JSON.stringify(value));
         } else {
           form.append(key, value);
         }
       }
+    }
 
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${token}`
-        },
-        body: form,
-      });
+    // Append files from the files object
+    const fileKeys = [
+      'panCardImage',
+      'companyPanCardImage',
+      'gstDocument',
+      'additionalDocumentUpload',
+      'documentImage',
+      'aadharCardImage',
+      'profilePicture'
+    ];
 
-      const result = await response.json();
-      if (!response.ok) {
-        Swal.close();
-
-        Swal.fire({
-          icon: "error",
-          title: "Creation Failed",
-          text: result.message || result.error || "An error occurred",
-        });
-
-        if (result.error && typeof result.error === 'object') {
-          const entries = Object.entries(result.error);
-          let focused = false;
-
-          entries.forEach(([key, message]) => {
-            setErrors((prev) => ({
-              ...prev,
-              [key]: message,
-            }));
-
-            if (!focused) {
-              const tab = getTabByFieldName(key); // make sure this is imported or defined above
-              if (tab) setActiveTab(tab);
-
-              setTimeout(() => {
-                const input = document.querySelector(`[name="${key}"]`);
-                if (input) input.focus();
-              }, 300);
-
-              focused = true;
-            }
-          });
-        }
-
-        throw new Error(result.message || result.error || "Submission failed");
-      }
-
-      Swal.close();
-
-      if (result) {
-        Swal.fire({
-          icon: "success",
-          title: "Supplier updated",
-          text: `The supplier has been updated successfully!`,
-          showConfirmButton: true,
-        }).then((res) => {
-          if (res.isConfirmed) {
-            setFormData({});
-            router.push("/admin/supplier/list");
-
-          }
+    fileKeys.forEach((key) => {
+      if (files[key] && Array.isArray(files[key])) {
+        files[key].forEach(file => {
+          form.append(key, file, file.name);
         });
       }
-      router.push("/admin/supplier/list");
-    } catch (error) {
-      console.error("Error:", error);
+    });
+
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
+      body: form,
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
       Swal.close();
       Swal.fire({
         icon: "error",
-        title: "Submission Error",
-        text: error.message || "Something went wrong. Please try again.",
+        title: "Update Failed",
+        text: result.message || result.error || "An error occurred",
       });
 
-      setAccountErrors({});
-    } finally {
-      setLoading(false);
+      if (result.error && typeof result.error === 'object') {
+        const entries = Object.entries(result.error);
+        let focused = false;
+
+        entries.forEach(([key, message]) => {
+          setErrors((prev) => ({
+            ...prev,
+            [key]: message,
+          }));
+
+          if (!focused) {
+            const tab = getTabByFieldName(key);
+            if (tab) setActiveTab(tab);
+
+            setTimeout(() => {
+              const input = document.querySelector(`[name="${key}"]`);
+              if (input) input.focus();
+            }, 300);
+
+            focused = true;
+          }
+        });
+      }
+
+      throw new Error(result.message || result.error || "Submission failed");
     }
-  };
+
+    Swal.close();
+
+    Swal.fire({
+      icon: "success",
+      title: "Supplier updated",
+      text: `The supplier has been updated successfully!`,
+      showConfirmButton: true,
+    }).then((res) => {
+      if (res.isConfirmed) {
+        setFormData({});
+        setActiveTab("profile-edit")
+        router.push("/admin/supplier/list");
+
+      }
+    });
+
+  } catch (error) {
+    console.error("Error:", error);
+    Swal.close();
+    Swal.fire({
+      icon: "error",
+      title: "Submission Error",
+      text: error.message || "Something went wrong. Please try again.",
+    });
+    setAccountErrors({});
+  } finally {
+    setLoading(false);
+  }
+};
+
 
 
   const labelClasses = (field) => "block text-[#232323] font-bold mb-1";
@@ -570,12 +591,7 @@ const BusinessInfo = () => {
           {[
             { label: 'GST Number', name: 'gstNumber' },
             { label: 'Company PAN Card ID', name: 'companyPanNumber' },
-            { label: 'Upload GST Document', name: 'gstDocument', type: 'file' },
-            { label: 'Upload Company Pan Card Document', name: 'companyPanCardImage', type: 'file' },
             { label: 'Company Pan Card Name', name: 'companyPanCardName' },
-            { label: 'Aadhar Card ID', name: 'aadharNumber' },
-            { label: 'Name on PAN Card', name: 'panCardHolderName' },
-            { label: 'Name Aadhar Card ID', name: 'aadharCardHolderName' },
           ].map(({ label, name, type = 'text' }) => (
             <div key={name}>
               {renderLabel(label, name)}
@@ -653,10 +669,89 @@ const BusinessInfo = () => {
             </Swiper>
           )}
         </div>
+        <div className="mt-6">
+          <div className="mb-4">
+            {renderLabel('Upload companyPanCardImage ', 'companyPanCardImage')}
+            <input
+              type="file"
+              name="companyPanCardImage"
+              multiple
+              onChange={handleChange}
+              className={inputClasses('companyPanCardImage')}
+            />
+            {renderError('companyPanCardImage')}
+          </div>
+
+          {/* File preview for GST Document */}
+          {formData?.companyPanCardImage?.length > 0 && (
+            <Swiper
+              key={formData.id}
+              modules={[Navigation]}
+              slidesPerView={2}
+              loop={formData.companyPanCardImage?.split(',').length > 1}
+              navigation={true}
+              className="mySwiper w-full ms-2"
+            >
+              {formData.companyPanCardImage?.split(',').map((img, index) => (
+                <SwiperSlide key={index} className="relative gap-3">
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                    onClick={() => {
+                      Swal.fire({
+                        title: 'Are you sure?',
+                        text: `Do you want to delete this image?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+
+                          handleImageDelete(index, 'gstDocument'); // Call your delete function
+                        }
+                      });
+                    }}
+                  >
+                    ✕
+                  </button>
+
+                  {/* Image */}
+                  <Image
+                    src={fetchImages(img)}
+                    alt={`Image ${index + 1}`}
+                    width={500}
+                    height={500}
+                    className="me-3 p-2 object-cover rounded"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
+        </div>
 
       </div>
 
-      {/* PAN and Aadhar Upload */}
+      <div className="grid lg:grid-cols-3 gap-4 mt-2">
+        {[
+          { label: 'Aadhar Card ID', name: 'aadharNumber' },
+          { label: 'Name on PAN Card', name: 'panCardHolderName' },
+          { label: 'Name Aadhar Card ID', name: 'aadharCardHolderName' },
+        ].map(({ label, name, type = 'text' }) => (
+          <div key={name}>
+            {renderLabel(label, name)}
+            <input
+              type={type}
+              name={name}
+              {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name], onChange: handleChange })}
+              className={inputClasses(name)}
+            />
+            {renderError(name)}
+          </div>
+        ))}
+      </div>
       <div className="grid md:grid-cols-2 py-5 gap-3">
         {/* PAN Card Image Upload */}
         <div>

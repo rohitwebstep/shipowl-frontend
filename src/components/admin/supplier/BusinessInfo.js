@@ -183,7 +183,7 @@ const BusinessInfo = () => {
         if (value === null || value === undefined || value === '') continue;
 
         if (
-          ['panCardImage', 'gstDocument', 'additionalDocumentUpload', 'documentImage', 'aadharCardImage', 'profilePicture'].includes(key)
+          ['panCardImage', 'gstDocument','companyPanCardImage', 'additionalDocumentUpload', 'documentImage', 'aadharCardImage', 'profilePicture'].includes(key)
         ) {
           if (Array.isArray(value)) {
             value.forEach(file => form.append(key, file, file.name));

@@ -129,133 +129,125 @@ const ProfileEditProvider = ({ children }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const validateBusiness = () => {
-    const newErrors = {};
 
-    const alwaysRequiredFields = [
-      'companyName',
-      'brandName',
-      'billingAddress',
-      'billingPincode',
-      'billingCountry',
-      'billingState',
-      'billingCity',
-      'clientEntryType'
-    ];
+  console.log('formData',formData);
+  console.log('files',files);
+const validateBusiness = () => {
+  const newErrors = {};
 
-    alwaysRequiredFields.forEach((field) => {
-      if (!formData[field] || formData[field].toString().trim() === '') {
-        newErrors[field] = requiredFields[field];
-      }
-    });
+  const alwaysRequiredFields = [
+    'companyName',
+    'brandName',
+    'billingAddress',
+    'billingPincode',
+    'billingCountry',
+    'billingState',
+    'billingCity',
+    'clientEntryType',
+  ];
 
-    // GST/PAN logic
+  alwaysRequiredFields.forEach((field) => {
+    if (!formData[field] || formData[field].toString().trim() === '') {
+      newErrors[field] = requiredFields[field];
+    }
+  });
 
-    const {
-      gstNumber,
-      gstDocument,
-      companyPanNumber,
-      companyPanCardName,
-      companyPanCardImage,
+  const {
+    gstNumber,
+    gstDocument,
+    companyPanNumber,
+    companyPanCardName,
+    companyPanCardImage,
+    aadharNumber,
+    panCardHolderName,
+    aadharCardHolderName,
+    panCardImage,
+    aadharCardImage,
+  } = formData;
 
-      aadharNumber,
-      panCardHolderName,
-      aadharCardHolderName,
-      panCardImage,
-      aadharCardImage,
-    } = formData;
+  const hasGST =
+    !!gstNumber?.trim() ||
+    !!gstDocument ||
+    !!companyPanNumber?.trim() ||
+    !!companyPanCardName?.trim() ||
+    !!companyPanCardImage;
 
-    const hasGST =
-      !!gstNumber?.trim() ||
-      !!gstDocument ||
-      !!companyPanNumber?.trim() ||
-      !!companyPanCardName?.trim() ||
-      !!companyPanCardImage;
+  const hasAadhar =
+    !!aadharNumber?.trim() ||
+    !!panCardHolderName?.trim() ||
+    !!aadharCardHolderName?.trim() ||
+    !!panCardImage ||
+    !!aadharCardImage;
 
-    const hasAadhar =
-      !!aadharNumber?.trim() ||
-      !!panCardHolderName?.trim() ||
-      !!aadharCardHolderName?.trim() ||
-      !!panCardImage ||
-      !!aadharCardImage;
-
-    if (hasGST) {
-      if (!gstNumber?.trim()) {
-        newErrors.gstNumber = requiredFields.gstNumber || 'GST Number is required';
-      }
-
-      if (!companyPanCardImage) {
-        newErrors.companyPanCardImage =
-          requiredFields.companyPanCardImage || 'Company PAN Card Image is required';
-      } else if (
-        !Array.isArray(files.companyPanCardImage) ||
-        files.companyPanCardImage.length === 0
-      ) {
-        newErrors.companyPanCardImage = 'Company PAN Card Image is required';
-      }
-
-      if (!gstDocument) {
-        newErrors.gstDocument = requiredFields.gstDocument || 'GST Document is required';
-      } else if (
-        !Array.isArray(files.gstDocument) ||
-        files.gstDocument.length === 0
-      ) {
-        newErrors.gstDocument = 'GST Document is required';
-      }
-
-      if (!companyPanNumber?.trim()) {
-        newErrors.companyPanNumber =
-          requiredFields.companyPanNumber || 'Company PAN Number is required';
-      }
-
-      if (!companyPanCardName?.trim()) {
-        newErrors.companyPanCardName =
-          requiredFields.companyPanCardName || 'Company PAN Card Name is required';
-      }
+  if (hasGST) {
+    if (!gstNumber?.trim()) {
+      newErrors.gstNumber = requiredFields.gstNumber || 'GST Number is required';
     }
 
-    if (hasAadhar) {
-      if (!aadharNumber?.trim()) {
-        newErrors.aadharNumber =
-          requiredFields.aadharNumber || 'Aadhar Number is required';
-      }
+    const hasCompanyPanCardImage =
+      (companyPanCardImage && companyPanCardImage.trim() !== '') ||
+      (Array.isArray(files.companyPanCardImage) && files.companyPanCardImage.length > 0);
 
-      if (!aadharCardHolderName?.trim()) {
-        newErrors.aadharCardHolderName =
-          requiredFields.aadharCardHolderName || 'Aadhar Card Holder Name is required';
-      }
-
-      if (!panCardHolderName?.trim()) {
-        newErrors.panCardHolderName =
-          requiredFields.panCardHolderName || 'PAN Card Holder Name is required';
-      }
-
-      if (!panCardImage) {
-        newErrors.panCardImage =
-          requiredFields.panCardImage || 'PAN Card Image is required';
-      } else if (
-        !Array.isArray(files.panCardImage) ||
-        files.panCardImage.length === 0
-      ) {
-        newErrors.panCardImage = 'PAN Card Image is required';
-      }
-
-      if (!aadharCardImage) {
-        newErrors.aadharCardImage =
-          requiredFields.aadharCardImage || 'Aadhar Card Image is required';
-      } else if (
-        !Array.isArray(files.aadharCardImage) ||
-        files.aadharCardImage.length === 0
-      ) {
-        newErrors.aadharCardImage = 'Aadhar Card Image is required';
-      }
+    if (!hasCompanyPanCardImage) {
+      newErrors.companyPanCardImage =
+        requiredFields.companyPanCardImage || 'Company PAN Card Image is required';
     }
 
+    const hasGstDoc =
+      (gstDocument && gstDocument.trim() !== '') ||
+      (Array.isArray(files.gstDocument) && files.gstDocument.length > 0);
 
+    if (!hasGstDoc) {
+      newErrors.gstDocument = requiredFields.gstDocument || 'GST Document is required';
+    }
 
-    setBusinessErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    if (!companyPanNumber?.trim()) {
+      newErrors.companyPanNumber =
+        requiredFields.companyPanNumber || 'Company PAN Number is required';
+    }
+
+    if (!companyPanCardName?.trim()) {
+      newErrors.companyPanCardName =
+        requiredFields.companyPanCardName || 'Company PAN Card Name is required';
+    }
+  }
+
+  if (hasAadhar) {
+    if (!aadharNumber?.trim()) {
+      newErrors.aadharNumber = requiredFields.aadharNumber || 'Aadhar Number is required';
+    }
+
+    if (!aadharCardHolderName?.trim()) {
+      newErrors.aadharCardHolderName =
+        requiredFields.aadharCardHolderName || 'Aadhar Card Holder Name is required';
+    }
+
+    if (!panCardHolderName?.trim()) {
+      newErrors.panCardHolderName =
+        requiredFields.panCardHolderName || 'PAN Card Holder Name is required';
+    }
+
+    const hasPanCardImage =
+      (panCardImage && panCardImage.trim() !== '') ||
+      (Array.isArray(files.panCardImage) && files.panCardImage.length > 0);
+
+    if (!hasPanCardImage) {
+      newErrors.panCardImage = requiredFields.panCardImage || 'PAN Card Image is required';
+    }
+
+    const hasAadharCardImage =
+      (aadharCardImage && aadharCardImage.trim() !== '') ||
+      (Array.isArray(files.aadharCardImage) && files.aadharCardImage.length > 0);
+
+    if (!hasAadharCardImage) {
+      newErrors.aadharCardImage = requiredFields.aadharCardImage || 'Aadhar Card Image is required';
+    }
+  }
+
+  setBusinessErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
 
   return (
     <ProfileEditContext.Provider value={{

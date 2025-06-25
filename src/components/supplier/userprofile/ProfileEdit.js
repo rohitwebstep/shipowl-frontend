@@ -17,6 +17,8 @@ const ProfileEdit = () => {
     errors,
     setErrors,
     setFormData,
+    files,
+    setFiles,
     stateData,
     cityData,
     setCityData,
@@ -129,6 +131,20 @@ const ProfileEdit = () => {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     let updatedFormData = { ...formData };
+
+    // Handle file input (multiple files)
+    if (files) {
+      setFiles((prev) => ({
+        ...prev,
+        [name]: Array.from(files), // Store files as an array
+      }));
+    } else {
+      // Handle text input (single value)
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value, // Store value for text-based inputs
+      }));
+    }
 
     if (files?.length) {
       const file = files[0];

@@ -13,7 +13,7 @@ import Select from 'react-select';
 import { useImageURL } from "@/components/ImageURLContext";
 const BusinessInfo = () => {
   const { fetchImages } = useImageURL();
-  const { formData, requiredFields, businessErrors, validateBusiness, setBusinessErrors, files, setFiles, setFormData, stateData, cityData, setCityData, setStateData, setActiveTab, countryData } = useContext(ProfileContext);
+  const { formData, businessErrors, validateBusiness, setBusinessErrors, files, setFiles, setFormData, stateData, cityData, setCityData, setStateData, setActiveTab, countryData } = useContext(ProfileContext);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -49,7 +49,6 @@ const BusinessInfo = () => {
       [name]: '', // Reset error for the field
     }));
   };
-
 
   const fetchState = useCallback(async (id) => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
@@ -239,48 +238,72 @@ const BusinessInfo = () => {
         didOpen: () => Swal.showLoading()
       });
 
-      const url = `https://shipowl-kd06.onrender.com/api/supplier/profile/update`; // Ensure the URL is correct
+      const url = `https://shipowl-kd06.onrender.com/api/supplier/profile/update`;
       const form = new FormData();
-      for (const key in files) {
-        const value = files[key];
 
-        // Skip null, undefined, or empty values
-        if (value === null || value === undefined || value === '') continue;
+      // Step 1: Append files from files state
+      const fileKeys = [
+        'panCardImage',
+        'gstDocument',
+        'companyPanCardImage',
+        'additionalDocumentUpload',
+        'documentImage',
+        'aadharCardImage',
+        'profilePicture'
+      ];
 
-        // Special handling for file inputs
-        if (['panCardImage', 'gstDocument', 'additionalDocumentUpload', 'documentImage', 'aadharCardImage', 'profilePicture'].includes(key)) {
-          if (Array.isArray(value)) {
-            // Append each file in the array
-            value.forEach(file => {
-              form.append(key, file, file.name);
-            });
-          } else if (value instanceof File) {
-            // Single file input
-            form.append(key, value, value.name);
-          }
+      fileKeys.forEach((key) => {
+        const fileValue = files[key];
+
+        // Skip if already present as a URL in formData (old image not changed)
+        if (formData[key] && typeof formData[key] === 'string' && formData[key].startsWith('http')) {
+          return;
         }
-      }
+
+        if (Array.isArray(fileValue)) {
+          fileValue.forEach((file) => {
+            if (file instanceof File) form.append(key, file, file.name);
+          });
+        } else if (fileValue instanceof File) {
+          form.append(key, fileValue, fileValue.name);
+        }
+      });
+
+      // Step 2: Append all other fields from formData
       for (const key in formData) {
-        if (formData[key] !== null && formData[key] !== '') {
-          form.append(key, formData[key]);
+        const value = formData[key];
+        if (value !== null && value !== undefined && value !== '') {
+          // Only append non-file values
+          if (!fileKeys.includes(key)) {
+            if (typeof value === 'object') {
+              form.append(key, JSON.stringify(value));
+            } else {
+              form.append(key, value);
+            }
+          } else {
+            // For file keys, if a URL (string) exists, keep it
+            if (typeof value === 'string' && value.startsWith('http')) {
+              form.append(key, value); // retain previous uploaded file URL
+            }
+          }
         }
       }
 
       const response = await fetch(url, {
         method: "PUT",
         headers: {
-          "Authorization": `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: form,
       });
 
       const result = await response.json();
+
       if (!response.ok) {
         Swal.close();
-
         Swal.fire({
           icon: "error",
-          title: "Creation Failed",
+          title: "Update Failed",
           text: result.message || result.error || "An error occurred",
         });
 
@@ -295,7 +318,7 @@ const BusinessInfo = () => {
             }));
 
             if (!focused) {
-              const tab = getTabByFieldName(key); // make sure this is imported or defined above
+              const tab = getTabByFieldName(key);
               if (tab) setActiveTab(tab);
 
               setTimeout(() => {
@@ -313,21 +336,18 @@ const BusinessInfo = () => {
 
       Swal.close();
 
-      if (result) {
-        Swal.fire({
-          icon: "success",
-          title: "Supplier updated",
-          text: `The supplier has been updated successfully!`,
-          showConfirmButton: true,
-        }).then((res) => {
-          if (res.isConfirmed) {
-            setFormData({});
-            router.push("/supplier/profile");
+      Swal.fire({
+        icon: "success",
+        title: "Supplier updated",
+        text: `The supplier has been updated successfully!`,
+        showConfirmButton: true,
+      }).then((res) => {
+        if (res.isConfirmed) {
+          setFormData({});
+          router.push("/supplier/profile");
+        }
+      });
 
-          }
-        });
-      }
-      router.push("/supplier/profile");
     } catch (error) {
       console.error("Error:", error);
       Swal.close();
@@ -336,22 +356,78 @@ const BusinessInfo = () => {
         title: "Submission Error",
         text: error.message || "Something went wrong. Please try again.",
       });
-
       setAccountErrors({});
     } finally {
       setLoading(false);
     }
   };
+
   const labelClasses = (field) => "block text-[#232323] font-bold mb-1";
   const inputClasses = (field) =>
     `w-full p-3 border rounded-lg font-bold ${businessErrors[field] ? 'border-red-500' : 'border-[#DFEAF2]'} text-[#718EBF]`;
 
+
+  const {
+    gstNumber,
+    gstDocument,
+    companyPanNumber,
+    companyPanCardName,
+    companyPanCardImage,
+
+    aadharNumber,
+    panCardHolderName,
+    aadharCardHolderName,
+    panCardImage,
+    aadharCardImage,
+  } = formData;
+
+  const hasGST =
+    !!gstNumber?.trim() ||
+    !!gstDocument ||
+    !!companyPanNumber?.trim() ||
+    !!companyPanCardName?.trim() ||
+    !!companyPanCardImage;
+
+  const hasAadhar =
+    !!aadharNumber?.trim() ||
+    !!panCardHolderName?.trim() ||
+    !!aadharCardHolderName?.trim() ||
+    !!panCardImage ||
+    !!aadharCardImage;
+
+
+  const requiredFields2 = {
+    ...(hasGST && {
+      gstNumber: true,
+      gstDocument: true,
+      companyPanNumber: true,
+      companyPanCardName: true,
+      companyPanCardImage: true,
+    }),
+    ...(hasAadhar && {
+      aadharNumber: true,
+      panCardHolderName: true,
+      aadharCardHolderName: true,
+      panCardImage: true,
+      aadharCardImage: true,
+    }),
+    companyName: true,
+    brandName: true,
+    billingAddress: true,
+    billingPincode: true,
+    billingCountry: true,
+    billingState: true,
+    billingCity: true,
+    clientEntryType: true,
+  };
+
   const renderLabel = (label, field) => (
     <label className={labelClasses(field)}>
       {label}
-      {requiredFields[field] && <span className="text-red-500 ml-1">*</span>}
+      {requiredFields2[field] && <span className="text-red-500 ml-1">*</span>}
     </label>
   );
+
 
   const renderError = (field) =>
     businessErrors[field] && <p className="text-red-500 text-sm mt-1">{businessErrors[field]}</p>;
@@ -508,9 +584,8 @@ const BusinessInfo = () => {
           {[
             { label: 'GST Number', name: 'gstNumber' },
             { label: 'Company PAN Card ID', name: 'companyPanNumber' },
-            { label: 'Aadhar Card ID', name: 'aadharNumber' },
-            { label: 'Name on PAN Card', name: 'panCardHolderName' },
-            { label: 'Name Aadhar Card ID', name: 'aadharCardHolderName' }
+            { label: 'Company Pan Card Name', name: 'companyPanCardName' },
+
           ].map(({ label, name, type = 'text' }) => (
             <div key={name}>
               {renderLabel(label, name)}
@@ -587,9 +662,89 @@ const BusinessInfo = () => {
               </Swiper>
             )}
           </div>
+          <div className="">
+            <div className="mb-4">
+              {renderLabel('Upload company PanCard Image', 'companyPanCardImage')}
+              <input
+                type="file"
+                name="companyPanCardImage"
+                multiple
+                accept="image/*"
+                onChange={handleChange}
+                className={inputClasses('companyPanCardImage')}
+              />
+              {renderError('companyPanCardImage')}
+            </div>
+
+            {/* File preview for GST Document */}
+            {formData?.companyPanCardImage?.length > 0 && (
+              <Swiper
+                key={formData.id}
+                modules={[Navigation]}
+                slidesPerView={2}
+                loop={formData.companyPanCardImage?.split(',').length > 1}
+                navigation={true}
+                className="mySwiper w-full ms-2"
+              >
+                {formData.companyPanCardImage?.split(',').map((img, index) => (
+                  <SwiperSlide key={index} className="relative gap-3">
+                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-10"
+                      onClick={() => {
+                        Swal.fire({
+                          title: 'Are you sure?',
+                          text: `Do you want to delete this image?`,
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#d33',
+                          cancelButtonColor: '#3085d6',
+                          confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+
+                            handleImageDelete(index, 'companyPanCardImage'); // Call your delete function
+                          }
+                        });
+                      }}
+                    >
+                      ✕
+                    </button>
+
+                    {/* Image */}
+                    <Image
+                      src={fetchImages(img)}
+                      alt={`Image ${index + 1}`}
+                      width={500}
+                      height={500}
+                      className="me-3 p-2 object-cover rounded"
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
+          </div>
         </div>
-
-
+      </div>
+      <div className="grid lg:grid-cols-3 gap-4 mt-2">
+        {[
+          { label: 'Aadhar Card ID', name: 'aadharNumber' },
+          { label: 'Name on PAN Card', name: 'panCardHolderName' },
+          { label: 'Name Aadhar Card ID', name: 'aadharCardHolderName' },
+        ].map(({ label, name, type = 'text' }) => (
+          <div key={name}>
+            {renderLabel(label, name)}
+            <input
+              type={type}
+              name={name}
+              {...(type === 'file' ? { multiple: true, onChange: handleChange } : { value: formData[name], onChange: handleChange })}
+              className={inputClasses(name)}
+            />
+            {renderError(name)}
+          </div>
+        ))}
+        {/* Separate file input for "Upload GST Document" */}
 
       </div>
 

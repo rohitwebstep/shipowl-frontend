@@ -185,7 +185,7 @@ const ProfileProvider = ({ children }) => {
       if (!gstNumber?.trim()) {
         newErrors.gstNumber = requiredFields.gstNumber || 'GST Number is required';
       }
-      if (!companyPanCardImage?.trim()) {
+      if (!companyPanCardImage) {
         newErrors.companyPanCardImage = requiredFields.companyPanCardImage || 'PAN Card Holder Name is required';
       }
       if (!gstDocument) {

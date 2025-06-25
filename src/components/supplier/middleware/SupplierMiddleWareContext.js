@@ -91,6 +91,7 @@ export default function SupplierMiddleWareProvider({ children }) {
                 router.push("/supplier/auth/login");
                 return;
             }
+            
 
         } catch (error) {
             console.error("Error:", error);
