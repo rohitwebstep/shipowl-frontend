@@ -7,6 +7,8 @@ import 'react-date-range/dist/theme/default.css';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from 'sweetalert2';
+import { FaCheck } from "react-icons/fa";
+
 const tabs = [
   { key: "warehouse-collected", label: "Collected at Warehouse" },
   { key: "rto", label: "RTO Count" },
@@ -29,11 +31,26 @@ import { HashLoader } from 'react-spinners';
 export default function RTO() {
   const [activeTab, setActiveTab] = useState('warehouse-collected');
   const { fetchImages } = useImageURL();
+  const [selected, setSelected] = useState('');
+
+  const handleCheckboxChange = (id) => {
+    setSelected((prev) => {
+      const ids = prev ? prev.split(',') : [];
+
+      const updated = ids.includes(String(id))
+        ? ids.filter((item) => item !== String(id))
+        : [...ids, String(id)];
+
+      return updated.join(',');
+    });
+  };
+
+  console.log('selected', selected)
 
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [disputeLevel2, setDisputeLevel2] = useState('');
+  const [disputeCase2, setDisputeCase2] = useState('');
   const [disputeOpen, setDisputeOpen] = useState(false);
   const [viewDispute, setViewDispute] = useState(false);
   const handleViewVariant = (item, variant) => {
@@ -46,7 +63,6 @@ export default function RTO() {
     packingGallery: '',
     unboxingGallery: '',
   });
-  const modalRefNew = useRef(null);
   const [scannedCode, setScannedCode] = useState('');
   const [message, setMessage] = useState('📷 Please scan a barcode...');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -67,10 +83,7 @@ export default function RTO() {
   const modalRef = useRef();
   const [files, setFiles] = useState([]);
 
-  const openModal = () => {
-    setIsModalOpen(true);
-    modalRef.current.showModal();
-  };
+;
 
   useScannerDetection({
     onComplete: (code) => {
@@ -80,15 +93,6 @@ export default function RTO() {
     },
     minLength: 3,
   });
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    modalRef.current.close();
-    setStatus('');
-    setPackingGallery([]);
-    setUnboxingGallery([]);
-  };
-
 
   const handleFileChange = (e) => {
     const inputName = e.target.name; // get the input's name attribute
@@ -110,7 +114,6 @@ export default function RTO() {
   const [toDate, setToDate] = useState(new Date());
 
   const formatDate = (date) => date.toISOString().split("T")[0];
-  console.log('formatDate', formatDate(fromDate), formatDate(toDate))
 
 
   const sendBarCodeOrder = async () => {
@@ -354,7 +357,7 @@ export default function RTO() {
   });
 
 
-  const handleSubmitdispute = async (e, order, id) => {
+  const disputeAll = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -376,26 +379,19 @@ export default function RTO() {
     try {
       // Show loading dialog
       Swal.fire({
-        title: 'Creating ...',
+        title: 'Creating...',
         text: 'Please wait while we save your data.',
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
         },
-        customClass: {
-          popup: 'custom-swal-zindex'
-        }
+
       });
 
-      closeModal();
       const formdata = new FormData();
-      Object.entries(files).forEach(([key, fileArray]) => {
-        fileArray.forEach((file) => {
-          formdata.append(key, file, file.name);
-        });
-      });
+      formdata.append('orders', Array.isArray(selected) ? selected.join(',') : selected);
 
-      const url = `https://shipowl-kd06.onrender.com/api/supplier/order/${order.id}/rto/${id}/response?status=${status}`;
+      const url = `https://shipowl-kd06.onrender.com/api/supplier/order/need-to-raise/dispute-1`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -413,43 +409,20 @@ export default function RTO() {
           icon: "error",
           title: "Creation Failed",
           text: result.message || result.error || "An error occurred.",
-          customClass: {
-            container: 'custom-swal-zindex'
-          },
+
         });
-
-        if (result.error && typeof result.error === 'object') {
-          const entries = Object.entries(result.error);
-          let focused = false;
-
-          entries.forEach(([key, message]) => {
-            setValidationErrors((prev) => ({
-              ...prev,
-              [key]: message,
-            }));
-
-            if (!focused) {
-              setTimeout(() => {
-                const input = document.querySelector(`[name="${key}"]`);
-                if (input) input.focus();
-              }, 300);
-              focused = true;
-            }
-          });
-        }
-
       } else {
         Swal.fire({
           icon: "success",
-          title: "Created",
+          title: "Dispute Created",
+          text: "Your dispute has been raised successfully!",
           showConfirmButton: true,
-          customClass: {
-            popup: 'custom-swal-zindex'
-          }
+
         }).then((res) => {
           if (res.isConfirmed) {
-            setFiles({});
-            setShowModal(false);
+       
+            fetchRto();
+            setSelected([]);
           }
         });
       }
@@ -461,15 +434,12 @@ export default function RTO() {
         icon: "error",
         title: "Submission Error",
         text: error.message || "Something went wrong. Please try again.",
-        customClass: {
-          popup: 'custom-swal-zindex'
-        }
       });
-      setError(error.message || "Submission failed.");
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -513,7 +483,7 @@ export default function RTO() {
       formdata.append("status", status);
 
 
-      const url = `https://shipowl-kd06.onrender.com/api/supplier/order/need-to-raise/${disputeLevel2}/dispute-2`;
+      const url = `https://shipowl-kd06.onrender.com/api/supplier/order/need-to-raise/${disputeCase2}/dispute-2`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -548,7 +518,7 @@ export default function RTO() {
         }).then((res) => {
           if (res.isConfirmed) {
             setFiles({});
-            setDisputeLevel2('');
+            setDisputeCase2('');
             setDisputeOpen(false);
             fetchRto();
           }
@@ -621,7 +591,7 @@ export default function RTO() {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => { setActiveTab(tab.key), setSelected('') }}
             className={`md:px-6 py-2 font-medium px-2  md:text-xl border-b-2 transition-all duration-200
                 ${activeTab === tab.key
                 ? "border-orange-500 text-orange-600"
@@ -679,6 +649,9 @@ export default function RTO() {
             <h2 className="text-2xl font-bold  font-dm-sans">RTO Order Details</h2>
             <div className="flex gap-3  flex-wrap items-center">
               <span onClick={() => fetchRto()} className="font-bold   font-dm-sans">Clear Filters</span>
+              {selected && (
+                <button className="bg-red-500 text-white p-2 px-4 rounded-md" onClick={disputeAll}>Dispute Selected</button>
+              )}
               <span><IoMdRefresh className="text-red-600 text-xl" /></span>
               <span><IoSettingsOutline className="text-xl" /></span>
               <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
@@ -716,8 +689,8 @@ export default function RTO() {
                 <thead className="uppercase text-gray-700">
                   <tr className="border-b border-[#DFEAF2] text-left">
                     <th className="p-3 px-5 whitespace-nowrap">SR.</th>
-                    <th className="p-3 px-5 whitespace-nowrap">+ n more products</th>
-                    <th className="p-3 px-5 whitespace-nowrap">Order#</th>
+                    <th className="p-3 px-5 whitespace-nowrap">Item Count</th> 
+                                       <th className="p-3 px-5 whitespace-nowrap">Order#</th>
 
                     {hasAnyPermission(
                       "shippingName",
@@ -755,7 +728,7 @@ export default function RTO() {
                       </>
                     )}
 
-                    <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
+
 
                     {hasAnyPermission("totalAmount") && (
                       <th className="p-3 px-5 whitespace-nowrap">Total</th>
@@ -776,8 +749,23 @@ export default function RTO() {
                         .filter((img) => img.trim() !== '');
 
                     return (
-                      <tr key={order.id} className="border-b border-[#DFEAF2]">
-                        <td className="p-3 px-5 whitespace-nowrap">{index + 1}</td>
+                      <tr key={order.id} className="border-b border-[#DFEAF2] capitalize">
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <div className="flex items-center">{activeTab == "need-to-raise" && (
+
+                            <label className="flex items-center cursor-pointer mr-2">
+                              <input
+                                type="checkbox"
+                                checked={selected.includes(order.id)}
+                                onChange={() => handleCheckboxChange(order.id)}
+                                className="peer hidden"
+                              />
+                              <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                                <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                              </div>
+                            </label>
+                          )}
+                            {index + 1}</div></td>
                         <td className="p-3 px-5 whitespace-nowrap">
                           <div className='flex items-center gap-3'>
                             <div className="flex gap-2 flex-wrap">
@@ -827,7 +815,7 @@ export default function RTO() {
                             </PermissionField>
                             <PermissionField permissionKey="status">
                               <p>
-                                <span className={`font-bold ${order.payment?.status === "failed"
+                                <span className={`font-bold uppercase ${order.payment?.status === "failed"
                                   ? "text-red-500"
                                   : order.payment?.status === "pending"
                                     ? "text-yellow-500"
@@ -902,8 +890,7 @@ export default function RTO() {
                           </td>
                         )}
 
-                        {/* Item Count */}
-                        <td className="p-3 px-5 whitespace-nowrap">{order.items.length}</td>
+
 
                         {/* Total Amount */}
                         {hasAnyPermission("totalAmount") && (
@@ -914,39 +901,44 @@ export default function RTO() {
 
                         {/* Actions */}
                         <td className="px-4 py-2 text-sm whitespace-nowrap text-center">
-                          <div className="flex gap-2">
+                          <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => handleViewVariant(order, order.items)}
                               className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600"
                             >
                               View Variants
                             </button>
+                            {activeTab === "warehouse-collected" && (
+                              !order.disputeCase ? (
+                                <button
+                                  onClick={() => {
+                                    setDisputeCase2(order.id),
+                                      setDisputeOpen(true)
+                                  }}
+                                  className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
+                                  Initiate Dispute
+                                </button>
+                              ) : (<button onClick={() => {
+                                setSelectedDisputeItem({
+                                  status: order.supplierRTOResponse || '',
+                                  packingGallery: order.packingGallery || '',
+                                  unboxingGallery: order.unboxingGallery || '',
+                                }); // Save clicked dispute item to state
+                                setViewDispute(true)
+                              }} className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
+                                View Dispute
+                              </button>
+                              )
+                            )}
+
                             {activeTab === "need-to-raise" && (
                               <>
-                                {!order.disputeLevel ? (
+                                {!order.disputeCase ? (
                                   <button onClick={() => initiateLevel1(order.id)} className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
-                                    Initiate Dispute Level 1
-                                  </button>
-                                ) : order.disputeLevel === 1 ? (
-                                  <button
-                                    onClick={() => {
-                                      setDisputeLevel2(order.id),
-                                        setDisputeOpen(true)
-                                    }}
-                                    className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
-                                    Initiate Dispute Level 2
+                                    Initiate Dispute
                                   </button>
                                 ) : (
-                                  <button onClick={() => {
-                                    setSelectedDisputeItem({
-                                      status: order.supplierRTOResponse || '',
-                                      packingGallery: order.packingGallery || '',
-                                      unboxingGallery: order.unboxingGallery || '',
-                                    }); // Save clicked dispute item to state
-                                    setViewDispute(true)
-                                  }} className="px-3 py-1 text-sm bg-orange-500 text-white rounded hover:bg-orange-600">
-                                    View Dispute
-                                  </button>
+                                  <p>Dispute Initiated</p>
                                 )}
                               </>
                             )}
@@ -975,7 +967,7 @@ export default function RTO() {
 
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Raise a Dispute</h2>
-              <button onClick={() => { setDisputeOpen(false), setDisputeLevel2('') }} className="text-gray-500 hover:text-black">✕</button>
+              <button onClick={() => { setDisputeOpen(false), setDisputeCase2('') }} className="text-gray-500 hover:text-black">✕</button>
             </div>
 
             <div className="space-y-4">
@@ -988,7 +980,6 @@ export default function RTO() {
                 >
                   <option value="">Select Status</option>
                   <option value="wrong item received">Wrong Item Received</option>
-                  <option value="not received">Not Delivered</option>
 
                 </select>
               </div>
@@ -1023,7 +1014,7 @@ export default function RTO() {
             </div>
 
             <div className="mt-6 flex justify-end gap-2">
-              <button onClick={() => { setDisputeOpen(false), setDisputeLevel2('') }} className="px-4 py-2 border rounded">
+              <button onClick={() => { setDisputeOpen(false), setDisputeCase2('') }} className="px-4 py-2 border rounded">
                 Cancel
               </button>
               <button
@@ -1084,7 +1075,6 @@ export default function RTO() {
                           />
                         )}
                       </div>
-                      <div className="absolute top-0 left-0 w-full text-center bg-orange-500 p-2 text-white ">Suggested Price :{variant.price}</div>
 
 
                     </div>

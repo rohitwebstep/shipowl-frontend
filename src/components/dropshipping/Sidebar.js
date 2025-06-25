@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { IoMdAnalytics } from "react-icons/io";
+
 import {
   Home,
   ShoppingCart,
@@ -25,6 +27,7 @@ import { FileBarChart2 } from "lucide-react";
 
 const menuItems = [
   { name: "Home", icon: Home, href: "/dropshipping", section: "MENU" },
+  { name: "Analytics", icon: IoMdAnalytics , href: "/dropshipping/analytics", section: "MENU" },
 
   {
     name: "Inventory",

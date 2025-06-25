@@ -12,6 +12,8 @@ export const ImageURLProvider = ({ children }) => {
     }
     if (url.includes('www.')) {
       return url;
+    }else{
+      return 'https://placehold.co/400';
     }
 
     const splitPart = url.split('tmp');

@@ -10,30 +10,18 @@ import { HashLoader } from 'react-spinners';
 import productimg from '@/app/assets/product1.png';
 import { X, ClipboardCopy, HelpCircle, Upload, Store, Star } from 'lucide-react';
 import CategorySection from './CatogorySection'
-import { FaCalculator } from "react-icons/fa";
-import { RiResetRightLine } from "react-icons/ri";
-import { RxCross1 } from "react-icons/rx";
-import { ChevronRight, ChevronDown } from "lucide-react"; // Optional: Lucide icons
-import { TbCube } from "react-icons/tb";
-import { GoArrowUpRight } from "react-icons/go";
-import { FiArrowDownLeft } from "react-icons/fi";
 import { useImageURL } from "@/components/ImageURLContext";
-import { useDropshipper } from '../middleware/DropshipperMiddleWareContext';
 const NewlyLaunched = () => {
   const router = useRouter();
   const [shipCost, setShipCost] = useState([]);
   const [showResult, setShowResult] = useState(false);
-  const [openCalculator, setOpenCalculator] = useState(null);
-  const [calculateData, setcalculateData] = useState('');
   const [selectedVariant, setSelectedVariant] = useState('');
   const [products, setProducts] = useState([]);
   const [shopifyStores, setShopifyStores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('notmy');
   const [type, setType] = useState(false);
-  const { InputField, ResultItem, ProductInfo } = useDropshipper();
   const { fetchImages } = useImageURL();
-  const [activeModal, setActiveModal] = useState("");
   const [openSection, setOpenSection] = useState(null);
   const [activeModalPushToShopify, setActiveModalPushToShopify] = useState('Shipowl');
 
@@ -742,247 +730,7 @@ const NewlyLaunched = () => {
           );
         })()}
 
-        {calculateData && openCalculator && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white w-full max-w-4xl rounded shadow-lg p-6 max-h-[90vh] overflow-y-auto">
-              {/* Header */}
-              <div className="flex justify-between items-center border-b pb-3">
-                <div className='flex gap-3 items-center'>
-                  <div className='bg-gray-200 text-center p-3 flex justify-center items-center '>
-                    <FaCalculator className="text-2xl" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">Pricing Calculator</h2>
-                    <p className='text-xs'>Please enter all the required fields (<span className='text-red-500'>*</span>) to calculate your expected profit</p>
-                  </div>
-                </div>
-                <div className='flex gap-4 justify-end'>
-                  <button className="text-sm underline font-bold items-center gap-2 flex text-black" onClick={() => setForm({
-                    dropPrice: '',
-                    totalOrderQty: '',
-                    confirmOrderPercentage: '90',
-                    deliveryPercentage: '50',
-                    adSpends: '',
-                    miscCharges: '',
-                  })}>
-                    <RiResetRightLine /> Reset
-                  </button>
-                  <button onClick={() => setOpenCalculator(false)} className="text-sm text-black font-bold" >
-                    <RxCross1 />
-                  </button>
-                </div>
-              </div>
-
-              {/* Info Bar */}
-              <div className="flex gap-6 mt-4 mb-6">
-                {calculateData?.image ? (
-                  <Image
-                    src={fetchImages(calculateData.image.split(",")[0] || null)}
-                    alt={calculateData?.name || "Product Image"}
-                    width={100}
-                    height={100}
-                  />
-                ) : null}
-
-                <ProductInfo label="Shipowl Price" value={calculateData?.price} />
-                <ProductInfo label="RTO Charges" value={shipCost} />
-                <ProductInfo label="Product Weight" value={`${calculateData?.weight} GM `} />
-              </div>
-
-              {/* Main Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Form Side */}
-                <div className="space-y-4 bg-[#f5f5f5] rounded-md p-4">
-                  <InputField
-                    label="Selling Price"
-                    value={form.dropPrice}
-                    onChange={(val) => handleChange('dropPrice', val)}
-                    error={errors.dropPrice}
-                    required
-
-                  />
-                  <InputField
-                    label="Expected Orders"
-                    value={form.totalOrderQty}
-                    onChange={(val) => handleChange('totalOrderQty', val)}
-                    error={errors.totalOrderQty}
-                    required
-                  />
-                  <InputField
-                    label="Confirmed Orders (%)"
-                    value={form.confirmOrderPercentage}
-                    onChange={(val) => handleChange('confirmOrderPercentage', Math.min(100, val))}
-                    error={errors.confirmOrderPercentage}
-                    required
-                    suffix="%"
-                  />
-                  <InputField
-                    label="Expected Delivery (%)"
-                    value={form.deliveryPercentage}
-                    onChange={(val) => handleChange('deliveryPercentage', Math.min(100, val))}
-                    error={errors.deliveryPercentage}
-                    required
-                    suffix="%"
-                  />
-                  <InputField
-                    label="Ad Spends per Order"
-                    value={form.adSpends}
-                    onChange={(val) => handleChange('adSpends', val)}
-                    error={errors.adSpends}
-                    required
-                    suffix="₹"
-                  />
-                  <InputField
-                    label="Total Misc. Charges"
-                    value={form.miscCharges}
-                    onChange={(val) => handleChange('miscCharges', val)}
-                    suffix="₹"
-                  />
-                </div>
-
-
-                {/* Results Side */}
-                <div>
-                  <div className={`p-4 rounded-md ${showResult ? (finalMargin < 0 ? 'bg-red-50' : 'bg-green-50') : 'bg-gray-100'}`}>
-                    <ResultItem label="Net Profit" value={`₹${finalMargin.toFixed(2)}`} isVisible={showResult} />
-                    <p className='text-xs'>Total Earnings - Total Spends</p>
-                    <hr className='my-4' />
-                    <ResultItem label="Net Profit (Per Order)" value={`₹${profitPerOrder.toFixed(2)}`} isVisible={showResult} />
-                    <p className='text-xs'>Net Profit / Expected Orders</p>
-                  </div>
-
-
-                  <div className="border border-gray-300 p-4 rounded-md space-y-4 mt-3">
-                    {/* Orders Section */}
-                    <div className="border-b border-gray-200 pb-2">
-                      <div
-                        className="flex items-center justify-between cursor-pointer"
-                        onClick={() => toggleSection("orders")}
-                      >
-                        <div className="flex items-center gap-2 w-full">
-                          <div className="bg-purple-100 p-2 ">
-                            <TbCube className="text-purple-700" />
-                          </div>
-                          <ResultItem
-                            label="# Orders"
-                            value={totalOrderQty}
-                            isVisible={showResult}
-                            placeholder="-"
-                          />
-                        </div>
-                        {openSection === "orders" ? (
-                          <ChevronDown className="text-gray-500" />
-                        ) : (
-                          <ChevronRight className="text-gray-500" />
-                        )}
-                      </div>
-                      {openSection === "orders" && (
-                        <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
-                          <ul>
-                            <li>
-                              Confirmed Orders: <span>{confirmedQty}</span>
-                            </li>
-                            <li>
-                              Delivered Orders: <span>{deliveredQty}</span>
-                            </li>
-                            <li>
-                              RTO Orders: <span>{deliveredRTOQty}</span>
-                            </li>
-                            <li>
-                              Cancelled Orders: <span>{totalOrderQty - confirmedQty}</span>
-                            </li>
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Earnings Section */}
-                    <div className="border-b border-gray-200 pb-2">
-                      <div className="flex items-center  cursor-pointer"
-                        onClick={() => toggleSection("earnings")}
-                      >
-                        <div className="flex items-center gap-2 w-full">
-                          <div className="bg-green-100 p-2 ">
-                            <FiArrowDownLeft className="text-green-700" />
-                          </div>
-                          <ResultItem
-                            label="Total Earnings"
-                            value={`₹${finalEarnings}`}
-                            isVisible={showResult}
-                          />
-                        </div>
-                        {openSection === "earnings" ? (
-                          <ChevronDown className="text-gray-500" />
-                        ) : (
-                          <ChevronRight className="text-gray-500" />
-                        )}
-                      </div>
-                      {openSection === "earnings" && (
-                        <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
-                          <ul>
-                            <li>
-
-                              Margin Per Order: <span>{dropPrice > 0 ? dropPrice - productPrice : '-'}</span>
-                            </li>
-                            <li>
-                              Delivered Orders: <span>{deliveredQty}</span>
-                            </li>
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Expenses Section */}
-                    <div className="border-b border-gray-200 pb-2">
-                      <div
-                        className="flex items-center justify-between cursor-pointer w-full"
-                        onClick={() => toggleSection("expenses")}
-                      >
-                        <div className="flex items-center gap-2 w-full">
-                          <div className="bg-red-100 p-2 ">
-                            <GoArrowUpRight className="text-red-700" />
-                          </div>
-                          <ResultItem
-                            label="Total Spends"
-                            value={`₹ ${totalExpenses}`}
-                            isVisible={showResult}
-                          />
-                        </div>
-                        {openSection === "expenses" ? (
-                          <ChevronDown className="text-gray-500" />
-                        ) : (
-                          <ChevronRight className="text-gray-500" />
-                        )}
-                      </div>
-                      {openSection === "expenses" && (
-                        <div className="inner-item mt-2 pl-10 text-sm text-gray-700 space-y-1">
-                          <ul>
-                            <li>
-                              Total Ad Spends: <span>{totalAddSpend}</span>
-                            </li>
-                            <li>
-                              (+)Total RTO Charges:{" "}
-                              <span>{deliveryCostPerUnit * deliveredRTOQty}</span>
-                            </li>
-                            <li>
-                              (+)Total Misc. Charges: <span>{miscCharges}</span>
-                            </li>
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer Note */}
-              <p className="text-xs text-gray-500 mt-6">
-                Note: This calculator provides estimated figures. Actual results may vary. Shipowl does not commit to any expected profit based on these calculations.
-              </p>
-            </div>
-          </div>
-        )
-        }
+   
 
         {showVariantPopup && selectedProduct && (
           <div className="fixed  px-6 md:px-0  inset-0 bg-[#000000b0] bg-opacity-40 flex z-50 items-center justify-center ">
@@ -1040,9 +788,9 @@ const NewlyLaunched = () => {
                             <Image
                               height={40}
                               width={40}
-                              src="https://placehold.com/600x400"
+                              src="https://placehold.co/400"
                               alt="Placeholder"
-                              className="rounded shrink-0"
+                              className="h-full w-full object-cover"
                             />
                           )}
 

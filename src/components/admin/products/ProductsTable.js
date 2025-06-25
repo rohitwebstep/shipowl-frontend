@@ -176,7 +176,7 @@ const ProductTable = () => {
                     console.error("Failed to load DataTables dependencies:", error);
                 });
         }
-    }, [products, loading]);
+    }, [ loading]);
 
     const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 

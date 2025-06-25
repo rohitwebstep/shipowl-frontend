@@ -45,8 +45,8 @@ export default function ProductDetails() {
     setErrors({ ...errors, [name]: '' });
   };
   const handleEditorChange = (value, field) => {
-  setFormData((prev) => ({ ...prev, [field]: value }));
-};
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleChangeTags = (newTags) => {
     setFormData((prevData) => {
@@ -121,6 +121,12 @@ export default function ProductDetails() {
           Description <span className="text-red-500">*</span>
         </label>
 
+        {/* 'checklist', 'mediaembed', 'casechange', 'formatpainter',
+            'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen',
+            'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate',
+            'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes',
+            'mergetags', 'autocorrect', 'typography', 'inlinecss',
+            'markdown', 'importword', 'exportword', 'exportpdf' */}
         <Editor
           apiKey="frnlhul2sjabyse5v4xtgnphkcgjxm316p0r37ojfop0ux83"
           value={formData.description}
@@ -131,13 +137,7 @@ export default function ProductDetails() {
             plugins: [
               'anchor', 'autolink', 'charmap', 'codesample', 'emoticons',
               'image', 'link', 'lists', 'media', 'searchreplace', 'table',
-              'visualblocks', 'wordcount',
-              'checklist', 'mediaembed', 'casechange', 'formatpainter',
-              'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen',
-              'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate',
-              'ai', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes',
-              'mergetags', 'autocorrect', 'typography', 'inlinecss',
-              'markdown', 'importword', 'exportword', 'exportpdf'
+              'visualblocks', 'wordcount'
             ],
             toolbar:
               'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | ' +

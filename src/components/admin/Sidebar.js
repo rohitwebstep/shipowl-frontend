@@ -8,6 +8,7 @@ import {
   FileText, Settings, Volume2, MapPin, User, Warehouse, ClipboardList,
   BadgeDollarSign, ShieldCheck, LayoutDashboard, UserCheck, Users, Image as LucideImage, Banknote, Tags
 } from "lucide-react";
+import { GoUnverified } from "react-icons/go";
 import logo from "@/app/images/Shipowllogo.png";
 import { useAdmin } from "./middleware/AdminMiddleWareContext";
 
@@ -27,7 +28,7 @@ export default function Sidebar() {
     }));
   };
 
-  const actions = ['View Listing', 'Update', 'Create', 'Listing', 'View', 'Soft Delete','Permanent Delete', 'Restore', 'Trash Listing', 'Bank Account Change Request View Listing', 'Bank Account Change Request Review'];
+  const actions = ['View Listing', 'Update', 'Create', 'Listing', 'View', 'Soft Delete', 'Permanent Delete', 'Restore', 'Trash Listing', 'Bank Account Change Request View Listing', 'Bank Account Change Request Review'];
 
   const hasPermission = (module, actionList) => {
     return extractedPermissions.some(
@@ -62,6 +63,7 @@ export default function Sidebar() {
           icon: LayoutDashboard,
           subMenu: [
             { icon: ClipboardList, module: "Supplier", action: actions, name: "Supplier List", href: "/admin/supplier/list" },
+            { icon: GoUnverified , module: "Supplier", action: actions, name: "unverified Supplier List", href: "/admin/supplier/Unverified/list" },
             { icon: Banknote, module: "Supplier", action: actions, name: "Bank Details Update Requests", href: "/admin/bankaccount-update-requests" },
             { icon: ClipboardList, module: "productRequest", action: actions, name: "New Product Request", href: "/admin/products/new" },
             { icon: ShoppingCart, module: "order", action: actions, name: "Orders(In progress)", href: "/admin/supplier/orders" },
