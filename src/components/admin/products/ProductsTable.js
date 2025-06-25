@@ -3,7 +3,7 @@ import 'datatables.net-dt/css/dataTables.dataTables.css';
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import HashLoader from "react-spinners/HashLoader";
-import React, { useState, useContext, useCallback, useEffect } from "react";
+import React, { useState, useContext, useCallback, useEffect, useRef } from "react";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { FaCheck } from "react-icons/fa";
@@ -60,18 +60,6 @@ const ProductTable = () => {
     const handleDestroy = (id) => destroy(id, () => fetchTrashed(setProducts, setLoading));
 
 
-    const filteredProducts = products.filter((item) => {
-        const matchesCategory = category
-            ? String(item.categoryId) === String(category)
-            : true;
-
-        const matchesModel = selectedModel
-            ? String(item.list_as) === String(selectedModel)
-            : true;
-
-
-        return matchesCategory && matchesModel;
-    });
 
 
 
@@ -138,26 +126,30 @@ const ProductTable = () => {
         fetchData();
     }, [verifyAdminAuth]);
 
+    const tableRef = useRef(null);
+
     useEffect(() => {
-        if (typeof window !== "undefined" && products.length > 0 && !loading) {
-            let table = null;
+        let $ = null; // declare in parent scope
+        let table;
 
-            Promise.all([import("jquery"), import("datatables.net"), import("datatables.net-dt"), import("datatables.net-buttons"), import("datatables.net-buttons-dt")])
+        if (typeof window !== "undefined" && products.length > 0) {
+            Promise.all([
+                import("jquery"),
+                import("datatables.net"),
+                import("datatables.net-dt"),
+                import("datatables.net-buttons"),
+                import("datatables.net-buttons-dt")
+            ])
                 .then(([jQuery]) => {
-                    window.jQuery = window.$ = jQuery.default;
+                    $ = jQuery.default;
+                    window.$ = $;
 
-                    // Destroy existing DataTable if it exists
-                    if ($.fn.DataTable.isDataTable("#productTable")) {
-                        $("#productTable").DataTable().destroy();
-                        $("#productTable").empty();
+                    if ($.fn.DataTable.isDataTable(tableRef.current)) {
+                        $(tableRef.current).DataTable().clear().destroy(); // Safe destroy
                     }
 
-                    // Reinitialize DataTable with new product
-                    const isMobile = window.innerWidth <= 768;
-                    const pagingType = isMobile ? 'simple' : 'simple_numbers';
-
-                    table = $('#productTable').DataTable({
-                        pagingType,
+                    table = $(tableRef.current).DataTable({
+                        pagingType: window.innerWidth <= 768 ? "simple" : "simple_numbers",
                         language: {
                             paginate: {
                                 previous: "<",
@@ -165,18 +157,18 @@ const ProductTable = () => {
                             }
                         }
                     });
-                    return () => {
-                        if (table) {
-                            table.destroy();
-                            $("#productTable").empty();
-                        }
-                    };
                 })
                 .catch((error) => {
-                    console.error("Failed to load DataTables dependencies:", error);
+                    console.error("DataTable init failed:", error);
                 });
         }
-    }, [ loading]);
+
+        return () => {
+            if ($ && $.fn.DataTable.isDataTable(tableRef.current)) {
+                $(tableRef.current).DataTable().clear().destroy(); // Clean up
+            }
+        };
+    }, [products]);
 
     const shouldCheckPermissions = isAdminStaff && extractedPermissions.length > 0;
 
@@ -207,35 +199,30 @@ const ProductTable = () => {
                     <div className="">
                         <label className="block text-sm font-medium text-gray-700">Select Model</label>
                         <select
-                            value={selectedModel}
-                            onChange={(e) => setSelectedModel(e.target.value)}
                             className="w-full mt-1 px-3 py-3 border-[#DFEAF2] uppercase bg-white border rounded-lg text-sm"
                         >
                             <option value="">All</option>
-                            {[...new Set((products ?? []).map(item => item.list_as).filter(Boolean))].map((model, index) => (
-                                <option key={index} value={model}>
-                                    {model}
-                                </option>
-                            ))}
+                            {/* {[...new Set((products ?? []).map(item => item.list_as).filter(Boolean))].map((model) => (
+                                <option key={model} value={model}>{model}</option>
+                            ))} */}
+
                         </select>
                     </div>
 
                     <div className="">
                         <label className="block text-sm font-medium text-gray-700">Filter By Category</label>
                         <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
                             className="w-full mt-1 px-3 py-3 border-[#DFEAF2] bg-white border rounded-lg text-sm"
                         >
                             <option value="">All</option>
-                            {[...new Set((products ?? []).map(item => item.categoryId).filter(Boolean))].map((catId) => {
+                            {/* {[...new Set((products ?? []).map(item => item.categoryId).filter(Boolean))].map((catId) => {
                                 const cat = (categoryData ?? []).find(c => c.id === catId);
                                 return (
                                     <option key={catId} value={catId}>
                                         {cat ? cat.name : catId}
                                     </option>
                                 );
-                            })}
+                            })} */}
                         </select>
                     </div>
 
@@ -282,7 +269,7 @@ const ProductTable = () => {
                                 </div>
                                 <span className="ml-2  text-sm text-gray-600">Show RTO Live Count</span>
                             </label>
-                            {selected < 1 && <span className="font-semibold md:block hidden text-[#2B3674]">Total: {filteredProducts.length} Products</span>}
+                            {selected < 1 && <span className="font-semibold md:block hidden text-[#2B3674]">Total: {products.length} Products</span>}
                             {selected.length > 0 && (
                                 <h5 className="font-semibold text-[#2B3674] bg-[#DFE9FF] p-3 flex rounded-md gap-7">
                                     {selected.length} Products Selected{" "}
@@ -325,7 +312,7 @@ const ProductTable = () => {
 
                     {products.length > 0 ? (
                         <div className="overflow-x-auto relative main-outer-wrapper w-full">
-                            <table className="md:w-full w-auto display main-tables" id="productTable">
+                            <table ref={tableRef} className="md:w-full w-auto display main-tables" id="productTable">
                                 <thead>
                                     <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
                                         <th className="p-2 px-5  whitespace-nowrap text-left uppercase">
@@ -368,7 +355,7 @@ const ProductTable = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredProducts.map((item) => {
+                                    {products.map((item) => {
                                         const canDelete = shouldCheckPermissions
                                             ? extractedPermissions.some(
                                                 (perm) =>

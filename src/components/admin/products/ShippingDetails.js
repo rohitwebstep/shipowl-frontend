@@ -82,6 +82,7 @@ export default function ShippingDetails() {
       const result = await response.json();
       Swal.close();
 
+
       if (result) {
         Swal.fire({
           icon: "success",
@@ -90,6 +91,7 @@ export default function ShippingDetails() {
           showConfirmButton: true,
         }).then((res) => {
           if (res.isConfirmed) {
+            window.location.reload(); // ✅ Works for Pages Router
           }
         });
       }
