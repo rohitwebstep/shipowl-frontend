@@ -35,7 +35,7 @@ export default function Orders() {
     model: 'Warehouse Model',
   });
   const [message, setMessage] = useState('📷 Please scan a barcode...');
-
+ const [assignedPermissions, setAssignedPermissions] = useState([]);
   const [scannedCode, setScannedCode] = useState('');
   const [isBarCodePopupOpen, setIsBarCodePopupOpen] = useState(false);
   const openBarCodeModal = () => {
@@ -164,6 +164,10 @@ export default function Orders() {
       setReporting(result?.reportAnalytics || []);
       setPermission(result?.permissions[0] || []);
       setOrders(result?.orders || []);
+
+      if (result?.staffPermissionApplied == true) {
+        setAssignedPermissions(result?.assignedPermissions || []);
+      }
     } catch (error) {
       console.error("Error fetching report:", error);
     } finally {
@@ -413,12 +417,35 @@ export default function Orders() {
     }
   }, [orders, loading]);
 
+  let finalAllowedKeys = [];
+
+  if (assignedPermissions && assignedPermissions.length > 0) {
+    finalAllowedKeys = assignedPermissions
+      .map(p => p.permission?.action)
+      .filter(action => permission[action] === true);
+  } else {
+    finalAllowedKeys = Object.keys(permission).filter(key => permission[key] === true);
+  }
+
+  const hasAnyPermission = (...keys) => keys.some((key) => finalAllowedKeys.includes(key));
 
   const PermissionField = ({ permissionKey, children }) => {
-    const isAllowed = permission[permissionKey];
+    const isAllowed = finalAllowedKeys.includes(permissionKey);
+
     return (
-      <span style={isAllowed ? {} : { filter: "blur(3px)", opacity: 0.5, userSelect: "none" }}>
-        {' '}
+      <span
+        style={
+          isAllowed
+            ? {}
+            : {
+              filter: "blur(3px)",
+              opacity: 0.5,
+              userSelect: "none",
+              pointerEvents: "none",
+            }
+        }
+      >
+        {isAllowed ? children : ' '}
       </span>
     );
   };
@@ -588,234 +615,353 @@ export default function Orders() {
 
           </div>
         </div>
-       {orders?.length > 0 ? (
-  <>
-    {/* Orders Table */}
-    <div className="overflow-x-auto relative main-outer-wrapper w-full">
-      <table className="md:w-full w-auto display main-tables" id="orderTable">
-        <thead>
-          <tr className="text-[#A3AED0] uppercase border-b border-[#E9EDF7]">
-            <th className="p-3 px-5 whitespace-nowrap">Order #</th>
-            <th className="p-3 px-5 whitespace-nowrap">Customer</th>
-            <th className="p-3 px-5 whitespace-nowrap">Payment</th>
-            <th className="p-3 px-5 whitespace-nowrap">Shipment Details</th>
-            <th className="p-2 px-5 text-left whitespace-nowrap">Order Status</th>
-            <th className="p-2 px-5 text-left whitespace-nowrap">Download Invoice</th>
-            <th className="p-2 px-5 text-center">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
-              {/* Order ID */}
-              <td className="p-3 px-5 whitespace-nowrap">
-                <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
-                <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
-              </td>
+        {orders?.length > 0 ? (
+          <>
+            {/* Orders Table */}
+            <div className="overflow-x-auto relative main-outer-wrapper w-full">
+              <table className="md:w-full w-auto display main-tables" id="orderTable">
+                <thead>
+                  <tr className="text-[#A3AED0] uppercase border-b border-[#E9EDF7]">
+                    <th className="p-3 px-5 whitespace-nowrap">SR.</th>
+                    <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
+                    <th className="p-3 px-5 whitespace-nowrap">Order#</th>
 
-              {/* Customer Info */}
-              <td className="p-3 px-5 whitespace-nowrap">
-                <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
-                <br />
-                <span className="text-sm block">
-                  <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
-                </span>
-                <span className="text-sm text-[#01b574]">
-                  <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
-                </span>
-              </td>
+                    {hasAnyPermission(
+                      "shippingName",
+                      "shippingPhone",
+                      "shippingEmail"
+                    ) && <th className="p-3 px-5 whitespace-nowrap">Customer Information</th>}
 
-              {/* Payment Info */}
-              <td className="p-3 px-5 whitespace-nowrap font-semibold">
-                <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "-"}</span></p>
-                <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "-"}</span></p>
-                <p>Amount: <span className="font-bold">{order.payment?.amount || "-"}</span></p>
-                <p>
-                  Status:{" "}
-                  <span
-                    className={`font-bold ${
-                      order.payment?.status === "failed"
-                        ? "text-red-500"
-                        : order.payment?.status === "pending"
-                        ? "text-yellow-500"
-                        : "text-green-500"
-                    }`}
-                  >
-                    <PermissionField permissionKey="status">{order.payment?.status || "-"}</PermissionField>
-                  </span>
-                </p>
-              </td>
+                    {hasAnyPermission(
+                      "payment_mode",
+                      "transactionId",
+                      "amount",
+                      "status"
+                    ) && (
+                        <th className="p-3 px-5 whitespace-nowrap">Payment</th>
+                      )}
+                    {hasAnyPermission(
+                      "order_number",
+                      "shippingPhone",
+                      "shippingAddress",
+                      "awb_number",
+                    ) && <th className="p-3 px-5 whitespace-nowrap">Shipment Details</th>}
 
-              {/* Shipping Info */}
-              <td className="p-3 px-5 whitespace-nowrap">
-                <PermissionField permissionKey="orderNumber">{order.shippingApiResult?.data?.order_number}</PermissionField>
-                <br />
-                <PermissionField permissionKey="shippingAddress">{order.shippingAddress}</PermissionField>
-                <br />
-                <span className="text-green-500">
-                  <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
-                </span>
-                <br />
-                AWB: <PermissionField permissionKey="awbNumber">{order.shippingApiResult?.data?.awb_number}</PermissionField>
-              </td>
+                    {hasAnyPermission("trackingNumber ") && (
+                      <th className="p-3 px-5 whitespace-nowrap">Return Tracking #</th>
+                    )}
 
-              {/* Order Status */}
-              <td className="p-2 px-5 whitespace-nowrap">
-                <span
-                  className={`px-2 py-1 rounded w-max inline-block text-white text-sm capitalize ${
-                    order.status === "success"
-                      ? "bg-green-500"
-                      : order.status === "cancelled"
-                      ? "bg-red-500"
-                      : order.status === "pending"
-                      ? "bg-yellow-500 text-black"
-                      : "bg-gray-400"
-                  }`}
-                >
-                  {order.status}
-                </span>
-              </td>
+                    {hasAnyPermission("rtoDelivered", "delivered") && (
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">Status</th>
+                      </>
+                    )}
+                    {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
+                      <>
+                        <th className="p-3 px-5 whitespace-nowrap">Date</th>
+                      </>
+                    )}
 
-              {/* Invoice */}
-              <td className="p-2 px-5 whitespace-nowrap">
-                <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md text-sm">
-                  Generate Invoice
-                </button>
-              </td>
 
-              {/* Action */}
-              <td className="p-2 px-5 whitespace-nowrap">
-                <div className="flex gap-3 justify-end items-center mt-2">
-                  <button
-                    onClick={() => {
-                      setNoteInput(order.orderNote || "");
-                      setSelectedNoteOrder(order.id);
-                      setIsNoteModalOpen(true);
-                    }}
-                    className="text-[#F98F5C] border rounded-md font-dm-sans p-2 text-sm"
-                  >
-                    View / Add Notes
-                  </button>
 
-                  {!order.shippingApiResult?.data?.awb_number ? (
+                    {hasAnyPermission("totalAmount") && (
+                      <th className="p-3 px-5 whitespace-nowrap">Total</th>
+                    )}
+                    <th className="p-2 px-5 text-left whitespace-nowrap">Download Invoice</th>
+                    <th className="p-2 px-5 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
+                      {/* Order ID */}
+                      <td className="p-3 px-5 whitespace-nowrap">
+                        <div className="flex items-center">{activeTab == "need-to-raise" && (
+
+                          <label className="flex items-center cursor-pointer mr-2">
+                            <input
+                              type="checkbox"
+                              checked={selected.includes(order.id)}
+                              onChange={() => handleCheckboxChange(order.id)}
+                              className="peer hidden"
+                            />
+                            <div className="w-4 h-4 border-2 border-[#A3AED0] rounded-sm flex items-center justify-center peer-checked:bg-[#F98F5C] peer-checked:border-0 peer-checked:text-white">
+                              <FaCheck className="peer-checked:block text-white w-3 h-3" />
+                            </div>
+                          </label>
+                        )}
+                          {index + 1}</div></td>
+                      <td className="p-3 px-5 whitespace-nowrap">
+                        <div className='flex items-center gap-3'>
+                          <div className="flex gap-2 flex-wrap">
+
+                            <img
+                              src={fetchImages(variantImages[0])}
+                              alt={`Variant`}
+                              className="h-12 w-12 object-cover rounded-full border border-[#DFEAF2]"
+                            />
+
+                          </div>
+                          <div onClick={() => handleViewVariant(order, order.items)} className="mt-2 cursor-pointer text-sm text-gray-600">
+                            {order.items.length > 1 &&
+                              (<span>  +{order.items.length} more products</span>
+                              )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-3 px-5 whitespace-nowrap">
+                        <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
+                        <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
+                      </td>
+
+                      {hasAnyPermission("shippingName", "shippingPhone", "shippingEmail") && (
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="shippingName">{order.shippingName}</PermissionField>
+                          <br />
+                          <span className="text-sm block">
+                            <PermissionField permissionKey="shippingPhone">{order.shippingPhone}</PermissionField>
+                          </span>
+                          <span className="text-sm text-[#01b574]">
+                            <PermissionField permissionKey="shippingEmail">{order.shippingEmail}</PermissionField>
+                          </span>
+                        </td>
+                      )}
+
+                      {hasAnyPermission("payment_mode", "transactionId", "amount", "status") && (
+                        <td className="p-3 px-5 whitespace-nowrap font-semibold">
+                          <PermissionField permissionKey="payment_mode">
+                            <p>Method: <span className="font-bold">{order.shippingApiResult?.data?.payment_mode || "-"}</span></p>
+                          </PermissionField>
+                          <PermissionField permissionKey="transactionId">
+                            <p>Transaction Id: <span className="font-bold">{order.payment?.transactionId || "-"}</span></p>
+                          </PermissionField>
+                          <PermissionField permissionKey="amount">
+                            <p>Amount: <span className="font-bold">{order.payment?.amount || "-"}</span></p>
+                          </PermissionField>
+                          <PermissionField permissionKey="status">
+                            <p>
+                              <span className={`font-bold uppercase ${order.payment?.status === "failed"
+                                ? "text-red-500"
+                                : order.payment?.status === "pending"
+                                  ? "text-yellow-500"
+                                  : "text-green-500"
+                                }`}>
+                                {order.payment?.status || "-"}
+                              </span>
+                            </p>
+                          </PermissionField>
+                        </td>
+                      )}
+
+                      {hasAnyPermission("orderNumber", "shippingPhone", "shippingAddress", "awbNumber") && (
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="orderNumber">
+                            {order.shippingApiResult?.data?.order_number || "-"}
+                          </PermissionField>
+                          <br />
+                          <PermissionField permissionKey="shippingAddress">
+                            {order.shippingAddress || "-"}
+                          </PermissionField>
+                          <br />
+                          <span className="text-green-500">
+                            <PermissionField permissionKey="shippingPhone">
+                              {order.shippingPhone || "-"}
+                            </PermissionField>
+                          </span>
+                          <br />
+                          <PermissionField permissionKey="awbNumber">
+                            {order.shippingApiResult?.data?.awb_number || "-"}
+                          </PermissionField>
+                        </td>
+                      )}
+
+                      {hasAnyPermission("trackingNumber") && (
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          {order.items
+                            .map((item) => (
+                              <PermissionField key={item.id} permissionKey="trackingNumber">
+                                {item.supplierRTOResponse?.trackingNumber || "-"}
+                              </PermissionField>
+                            ))
+                            .reduce((prev, curr) => [prev, ", ", curr])}
+                        </td>
+                      )}
+
+                      {hasAnyPermission("rtoDelivered", "delivered") && (
+                        <td className="p-3 px-5 whitespace-nowrap capitalize">
+                          <PermissionField permissionKey="rtoDelivered">
+                            {order.delivered ? (
+                              <span className="text-green-600">Delivered</span>
+                            ) : order.rtoDelivered ? (
+                              <span className="text-orange-500">RTO Delivered</span>
+                            ) : (
+                              <span className="text-red-500">Pending</span>
+                            )}
+                          </PermissionField>
+                        </td>
+                      )}
+
+                      {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="rtoDeliveredDate">
+                            {order.deliveredDate ? (
+                              <span>{new Date(order.deliveredDate).toLocaleDateString()}</span>
+                            ) : order.rtoDeliveredDate ? (
+                              <span>{new Date(order.rtoDeliveredDate).toLocaleDateString()}</span>
+                            ) : (
+                              <span className="text-red-500">Pending</span>
+                            )}
+                          </PermissionField>
+                        </td>
+                      )}
+
+
+
+                      {/* Total Amount */}
+                      {hasAnyPermission("totalAmount") && (
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          <PermissionField permissionKey="totalAmount">₹{order.totalAmount}</PermissionField>
+                        </td>
+                      )}
+                      <td className="p-2 px-5 whitespace-nowrap">
+                        <button className="bg-[#2B3674] text-white font-medium px-4 py-2 rounded-md text-sm">
+                          Generate Invoice
+                        </button>
+                      </td>
+
+                      {/* Action */}
+                      <td className="p-2 px-5 whitespace-nowrap">
+                        <div className="flex gap-3 justify-end items-center mt-2">
+                          <button
+                            onClick={() => {
+                              setNoteInput(order.orderNote || "");
+                              setSelectedNoteOrder(order.id);
+                              setIsNoteModalOpen(true);
+                            }}
+                            className="text-[#F98F5C] border rounded-md font-dm-sans p-2 text-sm"
+                          >
+                            View / Add Notes
+                          </button>
+
+                          {!order.shippingApiResult?.data?.awb_number ? (
+                            <button
+                              className="bg-orange-500 text-white font-medium px-4 py-2 rounded-md text-sm"
+                              onClick={() => handleShipping(order.id)}
+                            >
+                              Shipping
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md text-sm"
+                                onClick={() => handleTracking(order.id)}
+                              >
+                                Tracking
+                              </button>
+                              <button
+                                className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md text-sm"
+                                onClick={() => handleCancel(order.id)}
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          )}
+                        </div>
+
+                        <ul className="flex gap-6 mt-4 justify-end">
+                          <li><RiFileEditFill className="text-black text-xl" /></li>
+                          <li><IoCloudDownloadOutline className="text-black text-xl" /></li>
+                          <li><RxCrossCircled className="text-black text-xl" /></li>
+                          <li><IoIosArrowDropdown className="text-black text-xl" /></li>
+                        </ul>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Note Model */}
+              {isNoteModalOpen && (
+                <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
                     <button
-                      className="bg-orange-500 text-white font-medium px-4 py-2 rounded-md text-sm"
-                      onClick={() => handleShipping(order.id)}
+                      onClick={() => setIsNoteModalOpen(false)}
+                      className="absolute top-2 right-2 text-gray-500 hover:text-black"
                     >
-                      Shipping
+                      ✕
                     </button>
-                  ) : (
-                    <>
+                    <h2 className="text-lg font-bold mb-4">Order Notes</h2>
+                    <textarea
+                      className="w-full border p-2 rounded-xl mb-4"
+                      rows={4}
+                      value={noteInput}
+                      onChange={(e) => setNoteInput(e.target.value)}
+                      placeholder="Add your note here..."
+                    />
+                    <div className="flex justify-end gap-2">
                       <button
-                        className="bg-blue-600 text-white font-medium px-4 py-2 rounded-md text-sm"
-                        onClick={() => handleTracking(order.id)}
-                      >
-                        Tracking
-                      </button>
-                      <button
-                        className="bg-[#B71D21] text-white font-medium px-4 py-2 rounded-md text-sm"
-                        onClick={() => handleCancel(order.id)}
+                        onClick={() => setIsNoteModalOpen(false)}
+                        className="bg-gray-200 px-4 py-2 rounded-md"
                       >
                         Cancel
                       </button>
-                    </>
-                  )}
+                      <button
+                        onClick={handleSaveNote}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                <ul className="flex gap-6 mt-4 justify-end">
-                  <li><RiFileEditFill className="text-black text-xl" /></li>
-                  <li><IoCloudDownloadOutline className="text-black text-xl" /></li>
-                  <li><RxCrossCircled className="text-black text-xl" /></li>
-                  <li><IoIosArrowDropdown className="text-black text-xl" /></li>
-                </ul>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Note Model */}
-      {isNoteModalOpen && (
-        <div className="fixed inset-0 bg-[#00000038] bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-lg relative">
-            <button
-              onClick={() => setIsNoteModalOpen(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-black"
-            >
-              ✕
-            </button>
-            <h2 className="text-lg font-bold mb-4">Order Notes</h2>
-            <textarea
-              className="w-full border p-2 rounded-xl mb-4"
-              rows={4}
-              value={noteInput}
-              onChange={(e) => setNoteInput(e.target.value)}
-              placeholder="Add your note here..."
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setIsNoteModalOpen(false)}
-                className="bg-gray-200 px-4 py-2 rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveNote}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md"
-              >
-                Save
-              </button>
+              )}
             </div>
-          </div>
-        </div>
-      )}
-    </div>
 
-    {/* Shipping Report */}
-    {(reporting?.shipowl || reporting?.selfship) && (
-      <div className="overflow-x-auto mt-6 p-4 bg-white rounded-xl shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
-        <table className="rounded-md border-[#DFEAF2] w-full text-sm text-left text-gray-700">
-          <thead className="text-xs uppercase text-gray-700">
-            <tr className="border-b border-[#DFEAF2]">
-              <th className="px-6 py-3">Shipping Method</th>
-              <th className="px-6 py-3">Order Count</th>
-              <th className="px-6 py-3">Total Product Cost</th>
-              <th className="px-6 py-3">Delivered Orders</th>
-              <th className="px-6 py-3">RTO Orders</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-              <td className="px-6 py-4 font-medium text-gray-900">Shipowl</td>
-              <td className="px-6 py-4">{reporting.shipowl?.orderCount}</td>
-              <td className="px-6 py-4">₹{reporting.shipowl?.totalProductCost}</td>
-              <td className="px-6 py-4">{reporting.shipowl?.deliveredOrder}</td>
-              <td className="px-6 py-4">{reporting.shipowl?.rtoOrder}</td>
-            </tr>
+            {/* Shipping Report */}
+            {(reporting?.shipowl || reporting?.selfship) && (
+              <div className="overflow-x-auto mt-6 p-4 bg-white rounded-xl shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
+                <table className="rounded-md border-[#DFEAF2] w-full text-sm text-left text-gray-700">
+                  <thead className="text-xs uppercase text-gray-700">
+                    <tr className="border-b border-[#DFEAF2]">
+                      <th className="px-6 py-3">Shipping Method</th>
+                      <th className="px-6 py-3">Order Count</th>
+                      <th className="px-6 py-3">Total Product Cost</th>
+                      <th className="px-6 py-3">Delivered Orders</th>
+                      <th className="px-6 py-3">RTO Orders</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+                      <td className="px-6 py-4 font-medium text-gray-900">Shipowl</td>
+                      <td className="px-6 py-4">{reporting.shipowl?.orderCount}</td>
+                      <td className="px-6 py-4">₹{reporting.shipowl?.totalProductCost}</td>
+                      <td className="px-6 py-4">{reporting.shipowl?.deliveredOrder}</td>
+                      <td className="px-6 py-4">{reporting.shipowl?.rtoOrder}</td>
+                    </tr>
 
-            <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-              <td className="px-6 py-4 font-medium text-gray-900">Selfship - Prepaid</td>
-              <td className="px-6 py-4">{reporting.selfship?.prepaid?.orderCount}</td>
-              <td className="px-6 py-4">₹{reporting.selfship?.prepaid?.totalProductCost}</td>
-              <td className="px-6 py-4">{reporting.selfship?.prepaid?.deliveredOrder}</td>
-              <td className="px-6 py-4">{reporting.selfship?.prepaid?.rtoOrder}</td>
-            </tr>
+                    <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+                      <td className="px-6 py-4 font-medium text-gray-900">Selfship - Prepaid</td>
+                      <td className="px-6 py-4">{reporting.selfship?.prepaid?.orderCount}</td>
+                      <td className="px-6 py-4">₹{reporting.selfship?.prepaid?.totalProductCost}</td>
+                      <td className="px-6 py-4">{reporting.selfship?.prepaid?.deliveredOrder}</td>
+                      <td className="px-6 py-4">{reporting.selfship?.prepaid?.rtoOrder}</td>
+                    </tr>
 
-            <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-              <td className="px-6 py-4 font-medium text-gray-900">Selfship - Postpaid</td>
-              <td className="px-6 py-4">{reporting.selfship?.postpaid?.orderCount}</td>
-              <td className="px-6 py-4">₹{reporting.selfship?.postpaid?.totalProductCost}</td>
-              <td className="px-6 py-4">{reporting.selfship?.postpaid?.deliveredOrder}</td>
-              <td className="px-6 py-4">{reporting.selfship?.postpaid?.rtoOrder}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    )}
-  </>
-) : (
-  <p className="text-center">No Orders Available</p>
-)}
+                    <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+                      <td className="px-6 py-4 font-medium text-gray-900">Selfship - Postpaid</td>
+                      <td className="px-6 py-4">{reporting.selfship?.postpaid?.orderCount}</td>
+                      <td className="px-6 py-4">₹{reporting.selfship?.postpaid?.totalProductCost}</td>
+                      <td className="px-6 py-4">{reporting.selfship?.postpaid?.deliveredOrder}</td>
+                      <td className="px-6 py-4">{reporting.selfship?.postpaid?.rtoOrder}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="text-center">No Orders Available</p>
+        )}
 
 
 

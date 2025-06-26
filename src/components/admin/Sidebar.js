@@ -64,8 +64,8 @@ export default function Sidebar() {
           subMenu: [
             { icon: ClipboardList, module: "Supplier", action: actions, name: "Supplier List", href: "/admin/supplier/list" },
             { icon: GoUnverified , module: "Supplier", action: actions, name: "unverified Supplier List", href: "/admin/supplier/Unverified/list" },
-            { icon: Banknote, module: "Supplier", action: actions, name: "Bank Details Update Requests", href: "/admin/bankaccount-update-requests" },
-            { icon: ClipboardList, module: "productRequest", action: actions, name: "New Product Request", href: "/admin/products/new" },
+            { icon: Banknote, module: "Supplier", action: actions, name: "Bank Details Update Requests ", href: "/admin/bankaccount-update-requests" },
+            { icon: ClipboardList, module: "productRequest", action: actions, name: "New Product Request (In progress)", href: "/admin/products/new" },
             { icon: ShoppingCart, module: "order", action: actions, name: "Orders(In progress)", href: "/admin/supplier/orders" },
             { icon: Warehouse, module: "warehouse", action: actions, name: "Warehouse", href: "/admin/supplier/warehouse/list" },
             { icon: ClipboardList, module: "rto", action: actions, name: "RTO Management (in progress)", href: "/admin/supplier/orders/rto-orders" },

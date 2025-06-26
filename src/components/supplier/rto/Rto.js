@@ -556,6 +556,7 @@ export default function RTO() {
   }
 
   const hasAnyPermission = (...keys) => keys.some((key) => finalAllowedKeys.includes(key));
+  
   const PermissionField = ({ permissionKey, children }) => {
     const isAllowed = finalAllowedKeys.includes(permissionKey);
 
