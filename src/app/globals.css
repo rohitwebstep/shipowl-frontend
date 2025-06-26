@@ -369,3 +369,7 @@ button.dt-paging-button {
 .main-tables .popup-boxes tbody td {
   border: 1px solid !important; 
 }
+.profilePage p {
+    font-size: 17px;
+    padding: 3px 0;
+}

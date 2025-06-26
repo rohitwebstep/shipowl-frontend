@@ -11,7 +11,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { useAdmin } from '../middleware/AdminMiddleWareContext';
 import { useAdminActions } from '@/components/commonfunctions/MainContext';
 import { ProfileContext } from './ProfileContext';
-
+import Swal from 'sweetalert2';
 const SupplierList = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
@@ -19,7 +19,8 @@ const SupplierList = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [expandedItem, setExpandedItem] = useState(null);
-    const [currentTab, setCurrentTab] = useState('active');
+    const [password, setPassword] = useState('');
+    const [expandPassModal, setExpandPassModal] = useState(null);
     const [selected, setSelected] = useState([]);
     const { setActiveSubTab } = useContext(ProfileContext);
 
@@ -140,18 +141,104 @@ const SupplierList = () => {
     }, [loading]);
 
 
+    const checkReporting = (id) => {
+        router.push(`/admin/supplier/reporting?id=${id}`);
+    }
+    const viewProfile = (id) => {
+        router.push(`/admin/supplier/profile?id=${id}`);
+    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const dropshipperData = JSON.parse(localStorage.getItem("shippingData"));
+        if (dropshipperData?.project?.active_panel !== "admin") {
+            localStorage.clear("shippingData");
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        const token = dropshipperData?.security?.token;
+        if (!token) {
+            router.push("/admin/auth/login");
+            return;
+        }
+
+        try {
+            Swal.fire({
+                title: 'Updating Password...',
+                text: 'Please wait ..',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            const myHeaders = new Headers();
+
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("Authorization", `Bearer ${token}`);
+
+            const raw = JSON.stringify({
+                "password": password
+            });
+
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow"
+            };
+
+            const url = `https://shipowl-kd06.onrender.com/api/admin/supplier/${expandPassModal}/password/reset`;
+
+            const response = await fetch(url, requestOptions);
+
+            const result = await response.json(); // Parse the result here
+
+            if (!response.ok) {
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Creation Failed",
+                    text: result.message || result.error || "An error occurred",
+                });
+
+
+            } else {
+                Swal.close();
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Updated",
+                    text: result.message || result.error || `Password Updated successfully!`,
+                    showConfirmButton: true,
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        setExpandPassModal('');
+                       fetchAll(setSuppliers, setLoading)
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.close();
+            Swal.fire({
+                icon: "error",
+                title: "Submission Error",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+            setError(error.message || "Submission failed.");
+        } finally {
+            setLoading(false);
+        }
+    };
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-[300px]">
                 <HashLoader color="orange" size={50} />
             </div>
         );
-    }
-
-
-
-    const checkReporting = (id) => {
-        router.push(`/admin/supplier/reporting?id=${id}`);
     }
     return (
 
@@ -198,18 +285,15 @@ const SupplierList = () => {
                     <table className="display main-tables w-full" id="supplierTable">
                         <thead>
                             <tr className="border-b text-[#A3AED0] border-[#E9EDF7]">
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Sr.</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Name</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Email</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Current Address</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Permanent Address</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Country</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">State</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">City</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Postal Code</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">View More</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Check Reporting</th>
-                                <th className="p-3 px-4 text-left uppercase whitespace-nowrap">Actions</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">Sr.</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">Name</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">Email</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">Permanent Address</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">View More</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">View Profile</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">Check Reporting</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">Update Password</th>
+                                <th className="p-3 text-left uppercase whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -217,7 +301,7 @@ const SupplierList = () => {
                                 return (
                                     <React.Fragment key={item.id}>
                                         <tr className="bg-transparent border-b border-[#E9EDF7] text-[#2B3674] font-semibold">
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">
+                                            <td className="p-3 text-left whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <label className="flex items-center cursor-pointer mr-2">
                                                         <input
@@ -233,46 +317,52 @@ const SupplierList = () => {
                                                     {index + 1}
                                                 </div>
                                             </td>
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">{item.name}</td>
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">{item.email}</td>
+                                            <td className="p-3 text-left whitespace-nowrap capitalize">{item.name.toLowerCase()}</td>
+                                            <td className="p-3 text-left whitespace-nowrap">{item.email}</td>
+                                            <td className="p-3 text-left">{item.permanentAddress || '-'}</td>
 
-                                            <td className="p-3 px-4 text-left">{item.currentAddress || '-'}</td>
-                                            <td className="p-3 px-4 text-left">{item.permanentAddress || '-'}</td>
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                {item.permanentCountry?.name || '-'}
-                                            </td>
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                {item.permanentState?.name || '-'}
-                                            </td>
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">
-                                                {item.permanentCity?.name || '-'}
-                                            </td>
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">{item.permanentPostalCode || '-'}</td>
-                                            <td className="p-3 px-4 text-center whitespace-nowrap">
+                                            <td className="p-3 text-center whitespace-nowrap">
                                                 <button
+                                                    disabled={!item.bankAccount}
                                                     onClick={() =>
                                                         expandedItem?.id === item.id
                                                             ? setExpandedItem(null)
                                                             : setExpandedItem(item)
                                                     }
-                                                    className="text-white rounded-md p-2 bg-[#2B3674] cursor-pointer font-semibold"
+                                                    className="text-white text-sm rounded-md p-2 bg-[#2B3674] cursor-pointer font-semibold"
                                                 >
                                                     {expandedItem?.id === item.id
                                                         ? "Hide Bank Details"
                                                         : "View Bank Details"}
                                                 </button>
                                             </td>
-                                            <td className="p-3 px-4 text-left whitespace-nowrap">
+                                            <td className="p-3 text-left whitespace-nowrap">
                                                 <button
-                                                    className='bg-orange-500 rounded-md text-white p-2'
+                                                    className='bg-[#3965FF] text-sm rounded-md text-white p-2'
+                                                    onClick={() => viewProfile(item.id)}
+                                                >
+                                                    View Profile
+                                                </button>
+                                            </td>
+                                            <td className="p-3 text-left whitespace-nowrap">
+                                                <button
+                                                    className='bg-orange-500 text-sm rounded-md text-white p-2'
                                                     onClick={() => checkReporting(item.id)}
                                                 >
                                                     View Reporting
                                                 </button>
                                             </td>
+                                            <td className="p-3 text-left whitespace-nowrap">
+                                                <button
+                                                    className='bg-[#01B574] text-sm rounded-md text-white p-2'
+                                                    onClick={() => setExpandPassModal(item.id)}
+                                                >
+                                                    Update Password
+                                                </button>
+                                            </td>
 
 
-                                            <td className="p-3 px-4 text-center">
+                                            <td className="p-3 text-center">
                                                 <div className="flex gap-2"> {isTrashed ? (
                                                     <>
                                                         {canRestore && <MdRestoreFromTrash onClick={() => handleRestore(item.id)} className="cursor-pointer text-3xl text-green-500" />}
@@ -290,20 +380,14 @@ const SupplierList = () => {
                                                     </>
                                                 )}</div>
                                             </td>
-
-
                                         </tr>
-
-
-
-
                                     </React.Fragment>
                                 );
                             })}
                         </tbody>
                     </table>
                     {expandedItem && (
-                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000094] bg-opacity-40">
                             <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
                                 <button
                                     onClick={() => setExpandedItem(null)}
@@ -333,6 +417,43 @@ const SupplierList = () => {
                                             "-"
                                         )}
                                     </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {expandPassModal && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000094] bg-opacity-40">
+                            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
+                                <button
+                                    onClick={() => setExpandPassModal(null)}
+                                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl"
+                                >
+                                    &times;
+                                </button>
+                                <h2 className="text-xl font-bold mb-4 text-[#2B3674]">Update Password</h2>
+                                <div className="space-y-3 text-sm text-[#2B3674]">
+                                    <div >
+                                        <label >
+                                            Enter New Password
+                                        </label>
+                                        <input
+                                            type='password'
+                                            name='password'
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full px-4 py-2 mt-1 border border-[#E0E5F2] text-[#A3AED0] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+
+                                        />
+
+                                    </div>
+                                    <button
+                                        onClick={handleSubmit}
+                                        type="submit"
+                                        className="w-auto px-10 bg-[#F98F5C] text-white py-3 rounded-lg hover:bg-orange-600"
+                                    >
+                                        Update Password
+                                    </button>
+
                                 </div>
                             </div>
                         </div>

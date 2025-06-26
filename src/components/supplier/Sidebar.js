@@ -39,15 +39,15 @@ export default function Sidebar() {
   };
   const menuItems = [
     { name: "Dashboard", icon: Home, href: "/supplier" },
-    { name: "Inventory", icon: ShoppingCart, href: "/supplier/inventory" },
+    // { name: "Inventory", icon: ShoppingCart, href: "/supplier/inventory" },
     { name: "Products", icon: Package, href: "/supplier/product/my" },
     { name: "New Product Request", icon: Package, href: "/supplier/product/request" },
     { name: "Orders", icon: ClipboardList, href: "/supplier/orders" },
     // { name: "Reporting", icon: FileBarChart2, href: "/supplier/reporting" },
     { name: "Warehouse", icon: Warehouse, href: "/supplier/warehouse" },
-    { name: "Category Management", icon: BiSolidCategory, href: "/supplier/category/list" },
+    // { name: "Category Management", icon: BiSolidCategory, href: "/supplier/category/list" },
     { name: "Subuser Listing", icon: Package, href: "/supplier/sub-user/list" },
-    { name: "Brand Management", icon: TbBrandBinance, href: "/supplier/brand/list" },
+    // { name: "Brand Management", icon: TbBrandBinance, href: "/supplier/brand/list" },
     { name: "RTO Orders", icon: Package, href: "/supplier/rto-orders" },
     { name: "Profile", icon: User, href: "/supplier/profile" },
     { name: "Settings (In progress)", icon: Settings, href: "/supplier/settings" },
@@ -55,9 +55,9 @@ export default function Sidebar() {
     { name: "Payment (In progress)", icon: CreditCard, href: "/supplier/payment" },
     { name: "Terms & Condition (In progress)", icon: BadgeDollarSign, href: "/supplier/terms" },
   ];
-  useEffect(()=>{
+  useEffect(() => {
     checkSupplierRole();
-  },[])
+  }, [])
 
   return (
     <>
