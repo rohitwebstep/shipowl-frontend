@@ -8,6 +8,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from 'sweetalert2';
 import { FaCheck } from "react-icons/fa";
+import { Filter } from 'lucide-react'; // Lucide icon
+
 
 const tabs = [
   { key: "warehouse-collected", label: "Collected at Warehouse" },
@@ -45,7 +47,9 @@ export default function RTO() {
     });
   };
 
-  console.log('selected', selected)
+  const [showFilter, setShowFilter] = useState(false);
+  const [orderId, setOrderId] = useState('');
+  const [filterOptions, setFilterOptions] = useState([]); // dropdown if needed
 
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -83,7 +87,7 @@ export default function RTO() {
   const modalRef = useRef();
   const [files, setFiles] = useState([]);
 
-;
+  ;
 
   useScannerDetection({
     onComplete: (code) => {
@@ -420,7 +424,7 @@ export default function RTO() {
 
         }).then((res) => {
           if (res.isConfirmed) {
-       
+
             fetchRto();
             setSelected([]);
           }
@@ -556,7 +560,7 @@ export default function RTO() {
   }
 
   const hasAnyPermission = (...keys) => keys.some((key) => finalAllowedKeys.includes(key));
-  
+
   const PermissionField = ({ permissionKey, children }) => {
     const isAllowed = finalAllowedKeys.includes(permissionKey);
 
@@ -685,13 +689,66 @@ export default function RTO() {
             </div>
           </div>
           {orders.length > 0 ? (
-            <div className="overflow-x-auto relative main-outer-wrapper w-full">
+            <div className="overflow-auto overflow-x-visible relative main-outer-wrapper w-full">
+
+
               <table className="min-w-full">
                 <thead className="uppercase text-gray-700">
                   <tr className="border-b border-[#DFEAF2] text-left">
                     <th className="p-3 px-5 whitespace-nowrap">SR.</th>
-                    <th className="p-3 px-5 whitespace-nowrap">Item Count</th> 
-                                       <th className="p-3 px-5 whitespace-nowrap">Order#</th>
+                    <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
+                    <th className="p-3 px-5 whitespace-nowrap overflow-visible relative" >
+                      <button onClick={() => setShowFilter(!showFilter)} className='flex gap-2'> Order# <Filter className="w-4 h-4" /></button>
+                      {showFilter && (
+                        <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <label className="text-sm font-medium text-gray-700">Order ID:</label>
+                            <button
+                              onClick={() => setOrderId('')}
+                              className="text-green-600 text-xs hover:underline"
+                            >
+                              Reset All
+                            </button>
+                          </div>
+                          <input
+                            type="text"
+                            value={orderId}
+                            onChange={(e) => setOrderId(e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring focus:ring-green-500"
+                            placeholder="Enter order ID"
+                          />
+
+                          {/* Optional Dropdown Filter */}
+                          <div className="mt-4">
+                            <label className="text-sm font-medium text-gray-700">Filter:</label>
+                            {filterOptions.length === 0 ? (
+                              <p className="text-xs text-gray-400 mt-1">No items found</p>
+                            ) : (
+                              <select className="w-full mt-1 px-2 py-2 text-sm border rounded-md">
+                                {filterOptions.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
+
+                          {/* Apply Button */}
+                          <button
+                            onClick={() => {
+                              const filtered = orders.filter((order) => order.orderNumber == orderId);
+                              setOrders(filtered); // assuming you already have this state
+                              setShowFilter(false);
+                            }}
+                            className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
+                          >
+                            Apply
+                          </button>
+
+                        </div>
+                      )}
+                    </th>
 
                     {hasAnyPermission(
                       "shippingName",

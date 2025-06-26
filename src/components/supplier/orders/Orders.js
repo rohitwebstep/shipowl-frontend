@@ -12,6 +12,9 @@ import { useRouter } from 'next/navigation';
 import { useSupplier } from '../middleware/SupplierMiddleWareContext';
 import { HashLoader } from 'react-spinners';
 import Swal from 'sweetalert2'; // ✅ added import
+import { FaCheck } from "react-icons/fa";
+import { useImageURL } from "@/components/ImageURLContext";
+
 import { RiFileEditFill } from 'react-icons/ri';
 import { IoCloudDownloadOutline } from 'react-icons/io5';
 import { RxCrossCircled } from 'react-icons/rx';
@@ -34,14 +37,27 @@ export default function Orders() {
     status: 'All',
     model: 'Warehouse Model',
   });
+  const { fetchImages } = useImageURL();
   const [message, setMessage] = useState('📷 Please scan a barcode...');
- const [assignedPermissions, setAssignedPermissions] = useState([]);
+  const [assignedPermissions, setAssignedPermissions] = useState([]);
   const [scannedCode, setScannedCode] = useState('');
   const [isBarCodePopupOpen, setIsBarCodePopupOpen] = useState(false);
   const openBarCodeModal = () => {
     setIsBarCodePopupOpen(true);
   }
+  const [selected, setSelected] = useState('');
 
+  const handleCheckboxChange = (id) => {
+    setSelected((prev) => {
+      const ids = prev ? prev.split(',') : [];
+
+      const updated = ids.includes(String(id))
+        ? ids.filter((item) => item !== String(id))
+        : [...ids, String(id)];
+
+      return updated.join(',');
+    });
+  }
   const [reporting, setReporting] = useState([]);
   const [permission, setPermission] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -623,7 +639,6 @@ export default function Orders() {
                 <thead>
                   <tr className="text-[#A3AED0] uppercase border-b border-[#E9EDF7]">
                     <th className="p-3 px-5 whitespace-nowrap">SR.</th>
-                    <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
                     <th className="p-3 px-5 whitespace-nowrap">Order#</th>
 
                     {hasAnyPermission(
@@ -672,11 +687,11 @@ export default function Orders() {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order) => (
+                  {orders.map((order, index) => (
                     <tr key={order.id} className="text-[#364e91] font-semibold border-b border-[#E9EDF7] align-top">
                       {/* Order ID */}
                       <td className="p-3 px-5 whitespace-nowrap">
-                        <div className="flex items-center">{activeTab == "need-to-raise" && (
+                        <div className="flex items-center">
 
                           <label className="flex items-center cursor-pointer mr-2">
                             <input
@@ -689,26 +704,9 @@ export default function Orders() {
                               <FaCheck className="peer-checked:block text-white w-3 h-3" />
                             </div>
                           </label>
-                        )}
+
                           {index + 1}</div></td>
-                      <td className="p-3 px-5 whitespace-nowrap">
-                        <div className='flex items-center gap-3'>
-                          <div className="flex gap-2 flex-wrap">
 
-                            <img
-                              src={fetchImages(variantImages[0])}
-                              alt={`Variant`}
-                              className="h-12 w-12 object-cover rounded-full border border-[#DFEAF2]"
-                            />
-
-                          </div>
-                          <div onClick={() => handleViewVariant(order, order.items)} className="mt-2 cursor-pointer text-sm text-gray-600">
-                            {order.items.length > 1 &&
-                              (<span>  +{order.items.length} more products</span>
-                              )}
-                          </div>
-                        </div>
-                      </td>
                       <td className="p-3 px-5 whitespace-nowrap">
                         <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
                         <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
@@ -917,47 +915,6 @@ export default function Orders() {
               )}
             </div>
 
-            {/* Shipping Report */}
-            {(reporting?.shipowl || reporting?.selfship) && (
-              <div className="overflow-x-auto mt-6 p-4 bg-white rounded-xl shadow-[0_2px_8px_0_rgba(0,0,0,0.1)]">
-                <table className="rounded-md border-[#DFEAF2] w-full text-sm text-left text-gray-700">
-                  <thead className="text-xs uppercase text-gray-700">
-                    <tr className="border-b border-[#DFEAF2]">
-                      <th className="px-6 py-3">Shipping Method</th>
-                      <th className="px-6 py-3">Order Count</th>
-                      <th className="px-6 py-3">Total Product Cost</th>
-                      <th className="px-6 py-3">Delivered Orders</th>
-                      <th className="px-6 py-3">RTO Orders</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900">Shipowl</td>
-                      <td className="px-6 py-4">{reporting.shipowl?.orderCount}</td>
-                      <td className="px-6 py-4">₹{reporting.shipowl?.totalProductCost}</td>
-                      <td className="px-6 py-4">{reporting.shipowl?.deliveredOrder}</td>
-                      <td className="px-6 py-4">{reporting.shipowl?.rtoOrder}</td>
-                    </tr>
-
-                    <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900">Selfship - Prepaid</td>
-                      <td className="px-6 py-4">{reporting.selfship?.prepaid?.orderCount}</td>
-                      <td className="px-6 py-4">₹{reporting.selfship?.prepaid?.totalProductCost}</td>
-                      <td className="px-6 py-4">{reporting.selfship?.prepaid?.deliveredOrder}</td>
-                      <td className="px-6 py-4">{reporting.selfship?.prepaid?.rtoOrder}</td>
-                    </tr>
-
-                    <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900">Selfship - Postpaid</td>
-                      <td className="px-6 py-4">{reporting.selfship?.postpaid?.orderCount}</td>
-                      <td className="px-6 py-4">₹{reporting.selfship?.postpaid?.totalProductCost}</td>
-                      <td className="px-6 py-4">{reporting.selfship?.postpaid?.deliveredOrder}</td>
-                      <td className="px-6 py-4">{reporting.selfship?.postpaid?.rtoOrder}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            )}
           </>
         ) : (
           <p className="text-center">No Orders Available</p>
@@ -965,8 +922,48 @@ export default function Orders() {
 
 
 
-
       </div>
+      
+        {(reporting?.shipowl || reporting?.selfship) && (
+          <div className="overflow-x-auto mt-6 p-4 bg-white rounded-md ">
+            <table className="rounded-md border-[#DFEAF2] w-full text-sm text-left text-gray-700">
+              <thead className="text-xs uppercase text-gray-700">
+                <tr className="border-b border-[#DFEAF2]">
+                  <th className="px-6 py-3">Shipping Method</th>
+                  <th className="px-6 py-3">Order Count</th>
+                  <th className="px-6 py-3">Total Product Cost</th>
+                  <th className="px-6 py-3">Delivered Orders</th>
+                  <th className="px-6 py-3">RTO Orders</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+                  <td className="px-6 py-4 font-medium text-gray-900">Shipowl</td>
+                  <td className="px-6 py-4">{reporting.shipowl?.orderCount}</td>
+                  <td className="px-6 py-4">₹{reporting.shipowl?.totalProductCost}</td>
+                  <td className="px-6 py-4">{reporting.shipowl?.deliveredOrder}</td>
+                  <td className="px-6 py-4">{reporting.shipowl?.rtoOrder}</td>
+                </tr>
+
+                <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+                  <td className="px-6 py-4 font-medium text-gray-900">Selfship - Prepaid</td>
+                  <td className="px-6 py-4">{reporting.selfship?.prepaid?.orderCount}</td>
+                  <td className="px-6 py-4">₹{reporting.selfship?.prepaid?.totalProductCost}</td>
+                  <td className="px-6 py-4">{reporting.selfship?.prepaid?.deliveredOrder}</td>
+                  <td className="px-6 py-4">{reporting.selfship?.prepaid?.rtoOrder}</td>
+                </tr>
+
+                <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+                  <td className="px-6 py-4 font-medium text-gray-900">Selfship - Postpaid</td>
+                  <td className="px-6 py-4">{reporting.selfship?.postpaid?.orderCount}</td>
+                  <td className="px-6 py-4">₹{reporting.selfship?.postpaid?.totalProductCost}</td>
+                  <td className="px-6 py-4">{reporting.selfship?.postpaid?.deliveredOrder}</td>
+                  <td className="px-6 py-4">{reporting.selfship?.postpaid?.rtoOrder}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
 
       {isModalOpen && tracking?.trackingData && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
