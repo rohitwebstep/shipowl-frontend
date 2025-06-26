@@ -8,8 +8,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from 'sweetalert2';
 import { FaCheck } from "react-icons/fa";
-import { Filter } from 'lucide-react'; // Lucide icon
-
+import { IoFilterSharp } from "react-icons/io5";
+const STATUS_LIST = [
+  "Cancelled", "Damaged", "Delivered", "Progress", "In Transit", "Lost", "Not Serviceable",
+  "Order Placed", "Out for Delivery", "Picked Up", "Pickup Cancelled",
+  "Pickup Pending", "Pickup Scheduled", "RTO Delivered", "RTO Failed", "RTO In Transit"
+];
 
 const tabs = [
   { key: "warehouse-collected", label: "Collected at Warehouse" },
@@ -46,8 +50,21 @@ export default function RTO() {
       return updated.join(',');
     });
   };
+  const [search, setSearch] = useState("");
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const filteredStatusList = STATUS_LIST.filter((status) =>
+    status.toLowerCase().includes(search.toLowerCase())
+  );
 
+  const toggleStatus = (status) => {
+    setSelectedStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    );
+  };
   const [showFilter, setShowFilter] = useState(false);
+  const [showStatus, setShowStatus] = useState(false);
   const [orderId, setOrderId] = useState('');
   const [filterOptions, setFilterOptions] = useState([]); // dropdown if needed
 
@@ -693,12 +710,77 @@ export default function RTO() {
 
 
               <table className="min-w-full">
-                <thead className="uppercase text-gray-700">
-                  <tr className="border-b border-[#DFEAF2] text-left">
+                <thead className=" text-gray-700">
+                  <tr className="border-b border-[#DFEAF2] text-left uppercase">
                     <th className="p-3 px-5 whitespace-nowrap">SR.</th>
                     <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
+                    <th className="p-3 px-5 whitespace-nowrap relative uppercase">
+                      <button onClick={() => { setShowStatus(!showStatus); setShowFilter(false); }} className='flex gap-2 uppercase items-center'> Shipment Status <IoFilterSharp className="w-4 h-4" /></button>
+
+                      {
+                        showStatus && (
+                          <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                            <h3 className="font-medium text-gray-700 mb-2">Filter by Status:</h3>
+                            <input
+                              type="text"
+                              placeholder="Search"
+                              className="w-full mb-2 px-3 py-1 border border-gray-300 rounded text-sm"
+                              value={search}
+                              onChange={(e) => setSearch(e.target.value)}
+                            />
+
+                            <div className="h-60 overflow-y-auto border border-gray-200 rounded p-2">
+                              {filteredStatusList.map((status) => (
+                                <label key={status} className="flex items-center gap-2 py-1 text-sm text-gray-700">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedStatuses.includes(status)}
+                                    onChange={() => toggleStatus(status)}
+                                    className="h-4 w-4"
+                                  />
+                                  {status}
+                                </label>
+                              ))}
+                              {filteredStatusList.length === 0 && (
+                                <p className="text-gray-400 text-sm mt-2">No items found</p>
+                              )}
+                            </div>
+
+                            <div className="mt-4 flex justify-between items-center">
+                              <button
+                                onClick={() => {
+                                  setSearch("");
+                                  setSelectedStatuses([]);
+                                }}
+                                className="text-green-600 text-sm hover:underline"
+                              >
+                                Reset All
+                              </button>
+                              <button
+
+                                className={`px-4 py-1 rounded text-white text-sm ${selectedStatuses.length
+                                  ? "bg-green-600 hover:bg-green-700"
+                                  : "bg-gray-300 cursor-not-allowed"
+                                  }`}
+                                onClick={() => {
+                                  const filtered = orders.filter((order) => order.status == selectedStatuses);
+                                  setOrders(filtered); // assuming you already have this state
+                                  setShowStatus(false);
+                                  setShowFilter(false);
+                                }}
+                                disabled={!selectedStatuses.length}
+                              >
+                                Apply
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      }
+
+                    </th>
+
                     <th className="p-3 px-5 whitespace-nowrap overflow-visible relative" >
-                      <button onClick={() => setShowFilter(!showFilter)} className='flex gap-2'> Order# <Filter className="w-4 h-4" /></button>
+                      <button onClick={() => { setShowFilter(!showFilter); setShowStatus(false); }} className='flex gap-2 uppercase items-center'> Order Details <IoFilterSharp className="w-4 h-4" /></button>
                       {showFilter && (
                         <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
                           <div className="flex justify-between items-center mb-2">
@@ -740,6 +822,7 @@ export default function RTO() {
                               const filtered = orders.filter((order) => order.orderNumber == orderId);
                               setOrders(filtered); // assuming you already have this state
                               setShowFilter(false);
+                              setShowStatus(false);
                             }}
                             className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
                           >
@@ -762,7 +845,7 @@ export default function RTO() {
                       "amount",
                       "status"
                     ) && (
-                        <th className="p-3 px-5 whitespace-nowrap">Payment</th>
+                        <th className="p-3 px-5 whitespace-nowrap">Payment Details</th>
                       )}
                     {hasAnyPermission(
                       "order_number",
@@ -777,12 +860,12 @@ export default function RTO() {
 
                     {hasAnyPermission("rtoDelivered", "delivered") && (
                       <>
-                        <th className="p-3 px-5 whitespace-nowrap">Status</th>
+                        <th className="p-3 px-5 whitespace-nowrap">Delivered Status</th>
                       </>
                     )}
                     {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
                       <>
-                        <th className="p-3 px-5 whitespace-nowrap">Date</th>
+                        <th className="p-3 px-5 whitespace-nowrap">Delivered Date</th>
                       </>
                     )}
 
@@ -841,6 +924,9 @@ export default function RTO() {
                                 )}
                             </div>
                           </div>
+                        </td>
+                        <td className="p-3 px-5 whitespace-nowrap">
+                          {order.status}
                         </td>
                         <td className="p-3 px-5 whitespace-nowrap">
                           <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>

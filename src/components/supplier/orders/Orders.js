@@ -132,28 +132,33 @@ export default function Orders() {
   const [toDate, setToDate] = useState(new Date());
 
   const formatDate = (date) => date.toISOString().split("T")[0];
+  // Refactored and Sorted by: Authentication -> API Calls -> Helpers
 
-  const fetchOrders = useCallback(async () => {
+  // AUTH Helpers
+  const getSupplierToken = () => {
     const supplierData = JSON.parse(localStorage.getItem("shippingData"));
-
     if (supplierData?.project?.active_panel !== "supplier") {
       localStorage.removeItem("shippingData");
       router.push("/supplier/auth/login");
-      return;
+      return null;
     }
-
-    const suppliertoken = supplierData?.security?.token;
-    if (!suppliertoken) {
+    const token = supplierData?.security?.token;
+    if (!token) {
       router.push("/supplier/auth/login");
-      return;
+      return null;
     }
+    return token;
+  };
+
+  // FETCH Orders
+  const fetchOrders = useCallback(async () => {
+    const suppliertoken = getSupplierToken();
+    if (!suppliertoken) return;
 
     try {
       setLoading(true);
       const response = await fetch(
-        `https://shipowl-kd06.onrender.com/api/supplier/order?from=${formatDate(
-          fromDate
-        )}&to=${formatDate(toDate)}`,
+        `https://shipowl-kd06.onrender.com/api/supplier/order?from=${formatDate(fromDate)}&to=${formatDate(toDate)}`,
         {
           method: "GET",
           headers: {
@@ -181,7 +186,7 @@ export default function Orders() {
       setPermission(result?.permissions[0] || []);
       setOrders(result?.orders || []);
 
-      if (result?.staffPermissionApplied == true) {
+      if (result?.staffPermissionApplied === true) {
         setAssignedPermissions(result?.assignedPermissions || []);
       }
     } catch (error) {
@@ -191,24 +196,13 @@ export default function Orders() {
     }
   }, [router, fromDate, toDate]);
 
+  // HANDLE Shipping
   const handleShipping = useCallback(async (id) => {
-    const supplierData = JSON.parse(localStorage.getItem('shippingData'));
-
-    if (supplierData?.project?.active_panel !== 'supplier') {
-      localStorage.removeItem('shippingData');
-      router.push('/supplier/auth/login');
-      return;
-    }
-
-    const suppliertoken = supplierData?.security?.token;
-    if (!suppliertoken) {
-      router.push('/supplier/auth/login');
-      return;
-    }
+    const suppliertoken = getSupplierToken();
+    if (!suppliertoken) return;
 
     try {
       setLoading(true);
-
       const response = await fetch(`https://shipowl-kd06.onrender.com/api/order/${id}/shipping`, {
         method: 'POST',
         headers: {
@@ -219,7 +213,6 @@ export default function Orders() {
 
       if (!response.ok) {
         const errorMessage = await response.json();
-
         if (errorMessage.isHighRto === true) {
           Swal.fire({
             icon: 'warning',
@@ -233,75 +226,41 @@ export default function Orders() {
               try {
                 const confirmResponse = await fetch(`https://shipowl-kd06.onrender.com/api/order/${id}/shipping/confirm`, {
                   method: 'POST',
-                  headers: {
-                    Authorization: `Bearer ${suppliertoken}`,
-                  },
+                  headers: { Authorization: `Bearer ${suppliertoken}` },
                 });
-
                 if (confirmResponse.ok) {
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Confirmed',
-                    text: 'Shipping confirmed successfully.',
-                  });
-
-                  // Optional: refresh order data
-                  const updated = await confirmResponse.json();
+                  Swal.fire({ icon: 'success', title: 'Confirmed', text: 'Shipping confirmed successfully.' });
                 } else {
                   const confirmError = await confirmResponse.json();
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: confirmError.message || 'Confirmation failed.',
-                  });
+                  Swal.fire({ icon: 'error', title: 'Error', text: confirmError.message || 'Confirmation failed.' });
                 }
               } catch (error) {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: error.message || 'Something went wrong during confirmation.',
-                });
+                Swal.fire({ icon: 'error', title: 'Error', text: error.message || 'Something went wrong.' });
               }
             }
           });
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Something went wrong!',
-            text: errorMessage.error || errorMessage.message || 'Please try again.',
-          });
+          Swal.fire({ icon: 'error', title: 'Something went wrong!', text: errorMessage.error || errorMessage.message || 'Please try again.' });
         }
-
         return;
       }
 
-      const result = await response.json();
+      await response.json();
       fetchOrders();
-      ``
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
       setLoading(false);
     }
   }, [router]);
+
+  // HANDLE Cancel
   const handleCancel = useCallback(async (id) => {
-    const supplierData = JSON.parse(localStorage.getItem('shippingData'));
-
-    if (supplierData?.project?.active_panel !== 'supplier') {
-      localStorage.removeItem('shippingData');
-      router.push('/supplier/auth/login');
-      return;
-    }
-
-    const suppliertoken = supplierData?.security?.token;
-    if (!suppliertoken) {
-      router.push('/supplier/auth/login');
-      return;
-    }
+    const suppliertoken = getSupplierToken();
+    if (!suppliertoken) return;
 
     try {
       setLoading(true);
-
       const response = await fetch(`https://shipowl-kd06.onrender.com/api/order/${id}/shipping/cancel`, {
         method: 'GET',
         headers: {
@@ -312,18 +271,11 @@ export default function Orders() {
 
       if (!response.ok) {
         const errorMessage = await response.json();
-
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Something went wrong!',
-          text: errorMessage.error || errorMessage.message || 'Please try again.',
-        });
-
+        Swal.fire({ icon: 'error', title: 'Something went wrong!', text: errorMessage.error || errorMessage.message || 'Please try again.' });
         return;
       }
 
-      const result = await response.json();
+      await response.json();
       fetchOrders();
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -332,24 +284,13 @@ export default function Orders() {
     }
   }, [router]);
 
+  // HANDLE Tracking
   const handleTracking = useCallback(async (id) => {
-    const supplierData = JSON.parse(localStorage.getItem('shippingData'));
-
-    if (supplierData?.project?.active_panel !== 'supplier') {
-      localStorage.removeItem('shippingData');
-      router.push('/supplier/auth/login');
-      return;
-    }
-
-    const suppliertoken = supplierData?.security?.token;
-    if (!suppliertoken) {
-      router.push('/supplier/auth/login');
-      return;
-    }
+    const suppliertoken = getSupplierToken();
+    if (!suppliertoken) return;
 
     try {
       setLoading(true);
-
       const response = await fetch(`https://shipowl-kd06.onrender.com/api/order/${id}/shipping/status`, {
         method: 'GET',
         headers: {
@@ -360,11 +301,7 @@ export default function Orders() {
 
       if (!response.ok) {
         const errorMessage = await response.json();
-        Swal.fire({
-          icon: 'error',
-          title: 'Something went wrong!',
-          text: errorMessage.error || errorMessage.message || 'Please try again.',
-        });
+        Swal.fire({ icon: 'error', title: 'Something went wrong!', text: errorMessage.error || errorMessage.message || 'Please try again.' });
         return;
       }
 
@@ -377,6 +314,7 @@ export default function Orders() {
       setLoading(false);
     }
   }, [router]);
+
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -417,9 +355,18 @@ export default function Orders() {
           $('#orderTable').DataTable().destroy();
           $('#orderTable').empty();
         }
+        const isMobile = window.innerWidth <= 768;
+        const pagingType = isMobile ? 'simple' : 'simple_numbers';
 
-        // Reinitialize DataTable with new data
-        table = $('#orderTable').DataTable();
+        table = $('#orderTable').DataTable({
+          pagingType,
+          language: {
+            paginate: {
+              previous: "<",
+              next: ">"
+            }
+          }
+        });
 
         return () => {
           if (table) {
@@ -639,7 +586,8 @@ export default function Orders() {
                 <thead>
                   <tr className="text-[#A3AED0] uppercase border-b border-[#E9EDF7]">
                     <th className="p-3 px-5 whitespace-nowrap">SR.</th>
-                    <th className="p-3 px-5 whitespace-nowrap">Order#</th>
+                    <th className="p-3 px-5 whitespace-nowrap">Order Details</th>
+                    <th className="p-3 px-5 whitespace-nowrap">Shipment Status</th>
 
                     {hasAnyPermission(
                       "shippingName",
@@ -653,7 +601,7 @@ export default function Orders() {
                       "amount",
                       "status"
                     ) && (
-                        <th className="p-3 px-5 whitespace-nowrap">Payment</th>
+                        <th className="p-3 px-5 whitespace-nowrap">Payment Details</th>
                       )}
                     {hasAnyPermission(
                       "order_number",
@@ -668,12 +616,12 @@ export default function Orders() {
 
                     {hasAnyPermission("rtoDelivered", "delivered") && (
                       <>
-                        <th className="p-3 px-5 whitespace-nowrap">Status</th>
+                        <th className="p-3 px-5 whitespace-nowrap">delivered Status</th>
                       </>
                     )}
                     {hasAnyPermission("rtoDeliveredDate", "deliveredDate") && (
                       <>
-                        <th className="p-3 px-5 whitespace-nowrap">Date</th>
+                        <th className="p-3 px-5 whitespace-nowrap">delivered Date</th>
                       </>
                     )}
 
@@ -710,6 +658,10 @@ export default function Orders() {
                       <td className="p-3 px-5 whitespace-nowrap">
                         <PermissionField permissionKey="orderNumber">{order.orderNumber}</PermissionField>
                         <span className="block">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</span>
+                      </td>
+                      <td className="p-3 px-5 whitespace-nowrap">
+                        {order.status}
+
                       </td>
 
                       {hasAnyPermission("shippingName", "shippingPhone", "shippingEmail") && (
@@ -923,47 +875,48 @@ export default function Orders() {
 
 
       </div>
-      
-        {(reporting?.shipowl || reporting?.selfship) && (
-          <div className="overflow-x-auto mt-6 p-4 bg-white rounded-md ">
-            <table className="rounded-md border-[#DFEAF2] w-full text-sm text-left text-gray-700">
-              <thead className="text-xs uppercase text-gray-700">
-                <tr className="border-b border-[#DFEAF2]">
-                  <th className="px-6 py-3">Shipping Method</th>
-                  <th className="px-6 py-3">Order Count</th>
-                  <th className="px-6 py-3">Total Product Cost</th>
-                  <th className="px-6 py-3">Delivered Orders</th>
-                  <th className="px-6 py-3">RTO Orders</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-gray-900">Shipowl</td>
-                  <td className="px-6 py-4">{reporting.shipowl?.orderCount}</td>
-                  <td className="px-6 py-4">₹{reporting.shipowl?.totalProductCost}</td>
-                  <td className="px-6 py-4">{reporting.shipowl?.deliveredOrder}</td>
-                  <td className="px-6 py-4">{reporting.shipowl?.rtoOrder}</td>
-                </tr>
 
-                <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-gray-900">Selfship - Prepaid</td>
-                  <td className="px-6 py-4">{reporting.selfship?.prepaid?.orderCount}</td>
-                  <td className="px-6 py-4">₹{reporting.selfship?.prepaid?.totalProductCost}</td>
-                  <td className="px-6 py-4">{reporting.selfship?.prepaid?.deliveredOrder}</td>
-                  <td className="px-6 py-4">{reporting.selfship?.prepaid?.rtoOrder}</td>
-                </tr>
+      {(reporting?.shipowl || reporting?.selfship) && (
+        <div className="overflow-x-auto mt-6 p-4 bg-white rounded-md ">
+          <h2 className="text-2xl font-bold  font-dm-sans text-[#2B3674]">Order Reporting</h2>
+          <table className="rounded-md border-[#DFEAF2] w-full text-sm text-left text-gray-700">
+            <thead className="text-xs uppercase text-gray-700">
+              <tr className="border-b border-[#DFEAF2]">
+                <th className="px-6 py-3">Shipping Method</th>
+                <th className="px-6 py-3">Order Count</th>
+                <th className="px-6 py-3">Total Product Cost</th>
+                <th className="px-6 py-3">Delivered Orders</th>
+                <th className="px-6 py-3">RTO Orders</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+                <td className="px-6 py-4 font-medium text-gray-900">Shipowl</td>
+                <td className="px-6 py-4">{reporting.shipowl?.orderCount}</td>
+                <td className="px-6 py-4">₹{reporting.shipowl?.totalProductCost}</td>
+                <td className="px-6 py-4">{reporting.shipowl?.deliveredOrder}</td>
+                <td className="px-6 py-4">{reporting.shipowl?.rtoOrder}</td>
+              </tr>
 
-                <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-gray-900">Selfship - Postpaid</td>
-                  <td className="px-6 py-4">{reporting.selfship?.postpaid?.orderCount}</td>
-                  <td className="px-6 py-4">₹{reporting.selfship?.postpaid?.totalProductCost}</td>
-                  <td className="px-6 py-4">{reporting.selfship?.postpaid?.deliveredOrder}</td>
-                  <td className="px-6 py-4">{reporting.selfship?.postpaid?.rtoOrder}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        )}
+              <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+                <td className="px-6 py-4 font-medium text-gray-900">Selfship - Prepaid</td>
+                <td className="px-6 py-4">{reporting.selfship?.prepaid?.orderCount}</td>
+                <td className="px-6 py-4">₹{reporting.selfship?.prepaid?.totalProductCost}</td>
+                <td className="px-6 py-4">{reporting.selfship?.prepaid?.deliveredOrder}</td>
+                <td className="px-6 py-4">{reporting.selfship?.prepaid?.rtoOrder}</td>
+              </tr>
+
+              <tr className="border-b border-[#DFEAF2] hover:bg-gray-50">
+                <td className="px-6 py-4 font-medium text-gray-900">Selfship - Postpaid</td>
+                <td className="px-6 py-4">{reporting.selfship?.postpaid?.orderCount}</td>
+                <td className="px-6 py-4">₹{reporting.selfship?.postpaid?.totalProductCost}</td>
+                <td className="px-6 py-4">{reporting.selfship?.postpaid?.deliveredOrder}</td>
+                <td className="px-6 py-4">{reporting.selfship?.postpaid?.rtoOrder}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {isModalOpen && tracking?.trackingData && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
