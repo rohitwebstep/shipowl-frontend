@@ -326,49 +326,43 @@ export default function RTO() {
     }
   }, []);
 
-  const initTable = async () => {
-    console.log('[initTable] Importing DataTables and jQuery...');
-    const [jQuery] = await Promise.all([
-      import('jquery'),
-      import('datatables.net'),
-      import('datatables.net-dt'),
-      import('datatables.net-buttons'),
-      import('datatables.net-buttons-dt'),
-    ]);
+  useEffect(() => {
+    if (typeof window !== 'undefined' && orders.length > 0 && !loading) {
+      let table = null;
 
-    window.jQuery = window.$ = jQuery.default;
-    const $ = window.$;
+      Promise.all([
+        import('jquery'),
+        import('datatables.net'),
+        import('datatables.net-dt'),
+        import('datatables.net-buttons'),
+        import('datatables.net-buttons-dt')
+      ]).then(([jQuery]) => {
+        window.jQuery = window.$ = jQuery.default;
 
-    const isMobile = window.innerWidth <= 768;
-    const pagingType = isMobile ? 'simple' : 'simple_numbers';
+        // Destroy existing DataTable if it exists
+        if ($.fn.DataTable.isDataTable('#rtoOrderTable')) {
+          $('#rtoOrderTable').DataTable().destroy();
+          $('#rtoOrderTable').empty();
+        }
 
-    // Wait a moment to ensure the table and rows are rendered
-    setTimeout(() => {
-      const $table = $('#rtoOrderTable');
+        // Reinitialize DataTable with new data
+        const isMobile = window.innerWidth <= 768;
+        const pagingType = isMobile ? 'simple' : 'simple_numbers';
 
-      // Check if table and rows exist
-      if (!$table.length || !$table.find('tbody tr').length) {
-        console.warn('[initTable] Table or rows not found. Aborting init.');
-        return;
-      }
-
-      if ($.fn.DataTable.isDataTable('#rtoOrderTable')) {
-        $table.DataTable().clear().destroy();
-      }
-
-      $table.DataTable({
-        pagingType,
-        language: {
-          paginate: {
-            previous: '<',
-            next: '>',
-          },
-        },
+        table = $('#rtoOrderTable').DataTable({
+          pagingType,
+          language: {
+            paginate: {
+              previous: "<",
+              next: ">"
+            }
+          }
+        });
+      }).catch((error) => {
+        console.error('Failed to load DataTables dependencies:', error);
       });
-
-      console.log('[initTable] DataTable initialized.');
-    }, 100); // Slight delay to ensure React renders table
-  };
+    }
+  }, [orders, loading]);
   const barcodeScannerOrder = useCallback(async () => {
     try {
       if (isBarCodePopupOpen && scannedCode) {
@@ -577,19 +571,9 @@ export default function RTO() {
     }
   };
 
- useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    await fetchRto(); // ✅ Call the real data fetching function
-    if (typeof window !== 'undefined' && orders.length) {
-      await initTable();
-    }
-    setLoading(false);
-  };
-
-  fetchData();
-}, []);
-
+  useEffect(() => {
+    fetchRto()
+  }, [fetchRto]);
 
   let finalAllowedKeys = [];
 
@@ -695,11 +679,35 @@ export default function RTO() {
           <div className="flex flex-wrap justify-between items-center mb-4 lg:px-3">
             <h2 className="text-2xl font-bold  font-dm-sans">RTO Order Details</h2>
             <div className="flex gap-3  flex-wrap items-center">
-              <span onClick={() => fetchRto()} className="font-bold   font-dm-sans">Clear Filters</span>
+              <span
+                className="font-bold font-dm-sans flex items-center gap-2 text-sm text-red-600 cursor-pointer hover:underline"
+                onClick={() => {
+                  if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                    const table = window.$('#rtoOrderTable').DataTable();
+
+                    // Clear global search
+                    table.search('');
+
+                    // Clear column searches
+                    table.columns().search('');
+
+                    // Redraw the table
+                    table.draw();
+                  }
+
+                  // Reset filter states
+                  setOrderId('');
+                  setSelectedStatuses([]);
+                  setSelectedPaymentStatuses([]);
+                  setSearch('');
+                }}
+
+              >
+                Clear Filters <IoMdRefresh className="text-xl" />
+              </span>
               {selected && (
                 <button className="bg-red-500 text-white p-2 px-4 rounded-md" onClick={disputeAll}>Dispute Selected</button>
               )}
-              <span><IoMdRefresh className="text-red-600 text-xl" /></span>
               <span><IoSettingsOutline className="text-xl" /></span>
               <span><FiDownloadCloud className="text-red-400 text-xl" /></span>
 
@@ -732,11 +740,14 @@ export default function RTO() {
           </div>
           {orders.length > 0 ? (
             <div className="overflow-auto overflow-x-visible relative main-outer-wrapper w-full">
+
+
               <table className="min-w-full display main-tables" id="rtoOrderTable">
                 <thead className=" text-gray-700">
                   <tr className="border-b border-[#DFEAF2] text-left uppercase">
                     <th className="p-3 px-5 whitespace-nowrap">SR.</th>
                     <th className="p-3 px-5 whitespace-nowrap">Item Count</th>
+
                     <th className="p-3 px-5 whitespace-nowrap relative uppercase">
                       <button onClick={() => {
                         setShowStatus(!showStatus);
@@ -750,6 +761,7 @@ export default function RTO() {
                         showStatus && (
                           <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
                             <h3 className="font-medium text-gray-700 mb-2">Filter by Status:</h3>
+
                             <input
                               type="text"
                               placeholder="Search"
@@ -780,22 +792,29 @@ export default function RTO() {
                                 onClick={() => {
                                   setSearch("");
                                   setSelectedStatuses([]);
+
+                                  // Clear DataTable column filter
+                                  if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                    window.$('#rtoOrderTable').DataTable().column(2).search('').draw();
+                                  }
                                 }}
                                 className="text-green-600 text-sm hover:underline"
                               >
                                 Reset All
                               </button>
-                              <button
 
+                              <button
                                 className={`px-4 py-1 rounded text-white text-sm ${selectedStatuses.length
                                   ? "bg-green-600 hover:bg-green-700"
                                   : "bg-gray-300 cursor-not-allowed"
                                   }`}
                                 onClick={() => {
-                                  const filtered = orders.filter((order) => order.status == selectedStatuses);
-                                  setOrders(filtered); // assuming you already have this state
+                                  if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                    const regex = selectedStatuses.join('|'); // OR regex for filtering
+                                    window.$('#rtoOrderTable').DataTable().column(2).search(regex, true, false).draw(); // exact match with regex
+                                  }
+
                                   setShowStatus(false);
-                                  initTable()
                                   setShowFilter(false);
                                 }}
                                 disabled={!selectedStatuses.length}
@@ -808,7 +827,6 @@ export default function RTO() {
                       }
 
                     </th>
-
                     <th className="p-3 px-5 whitespace-nowrap overflow-visible relative" >
                       <button onClick={() => {
                         setShowFilter(!showFilter);
@@ -819,19 +837,34 @@ export default function RTO() {
                       }} className='flex gap-2 uppercase items-center'> Order Details <IoFilterSharp className="w-4 h-4" /></button>
                       {showFilter && (
                         <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
+                          {/* Header */}
                           <div className="flex justify-between items-center mb-2">
                             <label className="text-sm font-medium text-gray-700">Order ID:</label>
                             <button
-                              onClick={() => setOrderId('')}
+                              onClick={() => {
+                                setOrderId('');
+                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                  window.$('#rtoOrderTable').DataTable().search('').draw();
+                                }
+                              }}
                               className="text-green-600 text-xs hover:underline"
                             >
                               Reset All
                             </button>
                           </div>
+
+                          {/* Input Search */}
                           <input
                             type="text"
                             value={orderId}
-                            onChange={(e) => setOrderId(e.target.value)}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setOrderId(value);
+
+                              if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                window.$('#rtoOrderTable').DataTable().search(value).draw();
+                              }
+                            }}
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring focus:ring-green-500"
                             placeholder="Enter order ID"
                           />
@@ -855,19 +888,19 @@ export default function RTO() {
                           {/* Apply Button */}
                           <button
                             onClick={() => {
-                              const filtered = orders.filter((order) => order.orderNumber == orderId);
-                              setOrders(filtered); // assuming you already have this state
+                              if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                window.$('#rtoOrderTable').DataTable().search(orderId).draw();
+                              }
                               setShowFilter(false);
-                              initTable();
                               setShowStatus(false);
                             }}
                             className="mt-4 w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
                           >
                             Apply
                           </button>
-
                         </div>
                       )}
+
                     </th>
 
                     {hasAnyPermission(
@@ -890,27 +923,31 @@ export default function RTO() {
                         {showCustomerFilter && (
                           <div className="absolute z-10 mt-2 w-64 bg-white border rounded-xl shadow-lg p-4">
                             <h3 className="font-medium text-gray-700 mb-2">Filter by Customer:</h3>
+
                             <input
                               type="text"
                               value={orderId}
-                              onChange={(e) => setOrderId(e.target.value)}
+                              onChange={(e) => {
+                                setOrderId(e.target.value);
+
+                                // Apply search directly to DataTable
+                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                  window.$('#rtoOrderTable').DataTable().search(e.target.value).draw();
+                                }
+                              }}
                               placeholder="Name, Phone, or Email..."
                               className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
                             />
                             <button
                               className="mt-2 block px-4 w-full bg-green-600 text-white py-1 rounded hover:bg-green-700"
                               onClick={() => {
-                                const keyword = orderId.toLowerCase();
-                                const filtered = orders.filter((order) =>
-                                  order?.shippingName?.toLowerCase().includes(keyword) ||
-                                  order?.shippingPhone?.toLowerCase().includes(keyword) ||
-                                  order?.shippingEmail?.toLowerCase().includes(keyword)
-                                );
-                                setOrders(filtered);
-                                initTable();
+                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                  window.$('#rtoOrderTable').DataTable().search(orderId).draw();
+                                }
                                 setShowCustomerFilter(false);
-                                setOrderId('')
+                                setOrderId('');
                               }}
+
                             >
                               Apply
                             </button>
@@ -947,7 +984,13 @@ export default function RTO() {
                               <input
                                 type="text"
                                 value={orderId}
-                                onChange={(e) => setOrderId(e.target.value)}
+                                onChange={(e) => {
+                                  setOrderId(e.target.value);
+                                  if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                    window.$('#rtoOrderTable').DataTable().search(e.target.value).draw();
+                                  }
+
+                                }}
                                 placeholder="Transaction ID..."
                                 className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
                               />
@@ -977,25 +1020,27 @@ export default function RTO() {
                                   : "bg-gray-300 cursor-not-allowed"
                                   }`}
                                 onClick={() => {
-                                  const keyword = orderId.toLowerCase();
-                                  const filtered = orders.filter((order) => {
-                                    const matchTransaction = order?.payment?.transactionId?.toLowerCase().includes(keyword);
-                                    const matchStatus = selectedPaymentStatuses.length
-                                      ? selectedPaymentStatuses.includes(order?.payment?.status)
-                                      : true;
-                                    return matchTransaction && matchStatus;
-                                  });
+                                  if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                    const table = window.$('#rtoOrderTable').DataTable();
 
-                                  setOrders(filtered);
+                                    // Combine transaction ID + status into one search query
+                                    let searchQuery = orderId.toLowerCase();
+                                    if (selectedPaymentStatuses.length) {
+                                      searchQuery += ' ' + selectedPaymentStatuses.join(' ');
+                                    }
+
+                                    table.search(searchQuery).draw();
+                                  }
+
                                   setOrderId('');
-                                  initTable();
                                   setSelectedPaymentStatuses([]);
-                                  setShowPaymentFilter(null);
+                                  setShowPaymentFilter(false);
                                 }}
                                 disabled={!orderId && selectedPaymentStatuses.length === 0}
                               >
                                 Apply
                               </button>
+
                             </div>
                           )}
                         </th>
@@ -1026,18 +1071,20 @@ export default function RTO() {
                               type="text"
                               placeholder="AWB number..."
                               value={orderId}
-                              onChange={(e) => setOrderId(e.target.value)}
+                              onChange={(e) => {
+                                setOrderId(e.target.value);
+                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                  window.$('#rtoOrderTable').DataTable().search(e.target.value).draw();
+                                }
+                              }}
                               className="w-full px-3 py-1 mb-2 border border-gray-300 rounded text-sm"
                             />
                             <button
                               className="mt-2 block px-4 w-full bg-green-600 text-white py-1 rounded hover:bg-green-700"
                               onClick={() => {
-                                const keyword = orderId.toLowerCase();
-                                const filtered = orders.filter((order) =>
-                                  order?.shippingApiResult?.data?.awb_number?.toLowerCase().includes(keyword)
-                                );
-                                setOrders(filtered);
-                                initTable();
+                                if (window.$.fn.DataTable.isDataTable('#rtoOrderTable')) {
+                                  window.$('#rtoOrderTable').DataTable().search(orderId).draw();
+                                }
                                 setOrderId('');
                                 setShowShipmentDetailsFilter(false);
                               }}
